@@ -1,16 +1,17 @@
 import Link from 'next/link';
 import { HelpCircle, ArrowLeft, ChevronRight } from 'lucide-react';
+import { JsonLd } from '../../components/json-ld';
+import { faqPageJsonLd } from '../../lib/seo';
 
 export const metadata = {
   title: 'Frequently Asked Questions | Evolution Stables',
   description: 'Everything you need to know about Digital Syndication, 5xM float billing, and prize money distribution.',
 };
 
-export default function FaqPage() {
-  const faqs = [
+const faqs = [
     {
       q: 'What is a Digitally Syndicated Lease (DSL)?',
-      a: 'A DSL is a regulated fractional leasehold of an elite racehorse. Instead of purchasing full thoroughbred bloodstock equity with unlimited capital liabilities, you subscribe to an authorized fractional stake (1% integer units) with fixed monthly keep and direct rights to 75% of net prize money.',
+      a: 'A DSL is a regulated fractional leasehold of an elite racehorse. Instead of purchasing full thoroughbred bloodstock equity with unlimited capital liabilities, you subscribe to an authorized fractional stake (lot size varies by campaign: Nellie in 0.5% steps; Prudentia and Hottathanafantasy in 0.25% steps — not all horses are 1%) with fixed monthly keep and direct rights to 75% of net prize money.',
     },
     {
       q: 'How does the 5×M Join Float Model work?',
@@ -28,10 +29,12 @@ export default function FaqPage() {
       q: 'Is Evolution Stables regulated in New Zealand?',
       a: 'Yes. Evolution Stables operates as an Authorised Syndicator under New Zealand Thoroughbred Racing (NZTR) in accordance with the Financial Markets Conduct (Equine Syndicating Schemes) Exemption Notice.',
     },
-  ];
+];
 
+export default function FaqPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
+      <JsonLd data={faqPageJsonLd(faqs)} />
       <Link
         href="/"
         className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#d4a964] hover:underline mb-8"

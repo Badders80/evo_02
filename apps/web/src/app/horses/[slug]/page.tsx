@@ -12,6 +12,8 @@ import { PricingCard } from '../../../components/pricing-card';
 import { CapTableCard } from '../../../components/cap-table-card';
 import { DataRoomCard } from '../../../components/data-room-card';
 import { DynamicHighlightPills } from '../../../components/thoroughbred-attributes';
+import { JsonLd } from '../../../components/json-ld';
+import { campaignShareMetadata, horseWebPageJsonLd } from '../../../lib/seo';
 import {
   ArrowLeft,
   ExternalLink,
@@ -36,15 +38,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: 'Thoroughbred Not Found | Evolution Stables' };
   }
 
+  const ogTitle = `${campaign.legalName} | Digitally-Syndicated Thoroughbred`;
   return {
     title: `${campaign.legalName} (${campaign.barnName}) | Commercials & Terms | Evolution Stables`,
     description: campaign.marketing.marketplaceHook,
-    openGraph: {
-      title: `${campaign.legalName} | Digitally-Syndicated Thoroughbred`,
-      description: campaign.marketing.marketplaceHook,
-      url: `https://evolutionstables.nz/horses/${campaign.slug}`,
-      type: 'article',
-    },
+    ...campaignShareMetadata(campaign, `/horses/${campaign.slug}`, ogTitle),
   };
 }
 
@@ -61,6 +59,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <JsonLd data={horseWebPageJsonLd(campaign)} />
       {/* Breadcrumb & Navigation Topbar */}
       <div className="border-b border-border bg-card/40">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">

@@ -6,6 +6,7 @@ import {
   getAllCampaigns,
   getCampaignMedia,
 } from '../../../../lib/horses-data';
+import { campaignShareMetadata } from '../../../../lib/seo';
 import {
   ArrowLeft,
   ExternalLink,
@@ -32,15 +33,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: 'Thoroughbred Story Not Found | Evolution Stables' };
   }
 
+  const ogTitle = `About ${campaign.legalName} | Thoroughbred Story & Outlook`;
   return {
     title: `About ${campaign.legalName} (${campaign.barnName}) | Story & Outlook | Evolution Stables`,
     description: campaign.marketing.marketplaceHook,
-    openGraph: {
-      title: `About ${campaign.legalName} | Thoroughbred Story & Outlook`,
-      description: campaign.marketing.marketplaceHook,
-      url: `https://evolutionstables.nz/horses/${campaign.slug}/about`,
-      type: 'article',
-    },
+    ...campaignShareMetadata(campaign, `/horses/${campaign.slug}/about`, ogTitle),
   };
 }
 
