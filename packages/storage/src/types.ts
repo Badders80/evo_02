@@ -32,7 +32,7 @@ export interface HorseMediaKeys {
 }
 
 export interface TrainerMediaKeys {
-  portrait: string;
+  portrait?: string;
   bioVideo?: string;
 }
 

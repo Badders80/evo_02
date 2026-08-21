@@ -1,37 +1,73 @@
 /**
- * Cloudflare R2 Public CDN Resolver ($0.00 / GB Egress)
- * Canonical Authority: evo_00/migration_bridge/03_ASSET_TRANSFERS.md
+ * Local still resolver for thoroughbred and trainer media.
+ *
+ * Folder convention (dumps of several images):
+ *   public/horses/{slug}/01.{ext}  = cover
+ *   public/horses/{slug}/02.{ext}+ = gallery, sequential
+ * Extension matches file bytes (png / jpg / webp). Do not invent CDN URLs
+ * for stills, video, or audio that are not on disk.
  */
 
 export const DEFAULT_CDN_HOST = 'https://cdn.evolutionstables.nz';
 
-/**
- * Locked launch campaign asset manifests per 03_ASSET_TRANSFERS.md
- */
-export const LOCKED_CAMPAIGN_ASSETS: Record<
-  string,
-  {
-    videoKey: string;
-    audioKey: string;
-  }
-> = {
-  'lady-ketchikan': {
-    videoKey: 'horses/lady-ketchikan/updates/cambridge_gallop.mp4',
-    audioKey: 'horses/lady-ketchikan/audio/kylie_update_aug.mp3',
-  },
-  nellie: {
-    videoKey: 'horses/lady-ketchikan/updates/cambridge_gallop.mp4',
-    audioKey: 'horses/lady-ketchikan/audio/kylie_update_aug.mp3',
-  },
-  'tml-x-yearn': {
-    videoKey: 'horses/tml-x-yearn/updates/intro_reel.mp4',
-    audioKey: 'horses/tml-x-yearn/audio/stephen_update_aug.mp3',
-  },
+/** 01 = cover. Remaining entries are gallery, in order. */
+export const HORSE_STILLS: Record<string, readonly string[]> = {
+  nellie: [
+    '/horses/nellie/01.png',
+    '/horses/nellie/02.webp',
+    '/horses/nellie/03.webp',
+    '/horses/nellie/04.webp',
+    '/horses/nellie/05.webp',
+    '/horses/nellie/06.webp',
+  ],
+  'lady-ketchikan': [
+    '/horses/nellie/01.png',
+    '/horses/nellie/02.webp',
+    '/horses/nellie/03.webp',
+    '/horses/nellie/04.webp',
+    '/horses/nellie/05.webp',
+    '/horses/nellie/06.webp',
+  ],
+  'tml-x-yearn': [
+    '/horses/tml-x-yearn/01.png',
+    '/horses/tml-x-yearn/02.webp',
+    '/horses/tml-x-yearn/03.jpg',
+  ],
+  prudentia: [
+    '/horses/prudentia/01.jpg',
+    '/horses/prudentia/02.png',
+    '/horses/prudentia/03.jpg',
+    '/horses/prudentia/04.jpg',
+  ],
+  'first-gear': [
+    '/horses/first-gear/01.png',
+    '/horses/first-gear/02.jpg',
+    '/horses/first-gear/03.jpg',
+    '/horses/first-gear/04.jpg',
+  ],
+  'i-stole-a-manolo': [
+    '/horses/i-stole-a-manolo/01.png',
+    '/horses/i-stole-a-manolo/02.jpg',
+    '/horses/i-stole-a-manolo/03.png',
+    '/horses/i-stole-a-manolo/04.png',
+  ],
+  hottathanafantasy: [
+    '/horses/hottathanafantasy/01.jpg',
+    '/horses/hottathanafantasy/02.jpg',
+  ],
 };
 
 /**
- * Resolves an object key to its public Cloudflare CDN URL.
+ * Portraits that exist on disk. Missing trainers (e.g. Barbara Kennedy) return
+ * no portrait — never substitute another yard's photo.
  */
+export const TRAINER_PORTRAITS: Record<string, string> = {
+  'stephen-gray': '/trainers/stephen-gray.png',
+  'lance-osullivan': '/trainers/wexford.jpg',
+  wexford: '/trainers/wexford.jpg',
+  'wexford-stables': '/trainers/wexford.jpg',
+};
+
 export function getCdnUrl(key: string, cdnHost = DEFAULT_CDN_HOST): string {
   const cleanKey = key.startsWith('/') ? key.slice(1) : key;
   const cleanHost = cdnHost.endsWith('/') ? cdnHost.slice(0, -1) : cdnHost;
@@ -43,110 +79,43 @@ export interface HorseCdnOverrides {
   audioFilename?: string;
 }
 
-export const KNOWN_HORSE_HEROES: Record<string, string> = {
-  nellie: '/horses/nellie/01_hero.png',
-  'lady-ketchikan': '/horses/nellie/01_hero.png',
-  'tml-x-yearn': '/horses/tml-x-yearn/01_hero.png',
-  prudentia: '/horses/prudentia/01_hero.jpg',
-  'first-gear': '/horses/first-gear/01_hero.png',
-  'i-stole-a-manolo': '/horses/i-stole-a-manolo/01_hero.png',
-  hottathanafantasy: '/horses/hottathanafantasy/01_hero.jpg',
-};
+function stillsFor(slug: string): readonly string[] {
+  return HORSE_STILLS[slug] ?? [];
+}
 
-export const KNOWN_HORSE_GALLERIES: Record<string, string[]> = {
-  nellie: [
-    '/horses/nellie/02_conformation_side.jpg',
-    '/horses/nellie/03_conformation_front.png',
-    '/horses/nellie/04_yearling_1.jpg',
-    '/horses/nellie/05_yearling_2.jpg',
-  ],
-  'tml-x-yearn': [
-    '/horses/tml-x-yearn/02_card_bg.png',
-    '/horses/tml-x-yearn/03_vimeo_thumb.jpg',
-  ],
-  prudentia: [
-    '/horses/prudentia/02_action.png',
-    '/horses/prudentia/03_tauranga_finish.png',
-    '/horses/prudentia/04_gallery_02.jpeg',
-    '/horses/prudentia/05_gallery_03.jpg',
-  ],
-  'first-gear': [
-    '/horses/first-gear/02_gallery_02.jpg',
-    '/horses/first-gear/03_gallery_03.jpg',
-    '/horses/first-gear/04_gallery_04.jpg',
-  ],
-  'i-stole-a-manolo': [
-    '/horses/i-stole-a-manolo/02_gallery_02.jpg',
-    '/horses/i-stole-a-manolo/03_gallery_03.png',
-    '/horses/i-stole-a-manolo/04_gallery_04.png',
-  ],
-  hottathanafantasy: [
-    '/horses/hottathanafantasy/02_gallery_02.jpg',
-  ],
-};
-
-export const KNOWN_TRAINER_PORTRAITS: Record<string, string> = {
-  'stephen-gray': '/trainers/stephen-gray.jpg',
-  'wexford-stables': '/trainers/wexford.jpg',
-  wexford: '/trainers/wexford.jpg',
-  'barbara-kennedy': '/trainers/stephen-gray.jpg',
-};
-
-/**
- * Generates CDN or local public URLs for thoroughbred campaign media.
- */
 export function getHorseCdnUrls(
   slug: string,
   overrides?: HorseCdnOverrides,
-  cdnHost = DEFAULT_CDN_HOST
+  _cdnHost = DEFAULT_CDN_HOST
 ) {
-  const canonical = LOCKED_CAMPAIGN_ASSETS[slug];
+  const stills = stillsFor(slug);
+  const cover = stills[0];
+  const gallery = stills.slice(1);
 
-  const videoKey =
-    overrides?.videoFilename
-      ? `horses/${slug}/updates/${overrides.videoFilename}`
-      : canonical?.videoKey ?? `horses/${slug}/updates/trackwork.mp4`;
-
-  const audioKey =
-    overrides?.audioFilename
-      ? `horses/${slug}/audio/${overrides.audioFilename}`
-      : canonical?.audioKey ?? `horses/${slug}/audio/trainer_update.mp3`;
-
-  const heroConformation =
-    KNOWN_HORSE_HEROES[slug] ?? getCdnUrl(`horses/${slug}/hero/conformation.webp`, cdnHost);
-
-  const paradeGallery =
-    KNOWN_HORSE_GALLERIES[slug] ?? [
-      getCdnUrl(`horses/${slug}/gallery/parade_01.webp`, cdnHost),
-      getCdnUrl(`horses/${slug}/gallery/parade_02.webp`, cdnHost),
-    ];
+  const trackworkVideo = overrides?.videoFilename
+    ? `/horses/${slug}/updates/${overrides.videoFilename}`
+    : undefined;
+  const trainerAudio = overrides?.audioFilename
+    ? `/horses/${slug}/audio/${overrides.audioFilename}`
+    : undefined;
 
   return {
-    heroConformation,
-    pedigreeBloodline: getCdnUrl(`horses/${slug}/hero/pedigree.webp`, cdnHost),
-    paradeGallery,
-    trackworkVideo: getCdnUrl(videoKey, cdnHost),
-    trainerAudio: getCdnUrl(audioKey, cdnHost),
+    heroConformation: cover ?? '',
+    paradeGallery: [...gallery],
+    ...(trackworkVideo ? { trackworkVideo } : {}),
+    ...(trainerAudio ? { trainerAudio } : {}),
   };
 }
 
-/**
- * Generates URLs for trainer portraits and media.
- */
-export function getTrainerCdnUrls(trainerSlug: string, cdnHost = DEFAULT_CDN_HOST) {
+export function getTrainerCdnUrls(trainerSlug: string, _cdnHost = DEFAULT_CDN_HOST) {
+  const portrait = TRAINER_PORTRAITS[trainerSlug];
   return {
-    portrait:
-      KNOWN_TRAINER_PORTRAITS[trainerSlug] ??
-      getCdnUrl(`trainers/${trainerSlug}/portrait.webp`, cdnHost),
+    ...(portrait ? { portrait } : {}),
   };
 }
 
-/**
- * Generates CDN URLs for brand identity, logos, and silks.
- */
-export function getBrandCdnUrls(cdnHost = DEFAULT_CDN_HOST) {
+export function getBrandCdnUrls(_cdnHost = DEFAULT_CDN_HOST) {
   return {
     crestGold: '/brand/logos/lockups/lockup-horizontal-gold.svg',
-    primarySilks: getCdnUrl('brand/silks/evolution_primary.webp', cdnHost),
   };
 }

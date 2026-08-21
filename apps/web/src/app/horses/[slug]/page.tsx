@@ -143,7 +143,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
               style={{ backgroundImage: `url(${media.horse.heroConformation})` }}
             />
             <div className="absolute bottom-4 left-4 rounded-md border border-border/80 bg-background/80 backdrop-blur-md px-3 py-1.5 text-xs font-mono text-foreground">
-              Official Conformation Stills
+              Cover · 01
             </div>
           </div>
 
@@ -186,6 +186,19 @@ export default async function HorseDetailPage({ params }: PageProps) {
             </div>
           </div>
         </div>
+
+        {media.horse.paradeGallery.length > 0 && (
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+            {media.horse.paradeGallery.map((src, i) => (
+              <div
+                key={src}
+                className="aspect-[4/3] overflow-hidden rounded-lg border border-border bg-card bg-cover bg-center"
+                style={{ backgroundImage: `url(${src})` }}
+                aria-label={`Still ${String(i + 2).padStart(2, '0')}`}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Dynamic Highlight Pills */}
         <div className="mt-8">
