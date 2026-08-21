@@ -1,6 +1,18 @@
 @import "tailwindcss";
 @import "@evo/brand_dna/theme.css";
 
+html.dark body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+html.dark body ::selection {
+  background-color: rgb(212 169 100 / 0.3);
+  color: #d4a964;
+}
+
 @theme {
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;

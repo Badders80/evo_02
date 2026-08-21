@@ -49,12 +49,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className="min-h-screen bg-background text-foreground antialiased selection:bg-[#d4a964]/30 selection:text-[#d4a964] flex flex-col justify-between">
-        <JsonLd data={organizationWebSiteJsonLd()} />
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className="min-h-screen bg-background text-foreground antialiased" suppressHydrationWarning>
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        <JsonLd data={organizationWebSiteJsonLd()} />
       </body>
     </html>
   );
