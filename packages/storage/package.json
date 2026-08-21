@@ -1,0 +1,44 @@
+{
+  "name": "@evo/storage",
+  "version": "1.0.0",
+  "description": "Evolution Stables Cloudflare R2 zero-egress client, presigned URL vault, and CDN media resolvers",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./cdn": {
+      "types": "./src/cdn.ts",
+      "default": "./src/cdn.ts"
+    },
+    "./vault": {
+      "types": "./src/vault.ts",
+      "default": "./src/vault.ts"
+    },
+    "./hash": {
+      "types": "./src/hash.ts",
+      "default": "./src/hash.ts"
+    },
+    "./client": {
+      "types": "./src/client.ts",
+      "default": "./src/client.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "test": "tsx tests/hash.test.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.750.0",
+    "@aws-sdk/s3-request-presigner": "^3.750.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "tsx": "^4.23.12",
+    "typescript": "^5.8.2"
+  }
+}

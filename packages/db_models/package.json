@@ -1,0 +1,42 @@
+{
+  "name": "@evo/db_models",
+  "version": "1.0.0",
+  "description": "Evolution Stables Supabase client, PostgreSQL schemas, DDL migrations, and type-safe database models",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./types": {
+      "types": "./src/types/database.types.ts",
+      "default": "./src/types/database.types.ts"
+    },
+    "./client": {
+      "types": "./src/client.ts",
+      "default": "./src/client.ts"
+    },
+    "./schema": "./src/schema/00001_initial_schema.sql",
+    "./schema/00002": "./src/schema/00002_cap_table_and_reservations.sql",
+    "./knowledge": {
+      "types": "./src/registry.ts",
+      "default": "./src/registry.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "test": "tsx tests/schema.test.ts && tsx tests/registry.test.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "tsx": "^4.23.12",
+    "typescript": "^5.8.2",
+    "@evo/brand_dna": "workspace:*"
+  }
+}
