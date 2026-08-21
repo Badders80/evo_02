@@ -287,6 +287,71 @@ GRANT EXECUTE ON FUNCTION public.reserve_campaign_shares(UUID, UUID, NUMERIC, IN
 REVOKE EXECUTE ON FUNCTION public.release_expired_reservations() FROM public, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.release_expired_reservations() TO service_role;
 
+-- 7b. ATOMIC POSTGRESQL RPC: consume_campaign_reservation (Service Role / Webhook)
+-- Marks active reservations consumed and decrements reserved_shares (does not return units to available).
+CREATE OR REPLACE FUNCTION public.consume_campaign_reservation(
+    p_inventory_id UUID,
+    p_user_id UUID
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+    v_res RECORD;
+    v_consumed INTEGER := 0;
+    v_units NUMERIC(5,2) := 0;
+BEGIN
+    FOR v_res IN
+        SELECT id, units
+        FROM public.checkout_reservations
+        WHERE inventory_id = p_inventory_id
+          AND user_id = p_user_id
+          AND status = 'active'
+        FOR UPDATE
+    LOOP
+        PERFORM 1 FROM public.inventory WHERE id = p_inventory_id FOR UPDATE;
+
+        UPDATE public.inventory
+        SET reserved_shares = GREATEST(0, reserved_shares - v_res.units)
+        WHERE id = p_inventory_id;
+
+        UPDATE public.checkout_reservations
+        SET status = 'consumed'
+        WHERE id = v_res.id;
+
+        INSERT INTO public.events (
+            event_type,
+            operator_id,
+            payload
+        )
+        VALUES (
+            'checkout.reservation_consumed',
+            auth.uid(),
+            jsonb_build_object(
+                'reservation_id', v_res.id,
+                'inventory_id', p_inventory_id,
+                'user_id', p_user_id,
+                'units', v_res.units
+            )
+        );
+
+        v_consumed := v_consumed + 1;
+        v_units := v_units + v_res.units;
+    END LOOP;
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'consumed_count', v_consumed,
+        'units', v_units
+    );
+END;
+$$;
+
+REVOKE EXECUTE ON FUNCTION public.consume_campaign_reservation(UUID, UUID) FROM public, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.consume_campaign_reservation(UUID, UUID) TO service_role;
+
 -- 9. ROW LEVEL SECURITY (RLS) FOR checkout_reservations
 ALTER TABLE public.checkout_reservations ENABLE ROW LEVEL SECURITY;
 

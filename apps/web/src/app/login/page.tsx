@@ -1,11 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { getSupabaseBrowserClient } from '@/lib/supabase-client';
+import { safeNextPath } from '@/lib/safe-next-path';
 import { Mail, Lock, Sparkles, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[80vh]" />}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
+  const searchParams = useSearchParams();
+  const nextPath = safeNextPath(searchParams.get('next'));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mode, setMode] = useState<'magic-link' | 'password'>('magic-link');
@@ -26,7 +38,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
         },
       });
 
@@ -58,7 +70,7 @@ export default function LoginPage() {
       if (error) {
         setErrorMsg(error.message);
       } else {
-        window.location.href = '/mystable';
+        window.location.href = nextPath;
       }
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'An unexpected error occurred.');

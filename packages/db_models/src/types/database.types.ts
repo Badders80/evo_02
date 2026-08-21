@@ -380,6 +380,13 @@ export interface Database {
         Args: Record<string, never>;
         Returns: number;
       };
+      consume_campaign_reservation: {
+        Args: {
+          p_inventory_id: string;
+          p_user_id: string;
+        };
+        Returns: Json;
+      };
     };
     Enums: {
       campaign_status: CampaignStatus;

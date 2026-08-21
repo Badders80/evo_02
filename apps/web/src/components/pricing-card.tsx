@@ -53,6 +53,16 @@ export function PricingCard({
       });
 
       const data = await res.json();
+      if (res.status === 401) {
+        const next = campaignSlug ? `/horses/${campaignSlug}` : '/mystable';
+        window.location.href = `/login?next=${encodeURIComponent(next)}`;
+        return;
+      }
+      if (res.status === 403) {
+        setCheckoutError(data.error || 'KYC verification required before checkout.');
+        setLoading(false);
+        return;
+      }
       if (!res.ok) {
         throw new Error(data.error || 'Failed to initiate checkout reservation');
       }

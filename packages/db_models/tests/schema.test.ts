@@ -13,7 +13,15 @@ console.log('Running @evo/db_models Schema & SQL Migration tests...\n');
 {
   const schemaDir = path.join(__dirname, '../src/schema');
   const files = fs.readdirSync(schemaDir).sort();
-  assert.ok(files.length >= 3, 'At least 3 SQL migration files should exist');
+  assert.ok(files.length >= 4, 'At least 4 SQL migration files should exist');
+  const handleNewUser = fs.readFileSync(path.join(schemaDir, '00004_handle_new_user.sql'), 'utf8');
+  assert.ok(handleNewUser.includes('handle_new_user'), '00004 must define handle_new_user');
+  assert.ok(handleNewUser.includes("kyc_status"), '00004 must set kyc_status');
+  assert.ok(handleNewUser.includes("'unverified'"), '00004 must insert unverified profiles');
+  assert.ok(handleNewUser.includes('ON auth.users'), '00004 must trigger on auth.users');
+  const reservations = fs.readFileSync(path.join(schemaDir, '00002_cap_table_and_reservations.sql'), 'utf8');
+  assert.ok(reservations.includes('reserve_campaign_shares'), '00002 must define reserve_campaign_shares');
+  assert.ok(reservations.includes('consume_campaign_reservation'), '00002 must define consume_campaign_reservation');
   const initialSchema = fs.readFileSync(path.join(schemaDir, '00001_initial_schema.sql'), 'utf8');
   assert.ok(initialSchema.includes('CREATE TABLE IF NOT EXISTS public.inventory'), 'Initial schema must define inventory table');
   assert.ok(initialSchema.includes('CREATE TABLE IF NOT EXISTS public.profiles'), 'Initial schema must define profiles table');
