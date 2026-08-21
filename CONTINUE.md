@@ -1,49 +1,51 @@
 # CONTINUE — evo_02
 
 **Date:** 2026-08-21  
-**Baseline:** GitHub `Badders80/evo_02` `main` (identity lock + stills + Barbara portrait)  
-**SSOT lock:** `evo_00/doc/ASSET_LOCK.md`
+**Branch:** `sprint-1-nellie-loop` (not merged, not pushed)  
+**HEAD:** `89989f0`  
+**Live site:** still `main`. This branch is the full website; when Nellie test-buy works, merge the whole branch.
+
+**SSOT:** `evo_00/doc/ASSET_LOCK.md`  
+**Legal pack = PDS/SA** (per horse). Site terms/privacy/FAQ are summaries only.
 
 ---
 
-## Layers
+## Next action
 
-| Layer | Status | Blocker? |
-|---|---|---|
-| **Backend** (engines + roster lock) | Proceed | No |
-| **Middle** (Supabase, Stripe, vault) | Stubs | Yes for real money |
-| **Front** (website) | Nellie copy + stills live | No for display |
-| **MC** | Messy xAI skin, not SSOT | **Park — not a blocker** |
+Prove one Nellie test purchase on this branch:
 
----
+1. Database with **new** tables (`00001`–`00004` in `packages/db_models/src/schema/`). Do **not** apply those to live Evolution-3.0 (old website schema; 0 holdings; no `profiles`). Use a preview/branch DB.
+2. Site already has gitignored `apps/web/.env.local`: Stripe **test** keys + `PURCHASES_ENABLED=true` + Supabase URL/anon/service from vault. Do not commit it.
+3. Create a test user; set `profiles.kyc_status='verified'` by hand (no Stripe Identity this sprint).
+4. Run web on a **free** port (3000 is LibreChat, not this app). Last run: `pnpm exec next dev -H 0.0.0.0 -p 3010` from `apps/web`.
+5. `stripe listen --forward-to localhost:<port>/api/webhooks/stripe --events checkout.session.completed` then rewrite `STRIPE_WEBHOOK_SECRET` / `STRIPE_CHECKOUT_WEBHOOK_SECRET` in `.env.local` from the printed `whsec_`.
+6. Login → `/horses/nellie` → pay `4242…` → `/mystable` shows the row.
 
-## Antigravity blast radius
-
-**Identity / data: cleaned.** Live code no longer has Te Akau, Sharrock, Marsh, Alex Bax, or Barbara-as-Stephen-Gray. Pedigrees locked. Checkout closed except Nellie (`listed`). First Gear visible completed.
-
-**Not cleaned (park, don’t reopen in Sprint 1):**
-- Mission Control UI restyle + duplicate `INITIAL_HORSES` (operator desk only)
-- `/home/evo/workspace/website_cloner` on **:3005** (sandbox, not this repo)
-- Checkout still has `usr_guest_demo` + `sha256_placeholder` — that’s unfinished middle, not a fake horse
-
-**Do not execute** the old “full-loop all horses + Mulan $65” plan. It fights the lock.
+Docs: `docs/plans/SPRINT1_RESULT.md`
 
 ---
 
-## Next sprint goal
+## Done on this branch
 
-**Nellie end-to-end, one real buyer.** Then bring the others in.
-
-Must include: Supabase auth (no guest) → KYC verified → `reserve_campaign_shares` RPC → Stripe test pay → webhook `holdings` + real hashes → `/mystable` shows that row.
-
-Everyone else stays **visible, not buyable**.
+- Nellie loop in code: no guest, KYC stub, `reserve_campaign_shares`, Stripe Checkout, HMAC webhook, real hashes, MyStable from DB. Kimi audit `36a4790`. Tests: `pnpm typecheck && pnpm test` green at audit.
+- Public SEO: sitemap (FAQ/privacy/terms/learn + horse about), OG `public/og/default.png`, JSON-LD. `4f9e5b9`.
+- Hydration warning on `<body>`: `89989f0`.
+- Hub rule: this chat plans/dispatches; Kimi at end of code slices; no production drip.
 
 ---
 
-## Nellie assets (ready)
+## Locked (don’t reopen)
 
-- Soft copy: `apps/web/src/lib/horses-data.ts` → PDP, `/about`, PDS §2
-- Stills: `public/horses/nellie/01.png` cover, `02.webp`–`06.webp` gallery
-- Trainer: `public/trainers/barbara-kennedy.png`
+- One site. Branch replaces `main` later — do not splice pages into a separate landing.
+- Nellie only for buy. Others visible, not buyable. No all-horses loop. No MC restyle. No `:3005` cloner.
+- Prudentia + Hotta: who-owns-what is locked in seed/MC (5% each, fully sold). Payouts = **v2**. First Gear = KYC names only, no stakes.
+- Tokinvest horses = one-time/`upfront`. New DSLs = `subscription_float`.
 
-Convention going forward: image dumps are `01`, `02`, `03`… **01 = cover**.
+---
+
+## Do not
+
+- Merge/push until the test card path works.
+- Apply `00001`–`00004` to Evolution-3.0.
+- Restart the killed `:3010` / `stripe listen` unless the human asks.
+- Treat website Terms as the legal pack.
