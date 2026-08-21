@@ -62,6 +62,7 @@ export const HORSE_STILLS: Record<string, readonly string[]> = {
  * no portrait — never substitute another yard's photo.
  */
 export const TRAINER_PORTRAITS: Record<string, string> = {
+  'barbara-kennedy': '/trainers/barbara-kennedy.png',
   'stephen-gray': '/trainers/stephen-gray.png',
   'lance-osullivan': '/trainers/wexford.jpg',
   wexford: '/trainers/wexford.jpg',

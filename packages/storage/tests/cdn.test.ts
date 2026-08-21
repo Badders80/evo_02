@@ -28,7 +28,8 @@ console.log('Running @evo/storage stills convention tests...');
   const gray = getTrainerCdnUrls('stephen-gray');
   assert.equal(gray.portrait, '/trainers/stephen-gray.png');
   const barbara = getTrainerCdnUrls('barbara-kennedy');
-  assert.equal(barbara.portrait, undefined, 'Barbara must not inherit Stephen Gray photo');
+  assert.equal(barbara.portrait, '/trainers/barbara-kennedy.png');
+  assert.notEqual(barbara.portrait, '/trainers/stephen-gray.png');
   const wexford = getTrainerCdnUrls('lance-osullivan');
   assert.equal(wexford.portrait, '/trainers/wexford.jpg');
 }

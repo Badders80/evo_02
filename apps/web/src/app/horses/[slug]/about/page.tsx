@@ -159,15 +159,26 @@ export default async function HorseAboutPage({ params }: PageProps) {
             <Building2 className="h-4 w-4" />
             <span>The Trainer & Stable</span>
           </div>
-          <div className="mt-2 flex flex-col md:flex-row md:items-baseline justify-between">
-            <h2 className="text-2xl font-medium text-foreground">{campaign.trainer.name}</h2>
-            <span className="text-xs font-mono text-muted-foreground">
-              {campaign.trainer.stable} · {campaign.trainer.location}
-            </span>
+          <div className="mt-4 flex flex-col gap-6 sm:flex-row sm:items-start">
+            {media.trainer.portrait && (
+              <div
+                className="h-40 w-28 shrink-0 overflow-hidden rounded-lg border border-border bg-cover bg-center"
+                style={{ backgroundImage: `url(${media.trainer.portrait})` }}
+                aria-label={campaign.trainer.name}
+              />
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-1">
+                <h2 className="text-2xl font-medium text-foreground">{campaign.trainer.name}</h2>
+                <span className="text-xs font-mono text-muted-foreground">
+                  {campaign.trainer.stable} · {campaign.trainer.location}
+                </span>
+              </div>
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground max-w-4xl">
+                {soft.trainerBio}
+              </p>
+            </div>
           </div>
-          <p className="mt-4 text-sm leading-relaxed text-muted-foreground max-w-4xl">
-            {soft.trainerBio}
-          </p>
         </section>
 
         {/* ========================================================================= */}
