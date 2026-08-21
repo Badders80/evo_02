@@ -70,8 +70,16 @@ export function r2ConfigFromEnv(env: NodeJS.Dict<string> = process.env): {
   return { accountId, accessKeyId, secretAccessKey, bucketName };
 }
 
+export const NELLIE_SLUG = 'nellie';
+
 export function isSha256Hex(value: string): boolean {
-  return /^[a-f0-9]{64}$/i.test(value);
+  return /^[a-f0-9]{64}$/.test(value);
+}
+
+export function assertNellieOnly(slug: string): void {
+  if (slug !== NELLIE_SLUG) {
+    throw new HttpError(409, 'NOT_NELLIE', 'Only Nellie is open for checkout');
+  }
 }
 
 export function resolveLegalHashes(slug: string): { pdsHash: string; saHash: string } {
@@ -102,6 +110,7 @@ export function resolveCampaignInventory(slug: string) {
 }
 
 export function assertCheckoutCampaign(slug: string) {
+  assertNellieOnly(slug);
   const resolved = resolveCampaignInventory(slug);
   if (!isCheckoutOpen(resolved.campaign)) {
     throw new HttpError(409, 'CHECKOUT_CLOSED', 'This campaign is visible but not open for subscription');
@@ -136,14 +145,65 @@ export function buildHoldingInsert(input: {
   };
 }
 
-export function resolvePaidAmountNzd(
-  amountTotalCents: unknown,
-  joinFloatUnitNzd: number
-): number {
-  if (typeof amountTotalCents === 'number' && Number.isFinite(amountTotalCents)) {
+export type ConsumeRpcResult = {
+  success?: boolean;
+  consumed_count?: number;
+  units?: number;
+  already_consumed?: boolean;
+  reservation_id?: string;
+  error?: string;
+  message?: string;
+  status?: string;
+};
+
+export function interpretConsumeResult(
+  data: unknown,
+  error: { message: string } | null,
+  holdingsDuplicate: boolean
+): { consumedCount: number; units: number; alreadyConsumed: boolean } {
+  if (error) {
+    throw new HttpError(500, 'RESERVATION_CONSUME_FAILED', error.message);
+  }
+  const result = data as ConsumeRpcResult | null;
+  if (!result) {
+    throw new HttpError(500, 'RESERVATION_CONSUME_FAILED', 'consume_campaign_reservation returned empty');
+  }
+  if (result.already_consumed === true || result.success === true) {
+    const consumedCount = Number(result.consumed_count ?? 0);
+    if (consumedCount === 0 && !result.already_consumed && !holdingsDuplicate) {
+      throw new HttpError(500, 'RESERVATION_MISSING', 'No active reservation to consume');
+    }
+    return {
+      consumedCount,
+      units: Number(result.units ?? 0),
+      alreadyConsumed: Boolean(result.already_consumed),
+    };
+  }
+  if (holdingsDuplicate && result.error === 'RESERVATION_NOT_FOUND') {
+    return { consumedCount: 0, units: 0, alreadyConsumed: true };
+  }
+  throw new HttpError(
+    500,
+    result.error || 'RESERVATION_CONSUME_FAILED',
+    result.message || result.error || 'consume_campaign_reservation returned success: false'
+  );
+}
+
+export function requirePaidCheckoutSession(session: Record<string, unknown>): void {
+  if (session.payment_status !== 'paid') {
+    throw new HttpError(
+      400,
+      'PAYMENT_NOT_PAID',
+      `checkout.session.completed payment_status is ${String(session.payment_status)}`
+    );
+  }
+}
+
+export function resolvePaidAmountNzd(amountTotalCents: unknown): number {
+  if (typeof amountTotalCents === 'number' && Number.isFinite(amountTotalCents) && amountTotalCents >= 0) {
     return amountTotalCents / 100;
   }
-  return joinFloatUnitNzd;
+  throw new HttpError(400, 'INVALID_AMOUNT_TOTAL', 'checkout.session.completed missing or invalid amount_total');
 }
 
 export function pricingForUnits(wholesaleMonthlyNzd: number, units: number) {

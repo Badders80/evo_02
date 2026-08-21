@@ -57,3 +57,13 @@ Without 2–4, checkout 401/403/503s by design. Sandbox no longer pretends a hol
 | PII in seeds | Unchanged 00003 (not expanded). |
 | Cap table | Consume decrements reserved; expire still returns unused. |
 | Scope | `apps/mission_control` untouched. Mulan still `coming_soon`. |
+
+## Audit
+
+End-of-chunk auditor vs `main...HEAD`. Gates: `pnpm typecheck && pnpm test` green. Refiner: Ollama Cloud `kimi-k2.7-code` + independent review (fail closed). SQL not applied to Evolution-3.0.
+
+**HIGH (fixed):** consume by `p_reservation_id` only (no all-reservations loop); reserved underflow fails closed (no `GREATEST` clamp); webhook HMAC required (503 if secret missing); checkout/webhook hard-locked to Nellie.
+
+**MED (fixed):** `payment_status === 'paid'`; missing `amount_total` fails; webhook unhandled errors 500; `handle_new_user` `search_path = public, pg_temp`; `kyc_audit_digest` CHECK `^[a-f0-9]{64}$` or null.
+
+**LOW (not pinged):** Stripe session create failure leaves reservation until 15m TTL; no `stripe_checkout_session_id` stamp on reserve; one active holding per user-horse; `/api/legal/download` unauthenticated.

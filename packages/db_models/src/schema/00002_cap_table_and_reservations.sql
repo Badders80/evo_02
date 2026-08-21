@@ -26,6 +26,16 @@ ALTER TABLE public.profiles
     ADD COLUMN IF NOT EXISTS kyc_audit_digest TEXT,
     ADD COLUMN IF NOT EXISTS nztr_license_number TEXT;
 
+DO $$ BEGIN
+    ALTER TABLE public.profiles
+    DROP CONSTRAINT IF EXISTS chk_kyc_audit_digest_sha256;
+    ALTER TABLE public.profiles
+    ADD CONSTRAINT chk_kyc_audit_digest_sha256
+    CHECK (kyc_audit_digest IS NULL OR kyc_audit_digest ~ '^[a-f0-9]{64}$');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
 CREATE INDEX IF NOT EXISTS idx_profiles_stripe_session 
     ON public.profiles(stripe_verification_session_id) 
     WHERE stripe_verification_session_id IS NOT NULL;
@@ -288,10 +298,14 @@ REVOKE EXECUTE ON FUNCTION public.release_expired_reservations() FROM public, an
 GRANT EXECUTE ON FUNCTION public.release_expired_reservations() TO service_role;
 
 -- 7b. ATOMIC POSTGRESQL RPC: consume_campaign_reservation (Service Role / Webhook)
--- Marks active reservations consumed and decrements reserved_shares (does not return units to available).
+-- Consumes exactly one reservation by ID. Decrements reserved_shares only (does not
+-- return units to available). Fails closed on underflow. Idempotent if already consumed.
+DROP FUNCTION IF EXISTS public.consume_campaign_reservation(UUID, UUID);
+
 CREATE OR REPLACE FUNCTION public.consume_campaign_reservation(
     p_inventory_id UUID,
-    p_user_id UUID
+    p_user_id UUID,
+    p_reservation_id UUID
 )
 RETURNS JSONB
 LANGUAGE plpgsql
@@ -300,57 +314,116 @@ SET search_path = public, pg_temp
 AS $$
 DECLARE
     v_res RECORD;
-    v_consumed INTEGER := 0;
-    v_units NUMERIC(5,2) := 0;
+    v_updated INTEGER;
 BEGIN
-    FOR v_res IN
-        SELECT id, units
-        FROM public.checkout_reservations
-        WHERE inventory_id = p_inventory_id
-          AND user_id = p_user_id
-          AND status = 'active'
-        FOR UPDATE
-    LOOP
-        PERFORM 1 FROM public.inventory WHERE id = p_inventory_id FOR UPDATE;
-
-        UPDATE public.inventory
-        SET reserved_shares = GREATEST(0, reserved_shares - v_res.units)
-        WHERE id = p_inventory_id;
-
-        UPDATE public.checkout_reservations
-        SET status = 'consumed'
-        WHERE id = v_res.id;
-
-        INSERT INTO public.events (
-            event_type,
-            operator_id,
-            payload
-        )
-        VALUES (
-            'checkout.reservation_consumed',
-            auth.uid(),
-            jsonb_build_object(
-                'reservation_id', v_res.id,
-                'inventory_id', p_inventory_id,
-                'user_id', p_user_id,
-                'units', v_res.units
-            )
+    IF p_reservation_id IS NULL OR p_inventory_id IS NULL OR p_user_id IS NULL THEN
+        RETURN jsonb_build_object(
+            'success', false,
+            'error', 'INVALID_ARGS',
+            'message', 'inventory_id, user_id, and reservation_id are required',
+            'consumed_count', 0
         );
+    END IF;
 
-        v_consumed := v_consumed + 1;
-        v_units := v_units + v_res.units;
-    END LOOP;
+    -- Lock inventory first (same order as reserve_campaign_shares) to avoid deadlocks.
+    PERFORM 1 FROM public.inventory WHERE id = p_inventory_id FOR UPDATE;
+    IF NOT FOUND THEN
+        RETURN jsonb_build_object(
+            'success', false,
+            'error', 'CAMPAIGN_NOT_FOUND',
+            'consumed_count', 0
+        );
+    END IF;
+
+    SELECT id, units, status, inventory_id, user_id
+    INTO v_res
+    FROM public.checkout_reservations
+    WHERE id = p_reservation_id
+    FOR UPDATE;
+
+    IF NOT FOUND THEN
+        RETURN jsonb_build_object(
+            'success', false,
+            'error', 'RESERVATION_NOT_FOUND',
+            'consumed_count', 0,
+            'units', 0
+        );
+    END IF;
+
+    IF v_res.inventory_id <> p_inventory_id OR v_res.user_id <> p_user_id THEN
+        RETURN jsonb_build_object(
+            'success', false,
+            'error', 'RESERVATION_MISMATCH',
+            'consumed_count', 0
+        );
+    END IF;
+
+    IF v_res.status = 'consumed' THEN
+        RETURN jsonb_build_object(
+            'success', true,
+            'consumed_count', 0,
+            'units', 0,
+            'already_consumed', true,
+            'reservation_id', v_res.id
+        );
+    END IF;
+
+    IF v_res.status <> 'active' THEN
+        RETURN jsonb_build_object(
+            'success', false,
+            'error', 'RESERVATION_NOT_ACTIVE',
+            'status', v_res.status,
+            'consumed_count', 0
+        );
+    END IF;
+
+    UPDATE public.inventory
+    SET reserved_shares = reserved_shares - v_res.units
+    WHERE id = p_inventory_id
+      AND reserved_shares >= v_res.units;
+
+    GET DIAGNOSTICS v_updated = ROW_COUNT;
+    IF v_updated <> 1 THEN
+        RETURN jsonb_build_object(
+            'success', false,
+            'error', 'RESERVED_UNDERFLOW',
+            'message', 'consume would double-count or underflow reserved_shares',
+            'consumed_count', 0
+        );
+    END IF;
+
+    UPDATE public.checkout_reservations
+    SET status = 'consumed'
+    WHERE id = v_res.id;
+
+    INSERT INTO public.events (
+        event_type,
+        operator_id,
+        payload
+    )
+    VALUES (
+        'checkout.reservation_consumed',
+        auth.uid(),
+        jsonb_build_object(
+            'reservation_id', v_res.id,
+            'inventory_id', p_inventory_id,
+            'user_id', p_user_id,
+            'units', v_res.units
+        )
+    );
 
     RETURN jsonb_build_object(
         'success', true,
-        'consumed_count', v_consumed,
-        'units', v_units
+        'consumed_count', 1,
+        'units', v_res.units,
+        'already_consumed', false,
+        'reservation_id', v_res.id
     );
 END;
 $$;
 
-REVOKE EXECUTE ON FUNCTION public.consume_campaign_reservation(UUID, UUID) FROM public, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.consume_campaign_reservation(UUID, UUID) TO service_role;
+REVOKE EXECUTE ON FUNCTION public.consume_campaign_reservation(UUID, UUID, UUID) FROM public, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.consume_campaign_reservation(UUID, UUID, UUID) TO service_role;
 
 -- 9. ROW LEVEL SECURITY (RLS) FOR checkout_reservations
 ALTER TABLE public.checkout_reservations ENABLE ROW LEVEL SECURITY;

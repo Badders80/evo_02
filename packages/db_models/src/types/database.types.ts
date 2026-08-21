@@ -384,6 +384,7 @@ export interface Database {
         Args: {
           p_inventory_id: string;
           p_user_id: string;
+          p_reservation_id: string;
         };
         Returns: Json;
       };

@@ -6,14 +6,18 @@ import { NELLIE_INVENTORY_ID, getInventoryId } from '../lib/inventory-ids';
 import {
   HttpError,
   assertCheckoutCampaign,
+  assertNellieOnly,
   buildHoldingInsert,
+  interpretConsumeResult,
   interpretReserveResult,
   isSha256Hex,
   purchasesAreEnabled,
   r2ConfigFromEnv,
+  requirePaidCheckoutSession,
   requireUserId,
   requireVerifiedKyc,
   resolveLegalHashes,
+  resolvePaidAmountNzd,
 } from '../lib/nellie-loop';
 import { safeNextPath } from '../lib/safe-next-path';
 import { signStripePayload, verifyStripeSignature } from '../lib/stripe-signature';
@@ -123,8 +127,10 @@ console.log('Running @evo/web Nellie loop tests...\n');
 {
   const open = getAllCampaigns().filter(isCheckoutOpen).map((c) => c.slug);
   assert.deepEqual(open, ['nellie']);
+  assert.throws(() => assertNellieOnly('tml-x-yearn'), (err: unknown) => err instanceof HttpError && err.status === 409);
   assert.throws(() => assertCheckoutCampaign('tml-x-yearn'), (err: unknown) => err instanceof HttpError && err.status === 409);
   assert.equal(getInventoryId('nellie'), NELLIE_INVENTORY_ID);
+  assertCheckoutCampaign('nellie');
   console.log('✅ only Nellie is buyable');
 }
 
@@ -159,8 +165,34 @@ console.log('Running @evo/web Nellie loop tests...\n');
   assert.ok(checkout.includes("rpc('reserve_campaign_shares'"));
   const webhook = fs.readFileSync(path.join(srcRoot, 'app/api/webhooks/stripe/route.ts'), 'utf8');
   assert.ok(webhook.includes("rpc('consume_campaign_reservation'"));
+  assert.ok(webhook.includes('p_reservation_id'), 'consume must pass reservation_id');
+  assert.ok(webhook.includes('WEBHOOK_SECRET_MISSING'), 'HMAC required fail-closed');
   assert.ok(!webhook.includes('catch {\n          // Fallback gracefully'));
   console.log('✅ source audit: no guest, no placeholder, RPC wired, consume fail-loud');
+}
+
+{
+  assert.throws(
+    () => interpretConsumeResult({ success: false, error: 'RESERVED_UNDERFLOW' }, null, false),
+    (err: unknown) => err instanceof HttpError && err.status === 500
+  );
+  assert.throws(
+    () => interpretConsumeResult({ success: true, consumed_count: 0 }, null, false),
+    (err: unknown) => err instanceof HttpError && (err as HttpError).code === 'RESERVATION_MISSING'
+  );
+  const ok = interpretConsumeResult({ success: true, consumed_count: 1, units: 1 }, null, false);
+  assert.equal(ok.consumedCount, 1);
+  const replay = interpretConsumeResult({ success: true, consumed_count: 0, already_consumed: true }, null, true);
+  assert.equal(replay.alreadyConsumed, true);
+  requirePaidCheckoutSession({ payment_status: 'paid' });
+  assert.throws(
+    () => requirePaidCheckoutSession({ payment_status: 'unpaid' }),
+    (err: unknown) => err instanceof HttpError && err.status === 400
+  );
+  assert.equal(resolvePaidAmountNzd(38000), 380);
+  assert.throws(() => resolvePaidAmountNzd(undefined), (err: unknown) => err instanceof HttpError);
+  assert.equal(isSha256Hex('A'.repeat(64)), false, 'kyc/legal hashes must be lowercase hex');
+  console.log('✅ consume/payment fail closed');
 }
 
 console.log('\n🎉 All @evo/web Nellie loop tests passed successfully!');

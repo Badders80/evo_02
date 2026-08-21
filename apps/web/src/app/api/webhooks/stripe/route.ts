@@ -6,10 +6,13 @@ import { getCompiledLegalPackForCampaign } from '@/lib/horses-data';
 import { verifyStripeSignature } from '@/lib/stripe-signature';
 import {
   HttpError,
+  assertNellieOnly,
   buildHoldingInsert,
+  interpretConsumeResult,
   isUniqueViolation,
   pricingForUnits,
   r2ConfigFromEnv,
+  requirePaidCheckoutSession,
   resolveCampaignInventory,
   resolveLegalHashes,
   resolvePaidAmountNzd,
@@ -26,12 +29,19 @@ async function persistCompletedCheckout(event: StripeEvent): Promise<void> {
   const metadata = (session.metadata as Record<string, string>) || {};
   const horseSlug = metadata.horse_slug;
   const userId = metadata.user_id;
+  const reservationId = metadata.reservation_id;
   const units = Number.parseInt(metadata.units || '', 10);
 
-  if (!horseSlug || !userId || !Number.isInteger(units) || units < 1) {
-    throw new HttpError(400, 'INVALID_METADATA', 'checkout.session.completed is missing horse_slug, user_id, or units');
+  if (!horseSlug || !userId || !reservationId || !Number.isInteger(units) || units < 1) {
+    throw new HttpError(
+      400,
+      'INVALID_METADATA',
+      'checkout.session.completed is missing horse_slug, user_id, reservation_id, or units'
+    );
   }
 
+  requirePaidCheckoutSession(session);
+  assertNellieOnly(horseSlug);
   const { campaign, inventoryId } = resolveCampaignInventory(horseSlug);
   const hashes = resolveLegalHashes(horseSlug);
   if (metadata.pds_hash && metadata.pds_hash !== hashes.pdsHash) {
@@ -42,7 +52,7 @@ async function persistCompletedCheckout(event: StripeEvent): Promise<void> {
   }
 
   const pricing = pricingForUnits(campaign.wholesaleMonthlyNzd, units);
-  const amountPaid = resolvePaidAmountNzd(session.amount_total, pricing.joinFloatUnitNzd);
+  const amountPaid = resolvePaidAmountNzd(session.amount_total);
   const subscriptionId = typeof session.subscription === 'string' ? session.subscription : null;
   const holding = buildHoldingInsert({
     userId,
@@ -64,16 +74,11 @@ async function persistCompletedCheckout(event: StripeEvent): Promise<void> {
   const { data: consumeData, error: consumeError } = await admin.rpc('consume_campaign_reservation', {
     p_inventory_id: inventoryId,
     p_user_id: userId,
+    p_reservation_id: reservationId,
   });
-  if (consumeError) {
-    throw new HttpError(500, 'RESERVATION_CONSUME_FAILED', consumeError.message);
-  }
-  const consumed = consumeData as { success?: boolean; consumed_count?: number } | null;
-  if (!consumed || consumed.success !== true) {
-    throw new HttpError(500, 'RESERVATION_CONSUME_FAILED', 'consume_campaign_reservation returned success: false');
-  }
-  if ((consumed.consumed_count ?? 0) === 0 && !isUniqueViolation(holdingError)) {
-    throw new HttpError(500, 'RESERVATION_MISSING', 'No active reservation to consume');
+  const consumed = interpretConsumeResult(consumeData, consumeError, isUniqueViolation(holdingError));
+  if (!consumed.alreadyConsumed && consumed.units > 0 && consumed.units !== units) {
+    throw new HttpError(500, 'RESERVATION_UNITS_MISMATCH', 'Consumed reservation units do not match Stripe metadata');
   }
 
   const r2 = r2ConfigFromEnv();
@@ -102,10 +107,14 @@ export async function POST(request: Request) {
     const sig = request.headers.get('stripe-signature');
     const webhookSecret = process.env.STRIPE_CHECKOUT_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET;
 
-    if (webhookSecret) {
-      if (!sig || !verifyStripeSignature(rawBody, sig, webhookSecret)) {
-        return NextResponse.json({ error: 'Invalid Stripe signature' }, { status: 400 });
-      }
+    if (!webhookSecret) {
+      return NextResponse.json(
+        { error: 'Stripe webhook secret is not configured', code: 'WEBHOOK_SECRET_MISSING' },
+        { status: 503 }
+      );
+    }
+    if (!sig || !verifyStripeSignature(rawBody, sig, webhookSecret)) {
+      return NextResponse.json({ error: 'Invalid Stripe signature' }, { status: 400 });
     }
 
     const event = JSON.parse(rawBody) as StripeEvent;
@@ -164,6 +173,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: err.message, code: err.code }, { status: err.status });
     }
     const msg = err instanceof Error ? err.message : 'Webhook error';
-    return NextResponse.json({ error: msg }, { status: 400 });
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
