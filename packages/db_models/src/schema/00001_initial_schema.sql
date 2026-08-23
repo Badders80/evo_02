@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS public.race_results (
     race_date DATE NOT NULL,
     track TEXT NOT NULL,
     race_name TEXT NOT NULL,
-    placing INTEGER NOT NULL CHECK (placing >= 1),
+    "placing" INTEGER NOT NULL CHECK ("placing" >= 1),
     gross_stakes_nzd NUMERIC(12,2) NOT NULL CHECK (gross_stakes_nzd >= 0),
     investor_pool_nzd NUMERIC(12,2) NOT NULL CHECK (investor_pool_nzd >= 0),
     quarter TEXT NOT NULL,
@@ -266,6 +266,31 @@ DROP POLICY IF EXISTS "Service role has full access to profiles" ON public.profi
 CREATE POLICY "Service role has full access to profiles"
     ON public.profiles FOR ALL
     USING (auth.jwt()->>'role' = 'service_role');
+
+-- ------------------------------------------------------------------------------
+-- BASE TABLE GRANTS
+-- RLS policies gate WHICH rows a role can see; base GRANTs gate WHETHER the
+-- role can touch the table at all. Without these, authenticated users get
+-- "permission denied for table <name>" even though a matching policy exists.
+--
+-- service_role grants: the Supabase service_role key satisfies RLS via its JWT,
+-- but base table privileges are a SEPARATE layer. The Stripe webhook path
+-- (events lookup/insert/mark, holdings insert, inventory consume, reservations)
+-- runs as service_role and 500s with "permission denied for table events"
+-- if these grants are missing. Proven live during the Nellie E2E walk.
+-- ------------------------------------------------------------------------------
+
+-- authenticated: read own data
+GRANT SELECT ON public.profiles TO authenticated;
+GRANT SELECT ON public.holdings TO authenticated;
+
+-- service_role: full DML on webhook + purchase-path tables
+GRANT SELECT, INSERT, UPDATE ON public.profiles TO service_role;
+GRANT SELECT, INSERT, UPDATE ON public.holdings TO service_role;
+GRANT SELECT, INSERT, UPDATE ON public.events TO service_role;
+GRANT SELECT, INSERT, UPDATE ON public.checkout_reservations TO service_role;
+GRANT SELECT, UPDATE ON public.inventory TO service_role;
+GRANT SELECT ON public.race_results TO service_role;
 
 -- ------------------------------------------------------------------------------
 -- INVENTORY POLICIES

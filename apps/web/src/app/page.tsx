@@ -1,12 +1,15 @@
 import Link from 'next/link';
 import { getAllCampaigns, getCampaignPricing, getCampaignMedia, isCheckoutOpen } from '../lib/horses-data';
 import { Sparkles, ArrowRight, CheckCircle2, Trophy, Coins, Compass } from 'lucide-react';
+import { LandingCtaPopup } from '../components/landing-cta-popup';
 
 export default function HomePage() {
   const campaigns = getAllCampaigns();
 
   return (
     <div className="flex flex-col gap-24 pb-20">
+      <LandingCtaPopup />
+
       {/* 1. Hero Showcase */}
       <section className="relative overflow-hidden pt-20 pb-16 sm:pt-28 sm:pb-24 border-b border-border bg-radial from-card/80 to-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center relative z-10">
