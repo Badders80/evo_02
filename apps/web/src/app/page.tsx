@@ -3,8 +3,8 @@ import { getAllCampaigns, getCampaignPricing, getCampaignMedia, isCheckoutOpen }
 import { Sparkles, ArrowRight, CheckCircle2, Trophy, Coins, Compass } from 'lucide-react';
 import { LandingCtaPopup } from '../components/landing-cta-popup';
 
-export default function HomePage() {
-  const campaigns = getAllCampaigns();
+export default async function HomePage() {
+  const campaigns = await getAllCampaigns();
 
   return (
     <div className="flex flex-col gap-24 pb-20">

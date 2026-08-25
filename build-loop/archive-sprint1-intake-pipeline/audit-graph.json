@@ -1,0 +1,176 @@
+{
+  "audit_meta": {
+    "project": "/home/evo/new/evo_02",
+    "stage": 5,
+    "command": "cd /home/evo/new/evo_02 && just check 2>&1 | tail -40",
+    "date": "2026-08-25",
+    "verdict": "FAIL"
+  },
+  "findings": [
+    {
+      "id": "finding-1",
+      "claim": "horses-data.ts: no CAMPAIGNS_DATA, all functions async, uses Supabase service client",
+      "result": "PASS",
+      "detail": "File imports getSupabaseServiceClient and defines getAllCampaigns/getCampaignBySlug as async; no CAMPAIGNS_DATA literal under apps/web/src."
+    },
+    {
+      "id": "finding-2",
+      "claim": "All 6 horses render via generateStaticParams",
+      "result": "PASS",
+      "detail": "Both [slug]/page.tsx and [slug]/about/page.tsx expose async generateStaticParams that call getAllCampaigns. Next.js build output contains all 6 slugs."
+    },
+    {
+      "id": "finding-3",
+      "claim": "Schema has 3 new JSONB columns on inventory",
+      "result": "PASS",
+      "detail": "Migration 00005_extended_pedigree.sql adds pedigree_data, soft_legal, marketing; database.types.ts mirrors them on Row/Insert/Update interfaces."
+    },
+    {
+      "id": "finding-4",
+      "claim": "listing_platform='evolution' for all horses",
+      "result": "WARN",
+      "detail": "Runtime state is forced to 'evolution' by 00005_extended_pedigree.sql, but the source seed file 00003_seed_inventory_only.sql still literal-inserts 'tokinvest' for 3 rows."
+    },
+    {
+      "id": "finding-5",
+      "claim": "Campaign pipeline compiles and exists at expected paths",
+      "result": "PASS",
+      "detail": "campaign-pipeline.ts exports createCampaignFromIntake; POST /api/campaign/create route exists and imports it; mission_control typecheck passes."
+    },
+    {
+      "id": "finding-6",
+      "claim": "No tokinvest refs remain in active code",
+      "result": "WARN",
+      "detail": "No runtime assignment/consumption of 'tokinvest', but the literal string persists in type definitions (legal_engine, db_models, web, mission_control) and brand_dna banned-term list."
+    },
+    {
+      "id": "finding-7",
+      "claim": "No build debt leftover (CAMPAIGNS_DATA refs, validateCampaign calls in data layer)",
+      "result": "PASS",
+      "detail": "Zero CAMPAIGNS_DATA matches in apps/web/src; zero validateCampaign matches in apps/web/src/lib."
+    },
+    {
+      "id": "finding-8",
+      "claim": "just check passes",
+      "result": "FAIL",
+      "detail": "@evo/web#test crashes with top-level await transform errors in nellie_loop.test.ts. Lint and typecheck are green."
+    }
+  ],
+  "evidence_edges": [
+    {
+      "finding": "finding-1",
+      "source": "apps/web/src/lib/horses-data.ts:16",
+      "reason": "Imports getSupabaseServiceClient from ./supabase-service"
+    },
+    {
+      "finding": "finding-1",
+      "source": "apps/web/src/lib/horses-data.ts:227-234",
+      "reason": "getAllCampaigns is exported async and queries Supabase inventory table"
+    },
+    {
+      "finding": "finding-1",
+      "source": "apps/web/src/lib/horses-data.ts:236-244",
+      "reason": "getCampaignBySlug is exported async and queries Supabase inventory table"
+    },
+    {
+      "finding": "finding-1",
+      "source": "search_files apps/web/src for CAMPAIGNS_DATA",
+      "reason": "Zero matches confirm no hardcoded CAMPAIGNS_DATA remains in web source"
+    },
+    {
+      "finding": "finding-2",
+      "source": "apps/web/src/app/horses/[slug]/page.tsx:29-32",
+      "reason": "Async generateStaticParams calls getAllCampaigns and maps slugs"
+    },
+    {
+      "finding": "finding-2",
+      "source": "apps/web/src/app/horses/[slug]/about/page.tsx:24-27",
+      "reason": "Async generateStaticParams calls getAllCampaigns and maps slugs"
+    },
+    {
+      "finding": "finding-2",
+      "source": "apps/web/.next/server/app/horses/",
+      "reason": "Directory contains rendered .html/.rsc/.meta for all 6 slugs: nellie, tml-x-yearn, prudentia, hottathanafantasy, i-stole-a-manolo, first-gear"
+    },
+    {
+      "finding": "finding-3",
+      "source": "supabase/migrations/00005_extended_pedigree.sql:9-12",
+      "reason": "ALTER TABLE adds pedigree_data, soft_legal, marketing JSONB columns"
+    },
+    {
+      "finding": "finding-3",
+      "source": "packages/db_models/src/types/database.types.ts:132-134,167-169,202-204",
+      "reason": "InventoryHorse Row/Insert/Update interfaces include the three JSONB columns"
+    },
+    {
+      "finding": "finding-4",
+      "source": "supabase/migrations/00005_extended_pedigree.sql:15-17",
+      "reason": "UPDATE forces every row to listing_platform='evolution'"
+    },
+    {
+      "finding": "finding-4",
+      "source": "supabase/migrations/00003_seed_inventory_only.sql:121,150,208",
+      "reason": "Legacy seed literal still inserts 'tokinvest' for three rows"
+    },
+    {
+      "finding": "finding-5",
+      "source": "apps/mission_control/src/lib/campaign-pipeline.ts:233",
+      "reason": "Exports async createCampaignFromIntake function"
+    },
+    {
+      "finding": "finding-5",
+      "source": "apps/mission_control/src/app/api/campaign/create/route.ts:2",
+      "reason": "POST endpoint imports createCampaignFromIntake"
+    },
+    {
+      "finding": "finding-5",
+      "source": "just check typecheck output",
+      "reason": "@evo/mission_control:typecheck passed (cache miss, executing f7925a2717036f9c)"
+    },
+    {
+      "finding": "finding-6",
+      "source": "packages/brand_dna/src/voice.ts:103",
+      "reason": "'tokinvest' appears in banned-term list, not as a listing platform"
+    },
+    {
+      "finding": "finding-6",
+      "source": "packages/legal_engine/src/types.ts:61",
+      "reason": "listingPlatform type union includes 'tokinvest' as a permitted string literal"
+    },
+    {
+      "finding": "finding-6",
+      "source": "packages/db_models/src/types/database.types.ts:125,160,195",
+      "reason": "listing_platform type union includes 'tokinvest' as a permitted string literal"
+    },
+    {
+      "finding": "finding-6",
+      "source": "apps/web/src/lib/horses-data.ts:59",
+      "reason": "listingPlatform type union includes 'tokinvest' as a permitted string literal"
+    },
+    {
+      "finding": "finding-6",
+      "source": "apps/mission_control/src/lib/campaign-pipeline.ts:59",
+      "reason": "listingPlatform type union includes 'tokinvest' as a permitted string literal"
+    },
+    {
+      "finding": "finding-7",
+      "source": "search_files apps/web/src for CAMPAIGNS_DATA",
+      "reason": "Zero matches"
+    },
+    {
+      "finding": "finding-7",
+      "source": "search_files apps/web/src/lib for validateCampaign",
+      "reason": "Zero matches"
+    },
+    {
+      "finding": "finding-8",
+      "source": "just check output / pnpm run test output",
+      "reason": "@evo/web#test exited (1) with esbuild transform error"
+    },
+    {
+      "finding": "finding-8",
+      "source": "apps/web/src/tests/nellie_loop.test.ts:66,71,87,88,129",
+      "reason": "Top-level await expressions fail when tsx transpiles to CommonJS output"
+    }
+  ]
+}

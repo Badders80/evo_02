@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { getSupabaseBrowserClient } from '@/lib/supabase-client';
 import {
-  getCampaignBySlug,
+  type HorseCampaign,
   getCampaignMedia,
   getCampaignPricing,
   getCompiledLegalPackForCampaign,
@@ -34,6 +34,8 @@ export type MyStableHolding = {
   signed_sa_hash: string;
 };
 
+export type MyStableDashboardCampaigns = Record<string, HorseCampaign>;
+
 function slugForInventoryId(horseId: string): string | undefined {
   return Object.entries(INVENTORY_UUID_BY_SLUG).find(([, id]) => id === horseId)?.[0];
 }
@@ -56,25 +58,26 @@ export function MyStableDashboard({
   kycStatus,
   holdings,
   lookupError,
+  campaigns,
 }: {
   userEmail: string;
   kycStatus: KycStatus | string;
   holdings: MyStableHolding[];
   lookupError?: string | null;
+  campaigns?: MyStableDashboardCampaigns;
 }) {
   const [activeTab, setActiveTab] = useState<'holdings' | 'feed' | 'vault' | 'billing'>('holdings');
   const kyc = kycLabel(kycStatus);
 
-  const resolved = holdings
+  const rows = holdings
     .map((holding) => {
-      const slug = slugForInventoryId(holding.horse_id);
-      const campaign = slug ? getCampaignBySlug(slug) : null;
+      const campaign = campaigns?.[holding.horse_id];
       return campaign ? { holding, campaign } : null;
     })
     .filter((row): row is NonNullable<typeof row> => row !== null);
 
-  const totalFloat = resolved.reduce((sum, row) => sum + Number(row.holding.float_balance_nzd), 0);
-  const totalKeep = resolved.reduce((sum, row) => sum + Number(row.holding.monthly_keep_rate_nzd), 0);
+  const totalFloat = rows.reduce((sum, row) => sum + Number(row.holding.float_balance_nzd), 0);
+  const totalKeep = rows.reduce((sum, row) => sum + Number(row.holding.monthly_keep_rate_nzd), 0);
 
   const handleSignOut = async () => {
     const supabase = getSupabaseBrowserClient();
@@ -132,8 +135,8 @@ export function MyStableDashboard({
             <Layers className="h-4 w-4 text-[#d4a964]" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold font-mono text-foreground">{resolved.length}</span>
-            <span className="text-xs text-muted-foreground">Thoroughbred{resolved.length === 1 ? '' : 's'}</span>
+            <span className="text-2xl font-semibold font-mono text-foreground">{rows.length}</span>
+            <span className="text-xs text-muted-foreground">Thoroughbred{rows.length === 1 ? '' : 's'}</span>
           </div>
         </div>
 
@@ -193,7 +196,7 @@ export function MyStableDashboard({
 
       {activeTab === 'holdings' && (
         <div className="space-y-6">
-          {resolved.length === 0 ? (
+          {rows.length === 0 ? (
             <div className="rounded-2xl border border-border bg-card p-10 text-center space-y-4">
               <h3 className="text-lg font-medium text-foreground">No syndicate holdings yet</h3>
               <p className="text-sm text-muted-foreground max-w-md mx-auto">
@@ -209,7 +212,7 @@ export function MyStableDashboard({
               </Link>
             </div>
           ) : (
-            resolved.map(({ holding, campaign }) => {
+            rows.map(({ holding, campaign }) => {
               const media = getCampaignMedia(campaign.slug, campaign.trainer.slug);
               const pricing = getCampaignPricing(campaign, Number(holding.stake_percentage));
               return (
@@ -285,7 +288,7 @@ export function MyStableDashboard({
 
       {activeTab === 'feed' && (
         <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-          {resolved.length === 0
+          {rows.length === 0
             ? 'Yard memos appear after you hold a syndicate unit.'
             : 'No yard memos posted for your holdings yet.'}
         </div>
@@ -293,12 +296,12 @@ export function MyStableDashboard({
 
       {activeTab === 'vault' && (
         <div className="space-y-4">
-          {resolved.length === 0 ? (
+          {rows.length === 0 ? (
             <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
               Executed PDS/SA hashes appear here after webhook settlement.
             </div>
           ) : (
-            resolved.map(({ holding, campaign }) => {
+            rows.map(({ holding, campaign }) => {
               const pack = getCompiledLegalPackForCampaign(campaign);
               return (
                 <div key={holding.id} className="rounded-xl border border-border bg-card p-6 space-y-4">

@@ -59,9 +59,12 @@ export async function POST(request: Request) {
         : null;
     requireVerifiedKyc(kycStatus);
 
-    const { campaign, inventoryId } = assertCheckoutCampaign(horseSlug);
+    const { campaign, inventoryId } = await assertCheckoutCampaign(horseSlug);
+    if (!campaign) {
+      return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
+    }
     const pricing = pricingForUnits(campaign.wholesaleMonthlyNzd, units);
-    const legalPack = resolveLegalHashes(horseSlug);
+    const legalPack = await resolveLegalHashes(horseSlug);
 
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       return NextResponse.json(

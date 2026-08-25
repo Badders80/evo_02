@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+
+// Set Supabase env vars for test context (matches local supabase status output)
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321';
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || 'REDACTED-DEAD-LOCAL-KEY';
+process.env.NEXT_PUBLIC_SUPABASE_URL = SUPABASE_URL;
+process.env.SUPABASE_SERVICE_ROLE_KEY = SERVICE_KEY;
+
 import { getAllCampaigns, getCompiledLegalPackForCampaign, isCheckoutOpen } from '../lib/horses-data';
 import { NELLIE_INVENTORY_ID, getInventoryId } from '../lib/inventory-ids';
 import {
@@ -23,6 +30,8 @@ import { safeNextPath } from '../lib/safe-next-path';
 import { signStripePayload, verifyStripeSignature } from '../lib/stripe-signature';
 
 console.log('Running @evo/web Nellie loop tests...\n');
+
+(async () => {
 
 {
   assert.throws(() => requireUserId(null), (err: unknown) => err instanceof HttpError && err.status === 401);
@@ -63,12 +72,13 @@ console.log('Running @evo/web Nellie loop tests...\n');
 }
 
 {
-  const hashes = resolveLegalHashes('nellie');
+  const hashes = await resolveLegalHashes('nellie');
   assert.ok(isSha256Hex(hashes.pdsHash));
   assert.ok(isSha256Hex(hashes.saHash));
   assert.ok(!hashes.pdsHash.includes('placeholder'));
   assert.ok(!hashes.saHash.includes('placeholder'));
-  const campaign = getAllCampaigns().find((c) => c.slug === 'nellie');
+  const campaigns = await getAllCampaigns();
+  const campaign = campaigns.find((c: { slug: string }) => c.slug === 'nellie');
   assert.ok(campaign);
   const pack = getCompiledLegalPackForCampaign(campaign);
   assert.equal(pack.metadata.ownerName, campaign.owner.entity);
@@ -83,8 +93,8 @@ console.log('Running @evo/web Nellie loop tests...\n');
     units: 1,
     amountPaidNzd: 380,
     monthlyKeepNzd: 76,
-    pdsHash: resolveLegalHashes('nellie').pdsHash,
-    saHash: resolveLegalHashes('nellie').saHash,
+    pdsHash: (await resolveLegalHashes('nellie')).pdsHash,
+    saHash: (await resolveLegalHashes('nellie')).saHash,
     subscriptionId: null,
   });
   assert.equal(holding.horse_id, '11111111-0000-0000-0000-000000000001');
@@ -125,12 +135,12 @@ console.log('Running @evo/web Nellie loop tests...\n');
 }
 
 {
-  const open = getAllCampaigns().filter(isCheckoutOpen).map((c) => c.slug);
+  const open = (await getAllCampaigns()).filter(isCheckoutOpen).map((c: { slug: string }) => c.slug);
   assert.deepEqual(open, ['nellie']);
   assert.throws(() => assertNellieOnly('tml-x-yearn'), (err: unknown) => err instanceof HttpError && err.status === 409);
-  assert.throws(() => assertCheckoutCampaign('tml-x-yearn'), (err: unknown) => err instanceof HttpError && err.status === 409);
+  assert.rejects(async () => assertCheckoutCampaign('tml-x-yearn'), (err: unknown) => err instanceof HttpError && (err as HttpError).status === 409);
   assert.equal(getInventoryId('nellie'), NELLIE_INVENTORY_ID);
-  assertCheckoutCampaign('nellie');
+  await assertCheckoutCampaign('nellie');
   console.log('✅ only Nellie is buyable');
 }
 
@@ -196,3 +206,4 @@ console.log('Running @evo/web Nellie loop tests...\n');
 }
 
 console.log('\n🎉 All @evo/web Nellie loop tests passed successfully!');
+})();

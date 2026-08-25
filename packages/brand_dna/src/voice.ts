@@ -24,11 +24,7 @@ export const BRAND_VOICE = {
       fontSize: '11px',
       usage: ['standalone_signoff_stamp', 'hero_category_sublabel', 'video_end_card', 'document_seal'],
     },
-    triad: [
-      'Grounded in tradition.',
-      'Evolved through innovation.',
-      'Ownership transformed.',
-    ],
+    // Identity triad retired 2026-08-25 — canonical triad now lives in BRAND_IDENTITY (./identity.ts), ADR-007.
   },
   closers: [
     'From paddocks to participation — this is ownership, evolved.',

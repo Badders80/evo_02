@@ -4,5 +4,6 @@
 
 export * from './tokens';
 export * from './voice';
+export * from './identity';
 export { evolutionTailwindPreset } from './tailwind-preset';
 export { default as tailwindPreset } from './tailwind-preset';

@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   const slug = searchParams.get('slug') ?? 'nellie';
   const doc = searchParams.get('doc') ?? 'pds';
 
-  const campaign = getCampaignBySlug(slug);
+  const campaign = await getCampaignBySlug(slug);
   if (!campaign) {
     return NextResponse.json({ error: 'Horse not found' }, { status: 404 });
   }

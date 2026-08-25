@@ -82,8 +82,8 @@ export function assertNellieOnly(slug: string): void {
   }
 }
 
-export function resolveLegalHashes(slug: string): { pdsHash: string; saHash: string } {
-  const campaign = getCampaignBySlug(slug);
+export async function resolveLegalHashes(slug: string): Promise<{ pdsHash: string; saHash: string }> {
+  const campaign = await getCampaignBySlug(slug);
   if (!campaign) {
     throw new HttpError(404, 'CAMPAIGN_NOT_FOUND', 'Thoroughbred campaign not found');
   }
@@ -97,8 +97,8 @@ export function resolveLegalHashes(slug: string): { pdsHash: string; saHash: str
   return { pdsHash: pack.pdsHash, saHash: pack.saHash };
 }
 
-export function resolveCampaignInventory(slug: string) {
-  const campaign = getCampaignBySlug(slug);
+export async function resolveCampaignInventory(slug: string) {
+  const campaign = await getCampaignBySlug(slug);
   if (!campaign) {
     throw new HttpError(404, 'CAMPAIGN_NOT_FOUND', 'Thoroughbred campaign not found');
   }
@@ -109,9 +109,9 @@ export function resolveCampaignInventory(slug: string) {
   return { campaign, inventoryId };
 }
 
-export function assertCheckoutCampaign(slug: string) {
+export async function assertCheckoutCampaign(slug: string) {
   assertNellieOnly(slug);
-  const resolved = resolveCampaignInventory(slug);
+  const resolved = await resolveCampaignInventory(slug);
   if (!isCheckoutOpen(resolved.campaign)) {
     throw new HttpError(409, 'CHECKOUT_CLOSED', 'This campaign is visible but not open for subscription');
   }

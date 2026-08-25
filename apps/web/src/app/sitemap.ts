@@ -1,10 +1,10 @@
 import type { MetadataRoute } from 'next';
 import { getAllCampaigns } from '../lib/horses-data';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://evolutionstables.nz';
   const lastModified = new Date();
-  const campaigns = getAllCampaigns();
+  const campaigns = await getAllCampaigns();
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified, changeFrequency: 'daily', priority: 1.0 },

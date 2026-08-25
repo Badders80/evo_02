@@ -97,6 +97,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       inventory: {
         Row: {
@@ -128,6 +129,7 @@ export interface Database {
           sa_hash: string;
           pds_url: string;
           sa_url: string;
+          pedigree_data: Json | null;
           soft_legal?: Json | null;
           marketing?: Json | null;
           created_at: string;
@@ -162,6 +164,7 @@ export interface Database {
           sa_hash: string;
           pds_url: string;
           sa_url: string;
+          pedigree_data?: Json | null;
           soft_legal?: Json | null;
           marketing?: Json | null;
           created_at?: string;
@@ -196,11 +199,13 @@ export interface Database {
           sa_hash?: string;
           pds_url?: string;
           sa_url?: string;
+          pedigree_data?: Json | null;
           soft_legal?: Json | null;
           marketing?: Json | null;
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       checkout_reservations: {
         Row: {
@@ -236,6 +241,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       holdings: {
         Row: {
@@ -283,6 +289,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       race_results: {
         Row: {
@@ -324,6 +331,7 @@ export interface Database {
           distribution_status?: DistributionStatus;
           created_at?: string;
         };
+        Relationships: [];
       };
       events: {
         Row: {

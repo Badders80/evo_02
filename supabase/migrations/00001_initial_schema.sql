@@ -144,9 +144,6 @@ CREATE TABLE IF NOT EXISTS public.inventory (
     sa_hash TEXT NOT NULL,
     pds_url TEXT NOT NULL,
     sa_url TEXT NOT NULL,
-    pedigree_data JSONB,
-    soft_legal JSONB,
-    marketing JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

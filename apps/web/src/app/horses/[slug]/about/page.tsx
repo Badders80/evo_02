@@ -22,13 +22,13 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  const campaigns = getAllCampaigns();
+  const campaigns = await getAllCampaigns();
   return campaigns.map((c) => ({ slug: c.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const campaign = getCampaignBySlug(slug);
+  const campaign = await getCampaignBySlug(slug);
   if (!campaign || !campaign.softLegal?.aboutHorse) {
     return { title: 'Thoroughbred Story Not Found | Evolution Stables' };
   }
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function HorseAboutPage({ params }: PageProps) {
   const { slug } = await params;
-  const campaign = getCampaignBySlug(slug);
+  const campaign = await getCampaignBySlug(slug);
 
   if (!campaign || !campaign.softLegal?.aboutHorse?.trim()) {
     notFound();

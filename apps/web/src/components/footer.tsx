@@ -10,7 +10,7 @@ export function Footer() {
           <div className="grid gap-6 text-center sm:grid-cols-3">
             <div className="flex flex-col items-center">
               <span className="text-xs font-semibold tracking-[0.2em] uppercase text-[#d4a964]">
-                Grounded in tradition.
+                Grounded in Heritage.
               </span>
               <p className="mt-1.5 text-xs text-muted-foreground max-w-xs">
                 Partnered with New Zealand’s premier stud books, breeders, and classic race trainers.
@@ -18,7 +18,7 @@ export function Footer() {
             </div>
             <div className="flex flex-col items-center border-t border-border/60 pt-4 sm:border-t-0 sm:border-x sm:px-4 sm:pt-0">
               <span className="text-xs font-semibold tracking-[0.2em] uppercase text-[#d4a964]">
-                Evolved through innovation.
+                Evolved Through Tradition.
               </span>
               <p className="mt-1.5 text-xs text-muted-foreground max-w-xs">
                 Frictionless digital syndication with institutional reporting and transparent billing.
