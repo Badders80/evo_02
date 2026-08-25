@@ -8,6 +8,8 @@
 **SSOT:** `evo_00/doc/ASSET_LOCK.md`  
 **Legal pack = PDS/SA** (per horse). Site terms/privacy/FAQ are summaries only.
 
+**Deferred (2026-08-25):** Brand triad alignment in `apps/web` — old triad still present in footer.tsx (3 gold lines) + layout.tsx meta description. Locked wording: *Grounded in Heritage. / Evolved Through Tradition. / Own the Experience.* Canonical: `evo_00/doc/IDENTITY.md` (ADR-007) + `@evo/brand_dna/identity`. Swap all together before cutover.
+
 ---
 
 ## Next action

@@ -8,7 +8,7 @@ export const BRAND_IDENTITY = {
   categoryLine:
     'Evolution Stables — New Zealand regulated digital-syndication of Thoroughbreds.',
   corePromise:
-    "Racing isn't a VIP spectacle you watch. It's a human relationship you belong to.",
+    "Racing isn't a spectacle you watch. It's a human relationship you belong to.",
   triad: [
     {
       pillar: 'Grounded in Heritage.',
@@ -23,7 +23,7 @@ export const BRAND_IDENTITY = {
     {
       pillar: 'Own the Experience.',
       essence:
-        'Not access. Not VIP. You hold the share, you get the game plan, you stand in the photo. The feeling doesn\u2019t rent \u2014 it compounds.',
+        'Not access. Not a title. You hold the share, you get the game plan, you stand in the photo. The feeling doesn\u2019t rent \u2014 it compounds.',
     },
   ],
   cadence:
