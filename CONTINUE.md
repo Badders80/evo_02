@@ -1,8 +1,9 @@
 # CONTINUE — evo_02
 
-**Date:** 2026-08-26 (sprint e2e-wire CLOSE-OUT · LINE DRAWN UNDER SESSION)
-**Branch:** `sprint-1-nellie-loop` — **COMMITTED & FROZEN** (not merged, not pushed)
-**Live site:** still `main` (Vercel) — untouched by everything below.
+**Date:** 2026-08-26 evening — **DUAL SPRINT LAUNCHED: Track A + Track B in parallel**
+**Branch:** `ui-sprint-1` (NEW, cut from cb4ac12) — UI wiring sprint. `sprint-1-nellie-loop` stays frozen at cb4ac12.
+**Briefs:** [`build-loop/track-a-brief.md`](build-loop/track-a-brief.md) (UI) · [`build-loop/track-b-brief.md`](build-loop/track-b-brief.md) (gbrain repairs, separate session)
+**Live site:** still served by evo_01/02_website via Vercel (`origin/main` @ 020a691). evo_01 working tree is DIRTY — hands off. Cutover = founder manual step after click-through.
 
 **SSOT:** `evo_00/doc/ASSET_LOCK.md` · Legal pack = PDS/SA (per horse).
 
