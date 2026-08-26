@@ -50,6 +50,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/brand/logos/favicon/favicon-gold.svg" type="image/svg+xml" />
+        <link rel="icon" href="/brand/logos/favicon/favicon-white.svg" type="image/svg+xml" />
+        <link rel="icon" href="/brand/logos/favicon/favicon-black.svg" type="image/svg+xml" />
+        <link rel="icon" href="/brand/logos/favicon/favicon-border-grey.svg" type="image/svg+xml" />
+        <link rel="icon" href="/brand/logos/favicon/favicon-muted-grey.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/brand/logos/favicon/favicon-gold.svg" />
+      </head>
       <body className="min-h-screen bg-background text-foreground antialiased" suppressHydrationWarning>
         <Header />
         <main className="flex-1">{children}</main>

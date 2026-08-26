@@ -36,30 +36,22 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-background/90 backdrop-blur-md transition-colors">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Brand Crest & Title */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded border border-[#d4a964]/40 bg-[#d4a964]/10 transition-colors group-hover:border-[#d4a964]">
-            <svg
-              className="h-5 w-5 text-[#d4a964]"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-            </svg>
-          </div>
-          <div className="flex flex-col">
-            <span className="font-serif text-base font-medium tracking-tight text-foreground sm:text-lg">
-              EVOLUTION <span className="text-[#d4a964]">STABLES</span>
-            </span>
-            <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground">
-              Authorised NZTR Syndicator
-            </span>
-          </div>
-        </Link>
+        /* Brand Crest & Title */
+                <Link href="/" className="flex items-center gap-3 group">
+                  <img
+                    src="/brand/logos/lockups/lockup-horizontal-gold.svg"
+                    alt="Evolution Stables"
+                    className="h-9 w-auto"
+                  />
+                  <div className="flex flex-col">
+                    <span className="font-serif text-base font-medium tracking-tight text-foreground sm:text-lg">
+                      EVOLUTION <span className="text-[#d4a964]">STABLES</span>
+                    </span>
+                    <span className="text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground">
+                      Authorised NZTR Syndicator
+                    </span>
+                  </div>
+                </Link>
 
         {/* Navigation Links */}
         <nav className="hidden items-center gap-7 md:flex">
