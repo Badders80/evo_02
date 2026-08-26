@@ -5,6 +5,17 @@
 
 import type { CloseStyle } from '@evo/db_models/types';
 
+/**
+ * Canonical DSL share math (locked 2026-08-26, founder).
+ * A lot/share = one increment (0.5%). Available units = listed stake % / step %.
+ * Min investment is a purchase floor — never a divisor for counting units.
+ * Investor-facing language is percentage-based; "lots" never appears.
+ */
+export const SHARE_MATH = {
+  DEFAULT_MIN_INVESTMENT_PCT: 1.0,
+  DEFAULT_STAKE_STEP_PCT: 0.5,
+} as const;
+
 export interface ThoroughbredPedigree {
   legalName: string;
   barnName: string;
@@ -58,7 +69,9 @@ export interface SyndicateLegalContext {
   sharesAvailable: number;
   paymentModel?: 'subscription_float' | 'upfront';
   termMonths?: number;
-  listingPlatform?: 'evolution' | 'tokinvest' | string;
+  listingPlatform?: string;
+  minInvestmentPct?: number;
+  stakeStepPct?: number;
   pdsVersion: string;
   saVersion: string;
   effectiveDate: string;

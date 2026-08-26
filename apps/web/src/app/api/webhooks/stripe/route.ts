@@ -16,6 +16,7 @@ import {
   resolveCampaignInventory,
   resolveLegalHashes,
   resolvePaidAmountNzd,
+  stakePctToStepUnits,
 } from '@/lib/nellie-loop';
 
 type StripeEvent = {
@@ -30,9 +31,11 @@ async function persistCompletedCheckout(event: StripeEvent): Promise<void> {
   const horseSlug = metadata.horse_slug;
   const userId = metadata.user_id;
   const reservationId = metadata.reservation_id;
-  const units = Number.parseInt(metadata.units || '', 10);
+  // Metadata carries investor-facing PERCENT (locked rule 2026-08-26). Parse as float,
+  // never parseInt — a 1.5% purchase must not silently become 1%.
+  const units = Number.parseFloat(metadata.units || '');
 
-  if (!horseSlug || !userId || !reservationId || !Number.isInteger(units) || units < 1) {
+  if (!horseSlug || !userId || !reservationId || !Number.isFinite(units) || units <= 0) {
     throw new HttpError(
       400,
       'INVALID_METADATA',
@@ -77,8 +80,13 @@ async function persistCompletedCheckout(event: StripeEvent): Promise<void> {
     p_reservation_id: reservationId,
   });
   const consumed = interpretConsumeResult(consumeData, consumeError, isUniqueViolation(holdingError));
-  if (!consumed.alreadyConsumed && consumed.units > 0 && consumed.units !== units) {
-    throw new HttpError(500, 'RESERVATION_UNITS_MISMATCH', 'Consumed reservation units do not match Stripe metadata');
+  if (!consumed.alreadyConsumed && consumed.units > 0) {
+    // Reservation RPC counts step-units (0.5% each); metadata carries percent. Compare
+    // in the same dimension — a percent/units mismatch here means the two ends diverged.
+    const expectedStepUnits = stakePctToStepUnits(units, campaign.stakeStepPct);
+    if (consumed.units !== expectedStepUnits) {
+      throw new HttpError(500, 'RESERVATION_UNITS_MISMATCH', 'Consumed reservation units do not match Stripe metadata');
+    }
   }
 
   const r2 = r2ConfigFromEnv();

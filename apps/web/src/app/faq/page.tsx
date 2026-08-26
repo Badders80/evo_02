@@ -11,7 +11,7 @@ export const metadata = {
 const faqs = [
     {
       q: 'What is a Digitally Syndicated Lease (DSL)?',
-      a: 'A DSL is a regulated fractional leasehold of an elite racehorse. Instead of purchasing full thoroughbred bloodstock equity with unlimited capital liabilities, you subscribe to an authorized fractional stake (lot size varies by campaign: Nellie in 0.5% steps; Prudentia and Hottathanafantasy in 0.25% steps — not all horses are 1%) with fixed monthly keep and direct rights to 75% of net prize money.',
+      a: 'A DSL is a regulated fractional leasehold of an elite racehorse. Instead of purchasing full thoroughbred bloodstock equity with unlimited capital liabilities, you subscribe to an authorized fractional stake (minimum investments and stake increments vary by campaign — exact percentages are shown on each horse\'s subscription page) with fixed monthly keep and direct rights to 75% of net prize money.',
     },
     {
       q: 'How does the 5×M Join Float Model work?',

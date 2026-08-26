@@ -1,0 +1,548 @@
+[0m
+> build · nemotron-3-ultra-free
+[0m
+[0m✱ [0mGlob "apps/mission_control/src/lib/*.test.ts"[90m 2 matches[0m
+[0m→ [0mRead apps/mission_control/package.json
+[0m→ [0mRead apps/mission_control/src/lib/intake.test.ts
+[0m→ [0mRead apps/mission_control/src/lib/cap-table.test.ts
+[0m✱ [0mGrep "createCampaignFromIntake"[90m in . · 38 matches[0m
+[0m✱ [0mGrep "getSupabaseServiceClient"[90m in . · 22 matches[0m
+[0m→ [0mRead apps/mission_control/src/lib/campaign-pipeline.ts
+[0m→ [0mRead apps/mission_control/src/lib/supabase-server.ts
+[0m
+[0m← [0mWrite apps/mission_control/src/lib/campaign-pipeline.test.ts
+Wrote file successfully.
+[0m
+[0m← [0mEdit apps/mission_control/package.json
+Index: /home/evo/new/evo_02/apps/mission_control/package.json
+===================================================================
+--- /home/evo/new/evo_02/apps/mission_control/package.json
++++ /home/evo/new/evo_02/apps/mission_control/package.json
+@@ -7,9 +7,9 @@
+   "build": "next build",
+   "start": "next start",
+   "lint": "eslint src/",
+   "typecheck": "tsc --noEmit",
+-  "test": "tsx src/lib/intake.test.ts && tsx src/lib/cap-table.test.ts"
++  "test": "tsx src/lib/intake.test.ts && tsx src/lib/cap-table.test.ts && tsx src/lib/campaign-pipeline.test.ts"
+ },
+ "dependencies": {
+   "@evo/brand_dna": "workspace:*",
+   "@evo/db_models": "workspace:*",
+
+[0m
+[0m$ [0mcd /home/evo/new/evo_02 && just check
+pnpm run lint
+$ turbo run lint
+• turbo 2.10.10
+
+   • Packages in scope: @evo/brand_dna, @evo/db_models, @evo/legal_engine, @evo/mission_control, @evo/storage, @evo/web
+   • Running lint in 6 packages
+   • Remote caching disabled
+
+@evo/storage:lint: cache hit, replaying logs 04ea80da50c0c6d4
+@evo/brand_dna:lint: cache hit, replaying logs 01813af51789612e
+@evo/storage:lint: $ eslint src/
+@evo/brand_dna:lint: $ eslint src/
+@evo/brand_dna:build: cache hit, replaying logs d475bb918469a4d7
+@evo/brand_dna:build: $ tsc
+@evo/storage:build: cache hit, replaying logs e8b8d5cbf12c6a7e
+@evo/storage:build: $ tsc
+@evo/db_models:build: cache hit, replaying logs 92559299757c597a
+@evo/db_models:build: $ tsc
+@evo/db_models:lint: cache hit, replaying logs 5ae9167fbacf3fb5
+@evo/db_models:lint: $ eslint src/
+@evo/legal_engine:build: cache hit, replaying logs eeca59ba41b12d30
+@evo/legal_engine:build: $ tsc
+@evo/legal_engine:lint: cache hit, replaying logs 53eaaa856c8d3fd0
+@evo/legal_engine:lint: $ eslint src/
+@evo/mission_control:lint: cache miss, executing a762cfc847abfe85
+@evo/web:lint: cache hit, replaying logs a859a44a6c638114
+@evo/web:lint: $ eslint src/
+@evo/mission_control:lint: $ eslint src/
+
+ Tasks:    10 successful, 10 total
+Cached:    9 cached, 10 total
+  Time:    1.241s 
+
+pnpm run typecheck
+$ turbo run typecheck
+• turbo 2.10.10
+
+   • Packages in scope: @evo/brand_dna, @evo/db_models, @evo/legal_engine, @evo/mission_control, @evo/storage, @evo/web
+   • Running typecheck in 6 packages
+   • Remote caching disabled
+
+@evo/brand_dna:typecheck: cache hit, replaying logs 38dc7ecaf7f8ae4e
+@evo/brand_dna:typecheck: $ tsc --noEmit
+@evo/storage:typecheck: cache hit, replaying logs 1f0e0e52bfc35ab9
+@evo/brand_dna:build: cache hit, replaying logs d475bb918469a4d7
+@evo/storage:build: cache hit, replaying logs e8b8d5cbf12c6a7e
+@evo/storage:typecheck: $ tsc --noEmit
+@evo/storage:build: $ tsc
+@evo/brand_dna:build: $ tsc
+@evo/db_models:typecheck: cache hit, replaying logs 6f678abbaa2dc0de
+@evo/db_models:typecheck: $ tsc --noEmit
+@evo/db_models:build: cache hit, replaying logs 92559299757c597a
+@evo/db_models:build: $ tsc
+@evo/legal_engine:typecheck: cache hit, replaying logs 912243bc1b4cf6b5
+@evo/legal_engine:typecheck: $ tsc --noEmit
+@evo/legal_engine:build: cache hit, replaying logs eeca59ba41b12d30
+@evo/legal_engine:build: $ tsc
+@evo/web:typecheck: cache hit, replaying logs daf7d66dff159091
+@evo/mission_control:typecheck: cache miss, executing f1f4ea121fa43e1d
+@evo/web:typecheck: $ tsc --noEmit
+@evo/mission_control:typecheck: $ tsc --noEmit
+
+ Tasks:    10 successful, 10 total
+Cached:    9 cached, 10 total
+  Time:    1.254s 
+
+pnpm run test
+$ turbo run test
+• turbo 2.10.10
+
+   • Packages in scope: @evo/brand_dna, @evo/db_models, @evo/legal_engine, @evo/mission_control, @evo/storage, @evo/web
+   • Running test in 6 packages
+   • Remote caching disabled
+
+@evo/storage:test: cache hit, replaying logs 49ad9529ff5d18b3
+@evo/storage:test: $ tsx tests/hash.test.ts && tsx tests/cdn.test.ts
+@evo/storage:test: Running @evo/storage isomorphic SHA-256 NIST test vectors...
+@evo/storage:test: 
+@evo/storage:test: ✅ All isomorphic SHA-256 test vectors PASSED!
+@evo/storage:test: 
+@evo/storage:test: Running @evo/storage stills convention tests...
+@evo/storage:test: ✅ Stills convention: 01 cover, true extensions, no fake CDN, no yard mix-up
+@evo/storage:build: cache hit, replaying logs e8b8d5cbf12c6a7e
+@evo/brand_dna:build: cache hit, replaying logs d475bb918469a4d7
+@evo/storage:build: $ tsc
+@evo/brand_dna:build: $ tsc
+@evo/brand_dna:test: cache hit, replaying logs 8f7ed7586bc8d8a2
+@evo/brand_dna:test: $ tsx tests/voice.test.ts
+@evo/brand_dna:test: Running brand_dna voice tests...
+@evo/brand_dna:test: ✅ Banned term enforcement works (including "opaque")
+@evo/brand_dna:test: ✅ Exclamation mark enforcement works
+@evo/brand_dna:test: ✅ Tag taxonomy validation works
+@evo/brand_dna:test: 🎉 All brand_dna voice tests passed.
+@evo/db_models:test: cache hit, replaying logs e3fa01f2f1d829b0
+@evo/db_models:test: $ tsx tests/schema.test.ts && tsx tests/registry.test.ts
+@evo/db_models:test: Running @evo/db_models Schema & SQL Migration tests...
+@evo/db_models:test: 
+@evo/db_models:test: ✅ SQL Migration files, DDL statements, and Seed scripts verified
+@evo/db_models:test: ✅ TypeScript Database Models & Type Safety verified
+@evo/db_models:test: ✅ Seed step-unit invariants verified
+@evo/db_models:test: 
+@evo/db_models:test: 🎉 All @evo/db_models Schema tests passed successfully!
+@evo/db_models:test: Running knowledge registry tests...
+@evo/db_models:test: ✅ Lookup helpers return correct canonical records
+@evo/db_models:test: ✅ Jockey affinity queries work
+@evo/db_models:test: ✅ Registry slug uniqueness verified
+@evo/db_models:test: ✅ Brand-voice seed gate passed for 147 registry strings
+@evo/db_models:test: ✅ Live asset lock: Stephen Gray Racing only, research trainers excluded, First Gear completed
+@evo/db_models:test: 🎉 All knowledge registry tests passed.
+@evo/db_models:build: cache hit, replaying logs 92559299757c597a
+@evo/db_models:build: $ tsc
+@evo/legal_engine:test: cache hit, replaying logs 560286ddc409aa14
+@evo/legal_engine:test: $ tsx tests/legal_engine.test.ts && tsx tests/settlement.test.ts
+@evo/legal_engine:test: Running legal_engine tests...
+@evo/legal_engine:test: 
+@evo/legal_engine:test: ✅ Deterministic Term Sheet / PDS / SA generation
+@evo/legal_engine:test: ✅ Term Sheet generation & anchors verified
+@evo/legal_engine:test: ✅ All mandatory PDS sections present
+@evo/legal_engine:test: ✅ All mandatory SA clauses present
+@evo/legal_engine:test: ✅ Nellie pricing anchors & SA schedule correct
+@evo/legal_engine:test: ✅ Mulan pricing anchors correct
+@evo/legal_engine:test: ✅ Compliance validator passes clean pack
+@evo/legal_engine:test: ✅ Banned term detection works (crypto, lead lessor, micro-ownership)
+@evo/legal_engine:test: ✅ Pricing invariant validation works
+@evo/legal_engine:test: ✅ Upfront payment model pack verified
+@evo/legal_engine:test: ✅ SHA-256 digests are 64-char hex
+@evo/legal_engine:test: ✅ Soft content PDS Section 2 layout verified
+@evo/legal_engine:test: ✅ PDS SHA-256 hash invariant to whitespace and CRLF line endings
+@evo/legal_engine:test: ✅ validateSyndicateContent successfully gates prohibited terminology
+@evo/legal_engine:test: ✅ "opaque" is rejected by unified legal banned-term gate
+@evo/legal_engine:test: ✅ Fixed-input SHA-256 digests are deterministic across compiler runs
+@evo/legal_engine:test: 
+@evo/legal_engine:test: 🎉 All legal_engine tests passed.
+@evo/legal_engine:test: Running @evo/legal_engine Settlement & Cap Table Invariant tests...
+@evo/legal_engine:test: 
+@evo/legal_engine:test: ✅ 3-Way Listed Stake Pool Invariants & Input Guards verified
+@evo/legal_engine:test: ✅ 75/25 Prize Distribution (0% Evolution) & Pro-Rata Payouts verified
+@evo/legal_engine:test: ✅ SOP Settlement Cases (Case B, Case D 4->3, Case E) verified
+@evo/legal_engine:test: ✅ NZ GST 3/23 Breakdown Identity verified
+@evo/legal_engine:test: 
+@evo/legal_engine:test: 🎉 All Settlement, Cap Table & GST tests passed successfully!
+@evo/legal_engine:build: cache hit, replaying logs eeca59ba41b12d30
+@evo/legal_engine:build: $ tsc
+@evo/web:test: cache hit, replaying logs 53b3baee037c4c2c
+@evo/mission_control:test: cache miss, executing 71a34f4db7dd7663
+@evo/web:test: $ tsx src/tests/nellie_loop.test.ts
+@evo/web:test: Running @evo/web Nellie loop tests...
+@evo/web:test: 
+@evo/web:test: ✅ create-session 401 without user.id
+@evo/web:test: ✅ KYC stub 403 unless verified
+@evo/web:test: ✅ reserve_campaign_shares fail closed
+@evo/web:test: ✅ purchases gated unless Stripe key + PURCHASES_ENABLED
+@evo/web:test: ✅ compiled Nellie hashes are 64-hex, same ownerName as checkout
+@evo/web:test: ✅ holdings insert shape rejects placeholder hashes
+@evo/web:test: ✅ Stripe HMAC verification
+@evo/web:test: ✅ login ?next= is path-safe
+@evo/web:test: ✅ only Nellie is buyable
+@evo/web:test: ✅ R2 skipped unless env exists
+@evo/web:test: ✅ source audit: no guest, no placeholder, RPC wired, consume fail-loud
+@evo/web:test: ✅ consume/payment fail closed
+@evo/web:test: 
+@evo/web:test: 🎉 All @evo/web Nellie loop tests passed successfully!
+@evo/mission_control:test: $ tsx src/lib/intake.test.ts && tsx src/lib/cap-table.test.ts && tsx src/lib/campaign-pipeline.test.ts
+@evo/mission_control:test: Running Horse Lookup, Smart Intake Parser & Invariant tests...
+@evo/mission_control:test: 
+@evo/mission_control:test: ✅ URL & Microchip extraction verified (Breeding, Performance Modal, Profile, and Security validation)
+@evo/mission_control:test: ✅ Horse Stud Book Lookup by URL & Microchip verified
+@evo/mission_control:test: ✅ Canonical DSL pricing invariants verified (SSOT computeDslPricing)
+@evo/mission_control:test: ✅ Smart Content Dump natural text extraction & entity matching verified
+@evo/mission_control:test: 
+@evo/mission_control:test: 🎉 All Intake, Lookup & Invariant tests passed successfully!
+@evo/mission_control:test: Running Mission Control Cap Table & Investor Registry integration tests...
+@evo/mission_control:test: 
+@evo/mission_control:test: ✅ Investor Registry & Allocated Share counts verified for all live campaigns
+@evo/mission_control:test: ✅ Listed Pool Cap Table Invariants verified for active campaigns
+@evo/mission_control:test: ✅ Settlement Desk calculations verified against @evo/legal_engine canon
+@evo/mission_control:test: 
+@evo/mission_control:test: 🎉 Mission Control Cap Table & Investor Integration tests PASSED!
+@evo/mission_control:test: node:internal/modules/run_main:107
+@evo/mission_control:test:     triggerUncaughtException(
+@evo/mission_control:test:     ^
+@evo/mission_control:test: 
+@evo/mission_control:test: Error: Transform failed with 2 errors:
+@evo/mission_control:test: /home/evo/new/evo_02/apps/mission_control/src/lib/campaign-pipeline.test.ts:36:17: ERROR: Top-level await is currently not supported with the "cjs" output format
+@evo/mission_control:test: /home/evo/new/evo_02/apps/mission_control/src/lib/campaign-pipeline.test.ts:50:2: ERROR: Top-level await is currently not supported with the "cjs" output format
+@evo/mission_control:test:     at failureErrorWithLog (/home/evo/new/evo_02/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:1752:15)
+@evo/mission_control:test:     at /home/evo/new/evo_02/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:1019:50
+@evo/mission_control:test:     at responseCallbacks.<computed> (/home/evo/new/evo_02/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:886:9)
+@evo/mission_control:test:     at handleIncomingPacket (/home/evo/new/evo_02/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:941:12)
+@evo/mission_control:test:     at Socket.readFromStdout (/home/evo/new/evo_02/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:864:7)
+@evo/mission_control:test:     at Socket.emit (node:events:508:28)
+@evo/mission_control:test:     at addChunk (node:internal/streams/readable:563:12)
+@evo/mission_control:test:     at readableAddChunkPushByteMode (node:internal/streams/readable:514:3)
+@evo/mission_control:test:     at Readable.push (node:internal/streams/readable:394:5)
+@evo/mission_control:test:     at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+@evo/mission_control:test:   name: 'TransformError'
+@evo/mission_control:test: }
+@evo/mission_control:test: 
+@evo/mission_control:test: Node.js v24.14.0
+@evo/mission_control:test: [ELIFECYCLE] Test failed. See above for more details.
+@evo/mission_control#test:  ERROR  command (/home/evo/new/evo_02/apps/mission_control) /home/evo/.nvm/versions/node/v24.14.0/bin/pnpm run test exited (1)
+
+ Tasks:    9 successful, 10 total
+Cached:    9 cached, 10 total
+  Time:    786ms 
+Failed:    @evo/mission_control#test
+
+ ERROR  run failed: command  exited (1)
+[ELIFECYCLE] Test failed. See above for more details.
+error: Recipe `test` failed on line 32 with exit code 1
+[0m
+[0m← [0mEdit apps/mission_control/src/lib/campaign-pipeline.test.ts
+Index: /home/evo/new/evo_02/apps/mission_control/src/lib/campaign-pipeline.test.ts
+===================================================================
+--- /home/evo/new/evo_02/apps/mission_control/src/lib/campaign-pipeline.test.ts
++++ /home/evo/new/evo_02/apps/mission_control/src/lib/campaign-pipeline.test.ts
+@@ -4,50 +4,57 @@
+ import assert from 'node:assert/strict';
+ import { createCampaignFromIntake, type CampaignIntakePayload } from './campaign-pipeline';
+ import { getSupabaseServiceClient } from './supabase-server';
+ 
+-console.log('Running Campaign Pipeline Integration Test...\n');
++async function runTest() {
++  console.log('Running Campaign Pipeline Integration Test...\n');
+ 
+-const slug = `e2e-wire-test-${Date.now()}`;
++  const slug = `e2e-wire-test-${Date.now()}`;
+ 
+-const payload: CampaignIntakePayload = {
+-  slug,
+-  legalName: 'E2E Wire Test',
+-  barnName: 'E2E Wire Test',
+-  wholesaleMonthlyNzd: 76,
+-  pedigree: {
+-    sire: 'Test Sire',
+-    dam: 'Test Dam',
+-    gender: 'Filly',
+-    breeder: 'Test Breeder',
+-  },
+-  trainer: {
+-    name: 'Test Trainer',
+-    stable: 'Test Stable',
+-    location: 'Test Location',
+-  },
+-  owner: {
+-    entity: 'Evolution Stables',
+-  },
+-  closeStyle: 'fourteen_day',
+-  paymentModel: 'subscription_float',
+-};
++  const payload: CampaignIntakePayload = {
++    slug,
++    legalName: 'E2E Wire Test',
++    barnName: 'E2E Wire Test',
++    wholesaleMonthlyNzd: 76,
++    pedigree: {
++      sire: 'Test Sire',
++      dam: 'Test Dam',
++      gender: 'Filly',
++      breeder: 'Test Breeder',
++    },
++    trainer: {
++      name: 'Test Trainer',
++      stable: 'Test Stable',
++      location: 'Test Location',
++    },
++    owner: {
++      entity: 'Evolution Stables',
++    },
++    closeStyle: 'fourteen_day',
++    paymentModel: 'subscription_float',
++  };
+ 
+-try {
+-  const result = await createCampaignFromIntake(payload);
++  try {
++    const result = await createCampaignFromIntake(payload);
+ 
+-  assert.ok(result.inventoryId, 'Should return inventoryId');
+-  assert.ok(typeof result.inventoryId === 'string', 'inventoryId should be a string');
++    assert.ok(result.inventoryId, 'Should return inventoryId');
++    assert.ok(typeof result.inventoryId === 'string', 'inventoryId should be a string');
+ 
+-  assert.ok(result.legalPack, 'Should return legalPack');
+-  assert.ok(result.legalPack.pdsHash, 'legalPack should have pdsHash');
+-  assert.ok(result.legalPack.saHash, 'legalPack should have saHash');
+-  assert.match(result.legalPack.pdsHash, /^[0-9a-f]{64}$/, 'pdsHash must be 64-char hex');
+-  assert.match(result.legalPack.saHash, /^[0-9a-f]{64}$/, 'saHash must be 64-char hex');
++    assert.ok(result.legalPack, 'Should return legalPack');
++    assert.ok(result.legalPack.pdsHash, 'legalPack should have pdsHash');
++    assert.ok(result.legalPack.saHash, 'legalPack should have saHash');
++    assert.match(result.legalPack.pdsHash, /^[0-9a-f]{64}$/, 'pdsHash must be 64-char hex');
++    assert.match(result.legalPack.saHash, /^[0-9a-f]{64}$/, 'saHash must be 64-char hex');
+ 
+-  console.log(`✅ PASS: campaign-pipeline test — inventoryId=${result.inventoryId} pdsHash=${result.legalPack.pdsHash.slice(0, 8)}… saHash=${result.legalPack.saHash.slice(0, 8)}…`);
+-} finally {
+-  const supabase = getSupabaseServiceClient();
+-  await supabase.from('inventory').delete().eq('slug', slug);
++    console.log(`✅ PASS: campaign-pipeline test — inventoryId=${result.inventoryId} pdsHash=${result.legalPack.pdsHash.slice(0, 8)}… saHash=${result.legalPack.saHash.slice(0, 8)}…`);
++  } finally {
++    const supabase = getSupabaseServiceClient();
++    await supabase.from('inventory').delete().eq('slug', slug);
++  }
++
++  console.log('\n🎉 Campaign Pipeline Integration Test PASSED!');
+ }
+ 
+-console.log('\n🎉 Campaign Pipeline Integration Test PASSED!');
+\ No newline at end of file
++runTest().catch((err) => {
++  console.error('Test failed:', err);
++  process.exit(1);
++});
+\ No newline at end of file
+
+[0m
+[0m$ [0mcd /home/evo/new/evo_02 && just check
+pnpm run lint
+$ turbo run lint
+• turbo 2.10.10
+
+   • Packages in scope: @evo/brand_dna, @evo/db_models, @evo/legal_engine, @evo/mission_control, @evo/storage, @evo/web
+   • Running lint in 6 packages
+   • Remote caching disabled
+
+@evo/storage:lint: cache hit, replaying logs 04ea80da50c0c6d4
+@evo/brand_dna:lint: cache hit, replaying logs 01813af51789612e
+@evo/storage:lint: $ eslint src/
+@evo/brand_dna:lint: $ eslint src/
+@evo/storage:build: cache hit, replaying logs e8b8d5cbf12c6a7e
+@evo/brand_dna:build: cache hit, replaying logs d475bb918469a4d7
+@evo/storage:build: $ tsc
+@evo/brand_dna:build: $ tsc
+@evo/db_models:lint: cache hit, replaying logs 5ae9167fbacf3fb5
+@evo/db_models:lint: $ eslint src/
+@evo/db_models:build: cache hit, replaying logs 92559299757c597a
+@evo/db_models:build: $ tsc
+@evo/legal_engine:lint: cache hit, replaying logs 53eaaa856c8d3fd0
+@evo/legal_engine:lint: $ eslint src/
+@evo/legal_engine:build: cache hit, replaying logs eeca59ba41b12d30
+@evo/legal_engine:build: $ tsc
+@evo/mission_control:lint: cache miss, executing b0e819368e643cf9
+@evo/web:lint: cache hit, replaying logs a859a44a6c638114
+@evo/web:lint: $ eslint src/
+@evo/mission_control:lint: $ eslint src/
+
+ Tasks:    10 successful, 10 total
+Cached:    9 cached, 10 total
+  Time:    -294ms 
+
+pnpm run typecheck
+$ turbo run typecheck
+• turbo 2.10.10
+
+   • Packages in scope: @evo/brand_dna, @evo/db_models, @evo/legal_engine, @evo/mission_control, @evo/storage, @evo/web
+   • Running typecheck in 6 packages
+   • Remote caching disabled
+
+@evo/brand_dna:typecheck: cache hit, replaying logs 38dc7ecaf7f8ae4e
+@evo/brand_dna:build: cache hit, replaying logs d475bb918469a4d7
+@evo/brand_dna:build: $ tsc
+@evo/storage:typecheck: cache hit, replaying logs 1f0e0e52bfc35ab9
+@evo/brand_dna:typecheck: $ tsc --noEmit
+@evo/storage:typecheck: $ tsc --noEmit
+@evo/storage:build: cache hit, replaying logs e8b8d5cbf12c6a7e
+@evo/storage:build: $ tsc
+@evo/db_models:typecheck: cache hit, replaying logs 6f678abbaa2dc0de
+@evo/db_models:typecheck: $ tsc --noEmit
+@evo/db_models:build: cache hit, replaying logs 92559299757c597a
+@evo/db_models:build: $ tsc
+@evo/legal_engine:typecheck: cache hit, replaying logs 912243bc1b4cf6b5
+@evo/legal_engine:typecheck: $ tsc --noEmit
+@evo/legal_engine:build: cache hit, replaying logs eeca59ba41b12d30
+@evo/legal_engine:build: $ tsc
+@evo/mission_control:typecheck: cache miss, executing 4e41d09c8d79c58e
+@evo/web:typecheck: cache hit, replaying logs daf7d66dff159091
+@evo/web:typecheck: $ tsc --noEmit
+@evo/mission_control:typecheck: $ tsc --noEmit
+
+ Tasks:    10 successful, 10 total
+Cached:    9 cached, 10 total
+  Time:    1.443s 
+
+pnpm run test
+$ turbo run test
+• turbo 2.10.10
+
+   • Packages in scope: @evo/brand_dna, @evo/db_models, @evo/legal_engine, @evo/mission_control, @evo/storage, @evo/web
+   • Running test in 6 packages
+   • Remote caching disabled
+
+@evo/brand_dna:test: cache hit, replaying logs 8f7ed7586bc8d8a2
+@evo/storage:test: cache hit, replaying logs 49ad9529ff5d18b3
+@evo/brand_dna:test: $ tsx tests/voice.test.ts
+@evo/brand_dna:test: Running brand_dna voice tests...
+@evo/brand_dna:test: ✅ Banned term enforcement works (including "opaque")
+@evo/brand_dna:test: ✅ Exclamation mark enforcement works
+@evo/brand_dna:test: ✅ Tag taxonomy validation works
+@evo/storage:test: $ tsx tests/hash.test.ts && tsx tests/cdn.test.ts
+@evo/storage:test: Running @evo/storage isomorphic SHA-256 NIST test vectors...
+@evo/brand_dna:test: 🎉 All brand_dna voice tests passed.
+@evo/storage:test: 
+@evo/storage:test: ✅ All isomorphic SHA-256 test vectors PASSED!
+@evo/storage:test: 
+@evo/storage:test: Running @evo/storage stills convention tests...
+@evo/storage:test: ✅ Stills convention: 01 cover, true extensions, no fake CDN, no yard mix-up
+@evo/brand_dna:build: cache hit, replaying logs d475bb918469a4d7
+@evo/storage:build: cache hit, replaying logs e8b8d5cbf12c6a7e
+@evo/brand_dna:build: $ tsc
+@evo/storage:build: $ tsc
+@evo/db_models:test: cache hit, replaying logs e3fa01f2f1d829b0
+@evo/db_models:test: $ tsx tests/schema.test.ts && tsx tests/registry.test.ts
+@evo/db_models:test: Running @evo/db_models Schema & SQL Migration tests...
+@evo/db_models:test: 
+@evo/db_models:test: ✅ SQL Migration files, DDL statements, and Seed scripts verified
+@evo/db_models:test: ✅ TypeScript Database Models & Type Safety verified
+@evo/db_models:test: ✅ Seed step-unit invariants verified
+@evo/db_models:test: 
+@evo/db_models:test: 🎉 All @evo/db_models Schema tests passed successfully!
+@evo/db_models:test: Running knowledge registry tests...
+@evo/db_models:test: ✅ Lookup helpers return correct canonical records
+@evo/db_models:test: ✅ Jockey affinity queries work
+@evo/db_models:test: ✅ Registry slug uniqueness verified
+@evo/db_models:test: ✅ Brand-voice seed gate passed for 147 registry strings
+@evo/db_models:test: ✅ Live asset lock: Stephen Gray Racing only, research trainers excluded, First Gear completed
+@evo/db_models:test: 🎉 All knowledge registry tests passed.
+@evo/db_models:build: cache hit, replaying logs 92559299757c597a
+@evo/db_models:build: $ tsc
+@evo/legal_engine:test: cache hit, replaying logs 560286ddc409aa14
+@evo/legal_engine:test: $ tsx tests/legal_engine.test.ts && tsx tests/settlement.test.ts
+@evo/legal_engine:test: Running legal_engine tests...
+@evo/legal_engine:test: 
+@evo/legal_engine:test: ✅ Deterministic Term Sheet / PDS / SA generation
+@evo/legal_engine:test: ✅ Term Sheet generation & anchors verified
+@evo/legal_engine:test: ✅ All mandatory PDS sections present
+@evo/legal_engine:test: ✅ All mandatory SA clauses present
+@evo/legal_engine:test: ✅ Nellie pricing anchors & SA schedule correct
+@evo/legal_engine:test: ✅ Mulan pricing anchors correct
+@evo/legal_engine:test: ✅ Compliance validator passes clean pack
+@evo/legal_engine:test: ✅ Banned term detection works (crypto, lead lessor, micro-ownership)
+@evo/legal_engine:test: ✅ Pricing invariant validation works
+@evo/legal_engine:test: ✅ Upfront payment model pack verified
+@evo/legal_engine:test: ✅ SHA-256 digests are 64-char hex
+@evo/legal_engine:test: ✅ Soft content PDS Section 2 layout verified
+@evo/legal_engine:test: ✅ PDS SHA-256 hash invariant to whitespace and CRLF line endings
+@evo/legal_engine:test: ✅ validateSyndicateContent successfully gates prohibited terminology
+@evo/legal_engine:test: ✅ "opaque" is rejected by unified legal banned-term gate
+@evo/legal_engine:test: ✅ Fixed-input SHA-256 digests are deterministic across compiler runs
+@evo/legal_engine:test: 
+@evo/legal_engine:test: 🎉 All legal_engine tests passed.
+@evo/legal_engine:test: Running @evo/legal_engine Settlement & Cap Table Invariant tests...
+@evo/legal_engine:test: 
+@evo/legal_engine:test: ✅ 3-Way Listed Stake Pool Invariants & Input Guards verified
+@evo/legal_engine:test: ✅ 75/25 Prize Distribution (0% Evolution) & Pro-Rata Payouts verified
+@evo/legal_engine:test: ✅ SOP Settlement Cases (Case B, Case D 4->3, Case E) verified
+@evo/legal_engine:test: ✅ NZ GST 3/23 Breakdown Identity verified
+@evo/legal_engine:test: 
+@evo/legal_engine:test: 🎉 All Settlement, Cap Table & GST tests passed successfully!
+@evo/legal_engine:build: cache hit, replaying logs eeca59ba41b12d30
+@evo/legal_engine:build: $ tsc
+@evo/mission_control:test: cache miss, executing 082c487ca51e0fb8
+@evo/web:test: cache hit, replaying logs 53b3baee037c4c2c
+@evo/web:test: $ tsx src/tests/nellie_loop.test.ts
+@evo/web:test: Running @evo/web Nellie loop tests...
+@evo/web:test: 
+@evo/web:test: ✅ create-session 401 without user.id
+@evo/web:test: ✅ KYC stub 403 unless verified
+@evo/web:test: ✅ reserve_campaign_shares fail closed
+@evo/web:test: ✅ purchases gated unless Stripe key + PURCHASES_ENABLED
+@evo/web:test: ✅ compiled Nellie hashes are 64-hex, same ownerName as checkout
+@evo/web:test: ✅ holdings insert shape rejects placeholder hashes
+@evo/web:test: ✅ Stripe HMAC verification
+@evo/web:test: ✅ login ?next= is path-safe
+@evo/web:test: ✅ only Nellie is buyable
+@evo/web:test: ✅ R2 skipped unless env exists
+@evo/web:test: ✅ source audit: no guest, no placeholder, RPC wired, consume fail-loud
+@evo/web:test: ✅ consume/payment fail closed
+@evo/web:test: 
+@evo/web:test: 🎉 All @evo/web Nellie loop tests passed successfully!
+@evo/mission_control:test: $ tsx src/lib/intake.test.ts && tsx src/lib/cap-table.test.ts && tsx src/lib/campaign-pipeline.test.ts
+@evo/mission_control:test: Running Horse Lookup, Smart Intake Parser & Invariant tests...
+@evo/mission_control:test: 
+@evo/mission_control:test: ✅ URL & Microchip extraction verified (Breeding, Performance Modal, Profile, and Security validation)
+@evo/mission_control:test: ✅ Horse Stud Book Lookup by URL & Microchip verified
+@evo/mission_control:test: ✅ Canonical DSL pricing invariants verified (SSOT computeDslPricing)
+@evo/mission_control:test: ✅ Smart Content Dump natural text extraction & entity matching verified
+@evo/mission_control:test: 
+@evo/mission_control:test: 🎉 All Intake, Lookup & Invariant tests passed successfully!
+@evo/mission_control:test: Running Mission Control Cap Table & Investor Registry integration tests...
+@evo/mission_control:test: 
+@evo/mission_control:test: ✅ Investor Registry & Allocated Share counts verified for all live campaigns
+@evo/mission_control:test: ✅ Listed Pool Cap Table Invariants verified for active campaigns
+@evo/mission_control:test: ✅ Settlement Desk calculations verified against @evo/legal_engine canon
+@evo/mission_control:test: 
+@evo/mission_control:test: 🎉 Mission Control Cap Table & Investor Integration tests PASSED!
+@evo/mission_control:test: Running Campaign Pipeline Integration Test...
+@evo/mission_control:test: 
+@evo/mission_control:test: Test failed: Error: Failed to insert inventory campaign: permission denied for table inventory
+@evo/mission_control:test:     at createCampaignFromIntake (/home/evo/new/evo_02/apps/mission_control/src/lib/campaign-pipeline.ts:256:11)
+@evo/mission_control:test:     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+@evo/mission_control:test:     at async runTest (/home/evo/new/evo_02/apps/mission_control/src/lib/campaign-pipeline.test.ts:37:20)
+@evo/mission_control:test: [ELIFECYCLE] Test failed. See above for more details.
+@evo/mission_control#test:  ERROR  command (/home/evo/new/evo_02/apps/mission_control) /home/evo/.nvm/versions/node/v24.14.0/bin/pnpm run test exited (1)
+
+ Tasks:    9 successful, 10 total
+Cached:    9 cached, 10 total
+  Time:    1.041s 
+Failed:    @evo/mission_control#test
+
+ ERROR  run failed: command  exited (1)
+[ELIFECYCLE] Test failed. See above for more details.
+error: Recipe `test` failed on line 32 with exit code 1
+[0m
+EXIT:143

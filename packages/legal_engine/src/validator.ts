@@ -4,6 +4,7 @@
  */
 
 import type { SyndicateLegalContext, ValidationIssue, ValidationReport } from './types';
+import { SHARE_MATH } from './types';
 import { BANNED_LEGAL_TERMS } from '@evo/brand_dna/voice';
 
 export const MANDATORY_SA_CLAUSES = [
@@ -21,6 +22,11 @@ export const MANDATORY_PDS_SECTIONS = [
   '§4. Float & Billing',
   '§5. Gross Stakes Split',
   '§6. Exit & Close Style',
+] as const;
+
+export const MANDATORY_PDS_CLAUSES = [
+  'minimum investment of',
+  'increments of',
 ] as const;
 
 /**
@@ -95,6 +101,29 @@ export function validateLegalPack(
         severity: 'error',
         code: 'FLOAT_MISMATCH',
         message: `joinFloatUnitNzd (${context.pricing.joinFloatUnitNzd}) does not match 5 × keep = ${expectedFloat}`,
+      });
+    }
+
+    // 5. Share-math invariant (locked 2026-08-26): units = stake % / step %,
+    // step defaults to SHARE_MATH.DEFAULT_STAKE_STEP_PCT when unset.
+    const step = context.stakeStepPct ?? SHARE_MATH.DEFAULT_STAKE_STEP_PCT;
+    const expectedShares = context.totalHorsePercentage / step;
+    if (Math.abs(context.totalShares - expectedShares) > 1e-9) {
+      issues.push({
+        severity: 'error',
+        code: 'SHARE_MATH_MISMATCH',
+        message: `totalShares (${context.totalShares}) does not match totalHorsePercentage / stakeStepPct (${context.totalHorsePercentage} / ${step} = ${expectedShares})`,
+      });
+    }
+  }
+
+  // 6. Mandatory PDS clause wording (min investment / increments)
+  for (const clause of MANDATORY_PDS_CLAUSES) {
+    if (!pdsMarkdown.includes(clause)) {
+      issues.push({
+        severity: 'error',
+        code: 'MISSING_PDS_CLAUSE',
+        message: `PDS missing mandatory clause: "${clause}"`,
       });
     }
   }

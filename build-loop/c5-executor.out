@@ -1,0 +1,613 @@
+[0m
+> build · nemotron-3-ultra-free
+[0m
+[0m$ [0mcd /home/evo/new/evo_02 && just lint 2>&1
+pnpm run lint
+$ turbo run lint
+• turbo 2.10.10
+
+   • Packages in scope: @evo/brand_dna, @evo/db_models, @evo/legal_engine, @evo/mission_control, @evo/storage, @evo/web
+   • Running lint in 6 packages
+   • Remote caching disabled
+
+@evo/brand_dna:lint: cache hit, replaying logs 01813af51789612e
+@evo/storage:lint: cache hit, replaying logs 04ea80da50c0c6d4
+@evo/brand_dna:lint: $ eslint src/
+@evo/storage:lint: $ eslint src/
+@evo/storage:build: cache hit, replaying logs e8b8d5cbf12c6a7e
+@evo/brand_dna:build: cache hit, replaying logs d475bb918469a4d7
+@evo/storage:build: $ tsc
+@evo/brand_dna:build: $ tsc
+@evo/db_models:lint: cache hit, replaying logs f8731a9c60964048
+@evo/db_models:lint: $ eslint src/
+@evo/db_models:build: cache hit, replaying logs 6f9482241c9e255d
+@evo/db_models:build: $ tsc
+@evo/legal_engine:lint: cache hit, replaying logs 1536ab1335342aed
+@evo/legal_engine:lint: $ eslint src/
+@evo/legal_engine:build: cache hit, replaying logs de802d99002c97cb
+@evo/legal_engine:build: $ tsc
+@evo/web:lint: cache hit, replaying logs 04062d027835fada
+@evo/web:lint: $ eslint src/
+@evo/web:lint: 
+@evo/web:lint: /home/evo/new/evo_02/apps/web/src/components/mystable-dashboard.tsx
+@evo/web:lint:   39:10  warning  'slugForInventoryId' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@evo/mission_control:lint: cache hit, replaying logs fb77a2a5035f9252
+@evo/web:lint: 
+@evo/mission_control:lint: $ eslint src/
+@evo/mission_control:lint: 
+@evo/mission_control:lint: /home/evo/new/evo_02/apps/mission_control/src/components/investor-ledger.tsx
+@evo/mission_control:lint:   16:2  warning  'Sparkles' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@evo/mission_control:lint: 
+@evo/web:lint: /home/evo/new/evo_02/apps/web/src/components/thoroughbred-attributes.tsx
+@evo/mission_control:lint: /home/evo/new/evo_02/apps/mission_control/src/lib/campaign-pipeline.ts
+@evo/mission_control:lint:   136:9  warning  'stakeStepPct' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@evo/mission_control:lint: 
+@evo/mission_control:lint: ✖ 2 problems (0 errors, 2 warnings)
+@evo/web:lint:   1:20  warning  'CheckCircle2' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@evo/web:lint: 
+@evo/mission_control:lint: 
+@evo/web:lint: /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
+@evo/web:lint:    12:3  warning  'ownerDisplayName' is defined but never used. Allowed unused vars must match /^_/u      @typescript-eslint/no-unused-vars
+@evo/web:lint:   150:9  warning  'totalShares' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@evo/web:lint: 
+@evo/web:lint: ✖ 4 problems (0 errors, 4 warnings)
+@evo/web:lint: 
+
+ Tasks:    10 successful, 10 total
+Cached:    10 cached, 10 total
+  Time:    17ms >>> FULL TURBO
+[0m
+[0m→ [0mRead apps/web/src/lib/horses-data.ts
+[0m→ [0mRead apps/web/src/components/mystable-dashboard.tsx
+[0m→ [0mRead apps/web/src/components/thoroughbred-attributes.tsx
+[0m→ [0mRead apps/mission_control/src/lib/campaign-pipeline.ts
+[0m→ [0mRead apps/mission_control/src/components/investor-ledger.tsx
+[0m
+[0m← [0mEdit apps/web/src/lib/horses-data.ts
+Index: /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
+===================================================================
+--- /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
++++ /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
+@@ -8,9 +8,8 @@
+ } from '@evo/legal_engine';
+ import {
+   getSire,
+   getTrainer,
+-  ownerDisplayName,
+   type ListingStatus,
+ } from '@evo/db_models';
+ import { getHorseCdnUrls, getTrainerCdnUrls } from '@evo/storage/cdn';
+ import { getHorseMediaWithFallback } from './media-fallback';
+
+[0m
+[0m← [0mEdit apps/web/src/lib/horses-data.ts
+Index: /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
+===================================================================
+--- /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
++++ /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
+@@ -145,9 +145,9 @@
+ const trainer = resolveTrainer(row.trainer_name, row.trainer_location);
+ const owner = resolveOwner(row.slug);
+ 
+ const listedStakePct = Number(row.listed_stake_pct);
+-const totalShares = Number(row.total_shares);
++const _totalShares = Number(row.total_shares);
+ const sharesAvailable = Number(row.shares_available);
+ const reservedShares = Number(row.reserved_shares);
+ const stakeStepPct = Number(row.stake_step_pct);
+ 
+
+[0m
+[0m← [0mEdit apps/web/src/components/mystable-dashboard.tsx
+Index: /home/evo/new/evo_02/apps/web/src/components/mystable-dashboard.tsx
+===================================================================
+--- /home/evo/new/evo_02/apps/web/src/components/mystable-dashboard.tsx
++++ /home/evo/new/evo_02/apps/web/src/components/mystable-dashboard.tsx
+@@ -35,12 +35,8 @@
+ };
+ 
+ export type MyStableDashboardCampaigns = Record<string, HorseCampaign>;
+ 
+-function slugForInventoryId(horseId: string): string | undefined {
+-  return Object.entries(INVENTORY_UUID_BY_SLUG).find(([, id]) => id === horseId)?.[0];
+-}
+-
+ function kycLabel(status: KycStatus | string): { text: string; className: string } {
+   if (status === 'verified') {
+     return { text: 'Verified', className: 'text-emerald-400' };
+   }
+
+[0m
+[0m← [0mEdit apps/web/src/components/thoroughbred-attributes.tsx
+Index: /home/evo/new/evo_02/apps/web/src/components/thoroughbred-attributes.tsx
+===================================================================
+--- /home/evo/new/evo_02/apps/web/src/components/thoroughbred-attributes.tsx
++++ /home/evo/new/evo_02/apps/web/src/components/thoroughbred-attributes.tsx
+@@ -1,5 +1,5 @@
+-import { Sparkles, CheckCircle2 } from 'lucide-react';
++import { Sparkles } from 'lucide-react';
+ 
+ interface DynamicHighlightPillsProps {
+   tags?: string[];
+   highlights?: string[];
+
+[0m
+[0m✗ [0mEdit apps/mission_control/src/lib/campaign-pipeline.ts failed
+[91m[1mError: [0mFound multiple matches for oldString. Provide more surrounding context to make the match unique.
+[0m
+[0m← [0mEdit apps/mission_control/src/components/investor-ledger.tsx
+Index: /home/evo/new/evo_02/apps/mission_control/src/components/investor-ledger.tsx
+===================================================================
+--- /home/evo/new/evo_02/apps/mission_control/src/components/investor-ledger.tsx
++++ /home/evo/new/evo_02/apps/mission_control/src/components/investor-ledger.tsx
+@@ -1,20 +1,19 @@
+ 'use client';
+ 
+ import React, { useState, useMemo } from 'react';
+ import {
+- Users,
+- ShieldCheck,
+- Search,
+- Filter,
+- DollarSign,
+- Layers,
+- ChevronRight,
+- AlertCircle,
+- Clock,
+- CheckCircle2,
+- XCircle,
+- Sparkles,
++  Users,
++  ShieldCheck,
++  Search,
++  Filter,
++  DollarSign,
++  Layers,
++  ChevronRight,
++  AlertCircle,
++  Clock,
++  CheckCircle2,
++  XCircle,
+ } from 'lucide-react';
+ import {
+  getInvestors,
+  InvestorProfileRecord,
+
+[0m
+Now I'll fix the lint warnings first, then the tokinvest type unions. Let me start with the lint fixes:
+[0m→ [0mRead apps/mission_control/src/lib/campaign-pipeline.ts[90m [limit=50, offset=125][0m
+[0m
+[0m← [0mEdit apps/mission_control/src/lib/campaign-pipeline.ts
+Index: /home/evo/new/evo_02/apps/mission_control/src/lib/campaign-pipeline.ts
+===================================================================
+--- /home/evo/new/evo_02/apps/mission_control/src/lib/campaign-pipeline.ts
++++ /home/evo/new/evo_02/apps/mission_control/src/lib/campaign-pipeline.ts
+@@ -132,9 +132,9 @@
+ const horsePedigree = buildPedigree(intake.pedigree);
+ const trainer = buildTrainer(intake.trainer);
+ const totalStakePct = intake.totalSyndicateStakePct ?? 100.0;
+ const minStakePct = pricing.stakePercentage;
+-const stakeStepPct = 0.5;
++const _stakeStepPct = 0.5;
+ const totalShares = Math.floor(totalStakePct / minStakePct);
+ const sharesAvailable = totalShares;
+ 
+ return {
+
+[0m
+[0m$ [0mcd /home/evo/new/evo_02 && just lint 2>&1
+pnpm run lint
+$ turbo run lint
+• turbo 2.10.10
+
+   • Packages in scope: @evo/brand_dna, @evo/db_models, @evo/legal_engine, @evo/mission_control, @evo/storage, @evo/web
+   • Running lint in 6 packages
+   • Remote caching disabled
+
+@evo/storage:lint: cache hit, replaying logs 04ea80da50c0c6d4
+@evo/brand_dna:build: cache hit, replaying logs d475bb918469a4d7
+@evo/storage:lint: $ eslint src/
+@evo/brand_dna:build: $ tsc
+@evo/brand_dna:lint: cache hit, replaying logs 01813af51789612e
+@evo/brand_dna:lint: $ eslint src/
+@evo/storage:build: cache hit, replaying logs e8b8d5cbf12c6a7e
+@evo/storage:build: $ tsc
+@evo/db_models:lint: cache hit, replaying logs f8731a9c60964048
+@evo/db_models:lint: $ eslint src/
+@evo/db_models:build: cache hit, replaying logs 6f9482241c9e255d
+@evo/db_models:build: $ tsc
+@evo/legal_engine:lint: cache hit, replaying logs 1536ab1335342aed
+@evo/legal_engine:lint: $ eslint src/
+@evo/legal_engine:build: cache hit, replaying logs de802d99002c97cb
+@evo/legal_engine:build: $ tsc
+@evo/mission_control:lint: cache miss, executing e60266e74d217207
+@evo/web:lint: cache miss, executing 636f6d27efe7aeb0
+@evo/web:lint: $ eslint src/
+@evo/mission_control:lint: $ eslint src/
+@evo/web:lint: 
+@evo/web:lint: /home/evo/new/evo_02/apps/web/src/components/mystable-dashboard.tsx
+@evo/web:lint:   12:10  warning  'INVENTORY_UUID_BY_SLUG' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@evo/web:lint: 
+@evo/web:lint: ✖ 1 problem (0 errors, 1 warning)
+@evo/web:lint: 
+
+ Tasks:    10 successful, 10 total
+Cached:    8 cached, 10 total
+  Time:    1.302s
+[0m
+[0m→ [0mRead apps/web/src/components/mystable-dashboard.tsx[90m [limit=30][0m
+[0m
+[0m← [0mEdit apps/web/src/components/mystable-dashboard.tsx
+Index: /home/evo/new/evo_02/apps/web/src/components/mystable-dashboard.tsx
+===================================================================
+--- /home/evo/new/evo_02/apps/web/src/components/mystable-dashboard.tsx
++++ /home/evo/new/evo_02/apps/web/src/components/mystable-dashboard.tsx
+@@ -8,9 +8,8 @@
+   getCampaignMedia,
+   getCampaignPricing,
+   getCompiledLegalPackForCampaign,
+ } from '@/lib/horses-data';
+-import { INVENTORY_UUID_BY_SLUG } from '@/lib/inventory-ids';
+ import type { KycStatus } from '@evo/db_models/types';
+ import {
+   Sparkles,
+   ShieldCheck,
+
+[0m
+[0m$ [0mcd /home/evo/new/evo_02 && just lint 2>&1
+pnpm run lint
+$ turbo run lint
+• turbo 2.10.10
+
+   • Packages in scope: @evo/brand_dna, @evo/db_models, @evo/legal_engine, @evo/mission_control, @evo/storage, @evo/web
+   • Running lint in 6 packages
+   • Remote caching disabled
+
+@evo/brand_dna:lint: cache hit, replaying logs 01813af51789612e
+@evo/brand_dna:lint: $ eslint src/
+@evo/brand_dna:build: cache hit, replaying logs d475bb918469a4d7
+@evo/storage:lint: cache hit, replaying logs 04ea80da50c0c6d4
+@evo/storage:build: cache hit, replaying logs e8b8d5cbf12c6a7e
+@evo/brand_dna:build: $ tsc
+@evo/storage:lint: $ eslint src/
+@evo/storage:build: $ tsc
+@evo/db_models:lint: cache hit, replaying logs f8731a9c60964048
+@evo/db_models:lint: $ eslint src/
+@evo/db_models:build: cache hit, replaying logs 6f9482241c9e255d
+@evo/db_models:build: $ tsc
+@evo/legal_engine:lint: cache hit, replaying logs 1536ab1335342aed
+@evo/legal_engine:lint: $ eslint src/
+@evo/legal_engine:build: cache hit, replaying logs de802d99002c97cb
+@evo/legal_engine:build: $ tsc
+@evo/web:lint: cache miss, executing 285847c2db074917
+@evo/mission_control:lint: cache hit, replaying logs e60266e74d217207
+@evo/mission_control:lint: $ eslint src/
+@evo/web:lint: $ eslint src/
+
+ Tasks:    10 successful, 10 total
+Cached:    9 cached, 10 total
+  Time:    1.177s
+[0m
+[0m→ [0mRead packages/legal_engine/src/types.ts
+Lint warnings fixed. Now let's strip 'tokinvest' from type unions. First, let me read the target files:
+[0m
+[0m← [0mEdit packages/legal_engine/src/types.ts
+Index: /home/evo/new/evo_02/packages/legal_engine/src/types.ts
+===================================================================
+--- /home/evo/new/evo_02/packages/legal_engine/src/types.ts
++++ /home/evo/new/evo_02/packages/legal_engine/src/types.ts
+@@ -57,9 +57,9 @@
+ totalShares: number;
+ sharesAvailable: number;
+ paymentModel?: 'subscription_float' | 'upfront';
+ termMonths?: number;
+-listingPlatform?: 'evolution' | 'tokinvest' | string;
++listingPlatform?: string;
+ pdsVersion: string;
+ saVersion: string;
+ effectiveDate: string;
+ softLegal?: HorseSoftLegalContent;
+
+[0m
+[0m→ [0mRead packages/db_models/src/types/database.types.ts
+[0m
+[0m← [0mEdit packages/db_models/src/types/database.types.ts
+Index: /home/evo/new/evo_02/packages/db_models/src/types/database.types.ts
+===================================================================
+--- /home/evo/new/evo_02/packages/db_models/src/types/database.types.ts
++++ /home/evo/new/evo_02/packages/db_models/src/types/database.types.ts
+@@ -121,9 +121,9 @@
+ reserved_shares: number;
+ status: CampaignStatus;
+ close_style: CloseStyle;
+ payment_style: PaymentStyle;
+-listing_platform: 'evolution' | 'tokinvest' | string;
++listing_platform: string;
+ hero_image_url: string;
+ pedigree_image_url: string | null;
+ pds_hash: string;
+ sa_hash: string;
+
+[0m
+[0m← [0mEdit packages/db_models/src/types/database.types.ts
+Index: /home/evo/new/evo_02/packages/db_models/src/types/database.types.ts
+===================================================================
+--- /home/evo/new/evo_02/packages/db_models/src/types/database.types.ts
++++ /home/evo/new/evo_02/packages/db_models/src/types/database.types.ts
+@@ -156,9 +156,9 @@
+ reserved_shares?: number;
+ status?: CampaignStatus;
+ close_style?: CloseStyle;
+ payment_style?: PaymentStyle;
+-listing_platform?: 'evolution' | 'tokinvest' | string;
++listing_platform?: string;
+ hero_image_url: string;
+ pedigree_image_url?: string | null;
+ pds_hash: string;
+ sa_hash: string;
+@@ -191,9 +191,9 @@
+ reserved_shares?: number;
+ status?: CampaignStatus;
+ close_style?: CloseStyle;
+ payment_style?: PaymentStyle;
+-listing_platform?: 'evolution' | 'tokinvest' | string;
++listing_platform?: string;
+ hero_image_url?: string;
+ pedigree_image_url?: string | null;
+ pds_hash?: string;
+ sa_hash?: string;
+
+[0m
+[0m→ [0mRead apps/web/src/lib/horses-data.ts[90m [limit=70][0m
+[0m
+[0m← [0mEdit apps/web/src/lib/horses-data.ts
+Index: /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
+===================================================================
+--- /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
++++ /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
+@@ -55,9 +55,9 @@
+     availablePct: number;
+     totalInvestors: number;
+   };
+   closeStyle: 'fourteen_day' | 'three_x_remaining';
+-  listingPlatform?: 'evolution' | 'tokinvest' | string;
++  listingPlatform?: string;
+ }
+ 
+ /**
+  * 3-Tier Thoroughbred Naming Standard Formatter.
+
+[0m
+[0m→ [0mRead apps/mission_control/src/lib/campaign-pipeline.ts[90m [limit=70][0m
+[0m
+[0m← [0mEdit apps/mission_control/src/lib/campaign-pipeline.ts
+Index: /home/evo/new/evo_02/apps/mission_control/src/lib/campaign-pipeline.ts
+===================================================================
+--- /home/evo/new/evo_02/apps/mission_control/src/lib/campaign-pipeline.ts
++++ /home/evo/new/evo_02/apps/mission_control/src/lib/campaign-pipeline.ts
+@@ -55,9 +55,9 @@
+ softLegal?: Partial<HorseSoftLegalContent>;
+ marketing?: MarketingInput;
+ closeStyle?: CloseStyle;
+ paymentModel?: PaymentStyle;
+-listingPlatform?: 'evolution' | 'tokinvest' | string;
++listingPlatform?: string;
+ pdsVersion?: string;
+ saVersion?: string;
+ effectiveDate?: string;
+ termMonths?: number;
+
+[0m
+Now let's verify:
+[0m$ [0mcd /home/evo/new/evo_02 && just check 2>&1
+pnpm run lint
+$ turbo run lint
+• turbo 2.10.10
+
+   • Packages in scope: @evo/brand_dna, @evo/db_models, @evo/legal_engine, @evo/mission_control, @evo/storage, @evo/web
+   • Running lint in 6 packages
+   • Remote caching disabled
+
+@evo/brand_dna:lint: cache hit, replaying logs 01813af51789612e
+@evo/brand_dna:lint: $ eslint src/
+@evo/storage:build: cache hit, replaying logs e8b8d5cbf12c6a7e
+@evo/storage:build: $ tsc
+@evo/storage:lint: cache hit, replaying logs 04ea80da50c0c6d4
+@evo/storage:lint: $ eslint src/
+@evo/brand_dna:build: cache hit, replaying logs d475bb918469a4d7
+@evo/brand_dna:build: $ tsc
+@evo/db_models:lint: cache miss, executing 20a85ff322b7e005
+@evo/db_models:build: cache miss, executing 8046c95c7c1275bd
+@evo/db_models:lint: $ eslint src/
+@evo/db_models:build: $ tsc
+@evo/legal_engine:lint: cache miss, executing e2da9040874f4dc4
+@evo/legal_engine:build: cache miss, executing 463475b999917111
+@evo/legal_engine:build: $ tsc
+@evo/legal_engine:lint: $ eslint src/
+@evo/web:lint: cache miss, executing aee989f543880d76
+@evo/mission_control:lint: cache miss, executing ac3c3fed2af7085d
+@evo/mission_control:lint: $ eslint src/
+@evo/web:lint: $ eslint src/
+
+ Tasks:    10 successful, 10 total
+Cached:    4 cached, 10 total
+  Time:    3.284s 
+
+pnpm run typecheck
+$ turbo run typecheck
+• turbo 2.10.10
+
+   • Packages in scope: @evo/brand_dna, @evo/db_models, @evo/legal_engine, @evo/mission_control, @evo/storage, @evo/web
+   • Running typecheck in 6 packages
+   • Remote caching disabled
+
+@evo/brand_dna:typecheck: cache hit, replaying logs 38dc7ecaf7f8ae4e
+@evo/brand_dna:typecheck: $ tsc --noEmit
+@evo/brand_dna:build: cache hit, replaying logs d475bb918469a4d7
+@evo/brand_dna:build: $ tsc
+@evo/storage:typecheck: cache hit, replaying logs 1f0e0e52bfc35ab9
+@evo/storage:build: cache hit, replaying logs e8b8d5cbf12c6a7e
+@evo/storage:typecheck: $ tsc --noEmit
+@evo/storage:build: $ tsc
+@evo/db_models:build: cache miss, executing 92559299757c597a
+@evo/db_models:typecheck: cache miss, executing 6f678abbaa2dc0de
+@evo/db_models:build: $ tsc
+@evo/db_models:typecheck: $ tsc --noEmit
+@evo/legal_engine:build: cache miss, executing eeca59ba41b12d30
+@evo/legal_engine:typecheck: cache miss, executing 912243bc1b4cf6b5
+@evo/legal_engine:build: $ tsc
+@evo/legal_engine:typecheck: $ tsc --noEmit
+@evo/web:typecheck: cache miss, executing 7289f7b31e714590
+@evo/mission_control:typecheck: cache miss, executing d25062df21e0a312
+@evo/web:typecheck: $ tsc --noEmit
+@evo/mission_control:typecheck: $ tsc --noEmit
+
+ Tasks:    10 successful, 10 total
+Cached:    4 cached, 10 total
+  Time:    4.289s 
+
+pnpm run test
+$ turbo run test
+• turbo 2.10.10
+
+   • Packages in scope: @evo/brand_dna, @evo/db_models, @evo/legal_engine, @evo/mission_control, @evo/storage, @evo/web
+   • Running test in 6 packages
+   • Remote caching disabled
+
+@evo/storage:test: cache hit, replaying logs 49ad9529ff5d18b3
+@evo/storage:test: $ tsx tests/hash.test.ts && tsx tests/cdn.test.ts
+@evo/storage:test: Running @evo/storage isomorphic SHA-256 NIST test vectors...
+@evo/storage:test: 
+@evo/storage:test: ✅ All isomorphic SHA-256 test vectors PASSED!
+@evo/storage:test: 
+@evo/storage:test: Running @evo/storage stills convention tests...
+@evo/storage:test: ✅ Stills convention: 01 cover, true extensions, no fake CDN, no yard mix-up
+@evo/brand_dna:test: cache hit, replaying logs 8f7ed7586bc8d8a2
+@evo/storage:build: cache hit, replaying logs e8b8d5cbf12c6a7e
+@evo/brand_dna:build: cache hit, replaying logs d475bb918469a4d7
+@evo/storage:build: $ tsc
+@evo/brand_dna:build: $ tsc
+@evo/brand_dna:test: $ tsx tests/voice.test.ts
+@evo/brand_dna:test: Running brand_dna voice tests...
+@evo/brand_dna:test: ✅ Banned term enforcement works (including "opaque")
+@evo/brand_dna:test: ✅ Exclamation mark enforcement works
+@evo/brand_dna:test: ✅ Tag taxonomy validation works
+@evo/brand_dna:test: 🎉 All brand_dna voice tests passed.
+@evo/db_models:test: cache miss, executing e3fa01f2f1d829b0
+@evo/db_models:build: cache hit, replaying logs 92559299757c597a
+@evo/db_models:build: $ tsc
+@evo/legal_engine:test: cache miss, executing 560286ddc409aa14
+@evo/legal_engine:build: cache hit, replaying logs eeca59ba41b12d30
+@evo/legal_engine:build: $ tsc
+@evo/mission_control:test: cache miss, executing 46c0658da2234690
+@evo/web:test: cache miss, executing 53b3baee037c4c2c
+@evo/web:test: $ tsx src/tests/nellie_loop.test.ts
+@evo/db_models:test: $ tsx tests/schema.test.ts && tsx tests/registry.test.ts
+@evo/legal_engine:test: $ tsx tests/legal_engine.test.ts && tsx tests/settlement.test.ts
+@evo/mission_control:test: $ tsx src/lib/intake.test.ts && tsx src/lib/cap-table.test.ts
+@evo/db_models:test: Running @evo/db_models Schema & SQL Migration tests...
+@evo/db_models:test: 
+@evo/db_models:test: ✅ SQL Migration files, DDL statements, and Seed scripts verified
+@evo/db_models:test: ✅ TypeScript Database Models & Type Safety verified
+@evo/db_models:test: ✅ Seed step-unit invariants verified
+@evo/db_models:test: 
+@evo/db_models:test: 🎉 All @evo/db_models Schema tests passed successfully!
+@evo/legal_engine:test: Running legal_engine tests...
+@evo/legal_engine:test: 
+@evo/legal_engine:test: ✅ Deterministic Term Sheet / PDS / SA generation
+@evo/legal_engine:test: ✅ Term Sheet generation & anchors verified
+@evo/legal_engine:test: ✅ All mandatory PDS sections present
+@evo/legal_engine:test: ✅ All mandatory SA clauses present
+@evo/legal_engine:test: ✅ Nellie pricing anchors & SA schedule correct
+@evo/legal_engine:test: ✅ Mulan pricing anchors correct
+@evo/legal_engine:test: ✅ Compliance validator passes clean pack
+@evo/legal_engine:test: ✅ Banned term detection works (crypto, lead lessor, micro-ownership)
+@evo/legal_engine:test: ✅ Pricing invariant validation works
+@evo/legal_engine:test: ✅ Upfront payment model pack verified
+@evo/legal_engine:test: ✅ SHA-256 digests are 64-char hex
+@evo/legal_engine:test: ✅ Soft content PDS Section 2 layout verified
+@evo/legal_engine:test: ✅ PDS SHA-256 hash invariant to whitespace and CRLF line endings
+@evo/legal_engine:test: ✅ validateSyndicateContent successfully gates prohibited terminology
+@evo/legal_engine:test: ✅ "opaque" is rejected by unified legal banned-term gate
+@evo/legal_engine:test: ✅ Fixed-input SHA-256 digests are deterministic across compiler runs
+@evo/legal_engine:test: 
+@evo/legal_engine:test: 🎉 All legal_engine tests passed.
+@evo/mission_control:test: Running Horse Lookup, Smart Intake Parser & Invariant tests...
+@evo/mission_control:test: 
+@evo/mission_control:test: ✅ URL & Microchip extraction verified (Breeding, Performance Modal, Profile, and Security validation)
+@evo/mission_control:test: ✅ Horse Stud Book Lookup by URL & Microchip verified
+@evo/mission_control:test: ✅ Canonical DSL pricing invariants verified (SSOT computeDslPricing)
+@evo/mission_control:test: ✅ Smart Content Dump natural text extraction & entity matching verified
+@evo/mission_control:test: 
+@evo/mission_control:test: 🎉 All Intake, Lookup & Invariant tests passed successfully!
+@evo/web:test: Running @evo/web Nellie loop tests...
+@evo/web:test: 
+@evo/web:test: ✅ create-session 401 without user.id
+@evo/web:test: ✅ KYC stub 403 unless verified
+@evo/web:test: ✅ reserve_campaign_shares fail closed
+@evo/web:test: ✅ purchases gated unless Stripe key + PURCHASES_ENABLED
+@evo/db_models:test: Running knowledge registry tests...
+@evo/db_models:test: ✅ Lookup helpers return correct canonical records
+@evo/db_models:test: ✅ Jockey affinity queries work
+@evo/db_models:test: ✅ Registry slug uniqueness verified
+@evo/db_models:test: ✅ Brand-voice seed gate passed for 147 registry strings
+@evo/db_models:test: ✅ Live asset lock: Stephen Gray Racing only, research trainers excluded, First Gear completed
+@evo/db_models:test: 🎉 All knowledge registry tests passed.
+@evo/web:test: ✅ compiled Nellie hashes are 64-hex, same ownerName as checkout
+@evo/web:test: ✅ holdings insert shape rejects placeholder hashes
+@evo/web:test: ✅ Stripe HMAC verification
+@evo/web:test: ✅ login ?next= is path-safe
+@evo/legal_engine:test: Running @evo/legal_engine Settlement & Cap Table Invariant tests...
+@evo/legal_engine:test: 
+@evo/legal_engine:test: ✅ 3-Way Listed Stake Pool Invariants & Input Guards verified
+@evo/legal_engine:test: ✅ 75/25 Prize Distribution (0% Evolution) & Pro-Rata Payouts verified
+@evo/legal_engine:test: ✅ SOP Settlement Cases (Case B, Case D 4->3, Case E) verified
+@evo/legal_engine:test: ✅ NZ GST 3/23 Breakdown Identity verified
+@evo/legal_engine:test: 
+@evo/legal_engine:test: 🎉 All Settlement, Cap Table & GST tests passed successfully!
+@evo/web:test: ✅ only Nellie is buyable
+@evo/web:test: ✅ R2 skipped unless env exists
+@evo/web:test: ✅ source audit: no guest, no placeholder, RPC wired, consume fail-loud
+@evo/web:test: ✅ consume/payment fail closed
+@evo/web:test: 
+@evo/web:test: 🎉 All @evo/web Nellie loop tests passed successfully!
+@evo/mission_control:test: Running Mission Control Cap Table & Investor Registry integration tests...
+@evo/mission_control:test: 
+@evo/mission_control:test: ✅ Investor Registry & Allocated Share counts verified for all live campaigns
+@evo/mission_control:test: ✅ Listed Pool Cap Table Invariants verified for active campaigns
+@evo/mission_control:test: ✅ Settlement Desk calculations verified against @evo/legal_engine canon
+@evo/mission_control:test: 
+@evo/mission_control:test: 🎉 Mission Control Cap Table & Investor Integration tests PASSED!
+
+ Tasks:    10 successful, 10 total
+Cached:    6 cached, 10 total
+  Time:    765ms 
+
+✅ [evo_02] All lint, typecheck, and test gates PASSED.
+[0m
+[0m$ [0mcd /home/evo/new/evo_02 && grep -ri tokinvest apps packages --include='*.ts' --exclude-dir=dist
+packages/brand_dna/src/voice.ts:  'tokinvest',
+[0m
+Both verification commands pass. Here's the change summary:
+
+**Lint fixes (6 warnings → 0):**
+1. `apps/web/src/lib/horses-data.ts:12` — Removed unused `ownerDisplayName` import
+2. `apps/web/src/lib/horses-data.ts:150` — Prefixed `_totalShares` (assigned-but-unread)
+3. `apps/web/src/components/mystable-dashboard.tsx:39` — Deleted unused `slugForInventoryId` function + its `INVENTORY_UUID_BY_SLUG` import
+4. `apps/web/src/components/thoroughbred-attributes.tsx:1` — Removed unused `CheckCircle2` import
+5. `apps/mission_control/src/lib/campaign-pipeline.ts:136` — Prefixed `_stakeStepPct` (assigned-but-unread in `buildLegalContext`)
+6. `apps/mission_control/src/components/investor-ledger.tsx:16` — Removed unused `Sparkles` import
+
+**'tokinvest' type-union purge (4 files):**
+1. `packages/legal_engine/src/types.ts:61` — `listingPlatform?: 'evolution' | 'tokinvest' | string` → `listingPlatform?: string`
+2. `packages/db_models/src/types/database.types.ts:125,160,195` — Three occurrences (`Row`, `Insert`, `Update`) all changed to `string`
+3. `apps/web/src/lib/horses-data.ts:59` — `listingPlatform?: 'evolution' | 'tokinvest' | string` → `listingPlatform?: string`
+4. `apps/mission_control/src/lib/campaign-pipeline.ts:59` — `listingPlatform?: 'evolution' | 'tokinvest' | string` → `listingPlatform?: string`
+
+**Verification results:**
+```
+✅ just check → "All lint, typecheck, and test gates PASSED."
+✅ grep -ri tokinvest apps packages --include='*.ts' --exclude-dir=dist
+   packages/brand_dna/src/voice.ts:  'tokinvest',  ← ONLY permitted hit
+```
+EXIT:0

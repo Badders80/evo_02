@@ -4,6 +4,7 @@
  */
 
 import type { SyndicateLegalContext } from './types';
+import { SHARE_MATH } from './types';
 
 export function generateTermSheetMarkdown(context: SyndicateLegalContext): string {
   const p = context.pricing;
@@ -42,8 +43,8 @@ export function generateTermSheetMarkdown(context: SyndicateLegalContext): strin
 ---
 
 ### 2. Syndicate Stake & Commercials
-* **Syndicated Stake in Horse:** ${context.totalHorsePercentage.toFixed(1)}% total horse lease
-* **Available Stakes:** ${context.totalShares} Lots (${p.stakePercentage.toFixed(1)}% minimum stake / 0.5% step)
+* **Syndicated Stake in Horse:** ${context.totalHorsePercentage.toFixed(1)}% available (of the horse's total ownership)
+* **Minimum Investment:** ${(context.minInvestmentPct ?? SHARE_MATH.DEFAULT_MIN_INVESTMENT_PCT).toFixed(1)}% — increments of ${(context.stakeStepPct ?? SHARE_MATH.DEFAULT_STAKE_STEP_PCT).toFixed(1)}% thereafter
 * **Wholesale Base Cost:** $${p.costMonthlyNzd.toFixed(2)} / month per 1% stake
 * **Evolution Margin:** ${p.evolutionMarginPercent.toFixed(1)}%  |  **Payment Buffer:** ${p.processingBufferPercent.toFixed(1)}%
 * **Retail Monthly Rate (M):** $${p.monthlyKeepUnitNzd.toFixed(2)} / month per 1% stake

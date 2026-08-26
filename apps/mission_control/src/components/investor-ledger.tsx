@@ -2,18 +2,17 @@
 
 import React, { useState, useMemo } from 'react';
 import {
- Users,
- ShieldCheck,
- Search,
- Filter,
- DollarSign,
- Layers,
- ChevronRight,
- AlertCircle,
- Clock,
- CheckCircle2,
- XCircle,
- Sparkles,
+  Users,
+  ShieldCheck,
+  Search,
+  Filter,
+  DollarSign,
+  Layers,
+  ChevronRight,
+  AlertCircle,
+  Clock,
+  CheckCircle2,
+  XCircle,
 } from 'lucide-react';
 import {
  getInvestors,

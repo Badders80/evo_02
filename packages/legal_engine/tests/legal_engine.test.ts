@@ -37,8 +37,10 @@ const nellieContext: SyndicateLegalContext = {
   },
   closeStyle: 'fourteen_day',
   totalHorsePercentage: 5.0,
-  totalShares: 5,
-  sharesAvailable: 5,
+  totalShares: 10,
+  sharesAvailable: 10,
+  minInvestmentPct: 1.0,
+  stakeStepPct: 0.5,
   pdsVersion: '1.0.0',
   saVersion: '1.0.0',
   effectiveDate: '2026-08-17',
@@ -75,8 +77,10 @@ const mulanContext: SyndicateLegalContext = {
   },
   closeStyle: 'fourteen_day',
   totalHorsePercentage: 5.0,
-  totalShares: 5,
-  sharesAvailable: 5,
+  totalShares: 10,
+  sharesAvailable: 10,
+  minInvestmentPct: 1.0,
+  stakeStepPct: 0.5,
   pdsVersion: '1.0.0',
   saVersion: '1.0.0',
   effectiveDate: '2026-08-17',
@@ -127,7 +131,8 @@ export function runTests(): void {
   assertIncludes(nelliePack.pack.termSheetMarkdown, 'DSL Term Sheet', 'Term Sheet title');
   assertIncludes(nelliePack.pack.termSheetMarkdown, 'Owner:** Bax Bloodstock', 'Nellie Owner');
   assertIncludes(nelliePack.pack.termSheetMarkdown, 'Trainer:** Barbara Kennedy (Byerley Park, NZ)', 'Nellie Trainer');
-  assertIncludes(nelliePack.pack.termSheetMarkdown, '5.0% total horse lease', 'Nellie total syndicated %');
+  assertIncludes(nelliePack.pack.termSheetMarkdown, '5.0% available', 'Nellie total syndicated %');
+  assertIncludes(nelliePack.pack.termSheetMarkdown, 'Minimum Investment:** 1.0% — increments of 0.5% thereafter', 'Nellie min investment / step wording');
   assertIncludes(nelliePack.pack.termSheetMarkdown, '$76.00 / month per 1% stake', 'Nellie keep rate');
   assertIncludes(nelliePack.pack.termSheetMarkdown, '$380.00 per 1% stake', 'Nellie join float');
   assertIncludes(nelliePack.pack.termSheetMarkdown, '75% Investor Pool / 25% Owner Retention', 'Prize split');

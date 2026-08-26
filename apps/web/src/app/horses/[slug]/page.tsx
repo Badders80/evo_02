@@ -256,7 +256,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
               wholesaleMonthlyNzd={campaign.wholesaleMonthlyNzd}
               horseName={campaign.legalName}
               campaignSlug={campaign.slug}
-              sharesAvailable={Math.round(campaign.capTableFixture.availablePct)}
+              availablePct={Math.round(campaign.capTableFixture.availablePct)}
               checkoutOpen={isCheckoutOpen(campaign)}
               listingStatusLabel={
                 campaign.listingStatus === 'completed'

@@ -2,31 +2,34 @@
 
 import React, { useState } from 'react';
 import {
- computeDslPricing,
- validateSyndicateContent,
- compileLegalPack,
- type SyndicateLegalContext,
+  computeDslPricing,
+  validateSyndicateContent,
+  compileLegalPack,
+  SHARE_MATH,
+  type SyndicateLegalContext,
 } from '@evo/legal_engine';
 import {
- Send,
- CheckCircle2,
- Search,
- Sparkles,
- AlertCircle,
- ChevronDown,
- ChevronUp,
- BookOpen,
- ShieldCheck,
- FileCheck,
- Tag,
+  Send,
+  CheckCircle2,
+  Search,
+  Sparkles,
+  AlertCircle,
+  ChevronDown,
+  ChevronUp,
+  BookOpen,
+  ShieldCheck,
+  FileCheck,
+  Tag,
+  Globe,
 } from 'lucide-react';
 import { lookupHorse, type HorseLookupRecord } from '@/lib/horse-lookup';
 import {
- parseSmartContentDump,
- REGISTERED_OWNERS,
- REGISTERED_TRAINERS,
- type ExtractedIntakeData,
+  parseSmartContentDump,
+  REGISTERED_OWNERS,
+  REGISTERED_TRAINERS,
+  type ExtractedIntakeData,
 } from '@/lib/smart-intake-parser';
+import { publishCampaignAction } from '../app/actions/publish-campaign';
 
 interface HorseWorkspaceProps {
  horseContext: SyndicateLegalContext;
@@ -51,8 +54,10 @@ export function HorseWorkspace({
  const [racingOutlook, setRacingOutlook] = useState(horseContext.softLegal?.racingOutlookAndPedigree || '');
  const [marketplaceHook, setMarketplaceHook] = useState('');
  const [highlightPillsText, setHighlightPillsText] = useState('');
- const [publishSuccess, setPublishSuccess] = useState(false);
- const [publishedPdsHash, setPublishedPdsHash] = useState<string | null>(null);
+const [publishSuccess, setPublishSuccess] = useState(false);
+  const [publishedPdsHash, setPublishedPdsHash] = useState<string | null>(null);
+  const [publishing, setPublishing] = useState(false);
+  const [publishResult, setPublishResult] = useState<{ ok: boolean; inventoryId?: string; pdsHash?: string; saHash?: string; error?: string } | null>(null);
 
  // Intake State
  const [lookupQuery, setLookupQuery] = useState('');
@@ -164,11 +169,10 @@ export function HorseWorkspace({
  }
 
  if (extracted.totalHorsePercentage) {
- const stakePct = p.stakePercentage > 0 ? p.stakePercentage : 1.0;
- const shares = Math.round(extracted.totalHorsePercentage / stakePct);
- updated.totalHorsePercentage = extracted.totalHorsePercentage;
- updated.totalShares = shares;
- updated.sharesAvailable = shares;
+   const shares = Math.round(extracted.totalHorsePercentage / SHARE_MATH.DEFAULT_STAKE_STEP_PCT);
+   updated.totalHorsePercentage = extracted.totalHorsePercentage;
+   updated.totalShares = shares;
+   updated.sharesAvailable = shares;
  }
 
  if (extracted.closeStyle) {
@@ -194,8 +198,7 @@ export function HorseWorkspace({
 
  const handleTotalStakeChange = (pct: number) => {
  const validPct = Math.max(0.5, Math.min(100, pct));
- const stakePct = p.stakePercentage > 0 ? p.stakePercentage : 1.0;
- const shares = Math.round(validPct / stakePct);
+ const shares = Math.round(validPct / SHARE_MATH.DEFAULT_STAKE_STEP_PCT);
  onUpdateContext({
  ...horseContext,
  totalHorsePercentage: validPct,
@@ -225,21 +228,88 @@ export function HorseWorkspace({
  });
  };
 
- const handleTrainerSelect = (trainerId: string) => {
- const found = REGISTERED_TRAINERS.find((tr) => tr.id === trainerId);
- if (found) {
- onUpdateContext({
- ...horseContext,
- trainer: {
- name: found.name,
- location: found.location,
- managerEntity: found.managerEntity,
- },
- });
- }
- };
+const handleTrainerSelect = (trainerId: string) => {
+    const found = REGISTERED_TRAINERS.find((tr) => tr.id === trainerId);
+    if (found) {
+      onUpdateContext({
+        ...horseContext,
+        trainer: {
+          name: found.name,
+          location: found.location,
+          managerEntity: found.managerEntity,
+        },
+      });
+    }
+  };
 
- const lifecycleStages = [
+  const handlePublishToStorefront = async () => {
+    const combined = `${aboutHorse} ${trainerBio} ${racingOutlook} ${marketplaceHook} ${highlightPillsText}`;
+    if (!validateSyndicateContent(combined).ok) {
+      setPublishResult({ ok: false, error: 'Compliance validation failed. Fix prohibited terms before publishing.' });
+      return;
+    }
+
+    const payload = {
+      slug: horseContext.campaignSlug,
+      legalName: h.legalName,
+      barnName: h.barnName,
+      wholesaleMonthlyNzd: p.costMonthlyNzd,
+      totalSyndicateStakePct: horseContext.totalHorsePercentage,
+      pedigree: {
+        sire: h.sire,
+        dam: h.dam,
+        gender: h.gender,
+        breeder: h.breeder,
+        microchip: h.microchip,
+        foalingYear: h.foalingYear,
+        damSire: undefined,
+        foalingDate: undefined,
+        colour: undefined,
+        lifeNumber: undefined,
+        studBookUrl: undefined,
+        lineageSummary: undefined,
+      },
+      trainer: {
+        name: t.name,
+        stable: t.managerEntity || t.name,
+        location: t.location,
+      },
+      owner: {
+        entity: horseContext.ownerName,
+      },
+      softLegal: {
+        aboutHorse,
+        trainerBio,
+        racingOutlookAndPedigree: racingOutlook,
+      },
+      marketing: {
+        marketplaceHook: marketplaceHook || undefined,
+        highlightTags: highlightPillsText ? highlightPillsText.split(',').map((s) => s.trim()).filter(Boolean) : [],
+        highlights: undefined,
+      },
+      closeStyle: horseContext.closeStyle,
+      paymentModel: horseContext.paymentModel,
+      listingPlatform: horseContext.listingPlatform,
+    };
+
+    setPublishing(true);
+    setPublishResult(null);
+    try {
+      const result = await publishCampaignAction(payload);
+      setPublishResult(result);
+      if (result.ok) {
+        setPublishedPdsHash(result.pdsHash);
+        setPublishSuccess(true);
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error during publish';
+      setPublishResult({ ok: false, error: message });
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  const lifecycleStages = [
  { id: 'draft', label: 'Draft' },
  { id: 'coming_soon', label: 'Coming Soon' },
  { id: 'listed', label: 'Listed (Live)' },
@@ -247,12 +317,21 @@ export function HorseWorkspace({
  { id: 'completed', label: 'Completed' },
  ];
 
- const totalMonthlyTurnover =
- p.stakePercentage > 0
- ? p.monthlyKeepUnitNzd * (horseContext.totalHorsePercentage / p.stakePercentage)
- : 0;
+const totalMonthlyTurnover =
+  p.stakePercentage > 0
+  ? p.monthlyKeepUnitNzd * (horseContext.totalHorsePercentage / p.stakePercentage)
+  : 0;
 
- return (
+  const publishResultStyle = publishResult
+    ? {
+        borderColor: publishResult.ok ? 'rgba(16, 185, 129, 0.8)' : 'rgba(239, 68, 68, 0.8)',
+        backgroundColor: publishResult.ok ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+        color: publishResult.ok ? '#10b981' : '#ef4444',
+      }
+    : undefined;
+  const publishResultIconColor = publishResult ? (publishResult.ok ? '#10b981' : '#ef4444') : undefined;
+
+  return (
  <div className="flex flex-1 flex-col overflow-y-auto bg-white text-zinc-800 border-r border-zinc-200/80">
  {/* Header: Horse Identity & Lifecycle Stepper */}
  <div className="border-b border-zinc-200/80 p-5 bg-zinc-50/30">
@@ -554,11 +633,11 @@ export function HorseWorkspace({
  </div>
  </div>
  <div>
- <label className="block text-xs font-medium text-zinc-500">Total Lots (1.0% each)</label>
+ <label className="block text-xs font-medium text-zinc-500">Total Units (0.5% each)</label>
  <input
- type="text"
- disabled
- value={`${horseContext.totalShares} Lots`}
+   type="text"
+   disabled
+   value={`${horseContext.totalShares} units`}
  className="mt-1 h-8 w-full rounded border border-zinc-200/60 bg-white px-3 text-xs font-mono text-zinc-500"
  />
  </div>
@@ -899,63 +978,128 @@ export function HorseWorkspace({
  ))}
  </div>
  </div>
- </div>
+</div>
 
- {/* 1-Click Save & Legal Re-Hash */}
- <div className="rounded-lg border border-[#d4a964]/40 bg-[#d4a964]/5 p-4 space-y-3">
- <div className="flex items-center justify-between">
- <div>
- <h4 className="text-xs font-semibold text-zinc-900">1-Click Save & Legal Sync</h4>
- <p className="text-[11px] text-zinc-500 mt-0.5">
- Updates database, syncs live website, and re-computes official PDS SHA-256 hash.
- </p>
- </div>
+  {/* 1-Click Save & Legal Re-Hash */}
+  <div className="rounded-lg border border-[#d4a964]/40 bg-[#d4a964]/5 p-4 space-y-3">
+  <div className="flex items-center justify-between">
+  <div>
+  <h4 className="text-xs font-semibold text-zinc-900">1-Click Save & Legal Sync</h4>
+  <p className="text-[11px] text-zinc-500 mt-0.5">
+  Updates database, syncs live website, and re-computes official PDS SHA-256 hash.
+  </p>
+  </div>
 
- <button
- disabled={!validateSyndicateContent(`${aboutHorse} ${trainerBio} ${racingOutlook} ${marketplaceHook} ${highlightPillsText}`).ok}
- onClick={() => {
- const updated: SyndicateLegalContext = {
- ...horseContext,
- softLegal: {
- aboutHorse,
- trainerBio,
- racingOutlookAndPedigree: racingOutlook,
- },
- };
- try {
- const { pack } = compileLegalPack(updated, { skipValidation: false });
- onUpdateContext(updated);
- setPublishedPdsHash(pack.pdsHash);
- setPublishSuccess(true);
- } catch (err: unknown) {
-   alert(`Validation Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
- }
- }}
- className="flex items-center gap-1.5 rounded bg-[#d4a964] px-4 py-2 text-xs font-semibold text-black hover:bg-[#c39853] transition-colors disabled:opacity-50 shadow-md"
- >
- <FileCheck className="h-4 w-4" />
- <span>Save & Re-Hash Legal PDS</span>
- </button>
- </div>
+<button
+  disabled={!validateSyndicateContent(`${aboutHorse} ${trainerBio} ${racingOutlook} ${marketplaceHook} ${highlightPillsText}`).ok}
+  onClick={() => {
+  const updated: SyndicateLegalContext = {
+  ...horseContext,
+  softLegal: {
+  aboutHorse,
+  trainerBio,
+  racingOutlookAndPedigree: racingOutlook,
+  },
+  };
+  try {
+  const { pack } = compileLegalPack(updated, { skipValidation: false });
+  onUpdateContext(updated);
+  setPublishedPdsHash(pack.pdsHash);
+  setPublishSuccess(true);
+  } catch (err: unknown) {
+    alert(`Validation Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  }
+  }}
+  className="flex items-center gap-1.5 rounded bg-[#d4a964] px-4 py-2 text-xs font-semibold text-black hover:bg-[#c39853] transition-colors disabled:opacity-50 shadow-md"
+  >
+  <FileCheck className="h-4 w-4" />
+  <span>Save & Re-Hash Legal PDS</span>
+  </button>
+  </div>
 
- {publishSuccess && publishedPdsHash && (
- <div className="mt-3 rounded border border-emerald-800/80 bg-emerald-950/60 p-3 text-xs text-emerald-300 font-mono space-y-1">
- <div className="flex items-center gap-1.5 font-semibold text-emerald-200">
- <CheckCircle2 className="h-4 w-4 text-emerald-400" />
- <span>PDS Hash Successfully Re-Compiled:</span>
- </div>
- <div className="text-[11px] text-emerald-400/90 break-all select-all">
- {publishedPdsHash}
- </div>
- </div>
- )}
- </div>
- </div>
- </div>
- </div>
- )}
+  {publishSuccess && publishedPdsHash && (
+  <div className="mt-3 rounded border border-emerald-800/80 bg-emerald-950/60 p-3 text-xs text-emerald-300 font-mono space-y-1">
+  <div className="flex items-center gap-1.5 font-semibold text-emerald-200">
+  <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+  <span>PDS Hash Successfully Re-Compiled:</span>
+  </div>
+  <div className="text-[11px] text-emerald-400/90 break-all select-all">
+  {publishedPdsHash}
+  </div>
+  </div>
+  )}
 
- {activeTab === 'broadcast' && (
+  {/* Publish to Storefront */}
+  <div className="rounded-lg border border-emerald-600/40 bg-emerald-600/5 p-4 space-y-3">
+  <div className="flex items-center justify-between">
+  <div>
+  <h4 className="text-xs font-semibold text-zinc-900">Publish to Storefront</h4>
+  <p className="text-[11px] text-zinc-500 mt-0.5">
+  Creates inventory listing, computes SA hash, and makes the campaign live on the storefront.
+  </p>
+  </div>
+
+  <button
+  disabled={publishing || !validateSyndicateContent(`${aboutHorse} ${trainerBio} ${racingOutlook} ${marketplaceHook} ${highlightPillsText}`).ok}
+  onClick={handlePublishToStorefront}
+  className="flex items-center gap-1.5 rounded bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-500 transition-colors disabled:opacity-50 shadow-md"
+  >
+  <Globe className="h-4 w-4" />
+  <span>{publishing ? 'Publishing…' : 'Publish to Storefront'}</span>
+  </button>
+  </div>
+
+  {publishResult && (
+      <div
+        className="mt-3 rounded border p-3 text-xs font-mono space-y-1"
+        style={publishResultStyle}
+      >
+        <div className="flex items-center gap-1.5 font-semibold">
+          {publishResult.ok ? (
+            <CheckCircle2
+              className="h-4 w-4"
+              style={{ color: publishResultIconColor }}
+            />
+          ) : (
+            <AlertCircle
+              className="h-4 w-4"
+              style={{ color: publishResultIconColor }}
+            />
+          )}
+          <span>{publishResult.ok ? 'Published Successfully' : 'Publish Failed'}</span>
+        </div>
+        {publishResult.ok && (
+          <div className="text-[11px] break-all select-all space-y-0.5">
+            <div><strong>Inventory ID:</strong> {publishResult.inventoryId}</div>
+            <div><strong>PDS Hash:</strong> {publishResult.pdsHash}</div>
+            <div><strong>SA Hash:</strong> {publishResult.saHash}</div>
+          </div>
+        )}
+        {!publishResult.ok && (
+          <div className="text-[11px] break-all select-all">
+            {publishResult.error === 'unauthorized' ? (
+              <>
+                Operator session expired or missing.{' '}
+                <a href="/operator" className="underline font-semibold">
+                  Sign in as operator
+                </a>{' '}
+                and publish again.
+              </>
+            ) : (
+              publishResult.error
+            )}
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+  )}
+
+  {activeTab === 'broadcast' && (
  <div className="rounded-lg border border-zinc-200/80 bg-zinc-50/40 p-4 space-y-4">
  <div className="flex items-center justify-between border-b border-zinc-200/80 pb-2">
  <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-700">
@@ -1010,4 +1154,4 @@ export function HorseWorkspace({
  </div>
  </div>
  );
-}
+ }

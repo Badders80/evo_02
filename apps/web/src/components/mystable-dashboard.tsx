@@ -9,7 +9,6 @@ import {
   getCampaignPricing,
   getCompiledLegalPackForCampaign,
 } from '@/lib/horses-data';
-import { INVENTORY_UUID_BY_SLUG } from '@/lib/inventory-ids';
 import type { KycStatus } from '@evo/db_models/types';
 import {
   Sparkles,
@@ -35,10 +34,6 @@ export type MyStableHolding = {
 };
 
 export type MyStableDashboardCampaigns = Record<string, HorseCampaign>;
-
-function slugForInventoryId(horseId: string): string | undefined {
-  return Object.entries(INVENTORY_UUID_BY_SLUG).find(([, id]) => id === horseId)?.[0];
-}
 
 function kycLabel(status: KycStatus | string): { text: string; className: string } {
   if (status === 'verified') {

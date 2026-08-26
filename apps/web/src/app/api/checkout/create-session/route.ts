@@ -9,6 +9,7 @@ import {
   requireVerifiedKyc,
   resolveLegalHashes,
   pricingForUnits,
+  stakePctToStepUnits,
 } from '@/lib/nellie-loop';
 
 function jsonError(err: unknown): NextResponse {
@@ -24,7 +25,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { horseSlug, units = 1 } = body as { horseSlug?: string; units?: number };
 
-    if (!horseSlug || typeof units !== 'number' || units < 1 || !Number.isInteger(units)) {
+    // Investor-facing `units` are PERCENT of the horse (locked rule 2026-08-26).
+    if (!horseSlug || typeof units !== 'number' || !Number.isFinite(units) || units <= 0) {
       return NextResponse.json(
         { error: 'Invalid horseSlug or units parameter' },
         { status: 400 }
@@ -84,10 +86,13 @@ export async function POST(request: Request) {
     }
 
     const adminClient = getSupabaseServiceClient();
+    // Boundary conversion: the reservation RPC counts 0.5% step-units against
+    // inventory.shares_available — investor-facing values are percent. Convert here only.
+    const stepUnits = stakePctToStepUnits(units, campaign.stakeStepPct);
     const { data: reserveData, error: reserveError } = await adminClient.rpc('reserve_campaign_shares', {
       p_inventory_id: inventoryId,
       p_user_id: userId,
-      p_units: units,
+      p_units: stepUnits,
       p_ttl_minutes: 15,
     });
     const reservation = interpretReserveResult(reserveData, reserveError);

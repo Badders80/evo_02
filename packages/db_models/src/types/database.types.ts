@@ -122,7 +122,7 @@ export interface Database {
           status: CampaignStatus;
           close_style: CloseStyle;
           payment_style: PaymentStyle;
-          listing_platform: 'evolution' | 'tokinvest' | string;
+          listing_platform: string;
           hero_image_url: string;
           pedigree_image_url: string | null;
           pds_hash: string;
@@ -157,7 +157,7 @@ export interface Database {
           status?: CampaignStatus;
           close_style?: CloseStyle;
           payment_style?: PaymentStyle;
-          listing_platform?: 'evolution' | 'tokinvest' | string;
+          listing_platform?: string;
           hero_image_url: string;
           pedigree_image_url?: string | null;
           pds_hash: string;
@@ -192,7 +192,7 @@ export interface Database {
           status?: CampaignStatus;
           close_style?: CloseStyle;
           payment_style?: PaymentStyle;
-          listing_platform?: 'evolution' | 'tokinvest' | string;
+          listing_platform?: string;
           hero_image_url?: string;
           pedigree_image_url?: string | null;
           pds_hash?: string;

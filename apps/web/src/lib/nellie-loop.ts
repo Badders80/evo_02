@@ -1,4 +1,4 @@
-import { computeDslPricing } from '@evo/legal_engine';
+import { computeDslPricing, SHARE_MATH } from '@evo/legal_engine';
 import { getCampaignBySlug, getCompiledLegalPackForCampaign, isCheckoutOpen } from './horses-data';
 import { getInventoryId } from './inventory-ids';
 
@@ -11,6 +11,26 @@ export class HttpError extends Error {
     this.status = status;
     this.code = code;
   }
+}
+
+/**
+ * Canonical unit semantics (locked 2026-08-26): investor-facing values are PERCENTAGES.
+ * The reservation RPC (00002) counts 0.5% step-units against inventory.shares_available,
+ * so percent → step-units conversion happens ONLY at this boundary. Percent must be a
+ * whole multiple of the step; result is an integer count of step-units.
+ */
+export function stakePctToStepUnits(stakePct: number, stepPct: number = SHARE_MATH.DEFAULT_STAKE_STEP_PCT): number {
+  const unitsExact = stakePct / stepPct;
+  const units = Math.round(unitsExact);
+  if (!Number.isFinite(stakePct) || !Number.isFinite(stepPct) || stepPct <= 0 || Math.abs(unitsExact - units) > 1e-9 || units < 1) {
+    throw new HttpError(400, 'INVALID_STAKE', `stake must be a multiple of ${stepPct}% (received ${stakePct})`);
+  }
+  return units;
+}
+
+/** Inverse mapping: integer count of step-units → percentage of the horse. */
+export function stepUnitsToStakePct(stepUnits: number, stepPct: number = SHARE_MATH.DEFAULT_STAKE_STEP_PCT): number {
+  return Math.round(stepUnits * stepPct * 100) / 100;
 }
 
 export function requireUserId(user: { id?: string | null } | null | undefined): string {

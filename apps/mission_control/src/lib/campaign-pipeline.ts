@@ -8,6 +8,7 @@ import type {
   ThoroughbredPedigree,
   TrainerDetails,
 } from '@evo/legal_engine';
+import { SHARE_MATH } from '@evo/legal_engine';
 import type { CloseStyle, Database, PaymentStyle } from '@evo/db_models/types';
 import { getSupabaseServiceClient } from './supabase-server';
 
@@ -56,7 +57,7 @@ export interface CampaignIntakePayload {
   marketing?: MarketingInput;
   closeStyle?: CloseStyle;
   paymentModel?: PaymentStyle;
-  listingPlatform?: 'evolution' | 'tokinvest' | string;
+  listingPlatform?: string;
   pdsVersion?: string;
   saVersion?: string;
   effectiveDate?: string;
@@ -131,10 +132,9 @@ function buildLegalContext(
 ): SyndicateLegalContext {
   const horsePedigree = buildPedigree(intake.pedigree);
   const trainer = buildTrainer(intake.trainer);
-  const totalStakePct = intake.totalSyndicateStakePct ?? 100.0;
+  const totalStakePct = intake.totalSyndicateStakePct ?? 0; // required — guard in createCampaignFromIntake
   const minStakePct = pricing.stakePercentage;
-  const stakeStepPct = 0.5;
-  const totalShares = Math.floor(totalStakePct / minStakePct);
+  const totalShares = totalStakePct / SHARE_MATH.DEFAULT_STAKE_STEP_PCT;
   const sharesAvailable = totalShares;
 
   return {
@@ -148,6 +148,8 @@ function buildLegalContext(
     totalHorsePercentage: totalStakePct,
     totalShares,
     sharesAvailable,
+    minInvestmentPct: minStakePct,
+    stakeStepPct: SHARE_MATH.DEFAULT_STAKE_STEP_PCT,
     paymentModel: intake.paymentModel ?? 'subscription_float',
     termMonths: intake.termMonths ?? 12,
     listingPlatform: intake.listingPlatform ?? 'evolution',
@@ -164,10 +166,11 @@ function buildInventoryInsert(
   pricing: DslPricing,
   pack: CompiledLegalPack
 ): Database['public']['Tables']['inventory']['Insert'] {
-  const totalStakePct = intake.totalSyndicateStakePct ?? 100.0;
+  // DB invariant (00001): total_shares = listed_stake_pct / stake_step_pct AND total_shares <= 100.
+  const totalStakePct = intake.totalSyndicateStakePct as number; // guarded in createCampaignFromIntake
   const minStakePct = pricing.stakePercentage;
-  const stakeStepPct = 0.5;
-  const totalShares = Math.floor(totalStakePct / minStakePct);
+  const stakeStepPct = SHARE_MATH.DEFAULT_STAKE_STEP_PCT;
+  const totalShares = totalStakePct / stakeStepPct;
 
   return {
     slug: intake.slug,
@@ -238,6 +241,9 @@ export async function createCampaignFromIntake(
   }
   if (intake.wholesaleMonthlyNzd <= 0) {
     throw new Error('wholesaleMonthlyNzd must be greater than 0');
+  }
+  if (!intake.totalSyndicateStakePct || intake.totalSyndicateStakePct <= 0) {
+    throw new Error('totalSyndicateStakePct is required and must be greater than 0');
   }
 
   const pricing = computeDslPricing(intake.wholesaleMonthlyNzd, 1.0);

@@ -4,6 +4,7 @@
  */
 
 import type { SyndicateLegalContext, HorseSoftLegalContent } from './types';
+import { SHARE_MATH } from './types';
 
 /**
  * Normalizes soft text to prevent cryptographic hash drift from line endings or whitespace.
@@ -49,7 +50,7 @@ export function generatePdsMarkdown(context: SyndicateLegalContext): string {
 
 This Product Disclosure Statement relates to the **${context.syndicateName}**, a digitally-syndicated thoroughbred ownership campaign managed by **${t.managerEntity}**, a registered Syndicate Manager under the New Zealand Thoroughbred Racing (NZTR) Rules of Racing and Syndication Code of Practice.
 
-Participation is offered in the form of fractional leasehold stakes. Each stake represents a 1% interest in the syndicated leasehold of the thoroughbred described in §2.
+Participation is offered in the form of fractional leasehold stakes. Each stake is a percentage interest in the syndicated leasehold of the thoroughbred described in §2, from a minimum investment of ${(context.minInvestmentPct ?? SHARE_MATH.DEFAULT_MIN_INVESTMENT_PCT).toFixed(1)}%, with increments of ${(context.stakeStepPct ?? SHARE_MATH.DEFAULT_STAKE_STEP_PCT).toFixed(1)}% thereafter.
 
 ---
 

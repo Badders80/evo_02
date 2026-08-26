@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" role="img" aria-label="Evolution Stables placeholder">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a0a"/>
+      <stop offset="100%" stop-color="#070707"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bgGrad)"/>
+  <line x1="200" y1="450" x2="1400" y2="450" stroke="#d4a964" stroke-width="1.5" opacity="0.6"/>
+  <text x="800" y="420" font-family="Georgia, serif" font-size="28" font-weight="400" letter-spacing="0.3em" text-anchor="middle" fill="#d4a964" opacity="0.7">EVOLUTION STABLES</text>
+</svg>

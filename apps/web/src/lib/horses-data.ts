@@ -9,10 +9,10 @@ import {
 import {
   getSire,
   getTrainer,
-  ownerDisplayName,
   type ListingStatus,
 } from '@evo/db_models';
 import { getHorseCdnUrls, getTrainerCdnUrls } from '@evo/storage/cdn';
+import { getHorseMediaWithFallback } from './media-fallback';
 import { getSupabaseServiceClient } from './supabase-service';
 import type { InventoryHorse } from '@evo/db_models';
 
@@ -22,6 +22,7 @@ export interface HorseCampaign {
   barnName?: string;
   wholesaleMonthlyNzd: number;
   totalSyndicateStakePct: number;
+  stakeStepPct: number;
   softLegal: HorseSoftLegalContent;
   marketing: HorseMarketingContent;
   listingStatus: ListingStatus;
@@ -56,7 +57,7 @@ export interface HorseCampaign {
     totalInvestors: number;
   };
   closeStyle: 'fourteen_day' | 'three_x_remaining';
-  listingPlatform?: 'evolution' | 'tokinvest' | string;
+  listingPlatform?: string;
 }
 
 /**
@@ -146,7 +147,6 @@ function rowToCampaign(row: InventoryHorse): HorseCampaign {
   const owner = resolveOwner(row.slug);
 
   const listedStakePct = Number(row.listed_stake_pct);
-  const totalShares = Number(row.total_shares);
   const sharesAvailable = Number(row.shares_available);
   const reservedShares = Number(row.reserved_shares);
   const stakeStepPct = Number(row.stake_step_pct);
@@ -176,6 +176,7 @@ function rowToCampaign(row: InventoryHorse): HorseCampaign {
     barnName: row.barn_name || undefined,
     wholesaleMonthlyNzd: Number(row.cost_monthly_nzd),
     totalSyndicateStakePct: listedStakePct,
+    stakeStepPct,
     softLegal: {
       aboutHorse: softLegal.aboutHorse ?? '',
       trainerBio: softLegal.trainerBio ?? '',
@@ -254,8 +255,13 @@ export function getCampaignPricing(campaign: HorseCampaign, stakePct = 1.0): Dsl
  * Resolves all media CDN links for a campaign.
  */
 export function getCampaignMedia(slug: string, trainerSlug: string) {
+  const horseUrls = getHorseCdnUrls(slug);
+  const fallbackMedia = getHorseMediaWithFallback(slug);
   return {
-    horse: getHorseCdnUrls(slug),
+    horse: {
+      ...horseUrls,
+      heroConformation: horseUrls.heroConformation || fallbackMedia.heroConformation,
+    },
     trainer: getTrainerCdnUrls(trainerSlug),
   };
 }

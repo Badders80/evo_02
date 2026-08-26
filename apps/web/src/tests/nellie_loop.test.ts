@@ -2,9 +2,16 @@ import assert from 'node:assert/strict';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-// Set Supabase env vars for test context (matches local supabase status output)
+// Set Supabase env vars for test context. Service key loads from the app's gitignored
+// .env.local (local stack only) — never hardcoded here.
+import * as fs0 from 'node:fs';
+const envLocalWeb = fs0.readFileSync(new URL('../../.env.local', import.meta.url), 'utf8');
+const svcLine = envLocalWeb.split('\n').find((l) => l.startsWith('SUPABASE_SERVICE_ROLE_KEY='));
+if (!svcLine || !svcLine.split('=').slice(1).join('=').trim()) {
+  throw new Error('SUPABASE_SERVICE_ROLE_KEY missing — set it in apps/web/.env.local (local Supabase sb_secret_…)');
+}
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321';
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || 'REDACTED-DEAD-LOCAL-KEY';
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || svcLine.split('=').slice(1).join('=').trim();
 process.env.NEXT_PUBLIC_SUPABASE_URL = SUPABASE_URL;
 process.env.SUPABASE_SERVICE_ROLE_KEY = SERVICE_KEY;
 
@@ -25,6 +32,8 @@ import {
   requireVerifiedKyc,
   resolveLegalHashes,
   resolvePaidAmountNzd,
+  stakePctToStepUnits,
+  stepUnitsToStakePct,
 } from '../lib/nellie-loop';
 import { safeNextPath } from '../lib/safe-next-path';
 import { signStripePayload, verifyStripeSignature } from '../lib/stripe-signature';
@@ -204,6 +213,25 @@ console.log('Running @evo/web Nellie loop tests...\n');
   assert.equal(isSha256Hex('A'.repeat(64)), false, 'kyc/legal hashes must be lowercase hex');
   console.log('✅ consume/payment fail closed');
 }
+
+function runBoundaryUnitTests() {
+  // percent → step-units: 1% floor = 2 units; every half-step maps cleanly
+  assert.equal(stakePctToStepUnits(1), 2);
+  assert.equal(stakePctToStepUnits(1.5), 3);
+  assert.equal(stakePctToStepUnits(5.5), 11);
+  for (const bad of [0.75, 1.25, 3.33]) {
+    assert.throws(() => stakePctToStepUnits(bad), /multiple of/, `must reject ${bad}%`);
+  }
+  // inverse mapping round-trips (units → pct)
+  assert.equal(stepUnitsToStakePct(2), 1);
+  assert.equal(stepUnitsToStakePct(3), 1.5);
+  assert.equal(stepUnitsToStakePct(11), 5.5);
+  // campaign-specific step honored (0.25% closed campaigns)
+  assert.equal(stakePctToStepUnits(1.25, 0.25), 5);
+  console.log('✅ boundary units: percent↔step-units conversions locked (1%=floor=2×0.5%)');
+}
+
+runBoundaryUnitTests();
 
 console.log('\n🎉 All @evo/web Nellie loop tests passed successfully!');
 })();

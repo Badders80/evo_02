@@ -296,7 +296,7 @@ DO $$ BEGIN
         EXECUTE 'GRANT SELECT, INSERT, UPDATE ON public.checkout_reservations TO service_role';
     END IF;
 END $$;
-GRANT SELECT, UPDATE ON public.inventory TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.inventory TO service_role;
 GRANT SELECT ON public.race_results TO service_role;
 
 -- ------------------------------------------------------------------------------

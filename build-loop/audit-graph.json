@@ -1,0 +1,25 @@
+{
+  "sprint": "e2e-wire",
+  "audit_date": "2026-08-25",
+  "verdict": "PASS",
+  "findings": [
+    {"id": "finding-1", "claim": "Server action publishes campaign with real 64-hex hashes", "result": "PASS", "detail": "tsx eval + REST row both show 64-hex pds/sa hashes"},
+    {"id": "finding-2", "claim": "Auth fail-closed before parsing", "result": "PASS", "detail": "route.ts:12-25; curl no-token/wrong-token both 401"},
+    {"id": "finding-3", "claim": "Token never reaches browser", "result": "PASS", "detail": "grep OPERATOR_API_TOKEN in client src = 0 hits"},
+    {"id": "finding-4", "claim": "Tokinvest purged except banned-term list", "result": "PASS", "detail": "grep -ril tokinvest → only packages/brand_dna/src/voice.ts"},
+    {"id": "finding-5", "claim": "Shares invariant holds", "result": "PASS", "detail": "campaign-pipeline.ts:172; FIN row total_shares 10.0 for 5.0% @ 0.5"},
+    {"id": "finding-6", "claim": "Test horse deleted after proof", "result": "PASS", "detail": "psql count=0; REST like-query []"},
+    {"id": "finding-7", "claim": "Gates green at audit time", "result": "PASS", "detail": "just check: 10/10 PASSED"}
+  ],
+  "evidence_edges": [
+    {"finding": "finding-1", "source": "apps/mission_control/src/app/actions/publish-campaign.ts:7", "reason": "action returns {ok, inventoryId, pdsHash, saHash}"},
+    {"finding": "finding-1", "source": "build-loop/fin-walk-proof.md:35", "reason": "smoke + FIN create both returned 64-hex hashes"},
+    {"finding": "finding-2", "source": "apps/mission_control/src/app/api/campaign/create/route.ts:12", "reason": "auth block precedes try/parsing; timingSafeEqual at :23"},
+    {"finding": "finding-2", "source": "build-loop/fin-walk-proof.md:21", "reason": "401 no-token + 401 wrong-token curl results"},
+    {"finding": "finding-3", "source": "apps/mission_control/src/components/horse-workspace.tsx:31", "reason": "imports only the server action, no token string"},
+    {"finding": "finding-4", "source": "packages/brand_dna/src/voice.ts:1", "reason": "only file matching tokinvest"},
+    {"finding": "finding-5", "source": "apps/mission_control/src/lib/campaign-pipeline.ts:172", "reason": "totalShares = totalStakePct / stakeStepPct"},
+    {"finding": "finding-6", "source": "build-loop/fin-walk-proof.md:66", "reason": "DELETE 204 + count 0"},
+    {"finding": "finding-7", "source": "build-loop/fin-walk-proof.md:73", "reason": "just check tail PASSED"}
+  ]
+}

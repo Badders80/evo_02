@@ -1,4 +1,4 @@
-import { Sparkles, CheckCircle2 } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 interface DynamicHighlightPillsProps {
   tags?: string[];

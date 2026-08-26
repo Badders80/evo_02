@@ -8,7 +8,7 @@ interface PricingCardProps {
   wholesaleMonthlyNzd: number;
   horseName?: string;
   campaignSlug?: string;
-  sharesAvailable: number;
+  availablePct: number;
   checkoutOpen?: boolean;
   listingStatusLabel?: string;
 }
@@ -17,13 +17,20 @@ export function PricingCard({
   wholesaleMonthlyNzd,
   horseName: _horseName,
   campaignSlug,
-  sharesAvailable,
+  availablePct,
   checkoutOpen = true,
   listingStatusLabel,
 }: PricingCardProps) {
-  // Available unit options: integer 1% stakes up to available shares (minimum 1)
-  const maxUnits = Math.max(1, Math.min(sharesAvailable, 5));
-  const STAKE_OPTIONS = Array.from({ length: maxUnits }, (_, i) => i + 1);
+  // Stake options: every multiple of the locked 0.5% increment from the 1% floor,
+  // capped at the available percentage (max 10 buttons keeps the grid sane).
+  const stepPct = 0.5;
+  const minStepUnits = 2; // 1.0% floor expressed in step-units
+  const availStepUnits = Math.floor(availablePct / stepPct);
+  const maxStepUnits = Math.max(minStepUnits, Math.min(availStepUnits, 10));
+  const STAKE_OPTIONS = Array.from(
+    { length: maxStepUnits - minStepUnits + 1 },
+    (_, i) => (i + minStepUnits) * stepPct
+  );
 
   const [selectedStake, setSelectedStake] = useState<number>(1);
   const [loading, setLoading] = useState(false);
@@ -95,14 +102,14 @@ export function PricingCard({
         </div>
       </div>
 
-      {/* Integer Stake Unit Selector (Capped at sharesAvailable) */}
+      {/* Integer Stake Selector (Capped at available percentage) */}
       <div className="mt-5">
         <div className="flex items-center justify-between mb-2">
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            Select Units (1% = 1 Unit)
+            Select Stake
           </label>
           <span className="text-[11px] font-mono text-muted-foreground">
-            {sharesAvailable} Unit{sharesAvailable > 1 ? 's' : ''} Available
+            {availablePct.toFixed(1)}% Available
           </span>
         </div>
         <div className={`grid gap-2 ${STAKE_OPTIONS.length <= 2 ? 'grid-cols-2' : 'grid-cols-4'}`}>
@@ -119,7 +126,7 @@ export function PricingCard({
                     : 'border-border bg-card/60 text-muted-foreground hover:border-muted-foreground/60 hover:text-foreground'
                 }`}
               >
-                {units}% ({units} {units === 1 ? 'Unit' : 'Units'})
+                {units.toFixed(1)}%
               </button>
             );
           })}

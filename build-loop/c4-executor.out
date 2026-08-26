@@ -1,0 +1,319 @@
+[0m
+> build · nemotron-3-ultra-free
+[0m
+[0m✱ [0mGlob "apps/web/src/lib/**/*.ts"[90m 9 matches[0m
+[0m→ [0mRead packages/storage/src/index.ts
+[0m→ [0mRead packages/storage/src/cdn.ts
+[0m→ [0mRead apps/web/src/lib/horses-data.ts
+[0m
+[0m← [0mWrite apps/web/src/lib/media-fallback.ts
+Wrote file successfully.
+[0m
+Now I have a clear picture. Let me create the fallback utility and the placeholder SVG, then wire it into horses-data.ts.
+[0m$ [0mmkdir -p /home/evo/new/evo_02/apps/web/public/brand
+(no output)
+[0m
+[0m← [0mWrite apps/web/public/brand/placeholder-hero.svg
+Wrote file successfully.
+[0m
+[0m← [0mEdit apps/web/src/lib/horses-data.ts
+Index: /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
+===================================================================
+--- /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
++++ /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
+@@ -12,8 +12,9 @@
+   ownerDisplayName,
+   type ListingStatus,
+ } from '@evo/db_models';
+ import { getHorseCdnUrls, getTrainerCdnUrls } from '@evo/storage/cdn';
++import { getHorseMediaWithFallback } from './media-fallback';
+ import { getSupabaseServiceClient } from './supabase-service';
+ import type { InventoryHorse } from '@evo/db_models';
+ 
+ export interface HorseCampaign {
+
+[0m
+[0m← [0mEdit apps/web/src/lib/horses-data.ts
+Index: /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
+===================================================================
+--- /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
++++ /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
+@@ -254,10 +254,15 @@
+ /**
+  * Resolves all media CDN links for a campaign.
+  */
+ export function getCampaignMedia(slug: string, trainerSlug: string) {
++  const horseUrls = getHorseCdnUrls(slug);
++  const fallbackMedia = getHorseMediaWithFallback(slug);
+   return {
+-    horse: getHorseCdnUrls(slug),
++    horse: {
++      ...horseUrls,
++      heroConformation: horseUrls.heroConformation || fallbackMedia.heroConformation,
++    },
+     trainer: getTrainerCdnUrls(trainerSlug),
+   };
+ }
+ 
+
+[0m
+[0m$ [0mcd /home/evo/new/evo_02 && just check
+pnpm run lint
+$ turbo run lint
+• turbo 2.10.10
+
+   • Packages in scope: @evo/brand_dna, @evo/db_models, @evo/legal_engine, @evo/mission_control, @evo/storage, @evo/web
+   • Running lint in 6 packages
+   • Remote caching disabled
+
+@evo/brand_dna:lint: cache hit, replaying logs 01813af51789612e
+@evo/brand_dna:build: cache hit, replaying logs d475bb918469a4d7
+@evo/storage:lint: cache hit, replaying logs 04ea80da50c0c6d4
+@evo/brand_dna:build: $ tsc
+@evo/brand_dna:lint: $ eslint src/
+@evo/storage:lint: $ eslint src/
+@evo/storage:build: cache hit, replaying logs e8b8d5cbf12c6a7e
+@evo/storage:build: $ tsc
+@evo/db_models:lint: cache hit, replaying logs f8731a9c60964048
+@evo/db_models:lint: $ eslint src/
+@evo/db_models:build: cache hit, replaying logs 6f9482241c9e255d
+@evo/db_models:build: $ tsc
+@evo/legal_engine:lint: cache miss, executing 1536ab1335342aed
+@evo/legal_engine:build: cache hit, replaying logs de802d99002c97cb
+@evo/legal_engine:build: $ tsc
+@evo/web:lint: cache miss, executing b247f662acf53089
+@evo/mission_control:lint: cache miss, executing fb77a2a5035f9252
+@evo/legal_engine:lint: $ eslint src/
+@evo/web:lint: $ eslint src/
+@evo/mission_control:lint: $ eslint src/
+@evo/mission_control:lint: 
+@evo/mission_control:lint: /home/evo/new/evo_02/apps/mission_control/src/components/investor-ledger.tsx
+@evo/mission_control:lint:   16:2  warning  'Sparkles' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@evo/mission_control:lint: 
+@evo/mission_control:lint: /home/evo/new/evo_02/apps/mission_control/src/lib/campaign-pipeline.ts
+@evo/mission_control:lint:   136:9  warning  'stakeStepPct' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@evo/mission_control:lint: 
+@evo/mission_control:lint: ✖ 2 problems (0 errors, 2 warnings)
+@evo/mission_control:lint: 
+@evo/web:lint: 
+@evo/web:lint: /home/evo/new/evo_02/apps/web/src/components/mystable-dashboard.tsx
+@evo/web:lint:   39:10  warning  'slugForInventoryId' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@evo/web:lint: 
+@evo/web:lint: /home/evo/new/evo_02/apps/web/src/components/thoroughbred-attributes.tsx
+@evo/web:lint:   1:20  warning  'CheckCircle2' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@evo/web:lint: 
+@evo/web:lint: /home/evo/new/evo_02/apps/web/src/lib/horses-data.ts
+@evo/web:lint:    12:3  warning  'ownerDisplayName' is defined but never used. Allowed unused vars must match /^_/u      @typescript-eslint/no-unused-vars
+@evo/web:lint:   150:9  warning  'totalShares' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+@evo/web:lint: 
+@evo/web:lint: ✖ 4 problems (0 errors, 4 warnings)
+@evo/web:lint: 
+
+ Tasks:    10 successful, 10 total
+Cached:    7 cached, 10 total
+  Time:    2.539s 
+
+pnpm run typecheck
+$ turbo run typecheck
+• turbo 2.10.10
+
+   • Packages in scope: @evo/brand_dna, @evo/db_models, @evo/legal_engine, @evo/mission_control, @evo/storage, @evo/web
+   • Running typecheck in 6 packages
+   • Remote caching disabled
+
+@evo/brand_dna:typecheck: cache hit, replaying logs 38dc7ecaf7f8ae4e
+@evo/brand_dna:typecheck: $ tsc --noEmit
+@evo/brand_dna:build: cache hit, replaying logs d475bb918469a4d7
+@evo/brand_dna:build: $ tsc
+@evo/storage:typecheck: cache hit, replaying logs 1f0e0e52bfc35ab9
+@evo/storage:build: cache hit, replaying logs e8b8d5cbf12c6a7e
+@evo/storage:build: $ tsc
+@evo/storage:typecheck: $ tsc --noEmit
+@evo/db_models:typecheck: cache hit, replaying logs 0eff7e4a3ab22876
+@evo/db_models:typecheck: $ tsc --noEmit
+@evo/db_models:build: cache hit, replaying logs 6f9482241c9e255d
+@evo/db_models:build: $ tsc
+@evo/legal_engine:typecheck: cache hit, replaying logs 930f7fbe38c8384d
+@evo/legal_engine:typecheck: $ tsc --noEmit
+@evo/legal_engine:build: cache hit, replaying logs de802d99002c97cb
+@evo/legal_engine:build: $ tsc
+@evo/web:typecheck: cache miss, executing 1ac4d7221a0ff177
+@evo/mission_control:typecheck: cache miss, executing 0c0f02da00459254
+@evo/web:typecheck: $ tsc --noEmit
+@evo/mission_control:typecheck: $ tsc --noEmit
+
+ Tasks:    10 successful, 10 total
+Cached:    8 cached, 10 total
+  Time:    785ms 
+
+pnpm run test
+$ turbo run test
+• turbo 2.10.10
+
+   • Packages in scope: @evo/brand_dna, @evo/db_models, @evo/legal_engine, @evo/mission_control, @evo/storage, @evo/web
+   • Running test in 6 packages
+   • Remote caching disabled
+
+@evo/brand_dna:build: cache hit, replaying logs d475bb918469a4d7
+@evo/brand_dna:build: $ tsc
+@evo/storage:build: cache hit, replaying logs e8b8d5cbf12c6a7e
+@evo/storage:build: $ tsc
+@evo/brand_dna:test: cache hit, replaying logs 8f7ed7586bc8d8a2
+@evo/brand_dna:test: $ tsx tests/voice.test.ts
+@evo/brand_dna:test: Running brand_dna voice tests...
+@evo/brand_dna:test: ✅ Banned term enforcement works (including "opaque")
+@evo/brand_dna:test: ✅ Exclamation mark enforcement works
+@evo/brand_dna:test: ✅ Tag taxonomy validation works
+@evo/brand_dna:test: 🎉 All brand_dna voice tests passed.
+@evo/db_models:test: cache hit, replaying logs 56d185fd5326d384
+@evo/db_models:test: $ tsx tests/schema.test.ts && tsx tests/registry.test.ts
+@evo/db_models:test: Running @evo/db_models Schema & SQL Migration tests...
+@evo/db_models:test: 
+@evo/db_models:test: ✅ SQL Migration files, DDL statements, and Seed scripts verified
+@evo/db_models:test: ✅ TypeScript Database Models & Type Safety verified
+@evo/db_models:test: ✅ Seed step-unit invariants verified
+@evo/db_models:test: 
+@evo/db_models:test: 🎉 All @evo/db_models Schema tests passed successfully!
+@evo/db_models:test: Running knowledge registry tests...
+@evo/db_models:test: ✅ Lookup helpers return correct canonical records
+@evo/db_models:test: ✅ Jockey affinity queries work
+@evo/db_models:test: ✅ Registry slug uniqueness verified
+@evo/db_models:test: ✅ Brand-voice seed gate passed for 147 registry strings
+@evo/db_models:test: ✅ Live asset lock: Stephen Gray Racing only, research trainers excluded, First Gear completed
+@evo/db_models:test: 🎉 All knowledge registry tests passed.
+@evo/storage:test: cache hit, replaying logs 49ad9529ff5d18b3
+@evo/storage:test: $ tsx tests/hash.test.ts && tsx tests/cdn.test.ts
+@evo/storage:test: Running @evo/storage isomorphic SHA-256 NIST test vectors...
+@evo/storage:test: 
+@evo/storage:test: ✅ All isomorphic SHA-256 test vectors PASSED!
+@evo/storage:test: 
+@evo/storage:test: Running @evo/storage stills convention tests...
+@evo/storage:test: ✅ Stills convention: 01 cover, true extensions, no fake CDN, no yard mix-up
+@evo/db_models:build: cache hit, replaying logs 6f9482241c9e255d
+@evo/db_models:build: $ tsc
+@evo/legal_engine:test: cache hit, replaying logs d0bd979e2063ff7c
+@evo/legal_engine:test: $ tsx tests/legal_engine.test.ts && tsx tests/settlement.test.ts
+@evo/legal_engine:test: Running legal_engine tests...
+@evo/legal_engine:test: 
+@evo/legal_engine:test: ✅ Deterministic Term Sheet / PDS / SA generation
+@evo/legal_engine:test: ✅ Term Sheet generation & anchors verified
+@evo/legal_engine:test: ✅ All mandatory PDS sections present
+@evo/legal_engine:test: ✅ All mandatory SA clauses present
+@evo/legal_engine:test: ✅ Nellie pricing anchors & SA schedule correct
+@evo/legal_engine:test: ✅ Mulan pricing anchors correct
+@evo/legal_engine:test: ✅ Compliance validator passes clean pack
+@evo/legal_engine:test: ✅ Banned term detection works (crypto, lead lessor, micro-ownership)
+@evo/legal_engine:test: ✅ Pricing invariant validation works
+@evo/legal_engine:test: ✅ Upfront payment model pack verified
+@evo/legal_engine:test: ✅ SHA-256 digests are 64-char hex
+@evo/legal_engine:test: ✅ Soft content PDS Section 2 layout verified
+@evo/legal_engine:test: ✅ PDS SHA-256 hash invariant to whitespace and CRLF line endings
+@evo/legal_engine:test: ✅ validateSyndicateContent successfully gates prohibited terminology
+@evo/legal_engine:test: ✅ "opaque" is rejected by unified legal banned-term gate
+@evo/legal_engine:test: ✅ Fixed-input SHA-256 digests are deterministic across compiler runs
+@evo/legal_engine:test: 
+@evo/legal_engine:test: 🎉 All legal_engine tests passed.
+@evo/legal_engine:test: Running @evo/legal_engine Settlement & Cap Table Invariant tests...
+@evo/legal_engine:test: 
+@evo/legal_engine:test: ✅ 3-Way Listed Stake Pool Invariants & Input Guards verified
+@evo/legal_engine:test: ✅ 75/25 Prize Distribution (0% Evolution) & Pro-Rata Payouts verified
+@evo/legal_engine:test: ✅ SOP Settlement Cases (Case B, Case D 4->3, Case E) verified
+@evo/legal_engine:test: ✅ NZ GST 3/23 Breakdown Identity verified
+@evo/legal_engine:test: 
+@evo/legal_engine:build: cache hit, replaying logs de802d99002c97cb
+@evo/legal_engine:test: 🎉 All Settlement, Cap Table & GST tests passed successfully!
+@evo/legal_engine:build: $ tsc
+@evo/mission_control:test: cache hit, replaying logs ba87fe1a0a7b63c2
+@evo/mission_control:test: $ tsx src/lib/intake.test.ts && tsx src/lib/cap-table.test.ts
+@evo/mission_control:test: Running Horse Lookup, Smart Intake Parser & Invariant tests...
+@evo/mission_control:test: 
+@evo/mission_control:test: ✅ URL & Microchip extraction verified (Breeding, Performance Modal, Profile, and Security validation)
+@evo/mission_control:test: ✅ Horse Stud Book Lookup by URL & Microchip verified
+@evo/mission_control:test: ✅ Canonical DSL pricing invariants verified (SSOT computeDslPricing)
+@evo/mission_control:test: ✅ Smart Content Dump natural text extraction & entity matching verified
+@evo/mission_control:test: 
+@evo/mission_control:test: 🎉 All Intake, Lookup & Invariant tests passed successfully!
+@evo/mission_control:test: Running Mission Control Cap Table & Investor Registry integration tests...
+@evo/mission_control:test: 
+@evo/mission_control:test: ✅ Investor Registry & Allocated Share counts verified for all live campaigns
+@evo/mission_control:test: ✅ Listed Pool Cap Table Invariants verified for active campaigns
+@evo/mission_control:test: ✅ Settlement Desk calculations verified against @evo/legal_engine canon
+@evo/web:test: cache miss, executing a3f0049037173f8d
+@evo/mission_control:test: 
+@evo/mission_control:test: 🎉 Mission Control Cap Table & Investor Integration tests PASSED!
+@evo/web:test: $ tsx src/tests/nellie_loop.test.ts
+@evo/web:test: Running @evo/web Nellie loop tests...
+@evo/web:test: 
+@evo/web:test: ✅ create-session 401 without user.id
+@evo/web:test: ✅ KYC stub 403 unless verified
+@evo/web:test: ✅ reserve_campaign_shares fail closed
+@evo/web:test: ✅ purchases gated unless Stripe key + PURCHASES_ENABLED
+@evo/web:test: ✅ compiled Nellie hashes are 64-hex, same ownerName as checkout
+@evo/web:test: ✅ holdings insert shape rejects placeholder hashes
+@evo/web:test: ✅ Stripe HMAC verification
+@evo/web:test: ✅ login ?next= is path-safe
+@evo/web:test: ✅ only Nellie is buyable
+@evo/web:test: ✅ R2 skipped unless env exists
+@evo/web:test: ✅ source audit: no guest, no placeholder, RPC wired, consume fail-loud
+@evo/web:test: ✅ consume/payment fail closed
+@evo/web:test: 
+@evo/web:test: 🎉 All @evo/web Nellie loop tests passed successfully!
+
+ Tasks:    10 successful, 10 total
+Cached:    9 cached, 10 total
+  Time:    643ms 
+
+✅ [evo_02] All lint, typecheck, and test gates PASSED.
+[0m
+[0m$ [0mcd /home/evo/new/evo_02/apps/web && NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321 SUPABASE_SERVICE_ROLE_KEY=dummy npx tsx -e "
+import { getCampaignMedia } from './src/lib/horses-data.ts';
+const result = getCampaignMedia('e2e-wire-test-123', 'unknown-trainer');
+console.log('heroConformation:', result.horse.heroConformation);
+console.log('Expected:', '/brand/placeholder-hero.svg');
+console.log('Match:', result.horse.heroConformation === '/brand/placeholder-hero.svg');
+"
+heroConformation: /brand/placeholder-hero.svg
+Expected: /brand/placeholder-hero.svg
+Match: true
+[0m
+[0m$ [0mcd /home/evo/new/evo_02 && git diff --name-only
+apps/web/src/lib/horses-data.ts
+apps/web/tsconfig.tsbuildinfo
+build-loop/plan-graph.json
+[0m
+[0m$ [0mcd /home/evo/new/evo_02 && git status
+On branch sprint-1-nellie-loop
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   apps/web/src/lib/horses-data.ts
+	modified:   apps/web/tsconfig.tsbuildinfo
+	modified:   build-loop/plan-graph.json
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	apps/web/public/brand/placeholder-hero.svg
+	apps/web/src/lib/media-fallback.ts
+	build-loop/c4-executor.out
+	build-loop/chunk-c4-prompt.txt
+	build-loop/chunk-c5-prompt.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+[0m
+**Files changed:**
+- `apps/web/src/lib/media-fallback.ts` (new)
+- `apps/web/public/brand/placeholder-hero.svg` (new)
+- `apps/web/src/lib/horses-data.ts` (modified)
+
+**Verification output:**
+
+```
+a. just check:
+✅ [evo_02] All lint, typecheck, and test gates PASSED.
+
+b. tsx eval:
+heroConformation: /brand/placeholder-hero.svg
+Expected: /brand/placeholder-hero.svg
+Match: true
+```
+EXIT:0
