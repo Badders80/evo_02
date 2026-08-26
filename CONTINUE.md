@@ -48,13 +48,16 @@ then demote evo_01/02_website to archive.
 
 ---
 
-## Track B — gbrain repairs (in progress, separate session)
+## Track B — gbrain repairs ✅ COMPLETE (2026-08-26 ~20:45 NZST)
 
-Brief: `build-loop/track-b-brief.md`. Progress when it lands:
-- Sync script `|| true` fix: edited (marker now conditional on data-step success).
-- Queue drain: was mid-flight (15 waiting jobs; CLI path attempted via service stop —
-  **gbrain-mcp.service was stopped then restarted by host, verified active**).
-- Hub index repair, dedupe, CLAUDE.md naming fix: pending. Stray `/home/evo/evo_01/` delete stays FOUNDER-gated.
+Evidence-backed wrap:
+1. **Sync script fixed** — `|| true` removed from data steps; marker conditional; journal shows clean runs (20:27, 20:37, 20:41).
+2. **Sync verified** — evo00 `staleness_class: fresh`, last-sync today 08:13Z @ commit b8d723d; `unacknowledged_failures: 0`.
+3. **Queue drained** — 14 facts-absorb + 1 embed-backfill executed inline via CLI (`jobs submit --follow`); stats now 0 waiting / 15 completed / 0 failed.
+4. **Hub index repaired** — fact/e2e-wire-pipeline linked into hub (ranks #1 on search), 3 missing cards added to index, timeline entry added for cb4ac12 lock + ui-sprint-1.
+5. **Dedupe done** — 17 default-source duplicates of evo00 docs soft-deleted (72h recoverable); dead `new` source removed (0 pages). Brain score 83→84, pages 57→39, 0 dead links.
+6. **Naming drift** — `/home/evo/new/evo_00/AGENTS.md` got git-discipline law (#5). Home CLAUDE.md rewrite BLOCKED (protected-file approval needed — pending founder OK). Stray `/home/evo/evo_01/` inspected: only `05_industry-data/racing-content/output`, NO git — safe to delete, FOUNDER-GATED.
+Deferred: gbrain self-upgrade 0.46.23→0.46.29 (parked).
 
 ---
 
