@@ -67,6 +67,24 @@ website surface. Payouts remain v2. Mission Control restyle stays locked.
 - `acec420` W4 — MyStable light console scope + status tokens
 - Gate: `just check` → 10/10 PASS. Dev verified: / 200, /horses/nellie 200,
   /mystable→/login 200, NavBar/footer/gold lockup server-rendering.
+- **Kimi audit (kimi-k2.7-code:cloud, diff-scope, 2 passes A=plumbing B=components):**
+  verdict WARN — 0 FAILs on shipped claims. Fixed pre-gate (commit 8408b6f):
+  F1 useAuth displayName dropped surname → now joins full name;
+  F2 leads Row/SQL type drift (action_type missing from Row) → added;
+  F3 mystable wrapper `display:contents` killed the 300ms transition → real box.
+  Noted not-fixed (founder call / Pass 2): subscribe rate-limiting (pre-auth
+  spam surface), leads.status unconstrained text, leads uniqueness policy,
+  horse_name not persisted, `--color-muted`/`--color-heading` duplicate defs
+  in globals.css, `--color-pure-white` misnomer in light scope. Full graph:
+  `build-loop/audit-graph.json`; raw Kimi output in session /tmp/audit-A-out.txt.
+
+- `2c6ba07` W1+W2 — tokens + primitives + landing data/images/deps
+- `b54e862` leads plumbing (00007 migration, db_models types, /api/subscribe)
+- `45796d2` W3a — landing replication (NavBar/Footer/CtaLeadModal/8 sections/FAQ→CollapsePanel/auth adapter)
+- `7098055` W3b — token sweep of all app surfaces (hex → semantic tokens)
+- `acec420` W4 — MyStable light console scope + status tokens
+- Gate: `just check` → 10/10 PASS. Dev verified: / 200, /horses/nellie 200,
+  /mystable→/login 200, NavBar/footer/gold lockup server-rendering.
 
 Known notes for Pass 2 (not blockers):
 - `horses-data.ts` publish-payload still carries legacy ignored `totalShares/sharesAvailable` fields (pre-existing, documented non-blocker).
