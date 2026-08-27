@@ -44,6 +44,10 @@
     as-is (founder: content & info are good). After founder visual gate, a separate
     founder-guided curation pass removes/relocates anything unwanted. Never mix content
     decisions into reskin diffs.
+11. **Landing = replication, not re-skin.** evo_01 home is 9 self-contained section
+    components — port wholesale onto W1/W2 layers. Content guardrail: evo_02 copy wins
+    where yesterday's voice/tone/about alignment already landed there; evo_01 supplies
+    structure + styling.
 
 ---
 
@@ -53,7 +57,7 @@
 |---|-----------|----------|
 | W1 | Token foundation | evo_01 DESIGN.md + brand_dna reconciled → evo_02 `@theme` (v4); DESIGN.md spec in evo_02 |
 | W2 | Primitive layer | ~10 shadcn primitives + ~8 customs ported; utilities verified emitting (v4 PostCSS check) |
-| W3 | Public surface sweep | header, footer, home, horse detail, pricing-card, cap-table, data-room, landing-cta |
+| W3 | Landing replication + app reskin | Port evo_01 landing (shell + 9 sections + GrassBg/FixedBg + NavBar/Footer) into evo_02 on tokens; reskin marketplace, mystable, auth (login = dedicated pass) |
 | W4 | Console surfaces | mystable + checkout/marketplace flows restyled with x.ai patterns (W1 tokens only) |
 | W5 | Verify + resume cutover | `just check` 10/10, founder visual gate, then merge → Vercel sequence |
 
