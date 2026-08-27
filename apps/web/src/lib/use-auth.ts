@@ -23,11 +23,11 @@ export function useAuth() {
       if (!email) return null;
       const local = email.split("@")[0] || email;
       // "first.last@" or "first_last@" → "First Last"; else leave as-is
-      const displayName = /[._-]/.test(local)
-        ? local
-            .split(/[_\-.]/)[0]
-            .replace(/^\w/, (c) => c.toUpperCase())
-        : local;
+      const displayName = local
+        .split(/[_\-.]+/)
+        .filter(Boolean)
+        .map((p) => p.replace(/^\w/, (c) => c.toUpperCase()))
+        .join(" ");
       return { email, displayName };
     };
 

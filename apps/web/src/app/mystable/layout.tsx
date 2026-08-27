@@ -10,5 +10,9 @@ import type { Metadata } from 'next';
  * here at full fidelity — light theme, dense monospace data).
  */
 export default function MystableLayout({ children }: { children: React.ReactNode }) {
-  return <div data-theme="light" className="contents">{children}</div>;
+  return (
+    <div data-theme="light" className="min-h-full bg-background">
+      {children}
+    </div>
+  );
 }

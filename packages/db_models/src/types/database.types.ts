@@ -377,6 +377,7 @@ export interface Database {
           user_email: string;
           user_name: string | null;
           horse_slug: string | null;
+          action_type: string;
           utm_source: string | null;
           utm_campaign: string | null;
           referrer_url: string | null;

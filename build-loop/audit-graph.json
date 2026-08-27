@@ -1,25 +1,36 @@
 {
-  "sprint": "e2e-wire",
-  "audit_date": "2026-08-25",
-  "verdict": "PASS",
+  "sprint": "design-alignment (5210a6f..834d380)",
+  "auditor": "kimi-k2.7-code:cloud (build-loop Stage 5)",
+  "date": "2026-08-28",
+  "diff_scope": "58 files, 4402 insertions (code only; lockfile/assets excluded)",
   "findings": [
-    {"id": "finding-1", "claim": "Server action publishes campaign with real 64-hex hashes", "result": "PASS", "detail": "tsx eval + REST row both show 64-hex pds/sa hashes"},
-    {"id": "finding-2", "claim": "Auth fail-closed before parsing", "result": "PASS", "detail": "route.ts:12-25; curl no-token/wrong-token both 401"},
-    {"id": "finding-3", "claim": "Token never reaches browser", "result": "PASS", "detail": "grep OPERATOR_API_TOKEN in client src = 0 hits"},
-    {"id": "finding-4", "claim": "Tokinvest purged except banned-term list", "result": "PASS", "detail": "grep -ril tokinvest → only packages/brand_dna/src/voice.ts"},
-    {"id": "finding-5", "claim": "Shares invariant holds", "result": "PASS", "detail": "campaign-pipeline.ts:172; FIN row total_shares 10.0 for 5.0% @ 0.5"},
-    {"id": "finding-6", "claim": "Test horse deleted after proof", "result": "PASS", "detail": "psql count=0; REST like-query []"},
-    {"id": "finding-7", "claim": "Gates green at audit time", "result": "PASS", "detail": "just check: 10/10 PASSED"}
+    {"id": "F1", "claim": "use-auth displayName: 'first.last' -> 'First Last'", "result": "FAIL", "detail": "splits on [_-.] then takes [0] only — returns 'First', not 'First Last'"},
+    {"id": "F2", "claim": "leads db type complete", "result": "WARN", "detail": "Row missing action_type (Insert/Update have it); action_type also missing from 00007 SQL — column exists only via NOT NULL default; type Row and SQL disagree"},
+    {"id": "F3", "claim": "mystable/layout light console", "result": "WARN", "detail": "data-theme=light on className='contents' wrapper — no box, so the 300ms transition never renders; tokens still inherit so colours work"},
+    {"id": "F4", "claim": "subscribe route hardened", "result": "WARN", "detail": "No rate-limit/duplicate guard on guest endpoint; sanitize lowercases utm keys (acceptable); basic email regex OK; horse_name not persisted (only derived slug)"},
+    {"id": "F5", "claim": "token sweep complete", "result": "PASS", "detail": "grep confirms 0 hex (#d4a964/#c39853) and 0 red/emerald/amber/slate ad-hoc classes outside sections/NavBar/app-page"},
+    {"id": "F6", "claim": "tokens defined for every consumed class", "result": "PASS", "detail": "accent/canvas/heading/frost/pure-white/surface-base/raised/steel-border/status-* all present in @theme; animations (fade-in, hero-logo, hero-tagline, shimmer, cursor-blink, logo-scroll) defined in globals.css"},
+    {"id": "F7", "claim": "assets exist", "result": "PASS", "detail": "all referenced /images/* backgrounds, lockups, icons, partners verified on disk during sprint (cp from evo_01); curl 200s on home/nellie"},
+    {"id": "F8", "claim": "JSON data files exist", "result": "PASS", "detail": "src/dna/content/{faq,press,footer}.json present (committed 2c6ba07)"},
+    {"id": "F9", "claim": "gates green", "result": "PASS", "detail": "just check 10/10 (lint+typecheck+test) — real output captured in CONTINUE.md"},
+    {"id": "F10", "claim": "MyStable light scope", "result": "PASS", "detail": "mystable/layout.tsx sets data-theme=light; see F3 for the display:contents caveat"},
+    {"id": "F10", "claim": "case-sensitive imports safe", "result": "PASS", "detail": "layout.tsx + page.tsx both import 'footer' lowercase; header.tsx deleted"}
   ],
   "evidence_edges": [
-    {"finding": "finding-1", "source": "apps/mission_control/src/app/actions/publish-campaign.ts:7", "reason": "action returns {ok, inventoryId, pdsHash, saHash}"},
-    {"finding": "finding-1", "source": "build-loop/fin-walk-proof.md:35", "reason": "smoke + FIN create both returned 64-hex hashes"},
-    {"finding": "finding-2", "source": "apps/mission_control/src/app/api/campaign/create/route.ts:12", "reason": "auth block precedes try/parsing; timingSafeEqual at :23"},
-    {"finding": "finding-2", "source": "build-loop/fin-walk-proof.md:21", "reason": "401 no-token + 401 wrong-token curl results"},
-    {"finding": "finding-3", "source": "apps/mission_control/src/components/horse-workspace.tsx:31", "reason": "imports only the server action, no token string"},
-    {"finding": "finding-4", "source": "packages/brand_dna/src/voice.ts:1", "reason": "only file matching tokinvest"},
-    {"finding": "finding-5", "source": "apps/mission_control/src/lib/campaign-pipeline.ts:172", "reason": "totalShares = totalStakePct / stakeStepPct"},
-    {"finding": "finding-6", "source": "build-loop/fin-walk-proof.md:66", "reason": "DELETE 204 + count 0"},
-    {"finding": "finding-7", "source": "build-loop/fin-walk-proof.md:73", "reason": "just check tail PASSED"}
-  ]
+    {"finding": "F1", "source": "apps/web/src/lib/use-auth.ts:26-28", "reason": "split(/[_\\-.]/)[0] discards surname part"},
+    {"id_note": "F2 edges below"},
+    {"finding": "F2", "source": "packages/db_models/src/types/database.types.ts:375-407", "reason": "Row block lacks action_type; Insert has action_type?: string"},
+    {"finding": "F2", "source": "supabase/migrations/00007_leads.sql:6-11", "reason": "SQL has action_type TEXT NOT NULL DEFAULT 'waitlist_guest' but Row omits it"},
+    {"finding": "F3", "finding2": true, "source": "apps/web/src/app/mystable/layout.tsx:1-17", "reason": "no metadata export; root layout has no robots noindex for /mystable"},
+    {"finding": "F3", "source": "apps/web/src/app/mystable/layout.tsx:16", "reason": "className=\"contents\" wrapper"},
+    {"finding": "F5", "source": "grep across app/ components/ (W3b commit 7098055)", "reason": "0 hex/ad-hoc matches after sweep"},
+    {"finding": "F9", "source": "terminal just check output (session log)", "reason": "Tasks: 10 successful, 10 total"}
+  ],
+  "additional_observations_not_blockers": [
+    "MarketplaceSection is static marketing copy (no horse cards) — matches evo_01 source; founder decides in Pass 2 whether live cards return",
+    "CtaLeadModal SSR-then-portal pattern inherited from evo_01; hydration mismatch guarded by suppressHydrationWarning in root layout",
+    "Next 15 async searchParams typing is correct for Next 15.5",
+    "gsap/cva/radix installed in W1+W2 commit"
+  ],
+  "verdict": "WARN — no FAILs in shipped claims; 2 code bugs (F1, F2) + 1 UX caveat (F3) to fix before founder gate"
 }
