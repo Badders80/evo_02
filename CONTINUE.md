@@ -1,98 +1,62 @@
 # CONTINUE — evo_02
 
-**Date:** 2026-08-26 night — **TRACK A COMPLETE (UI wired, committed 22338b4) · Track B in progress (gbrain repairs, separate session)**
-**Branch:** `ui-sprint-1` @ 22338b4 (cut from cb4ac12). NOT merged — founder click-through pending.
-**Live site:** still served by evo_01/02_website via Vercel. evo_01 working tree is DIRTY — hands off. Cutover = founder manual step after click-through.
-
-**SSOT:** `evo_00/doc/ASSET_LOCK.md` · Legal pack = PDS/SA (per horse).
+**Date:** 2026-08-28 — **PASS 1 COMPLETE (design-alignment branch, all gates green) · Pass 2 = founder content sweep, handoff ready**
+**Branch:** `design-alignment` (cut from ui-sprint-1 — superseded, never merge that). NOT merged — founder gate pending.
+**Live site:** still served by evo_01/02_website via Vercel. evo_01 working tree is DIRTY — hands off.
+**DoD recap:** full lifecycle built (intake → docs → MC → site → KYC-gated buy). Remaining: founder gate → Pass 2 → cutover.
 
 ---
 
-## ⛔ THE LINE (founder, 2026-08-26)
-
-> **Content & core logic: LOCKED ✓ (cb4ac12) · UI look: WIRED ✓ (22338b4) — pending founder click-through.**
-
-### Track A wrap — what changed (commit `sprint(ui):` 22338b4 on ui-sprint-1)
-
-1. **@theme tokens** — `apps/web/src/app/globals.css`: brand HSL channels from
-   `packages/brand_dna/src/theme.css` mapped into Tailwind v4 `@theme --color-*`
-   (background/card/border/foreground/etc.). Root cause of raw pages fixed.
-2. **Favicon + logo** — favicon set wired in `apps/web/src/app/layout.tsx`;
-   horizontal-gold lockup in `apps/web/src/components/header.tsx`.
-3. **Fonts** — no change needed: design doc (`evo_00/doc/DESIGN_SYSTEM_AND_TOKENS.md` §2.3)
-   specs ui-sans-serif (UI) + ui-monospace (financial tables); both already mapped.
-
-### Verification evidence (re-run host-side after subagent timeout)
-
-- `just check` → **10 successful / 10 total** ✅ (lint + typecheck + tests)
-- Compiled CSS grep (`apps/web/.next/static/css/app/layout.css`) → `.bg-card`, `.bg-card\/40`,
-  `.bg-card\/60`, `.border-border`, `.border-border\/60`, `.border-border\/80`, `.text-foreground` all generate ✅
-- Zero diff confirmed on: `packages/legal_engine/**`, `apps/mission_control/src/lib/**`, migrations ✅
-
-## 🖱️ FOUNDER CLICK-THROUGH CHECKLIST (~5 min)
+## 🖱️ FOUNDER GATE (~10 min)
 
 ```bash
-pnpm --filter @evo/web dev -p 3010
+cd /home/evo/new/evo_02 && pnpm --filter @evo/web dev -p 3010
 ```
 
-1. [ ] Header logo renders (horizontal-gold lockup, dark header).
-2. [ ] Favicon shows in browser tab (gold SVG).
-3. [ ] Cards have dark elevation surfaces (`bg-card`, not flat black).
-4. [ ] Gold accents present (#d4a964 — selection, buttons, highlights).
-5. [ ] Pricing/cap-table figures render monospace.
-6. [ ] No layout breakage on: home, `/horses/nellie`, marketplace.
+Check: ① landing = evo_01 look (hero, 9 sections, glass nav, gold lockup)
+② `/horses/nellie` on token layer ③ `/login` reskinned ④ `/mystable` → light
+console (needs auth) ⑤ monospace financials.
+**Then:** `build-loop/pass2-content-sweep.md` — walk surfaces, mark KEEP/CUT.
+After sweep: merge `design-alignment` → main → founder-only Vercel cutover
+(root dir `apps/web`) → verify `/horses/nellie` 200 in prod → archive evo_01 website.
 
-**Happy →** merge `ui-sprint-1` → main locally; then FOUNDER-only: point Vercel at
-`Badders80/evo_02` (root dir `apps/web`), verify `/horses/nellie` returns 200,
-then demote evo_01/02_website to archive.
+## Pass 1 commit chain (design-alignment)
 
----
+- `2c6ba07` W1+W2 — token layer (@theme v4, dark + light scopes, Geist, dot-grid, film grain), 12 primitives, faq/press/footer json, image trees (27M), deps (gsap/cva/radix/tailwind-merge)
+- `b54e862` leads plumbing — 00007 migration, db_models types, /api/subscribe (uses **supabase-server** client: supabase-service's hand-typed Database breaks on postgrest-js 2.112.3 generics — leave as is)
+- `45796d2` W3a — landing replication: NavBar (use-auth supabase adapter), Footer, CtaLeadModal, 8 sections, FAQ → CollapsePanel (framer-motion-free), page.tsx = evo_01 section sequence
+- `7098055` W3b — token sweep: all hex (#d4a964/#c39853) → accent tokens; red/emerald/amber/slate → destructive/status tokens
+- `acec420` W4 — MyStable light console: `mystable/layout.tsx` sets `data-theme="light"` (300ms token transition = dark shell → light x.ai console); status tokens in both scopes
+- **Gate: `just check` → 10/10 PASS.** Dev verified: `/` 200, `/horses/nellie` 200, `/mystable`→`/login` 200, NavBar/footer/gold lockup server-rendering.
 
-## Track B — gbrain repairs ✅ COMPLETE (2026-08-26 ~20:45 NZST)
+## Pass 2 (founder-guided, subtractive only)
 
-Evidence-backed wrap:
-1. **Sync script fixed** — `|| true` removed from data steps; marker conditional; journal shows clean runs (20:27, 20:37, 20:41).
-2. **Sync verified** — evo00 `staleness_class: fresh`, last-sync today 08:13Z @ commit b8d723d; `unacknowledged_failures: 0`.
-3. **Queue drained** — 14 facts-absorb + 1 embed-backfill executed inline via CLI (`jobs submit --follow`); stats now 0 waiting / 15 completed / 0 failed.
-4. **Hub index repaired** — fact/e2e-wire-pipeline linked into hub (ranks #1 on search), 3 missing cards added to index, timeline entry added for cb4ac12 lock + ui-sprint-1.
-5. **Dedupe done** — 17 default-source duplicates of evo00 docs soft-deleted (72h recoverable); dead `new` source removed (0 pages). Brain score 83→84, pages 57→39, 0 dead links.
-6. **Naming drift** — `/home/evo/new/evo_00/AGENTS.md` got git-discipline law (#5). Home CLAUDE.md rewrite BLOCKED (protected-file approval needed — pending founder OK). Stray `/home/evo/evo_01/` inspected: only `05_industry-data/racing-content/output`, NO git — safe to delete, FOUNDER-GATED.
-Deferred: gbrain self-upgrade 0.46.23→0.46.29 (parked).
+`build-loop/pass2-content-sweep.md` — surface-by-surface KEEP/CUT/CUT list for
+founder; known candidates flagged (footer hero dup, /marketplace nav link,
+Tokinvest partner logos). Nothing executes without founder input.
 
 ---
 
-## Prior state — sprint e2e-wire (locked cb4ac12, all chunks done + audited)
+## Prior state — sprint e2e-wire (locked cb4ac12, audited)
 
-- Share-math lock (canonical): lot/share/unit = increment (0.5%); min investment = floor (1%);
-  units = stake ÷ step; investor-facing percentages only ("Lots" banned); whole multiple enforced + tested.
-- Operator auth: fail-closed 401 before cookie issuance, timing-safe sha256 compare, httpOnly `mc_op`.
-- Boundary units fix: checkout converts PERCENT → RPC step-units once (`stakePctToStepUnits`);
-  Stripe metadata stays percent; webhook float-parse + mismatch-guard.
-- Paid audit trail R3–R5 in `build-loop/paid-audit-*`; R5 residual #27 resolved host-side
-  (seed line corrected to match live DB truth). Full detail: `build-loop/chunk-audits-r3.md`.
-
-### Known non-blockers (documented, untouched)
-- prudentia/hotta MC seeds show simplified track-record values (live closed rows differ; publish-gated off).
-- `horses-data.ts` publish-payload carries legacy ignored `totalShares/sharesAvailable` fields.
+- Share-math: lot/share/unit = increment (0.5%); min = floor (1%); percentages only; stakePctToStepUnits at checkout boundary.
+- Operator auth: fail-closed 401, timing-safe sha256, httpOnly `mc_op`.
+- Known non-blockers: prudentia/hotta MC seeds simplified (publish-gated); horses-data.ts legacy payload fields.
 
 ### Commands
-- `just check` (lint + typecheck + tests, 10/10 must pass)
-- `pnpm --filter @evo/mission_control test` / `pnpm --filter @evo/web test`
-- Dev: web :3010, mission_control :3011
-- Local Supabase :54321 (svc key from gitignored `.env.local`)
 
----
+- `just check` (10/10 must pass) · web :3010, mission_control :3011 · Supabase :54321
+- pnpm: run from repo root ONLY, `export PNPM_HOME="$HOME/.local/share/pnpm"` first.
 
 ## Locked (don't reopen)
 
-- One site. Branch replaces `main` later — do not splice pages into a separate landing.
-- Nellie only for buy. Others visible, not buyable. No all-horses loop. No MC restyle.
-- Prudentia + Hotta: who-owns-what locked in seed/MC (5% each, fully sold). Payouts = v2. First Gear = KYC names only.
-- Tokinvest horses = one-time/`upfront`. New DSLs = `subscription_float`.
-- Owner/lessor = "Evolution Stables" (never "Ltd"/"Bloodstock"). NZTR-authorised names per `evo_00/doc/IDENTITY.md`.
+- One site. design-alignment replaces `main` after gate + Pass 2 — no splice.
+- Nellie only for buy. No MC restyle. Payouts = v2. First Gear = KYC names only.
+- Tokinvest horses = `upfront`. New DSLs = `subscription_float`.
+- Owner/lessor = "Evolution Stables" (never "Ltd"/"Bloodstock").
 
 ## Do not
 
-- Merge/push until founder signs off post-click-through.
-- Apply `00001`–`00006` to Evolution-3.0 (prod).
-- Treat website Terms as the legal pack.
+- Merge/push until founder signs off (click-through + Pass 2).
+- Apply 00001–00007 to Evolution-3.0 (prod).
+- Treat website Terms as the legal pack. Merge ui-sprint-1.
