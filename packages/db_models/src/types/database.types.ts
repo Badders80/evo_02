@@ -371,6 +371,40 @@ export interface Database {
           updated_at?: string;
         };
       };
+      leads: {
+        Row: {
+          id: string;
+          user_email: string;
+          user_name: string | null;
+          horse_slug: string | null;
+          utm_source: string | null;
+          utm_campaign: string | null;
+          referrer_url: string | null;
+          status: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_email: string;
+          user_name?: string | null;
+          horse_slug?: string | null;
+          action_type?: string;
+          utm_source?: string | null;
+          utm_campaign?: string | null;
+          referrer_url?: string | null;
+          status?: string;
+          created_at?: string;
+        };
+        Update: {
+          user_email?: string;
+          horse_slug?: string | null;
+          action_type?: string;
+          utm_source?: string | null;
+          utm_campaign?: string | null;
+          referrer_url?: string | null;
+          status?: string;
+        };
+      };
     };
     Views: Record<string, never>;
     Functions: {
