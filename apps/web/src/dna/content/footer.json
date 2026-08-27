@@ -1,0 +1,39 @@
+{
+  "tagline": {
+    "part1": "The Future of",
+    "highlighted": "Ownership",
+    "typewriter": "Has Arrived",
+    "subtitle": "Digital-Syndication, by Evolution Stables"
+  },
+  "links": {
+    "privacy": "/privacy",
+    "terms": "/terms"
+  },
+  "copyright": "© 2026 Evolution Stables.",
+  "social": [
+    {
+      "platform": "X",
+      "url": "https://x.com/EvolutionStables",
+      "ariaLabel": "Follow us on X",
+      "icon": "X"
+    },
+    {
+      "platform": "Instagram",
+      "url": "https://instagram.com/evostables",
+      "ariaLabel": "Follow us on Instagram",
+      "icon": "Instagram"
+    },
+    {
+      "platform": "LinkedIn",
+      "url": "https://www.linkedin.com/in/alex-baddeley/",
+      "ariaLabel": "Connect on LinkedIn",
+      "icon": "LinkedIn"
+    },
+    {
+      "platform": "Email",
+      "url": "mailto:alex@evolutionstables.nz",
+      "ariaLabel": "Send us an email",
+      "icon": "Mail"
+    }
+  ]
+}

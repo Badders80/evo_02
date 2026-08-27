@@ -1,46 +1,304 @@
 @import "tailwindcss";
 @import "@evo/brand_dna/theme.css";
 
-html.dark body {
+/* ============================================================
+   Evolution Stables — Design Token Layer (W1, design-alignment)
+   Source of truth: evo_00 brand_dna + evo_01/02_website DESIGN.md
+   Translated from evo_01 Tailwind v3 → Tailwind v4 @theme.
+   Components consume SEMANTIC tokens only (bg-background, bg-card,
+   text-foreground, border-border, bg-canvas, bg-raised, text-accent...).
+   Light console (MyStable/checkout) = [data-theme="light"] scope below.
+   ============================================================ */
+
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+  /* ---- Core palette (evo_01 canonical, warm greyscale) ---- */
+  --color-background: #030303;
+  --color-surface: #0a0a0a;
+  --color-surface-alt: #111111;
+  --color-foreground: rgba(255, 255, 255, 0.5);
+  --color-heading: #f8fafc;
+  --color-muted: #a1a1aa;
+  --color-muted-foreground: #737373;
+  --color-border: rgba(255, 255, 255, 0.1);
+
+  /* ---- Supplementary neutrals (Better Stack) — UI chrome only ---- */
+  --color-muted-steel: #646e87;
+  --color-steel-border: #939db8;
+  --color-frost: #c9d3ee;
+  --color-pure-white: #ffffff;
+
+  /* ---- Accent: single source of truth for gold ---- */
+  --color-accent: #d4a964;
+  --color-accent-hover: #c49a5a;
+  --color-gold: #d4a964;
+  --color-gold-hover: #c49a5a;
+
+  /* ---- Status colours (Badge primitive) ---- */
+  --color-success: #22c55e;
+  --color-warning: #eab308;
+  --color-error: #ef4444;
+
+  /* ---- Elevation system (tonal layering, no drop shadows) ---- */
+  --color-canvas: #030303;
+  --color-surface-base: #0a0a0a;
+  --color-raised: #111111;
+
+  /* ---- Radii ---- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* ---- Layout ---- */
+  --spacing-section: 80px;
+  --spacing-card: 24px;
+  --spacing-element: 20px;
+  --max-width-page: 1200px;
+
+  /* ---- shadcn semantic layer (dark default = canonical) ---- */
+  --color-card: #0a0a0a;
+  --color-card-foreground: rgba(255, 255, 255, 0.5);
+  --color-popover: #0a0a0a;
+  --color-popover-foreground: rgba(255, 255, 255, 0.5);
+  --color-primary: #d4a964;
+  --color-primary-foreground: #ffffff;
+  --color-primary-hover: #c49a5a;
+  --color-secondary: #111111;
+  --color-secondary-foreground: rgba(255, 255, 255, 0.5);
+  --color-muted: #111111;
+  --color-muted-foreground: #737373;
+  --color-accent-foreground: #ffffff;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  --color-input: rgba(255, 255, 255, 0.1);
+  --color-ring: #d4a964;
+}
+
+/* shadcn-style semantic var remap (consumed by primitives via bg-card etc.) */
+@layer base {
+  :root {
+    --background: #030303;
+    --foreground: rgba(255, 255, 255, 0.5);
+    --card: #0a0a0a;
+    --card-foreground: rgba(255, 255, 255, 0.5);
+    --popover: #0a0a0a;
+    --popover-foreground: rgba(255, 255, 255, 0.5);
+    --primary: #d4a964;
+    --primary-foreground: #ffffff;
+    --secondary: #111111;
+    --secondary-foreground: rgba(255, 255, 255, 0.5);
+    --muted: #111111;
+    --muted-foreground: #737373;
+    --accent: #d4a964;
+    --accent-foreground: #ffffff;
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --border: rgba(255, 255, 255, 0.1);
+    --input: rgba(255, 255, 255, 0.1);
+    --ring: #d4a964;
+    --radius: 16px;
+  }
+
+  /* ============================================================
+     LIGHT CONSOLE SCOPE — MyStable + checkout (x.ai patterns).
+     Same semantic variables, light values. Scoped to route segment
+     via data-theme="light" on a layout wrapper. Components unchanged.
+     Gold deepened for AA contrast on white: #8a6420 → text/accents.
+     ============================================================ */
+  [data-theme="light"] {
+    --background: #f7f7f5;
+    --foreground: rgba(15, 18, 24, 0.72);
+    --card: #ffffff;
+    --card-foreground: rgba(15, 18, 24, 0.75);
+    --popover: #ffffff;
+    --popover-foreground: rgba(15, 18, 24, 0.85);
+    --primary: #a87c2a;
+    --primary-foreground: #ffffff;
+    --secondary: #efefec;
+    --secondary-foreground: rgba(15, 18, 24, 0.75);
+    --muted: #efefec;
+    --muted-foreground: #6b7280;
+    --accent: #a87c2a;
+    --accent-foreground: #ffffff;
+    --destructive: #dc2626;
+    --destructive-foreground: #ffffff;
+    --border: rgba(15, 18, 24, 0.1);
+    --input: rgba(15, 18, 24, 0.12);
+    --ring: #a87c2a;
+    --color-background: #f7f7f5;
+    --color-surface: #ffffff;
+    --color-surface-alt: #f0f0ee;
+    --color-foreground: rgba(15, 18, 24, 0.72);
+    --color-heading: #0b0d12;
+    --color-muted: #6b7280;
+    --color-muted-foreground: #8a8f98;
+    --color-border: rgba(15, 18, 24, 0.1);
+    --color-canvas: #f7f7f5;
+    --color-surface-base: #ffffff;
+    --color-raised: #f0f0f0;
+    --color-accent: #a87c2a;
+    --color-accent-hover: #96691f;
+    --color-pure-white: #0b0d10;
+    --color-heading: #0c0e12;
+  }
+
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    font-family: var(--font-sans);
+  }
+}
+
+/* ---- Gentle theme transition (dark shell → light console) ---- */
+[data-theme] {
+  transition:
+    background-color 300ms ease,
+    color 300ms ease,
+    border-color 300ms ease;
+}
+
+html.dark body,
+body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 }
 
-html.dark body ::selection {
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+::selection {
   background-color: rgb(212 169 100 / 0.3);
   color: #d4a964;
 }
+[data-theme="light"] ::selection {
+  background-color: rgb(168 124 42 / 0.25);
+  color: #7a5a1e;
+}
 
-@theme {
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+/* ---- Film-grain texture over page canvas ---- */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+}
 
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-primary-hover: hsl(var(--primary-hover));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-border: hsl(var(--border));
-  --color-border-subtle: hsl(var(--border-subtle));
-  --color-border-bold: hsl(var(--border-bold));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-status-active: hsl(var(--status-active));
-  --color-status-pending: hsl(var(--status-pending));
-  --color-status-closed: hsl(var(--status-closed));
-  --radius: var(--radius);
+@layer utilities {
+  /* Dot-grid texture — 3% white on dark (founder spec) */
+  .dot-grid-surface {
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
+    position: relative;
+  }
+  .dot-grid-surface-light {
+    background-image: radial-gradient(circle, rgba(10, 12, 16, 0.05) 1px, transparent 1px);
+    background-size: 24px 24px;
+    position: relative;
+  }
+
+  .glass-streak {
+    position: relative;
+    overflow: hidden;
+  }
+  .glass-streak::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.6s ease-out;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glass-streak:hover::after {
+    left: 200%;
+  }
+
+  .masked-border {
+    position: relative;
+  }
+  .masked-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+/* ---- Keyframes ported from evo_01 ---- */
+@keyframes logo-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes cursor-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.animate-cursor-blink {
+  animation: cursor-blink 1s step-end infinite;
+}
+@keyframes shimmer {
+  0% { translate: -250% 0; }
+  100% { translate: 250% 0; }
+}
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+}
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out;
+}
+@keyframes heroLogoIn {
+  0% { opacity: 0; transform: translateY(24px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroTaglineIn {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-hero-logo {
+  animation: heroLogoIn 0.8s ease-out 0.85s both;
+}
+.animate-hero-tagline {
+  animation: heroTaglineIn 0.8s ease-out 1.05s both;
+}
+
+/* Financial/technical figures — monospace, tabular */
+.font-financial,
+.font-tabular {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+}
+
+/* ---- Accessibility: reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
