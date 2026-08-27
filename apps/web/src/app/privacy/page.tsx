@@ -11,19 +11,19 @@ export default function PrivacyPage() {
     <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
       <Link
         href="/"
-        className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#d4a964] hover:underline mb-8"
+        className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-accent hover:underline mb-8"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         <span>Return to Home</span>
       </Link>
 
-      <div className="inline-flex items-center gap-2 rounded-full border border-[#d4a964]/40 bg-[#d4a964]/10 px-3.5 py-1 text-xs font-mono tracking-[0.2em] uppercase text-[#d4a964] mb-4">
+      <div className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3.5 py-1 text-xs font-mono tracking-[0.2em] uppercase text-accent mb-4">
         <Lock className="h-3.5 w-3.5" />
         <span>Privacy & Data Protection</span>
       </div>
 
       <h1 className="text-4xl font-light tracking-tight text-foreground sm:text-5xl">
-        Privacy <span className="font-serif italic text-[#d4a964]">Policy</span>
+        Privacy <span className="font-serif italic text-accent">Policy</span>
       </h1>
       <p className="mt-2 text-xs font-mono text-muted-foreground">
         Updated August 2026 · Compliant with the New Zealand Privacy Act 2020

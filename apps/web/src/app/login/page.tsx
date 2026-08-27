@@ -84,13 +84,13 @@ function LoginForm() {
       <div className="w-full max-w-md space-y-8">
         {/* Header Branding */}
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#d4a964]/40 bg-[#d4a964]/10 px-3.5 py-1 text-xs font-mono tracking-[0.2em] uppercase text-[#d4a964]">
+          <div className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3.5 py-1 text-xs font-mono tracking-[0.2em] uppercase text-accent">
             <Sparkles className="h-3 w-3" />
             <span>Evolution Investor Portal</span>
           </div>
 
           <h1 className="mt-6 text-3xl font-light tracking-tight text-foreground sm:text-4xl">
-            Sign In to <span className="font-serif italic text-[#d4a964]">MyStables</span>
+            Sign In to <span className="font-serif italic text-accent">MyStables</span>
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Access your syndicated holdings, race updates, and legal contracts.
@@ -135,8 +135,8 @@ function LoginForm() {
 
           {/* Error Alert */}
           {errorMsg && (
-            <div className="mb-6 flex items-start gap-3 rounded-lg border border-red-900/60 bg-red-950/40 p-4 text-xs text-red-200">
-              <AlertCircle className="h-4 w-4 shrink-0 text-red-400 mt-0.5" />
+            <div className="mb-6 flex items-start gap-3 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-xs text-destructive-foreground">
+              <AlertCircle className="h-4 w-4 shrink-0 text-destructive mt-0.5" />
               <span>{errorMsg}</span>
             </div>
           )}
@@ -144,7 +144,7 @@ function LoginForm() {
           {magicLinkSent ? (
             /* Magic Link Sent View */
             <div className="text-center py-6 space-y-4">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-[#d4a964]/40 bg-[#d4a964]/10 text-[#d4a964]">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-accent/40 bg-accent/10 text-accent">
                 <CheckCircle2 className="h-6 w-6" />
               </div>
               <h3 className="text-lg font-medium text-foreground">Check your inbox</h3>
@@ -155,7 +155,7 @@ function LoginForm() {
                 <button
                   type="button"
                   onClick={() => setMagicLinkSent(false)}
-                  className="text-xs text-[#d4a964] hover:underline"
+                  className="text-xs text-accent hover:underline"
                 >
                   Use a different email address
                 </button>
@@ -179,7 +179,7 @@ function LoginForm() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="investor@domain.co.nz"
-                    className="w-full rounded-lg border border-border bg-background py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-[#d4a964] focus:outline-none focus:ring-1 focus:ring-[#d4a964]"
+                    className="w-full rounded-lg border border-border bg-background py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   />
                 </div>
               </div>
@@ -187,7 +187,7 @@ function LoginForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#d4a964] py-3 text-sm font-semibold tracking-wide text-[#0a0a0a] transition-all hover:bg-[#c39853] disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-accent py-3 text-sm font-semibold tracking-wide text-canvas transition-all hover:bg-accent-hover disabled:opacity-50"
               >
                 {loading ? (
                   <>
@@ -220,7 +220,7 @@ function LoginForm() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="investor@domain.co.nz"
-                    className="w-full rounded-lg border border-border bg-background py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-[#d4a964] focus:outline-none focus:ring-1 focus:ring-[#d4a964]"
+                    className="w-full rounded-lg border border-border bg-background py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   />
                 </div>
               </div>
@@ -240,7 +240,7 @@ function LoginForm() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full rounded-lg border border-border bg-background py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-[#d4a964] focus:outline-none focus:ring-1 focus:ring-[#d4a964]"
+                    className="w-full rounded-lg border border-border bg-background py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   />
                 </div>
               </div>
@@ -248,7 +248,7 @@ function LoginForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#d4a964] py-3 text-sm font-semibold tracking-wide text-[#0a0a0a] transition-all hover:bg-[#c39853] disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-accent py-3 text-sm font-semibold tracking-wide text-canvas transition-all hover:bg-accent-hover disabled:opacity-50"
               >
                 {loading ? (
                   <>
@@ -269,7 +269,7 @@ function LoginForm() {
         {/* Footer Note */}
         <div className="text-center text-xs text-muted-foreground">
           <span>Need help or new to Evolution? </span>
-          <Link href="/#marketplace" className="text-[#d4a964] hover:underline">
+          <Link href="/#marketplace" className="text-accent hover:underline">
             Explore Available Horses
           </Link>
         </div>

@@ -84,19 +84,19 @@ export function PricingCard({
   };
 
   return (
-    <div className="rounded-xl border border-[#d4a964]/40 bg-card p-6 shadow-xl relative overflow-hidden">
-      <div className="absolute top-0 right-0 h-28 w-28 bg-[#d4a964]/5 rounded-full blur-2xl pointer-events-none" />
+    <div className="rounded-xl border border-accent/40 bg-card p-6 shadow-xl relative overflow-hidden">
+      <div className="absolute top-0 right-0 h-28 w-28 bg-accent/5 rounded-full blur-2xl pointer-events-none" />
 
       <div className="flex items-center justify-between border-b border-border pb-4">
         <div>
-          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#d4a964]">
+          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-accent">
             Commercial Pricing Engine
           </span>
           <h3 className="text-xl font-medium tracking-tight text-foreground mt-0.5">
             Syndicate Subscription
           </h3>
         </div>
-        <div className="flex items-center gap-1.5 rounded-full border border-[#d4a964]/30 bg-[#d4a964]/10 px-2.5 py-1 text-[11px] font-mono text-[#d4a964]">
+        <div className="flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 text-[11px] font-mono text-accent">
           <Calculator className="h-3.5 w-3.5" />
           <span>DSL Standard</span>
         </div>
@@ -122,7 +122,7 @@ export function PricingCard({
                 onClick={() => setSelectedStake(units)}
                 className={`py-2 px-3 text-center rounded-lg border font-mono text-sm transition-all cursor-pointer ${
                   isSelected
-                    ? 'border-[#d4a964] bg-[#d4a964]/20 text-[#d4a964] font-semibold ring-1 ring-[#d4a964]/50'
+                    ? 'border-accent bg-accent/20 text-accent font-semibold ring-1 ring-accent/50'
                     : 'border-border bg-card/60 text-muted-foreground hover:border-muted-foreground/60 hover:text-foreground'
                 }`}
               >
@@ -146,7 +146,7 @@ export function PricingCard({
               </span>
               <span className="text-xs font-mono text-muted-foreground">NZD</span>
             </div>
-            <p className="mt-1 text-[10px] text-[#d4a964] font-mono">
+            <p className="mt-1 text-[10px] text-accent font-mono">
               3 mo deposit + 2 mo advance keep
             </p>
           </div>
@@ -156,7 +156,7 @@ export function PricingCard({
               Monthly Keep (M)
             </span>
             <div className="mt-1 flex items-baseline gap-1">
-              <span className="text-2xl sm:text-3xl font-mono font-semibold text-[#d4a964] tracking-tight">
+              <span className="text-2xl sm:text-3xl font-mono font-semibold text-accent tracking-tight">
                 ${pricing.monthlyKeepUnitNzd.toLocaleString()}
               </span>
               <span className="text-xs font-mono text-muted-foreground">/mo</span>
@@ -198,7 +198,7 @@ export function PricingCard({
 
       {/* Invariant Note & Guarantees */}
       <div className="mt-5 rounded-lg border border-border bg-background/50 p-3 flex gap-2.5">
-        <Info className="h-4 w-4 text-[#d4a964] shrink-0 mt-0.5" />
+        <Info className="h-4 w-4 text-accent shrink-0 mt-0.5" />
         <div className="text-[11px] text-muted-foreground leading-relaxed">
           <strong className="text-foreground">Unused Funds Pro-Rata Refund:</strong> Upon formal termination or maturity
           of the syndicate lease, all unused prepaid keep and security deposit reserve funds are refunded pro-rata to your
@@ -208,7 +208,7 @@ export function PricingCard({
 
       {/* Error Message */}
       {checkoutError && (
-        <div className="mt-4 rounded-lg border border-red-900/60 bg-red-950/40 p-3 text-xs text-red-300">
+        <div className="mt-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive-foreground">
           {checkoutError}
         </div>
       )}
@@ -224,7 +224,7 @@ export function PricingCard({
           type="button"
           onClick={handleCheckout}
           disabled={loading}
-          className="w-full rounded-lg bg-[#d4a964] py-3.5 px-4 text-center text-sm font-semibold tracking-wide text-[#0a0a0a] transition-all hover:bg-[#c39853] flex items-center justify-center gap-2 shadow-lg shadow-[#d4a964]/10 cursor-pointer disabled:opacity-60"
+          className="w-full rounded-lg bg-accent py-3.5 px-4 text-center text-sm font-semibold tracking-wide text-canvas transition-all hover:bg-accent-hover flex items-center justify-center gap-2 shadow-lg shadow-accent/10 cursor-pointer disabled:opacity-60"
         >
           {loading ? (
             <>

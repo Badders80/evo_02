@@ -80,13 +80,13 @@ export function LandingCtaPopup() {
         <button
           type="button"
           onClick={handleClose}
-          className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:border-[#d4a964] hover:text-[#d4a964]"
+          className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:border-accent hover:text-accent"
           aria-label="Close"
         >
           <X className="h-4 w-4" />
         </button>
 
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#d4a964]/40 bg-[#d4a964]/10 px-3.5 py-1 text-xs font-mono tracking-[0.2em] uppercase text-[#d4a964]">
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3.5 py-1 text-xs font-mono tracking-[0.2em] uppercase text-accent">
           <Sparkles className="h-3 w-3" />
           <span>Join the Evolution</span>
         </div>
@@ -100,8 +100,8 @@ export function LandingCtaPopup() {
         </p>
 
         {sent ? (
-          <div className="mt-6 rounded-xl border border-[#d4a964]/20 bg-[#d4a964]/5 p-6 text-center">
-            <p className="text-sm font-medium text-[#d4a964]">Check your inbox</p>
+          <div className="mt-6 rounded-xl border border-accent/20 bg-accent/5 p-6 text-center">
+            <p className="text-sm font-medium text-accent">Check your inbox</p>
             <p className="mt-2 text-xs text-muted-foreground">
               A secure login link was sent to <span className="text-foreground font-mono">{email}</span>. Click it once to create your account or sign in.
             </p>
@@ -118,18 +118,18 @@ export function LandingCtaPopup() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="investor@domain.co.nz"
-                className="w-full rounded-lg border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-[#d4a964] focus:outline-none focus:ring-1 focus:ring-[#d4a964]"
+                className="w-full rounded-lg border border-border bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               />
             </div>
 
             {errorMsg && (
-              <p className="text-xs text-red-400">{errorMsg}</p>
+              <p className="text-xs text-destructive">{errorMsg}</p>
             )}
 
             <button
               type="submit"
               disabled={submitting}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#d4a964] py-3 text-sm font-semibold tracking-wide text-[#0a0a0a] transition-all hover:bg-[#c39853] disabled:opacity-50"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-accent py-3 text-sm font-semibold tracking-wide text-canvas transition-all hover:bg-accent-hover disabled:opacity-50"
             >
               {submitting ? (
                 <span>Creating secure link...</span>
@@ -147,7 +147,7 @@ export function LandingCtaPopup() {
           <Link
             href="/#marketplace"
             onClick={handleClose}
-            className="text-xs font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-[#d4a964] hover:underline"
+            className="text-xs font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-accent hover:underline"
           >
             Explore the marketplace first
           </Link>

@@ -12,7 +12,7 @@ export function DataRoomCard({ pack, closeStyle, horseName: _horseName }: DataRo
     <div className="rounded-xl border border-border bg-card p-6 shadow-xl">
       <div className="flex items-center justify-between border-b border-border pb-4">
         <div>
-          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#d4a964]">
+          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-accent">
             Regulatory Compliance
           </span>
           <h3 className="text-xl font-medium tracking-tight text-foreground mt-0.5">
@@ -20,17 +20,17 @@ export function DataRoomCard({ pack, closeStyle, horseName: _horseName }: DataRo
           </h3>
         </div>
         <div className="flex items-center gap-1.5 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-mono text-muted-foreground">
-          <Scale className="h-3.5 w-3.5 text-[#d4a964]" />
+          <Scale className="h-3.5 w-3.5 text-accent" />
           <span>FMA Equine Exemption</span>
         </div>
       </div>
 
       <div className="mt-5 space-y-4">
         {/* Product Disclosure Statement (PDS) Document */}
-        <div className="rounded-lg border border-border bg-background p-4 transition-colors hover:border-[#d4a964]/40">
+        <div className="rounded-lg border border-border bg-background p-4 transition-colors hover:border-accent/40">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded border border-[#d4a964]/30 bg-[#d4a964]/10 text-[#d4a964]">
+              <div className="flex h-9 w-9 items-center justify-center rounded border border-accent/30 bg-accent/10 text-accent">
                 <FileText className="h-5 w-5" />
               </div>
               <div>
@@ -48,16 +48,16 @@ export function DataRoomCard({ pack, closeStyle, horseName: _horseName }: DataRo
           </div>
 
           <div className="mt-3 flex items-center gap-2 rounded bg-muted/30 px-3 py-1.5 font-mono text-[11px] text-muted-foreground">
-            <Hash className="h-3.5 w-3.5 text-[#d4a964] shrink-0" />
+            <Hash className="h-3.5 w-3.5 text-accent shrink-0" />
             <span className="truncate">SHA-256: {pack.pdsHash}</span>
           </div>
         </div>
 
         {/* Syndicate Agreement (SA) Document */}
-        <div className="rounded-lg border border-border bg-background p-4 transition-colors hover:border-[#d4a964]/40">
+        <div className="rounded-lg border border-border bg-background p-4 transition-colors hover:border-accent/40">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded border border-[#d4a964]/30 bg-[#d4a964]/10 text-[#d4a964]">
+              <div className="flex h-9 w-9 items-center justify-center rounded border border-accent/30 bg-accent/10 text-accent">
                 <Shield className="h-5 w-5" />
               </div>
               <div>
@@ -75,7 +75,7 @@ export function DataRoomCard({ pack, closeStyle, horseName: _horseName }: DataRo
           </div>
 
           <div className="mt-3 flex items-center gap-2 rounded bg-muted/30 px-3 py-1.5 font-mono text-[11px] text-muted-foreground">
-            <Hash className="h-3.5 w-3.5 text-[#d4a964] shrink-0" />
+            <Hash className="h-3.5 w-3.5 text-accent shrink-0" />
             <span className="truncate">SHA-256: {pack.saHash}</span>
           </div>
         </div>
@@ -85,7 +85,7 @@ export function DataRoomCard({ pack, closeStyle, horseName: _horseName }: DataRo
       <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
         <div className="rounded-lg border border-border/80 bg-background/50 p-3">
           <div className="flex items-center gap-1.5 text-foreground font-medium mb-1">
-            <CheckCircle2 className="h-3.5 w-3.5 text-[#d4a964]" />
+            <CheckCircle2 className="h-3.5 w-3.5 text-accent" />
             <span>Clause 6: Trainer Primacy</span>
           </div>
           <p className="text-[11px] text-muted-foreground leading-relaxed">
@@ -95,7 +95,7 @@ export function DataRoomCard({ pack, closeStyle, horseName: _horseName }: DataRo
 
         <div className="rounded-lg border border-border/80 bg-background/50 p-3">
           <div className="flex items-center gap-1.5 text-foreground font-medium mb-1">
-            <CheckCircle2 className="h-3.5 w-3.5 text-[#d4a964]" />
+            <CheckCircle2 className="h-3.5 w-3.5 text-accent" />
             <span>Exit Governance</span>
           </div>
           <p className="text-[11px] text-muted-foreground leading-relaxed">

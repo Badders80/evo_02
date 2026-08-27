@@ -37,19 +37,19 @@ export default function FaqPage() {
       <JsonLd data={faqPageJsonLd(faqs)} />
       <Link
         href="/"
-        className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#d4a964] hover:underline mb-8"
+        className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-accent hover:underline mb-8"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         <span>Return to Home</span>
       </Link>
 
-      <div className="inline-flex items-center gap-2 rounded-full border border-[#d4a964]/40 bg-[#d4a964]/10 px-3.5 py-1 text-xs font-mono tracking-[0.2em] uppercase text-[#d4a964] mb-4">
+      <div className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3.5 py-1 text-xs font-mono tracking-[0.2em] uppercase text-accent mb-4">
         <HelpCircle className="h-3.5 w-3.5" />
         <span>Investor Knowledge Base</span>
       </div>
 
       <h1 className="text-4xl font-light tracking-tight text-foreground sm:text-5xl">
-        Frequently Asked <span className="font-serif italic text-[#d4a964]">Questions</span>
+        Frequently Asked <span className="font-serif italic text-accent">Questions</span>
       </h1>
       <p className="mt-2 text-xs font-mono text-muted-foreground">
         Clear, mathematical answers to common questions about Evolution Stables.
@@ -57,9 +57,9 @@ export default function FaqPage() {
 
       <div className="mt-12 space-y-6">
         {faqs.map((faq, idx) => (
-          <div key={idx} className="rounded-xl border border-border bg-card p-6 transition-all hover:border-[#d4a964]/40">
+          <div key={idx} className="rounded-xl border border-border bg-card p-6 transition-all hover:border-accent/40">
             <h3 className="text-base font-medium text-foreground flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-[#d4a964] shrink-0" />
+              <ChevronRight className="h-4 w-4 text-accent shrink-0" />
               <span>{faq.q}</span>
             </h3>
             <p className="mt-3 pl-6 text-sm text-muted-foreground leading-relaxed">
@@ -76,7 +76,7 @@ export default function FaqPage() {
         </div>
         <Link
           href="/#marketplace"
-          className="inline-flex items-center gap-2 rounded-lg bg-[#d4a964] px-5 py-2.5 text-xs font-semibold text-[#0a0a0a] hover:bg-[#c39853] transition-all"
+          className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-xs font-semibold text-canvas hover:bg-accent-hover transition-all"
         >
           <span>Explore Available Horses</span>
         </Link>

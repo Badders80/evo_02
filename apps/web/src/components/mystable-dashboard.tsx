@@ -43,7 +43,7 @@ function kycLabel(status: KycStatus | string): { text: string; className: string
     return { text: 'Pending', className: 'text-amber-400' };
   }
   if (status === 'rejected') {
-    return { text: 'Rejected', className: 'text-red-400' };
+    return { text: 'Rejected', className: 'text-destructive' };
   }
   return { text: 'Unverified', className: 'text-muted-foreground' };
 }
@@ -84,12 +84,12 @@ export function MyStableDashboard({
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 space-y-10 pb-24">
       <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-border pb-6 gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#d4a964]/40 bg-[#d4a964]/10 px-3 py-1 text-xs font-mono tracking-[0.2em] uppercase text-[#d4a964]">
+          <div className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs font-mono tracking-[0.2em] uppercase text-accent">
             <Sparkles className="h-3 w-3" />
             <span>Evolution Investor Portal</span>
           </div>
           <h1 className="mt-3 text-3xl sm:text-4xl font-light tracking-tight text-foreground">
-            My<span className="font-serif italic text-[#d4a964]">Stables</span> Dashboard
+            My<span className="font-serif italic text-accent">Stables</span> Dashboard
           </h1>
           <p className="mt-1 text-xs font-mono text-muted-foreground">
             Authenticated Account: <span className="text-foreground">{userEmail}</span>
@@ -108,7 +108,7 @@ export function MyStableDashboard({
           <button
             type="button"
             onClick={handleSignOut}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3.5 py-2.5 text-xs text-muted-foreground hover:text-foreground hover:border-red-900/60 hover:bg-red-950/30 transition-all"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3.5 py-2.5 text-xs text-muted-foreground hover:text-foreground hover:border-destructive/40 hover:bg-destructive/10 transition-all"
             title="Sign Out"
           >
             <LogOut className="h-4 w-4" />
@@ -118,7 +118,7 @@ export function MyStableDashboard({
       </div>
 
       {lookupError && (
-        <div className="rounded-lg border border-red-900/60 bg-red-950/40 p-4 text-xs text-red-200">
+        <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-xs text-destructive-foreground">
           Holdings could not be loaded: {lookupError}
         </div>
       )}
@@ -127,7 +127,7 @@ export function MyStableDashboard({
         <div className="rounded-xl border border-border bg-card p-5">
           <div className="flex items-center justify-between text-muted-foreground">
             <span className="text-xs uppercase font-mono tracking-wider">Active Syndicates</span>
-            <Layers className="h-4 w-4 text-[#d4a964]" />
+            <Layers className="h-4 w-4 text-accent" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-2xl font-semibold font-mono text-foreground">{rows.length}</span>
@@ -149,10 +149,10 @@ export function MyStableDashboard({
         <div className="rounded-xl border border-border bg-card p-5">
           <div className="flex items-center justify-between text-muted-foreground">
             <span className="text-xs uppercase font-mono tracking-wider">Monthly Keep</span>
-            <CreditCard className="h-4 w-4 text-[#d4a964]" />
+            <CreditCard className="h-4 w-4 text-accent" />
           </div>
           <div className="mt-3 flex items-baseline gap-1">
-            <span className="text-2xl font-semibold font-mono text-[#d4a964]">${totalKeep.toLocaleString()}</span>
+            <span className="text-2xl font-semibold font-mono text-accent">${totalKeep.toLocaleString()}</span>
             <span className="text-xs font-mono text-muted-foreground">/mo</span>
           </div>
         </div>
@@ -177,7 +177,7 @@ export function MyStableDashboard({
             onClick={() => setActiveTab(tab)}
             className={`pb-3 px-4 text-xs uppercase font-mono tracking-wider transition-all border-b-2 ${
               activeTab === tab
-                ? 'border-[#d4a964] text-[#d4a964] font-medium'
+                ? 'border-accent text-accent font-medium'
                 : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -200,7 +200,7 @@ export function MyStableDashboard({
               </p>
               <Link
                 href="/horses/nellie"
-                className="inline-flex items-center gap-2 rounded-lg bg-[#d4a964] px-4 py-2 text-xs font-semibold text-[#0a0a0a] hover:bg-[#c39853] transition-all"
+                className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-canvas hover:bg-accent-hover transition-all"
               >
                 <span>View Nellie</span>
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -227,7 +227,7 @@ export function MyStableDashboard({
                     <div className="lg:col-span-8 p-6 sm:p-8 flex flex-col justify-between space-y-6">
                       <div>
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-mono uppercase tracking-[0.2em] text-[#d4a964]">
+                          <span className="text-xs font-mono uppercase tracking-[0.2em] text-accent">
                             {campaign.pedigree.gender} · {campaign.pedigree.sire} × {campaign.pedigree.dam}
                           </span>
                           <span className="text-xs font-mono text-muted-foreground">
@@ -242,7 +242,7 @@ export function MyStableDashboard({
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 rounded-xl border border-border bg-background p-4">
                         <div>
                           <span className="text-[10px] uppercase font-mono text-muted-foreground block">Your Stake</span>
-                          <span className="text-lg font-mono font-semibold text-[#d4a964]">
+                          <span className="text-lg font-mono font-semibold text-accent">
                             {Number(holding.stake_percentage).toFixed(1)}%
                           </span>
                         </div>
@@ -267,7 +267,7 @@ export function MyStableDashboard({
                       </div>
                       <Link
                         href={`/horses/${campaign.slug}`}
-                        className="inline-flex items-center gap-2 rounded-lg bg-[#d4a964] px-4 py-2 text-xs font-semibold text-[#0a0a0a] hover:bg-[#c39853] transition-all w-fit"
+                        className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-canvas hover:bg-accent-hover transition-all w-fit"
                       >
                         <span>View Thoroughbred Profile</span>
                         <ArrowRight className="h-3.5 w-3.5" />
@@ -303,7 +303,7 @@ export function MyStableDashboard({
                   <h3 className="text-lg font-medium text-foreground">{campaign.legalName}</h3>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between rounded-lg border border-border bg-background p-4 gap-4">
                     <div className="flex items-start gap-3">
-                      <FileText className="h-5 w-5 text-[#d4a964] shrink-0 mt-0.5" />
+                      <FileText className="h-5 w-5 text-accent shrink-0 mt-0.5" />
                       <div>
                         <span className="text-sm font-medium text-foreground block">Product Disclosure Statement</span>
                         <span className="text-[11px] font-mono text-muted-foreground">
@@ -314,7 +314,7 @@ export function MyStableDashboard({
                     <a
                       href={`/api/legal/download?slug=${campaign.slug}&doc=pds`}
                       download
-                      className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3.5 py-1.5 text-xs text-foreground hover:border-[#d4a964] hover:text-[#d4a964] transition-all"
+                      className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3.5 py-1.5 text-xs text-foreground hover:border-accent hover:text-accent transition-all"
                     >
                       <Download className="h-3.5 w-3.5" />
                       <span>Download</span>
@@ -322,7 +322,7 @@ export function MyStableDashboard({
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between rounded-lg border border-border bg-background p-4 gap-4">
                     <div className="flex items-start gap-3">
-                      <FileText className="h-5 w-5 text-[#d4a964] shrink-0 mt-0.5" />
+                      <FileText className="h-5 w-5 text-accent shrink-0 mt-0.5" />
                       <div>
                         <span className="text-sm font-medium text-foreground block">Syndicate Agreement</span>
                         <span className="text-[11px] font-mono text-muted-foreground">
@@ -333,7 +333,7 @@ export function MyStableDashboard({
                     <a
                       href={`/api/legal/download?slug=${campaign.slug}&doc=sa`}
                       download
-                      className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3.5 py-1.5 text-xs text-foreground hover:border-[#d4a964] hover:text-[#d4a964] transition-all"
+                      className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3.5 py-1.5 text-xs text-foreground hover:border-accent hover:text-accent transition-all"
                     >
                       <Download className="h-3.5 w-3.5" />
                       <span>Download</span>

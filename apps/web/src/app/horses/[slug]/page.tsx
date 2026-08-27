@@ -65,7 +65,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <Link
             href="/#marketplace"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-[#d4a964] transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-accent transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>Back to Marketplace</span>
@@ -73,7 +73,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
 
           {/* Tab Navigation */}
           <div className="flex items-center gap-1 bg-background/80 border border-border rounded-lg p-1">
-            <span className="px-3 py-1 text-xs font-medium rounded-md bg-card text-[#d4a964] border border-border shadow-sm">
+            <span className="px-3 py-1 text-xs font-medium rounded-md bg-card text-accent border border-border shadow-sm">
               Commercials & Terms
             </span>
             <Link
@@ -94,7 +94,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
         <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-border pb-6">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#d4a964]">
+              <span className="text-xs font-mono uppercase tracking-[0.25em] text-accent">
                 {campaign.pedigree.gender} · Foaled {campaign.pedigree.foalingDate}
               </span>
               <span className="rounded bg-emerald-950/80 border border-emerald-800/60 px-2 py-0.5 text-[10px] font-mono text-emerald-400">
@@ -125,7 +125,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
               href={campaign.pedigree.studBookUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-muted-foreground hover:border-[#d4a964] hover:text-[#d4a964] transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-muted-foreground hover:border-accent hover:text-accent transition-colors"
             >
               <span>Official Stud Book</span>
               <ExternalLink className="h-3.5 w-3.5" />
@@ -149,7 +149,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
           {/* Pedigree & Quick Spec Card */}
           <div className="flex flex-col justify-between rounded-xl border border-border bg-card p-6 lg:col-span-4">
             <div>
-              <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#d4a964]">
+              <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-accent">
                 <Dna className="h-4 w-4" />
                 <span>Pedigree & Trainer</span>
               </div>
@@ -210,7 +210,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
         {/* Soft Story Banner Link */}
         <div className="mt-8 rounded-xl border border-border bg-card/60 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-full bg-[#d4a964]/10 p-2.5 text-[#d4a964] border border-[#d4a964]/20">
+            <div className="rounded-full bg-accent/10 p-2.5 text-accent border border-accent/20">
               <Sparkles className="h-5 w-5" />
             </div>
             <div>
@@ -225,7 +225,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
 
           <Link
             href={`/horses/${campaign.slug}/about`}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-4 py-2 text-xs font-medium text-foreground hover:border-[#d4a964] hover:text-[#d4a964] transition-colors whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-4 py-2 text-xs font-medium text-foreground hover:border-accent hover:text-accent transition-colors whitespace-nowrap"
           >
             <span>Read Full Story & Pedigree</span>
             <ArrowRight className="h-3.5 w-3.5" />
@@ -239,7 +239,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
       <section className="mx-auto max-w-7xl px-4 pt-16 sm:px-6 lg:px-8">
         <div className="border-t border-border pt-12">
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#d4a964]">
+            <span className="text-xs font-mono uppercase tracking-[0.25em] text-accent">
               Hard Commercial & Legal Facts
             </span>
             <h2 className="mt-2 text-3xl font-medium tracking-tight text-foreground">

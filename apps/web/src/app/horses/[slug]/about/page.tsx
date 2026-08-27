@@ -59,7 +59,7 @@ export default async function HorseAboutPage({ params }: PageProps) {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <Link
             href={`/horses/${campaign.slug}`}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-[#d4a964] transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-accent transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>Back to Campaign Overview</span>
@@ -73,7 +73,7 @@ export default async function HorseAboutPage({ params }: PageProps) {
             >
               Commercials & Terms
             </Link>
-            <span className="px-3 py-1 text-xs font-medium rounded-md bg-card text-[#d4a964] border border-border shadow-sm">
+            <span className="px-3 py-1 text-xs font-medium rounded-md bg-card text-accent border border-border shadow-sm">
               About & Pedigree
             </span>
           </div>
@@ -84,7 +84,7 @@ export default async function HorseAboutPage({ params }: PageProps) {
         {/* Page Header */}
         <div className="border-b border-border pb-6">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#d4a964]">
+            <span className="text-xs font-mono uppercase tracking-[0.25em] text-accent">
               Soft Content & Story
             </span>
             <span className="rounded bg-background border border-border px-2 py-0.5 text-[10px] font-mono text-muted-foreground">
@@ -110,7 +110,7 @@ export default async function HorseAboutPage({ params }: PageProps) {
         <section className="mt-10 grid gap-8 lg:grid-cols-12">
           {/* Main Story Text */}
           <div className="rounded-xl border border-border bg-card p-6 lg:col-span-8 shadow-sm">
-            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#d4a964]">
+            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-accent">
               <BookOpen className="h-4 w-4" />
               <span>Section 2.1 · Form & Preparation</span>
             </div>
@@ -121,14 +121,14 @@ export default async function HorseAboutPage({ params }: PageProps) {
 
             <div className="mt-8 rounded-lg border border-border bg-background p-4 flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
-                <ShieldCheck className="h-4 w-4 text-[#d4a964]" />
+                <ShieldCheck className="h-4 w-4 text-accent" />
                 <span>NZTR Authorized Syndication Disclosure</span>
               </div>
               <a
                 href={campaign.pedigree.studBookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs font-mono text-[#d4a964] hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-mono text-accent hover:underline"
               >
                 <span>Official NZTR Record</span>
                 <ExternalLink className="h-3 w-3" />
@@ -152,7 +152,7 @@ export default async function HorseAboutPage({ params }: PageProps) {
         {/* SECTION 2: TRAINER & YARD BIO                                             */}
         {/* ========================================================================= */}
         <section className="mt-8 rounded-xl border border-border bg-card p-6 shadow-sm">
-          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#d4a964]">
+          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-accent">
             <Building2 className="h-4 w-4" />
             <span>The Trainer & Stable</span>
           </div>
@@ -185,7 +185,7 @@ export default async function HorseAboutPage({ params }: PageProps) {
           {/* Outlook Narrative */}
           <div className="rounded-xl border border-border bg-card p-6 lg:col-span-7 shadow-sm flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#d4a964]">
+              <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-accent">
                 <Dna className="h-4 w-4" />
                 <span>Section 2.3 · Outlook & Lineage</span>
               </div>
@@ -206,7 +206,7 @@ export default async function HorseAboutPage({ params }: PageProps) {
                     key={tag}
                     className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1 text-xs text-foreground font-medium"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#d4a964]" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-accent" />
                     {tag}
                   </span>
                 ))}
@@ -249,9 +249,9 @@ export default async function HorseAboutPage({ params }: PageProps) {
         </section>
 
         {/* Bottom CTA to Commercials */}
-        <section className="mt-12 rounded-xl border border-[#d4a964]/30 bg-gradient-to-r from-card to-background p-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
+        <section className="mt-12 rounded-xl border border-accent/30 bg-gradient-to-r from-card to-background p-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
           <div>
-            <span className="text-xs font-mono uppercase tracking-[0.25em] text-[#d4a964]">
+            <span className="text-xs font-mono uppercase tracking-[0.25em] text-accent">
               Ready to participate?
             </span>
             <h3 className="text-2xl font-light tracking-tight text-foreground mt-1">
@@ -264,7 +264,7 @@ export default async function HorseAboutPage({ params }: PageProps) {
 
           <Link
             href={`/horses/${campaign.slug}`}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#d4a964] px-6 py-3 text-sm font-semibold text-black hover:bg-[#c49a55] transition-colors whitespace-nowrap shadow-md"
+            className="inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-black hover:bg-[#c49a55] transition-colors whitespace-nowrap shadow-md"
           >
             <span>View Commercial Terms</span>
             <ArrowRight className="h-4 w-4" />

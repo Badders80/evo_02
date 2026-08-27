@@ -23,7 +23,7 @@ export function CapTableCard({
     <div className="rounded-xl border border-border bg-card p-6 shadow-xl relative">
       <div className="flex items-center justify-between border-b border-border pb-4">
         <div>
-          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#d4a964]">
+          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-accent">
             Cap Table Governance
           </span>
           <h3 className="text-xl font-medium tracking-tight text-foreground mt-0.5">
@@ -31,7 +31,7 @@ export function CapTableCard({
           </h3>
         </div>
         <div className="flex items-center gap-1.5 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-mono text-muted-foreground">
-          <PieChart className="h-3.5 w-3.5 text-[#d4a964]" />
+          <PieChart className="h-3.5 w-3.5 text-accent" />
           <span>100% Invariant</span>
         </div>
       </div>
@@ -46,13 +46,13 @@ export function CapTableCard({
           {/* Retained */}
           <div
             style={{ width: `${retainedPct}%` }}
-            className="bg-slate-700 transition-all"
+            className="bg-muted-steel transition-all"
             title={`Owner/Breeder Retained: ${retainedPct}%`}
           />
           {/* Allocated */}
           <div
             style={{ width: `${allocatedPct}%` }}
-            className="bg-[#d4a964] transition-all"
+            className="bg-accent transition-all"
             title={`Allocated Syndicate: ${allocatedPct}%`}
           />
           {/* Reserved */}
@@ -75,7 +75,7 @@ export function CapTableCard({
         {/* Retained Stake */}
         <div className="flex items-center justify-between rounded-lg border border-border/60 bg-background/60 p-3">
           <div className="flex items-center gap-2.5">
-            <div className="h-3 w-3 rounded-sm bg-slate-700" />
+            <div className="h-3 w-3 rounded-sm bg-muted-steel" />
             <div>
               <span className="font-sans text-sm text-foreground font-medium block">
                 Retained Stake (Lessor / Owner)
@@ -91,7 +91,7 @@ export function CapTableCard({
         {/* Allocated Shares */}
         <div className="flex items-center justify-between rounded-lg border border-border/60 bg-background/60 p-3">
           <div className="flex items-center gap-2.5">
-            <div className="h-3 w-3 rounded-sm bg-[#d4a964]" />
+            <div className="h-3 w-3 rounded-sm bg-accent" />
             <div>
               <span className="font-sans text-sm text-foreground font-medium block">
                 Allocated Syndicate Units
@@ -102,7 +102,7 @@ export function CapTableCard({
               </span>
             </div>
           </div>
-          <span className="text-sm font-semibold text-[#d4a964]">{allocatedPct.toFixed(1)}%</span>
+          <span className="text-sm font-semibold text-accent">{allocatedPct.toFixed(1)}%</span>
         </div>
 
         {/* Reserved (In-Flight Concurrency) */}
