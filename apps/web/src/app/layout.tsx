@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Header } from '../components/header';
+import { NavBar as Header } from '../components/NavBar';
 import { Footer } from '../components/footer';
 import { JsonLd } from '../components/json-ld';
 import {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { notifyAlexOfInterest } from '@/lib/notify-alex';
-import { getSupabaseServiceClient } from '@/lib/supabase-service';
+import { getSupabaseServiceClient } from '@/lib/supabase-server';
 
 /**
  * Interest Signups / waitlist — guest CTA modal submissions.
@@ -47,7 +47,8 @@ export async function POST(request: NextRequest) {
 
     // 1. Persist the lead (best-effort — a lead DB hiccup must not 500 the modal)
     try {
-      const { error } = await getSupabaseServiceClient()
+      const client = getSupabaseServiceClient();
+      const { error } = await client
         .from('leads')
         .insert({
           user_email: trimmed,

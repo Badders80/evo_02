@@ -404,6 +404,7 @@ export interface Database {
           referrer_url?: string | null;
           status?: string;
         };
+        Relationships: [];
       };
     };
     Views: Record<string, never>;
