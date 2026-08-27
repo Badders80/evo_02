@@ -1,10 +1,14 @@
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'My Stable | Evolution Stables',
-  robots: { index: false, follow: false },
-};
-
-export default function MyStableLayout({ children }: { children: React.ReactNode }) {
-  return children;
+/**
+ * MyStable route segment — LIGHT CONSOLE scope.
+ *
+ * Site shell stays dark+gold (root layout); this wrapper flips the same
+ * semantic tokens to their light values via [data-theme="light"] (see
+ * globals.css). ~300ms colour transition makes the dark→light shift feel
+ * like crossing a threshold into the owner console (x.ai patterns apply
+ * here at full fidelity — light theme, dense monospace data).
+ */
+export default function MystableLayout({ children }: { children: React.ReactNode }) {
+  return <div data-theme="light" className="contents">{children}</div>;
 }

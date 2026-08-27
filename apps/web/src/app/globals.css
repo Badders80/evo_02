@@ -40,6 +40,9 @@
   --color-success: #22c55e;
   --color-warning: #eab308;
   --color-error: #ef4444;
+  --color-status-active: #10b981;
+  --color-status-pending: #f59e0b;
+  --color-status-closed: #64748b;
 
   /* ---- Elevation system (tonal layering, no drop shadows) ---- */
   --color-canvas: #030303;
@@ -128,6 +131,9 @@
     --border: rgba(15, 18, 24, 0.1);
     --input: rgba(15, 18, 24, 0.12);
     --ring: #a87c2a;
+    --color-status-active: #047857;
+    --color-status-pending: #b45309;
+    --color-status-closed: #64748b;
     --color-background: #f7f7f5;
     --color-surface: #ffffff;
     --color-surface-alt: #f0f0ee;

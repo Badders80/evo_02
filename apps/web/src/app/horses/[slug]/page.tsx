@@ -97,7 +97,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
               <span className="text-xs font-mono uppercase tracking-[0.25em] text-accent">
                 {campaign.pedigree.gender} · Foaled {campaign.pedigree.foalingDate}
               </span>
-              <span className="rounded bg-emerald-950/80 border border-emerald-800/60 px-2 py-0.5 text-[10px] font-mono text-emerald-400">
+              <span className="rounded bg-status-active/10 border border-status-active/40 px-2 py-0.5 text-[10px] font-mono text-status-active">
                 {campaign.listingStatus === 'completed'
                   ? 'Completed Campaign'
                   : campaign.listingStatus === 'coming_soon'

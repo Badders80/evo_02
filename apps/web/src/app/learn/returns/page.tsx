@@ -78,7 +78,7 @@ export default function ReturnsGuidePage() {
             </div>
             <div className="flex justify-between py-2 border-b border-border text-muted-foreground">
               <span>Payout per 1% Unit Stake:</span>
-              <span className="text-emerald-400 font-semibold">$1,125.00 NZD</span>
+              <span className="text-status-active font-semibold">$1,125.00 NZD</span>
             </div>
           </div>
         </section>

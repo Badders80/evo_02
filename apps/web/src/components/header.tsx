@@ -73,7 +73,7 @@ export function Header() {
 
         {/* Action Gate / Regulated Status & MyStable Visual Control */}
         <div className="flex items-center gap-3">
-          <div className="hidden items-center gap-1.5 rounded-full border border-emerald-900/60 bg-emerald-950/40 px-2.5 py-1 text-[11px] font-medium text-emerald-400 sm:flex">
+          <div className="hidden items-center gap-1.5 rounded-full border border-status-active/40 bg-status-active/10 px-2.5 py-1 text-[11px] font-medium text-status-active sm:flex">
             <ShieldCheck className="h-3.5 w-3.5" />
             <span>NZTR Regulated</span>
           </div>

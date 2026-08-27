@@ -58,13 +58,13 @@ export function CapTableCard({
           {/* Reserved */}
           <div
             style={{ width: `${reservedPct}%` }}
-            className="bg-amber-500/80 transition-all"
+            className="bg-status-pending/80 transition-all"
             title={`In-Flight 15-Min Lock: ${reservedPct}%`}
           />
           {/* Available */}
           <div
             style={{ width: `${availablePct}%` }}
-            className="bg-emerald-500 transition-all"
+            className="bg-status-active transition-all"
             title={`Available for Subscription: ${availablePct}%`}
           />
         </div>
@@ -108,35 +108,35 @@ export function CapTableCard({
         {/* Reserved (In-Flight Concurrency) */}
         <div className="flex items-center justify-between rounded-lg border border-border/60 bg-background/60 p-3">
           <div className="flex items-center gap-2.5">
-            <div className="h-3 w-3 rounded-sm bg-amber-500/80" />
+            <div className="h-3 w-3 rounded-sm bg-status-pending/80" />
             <div>
               <span className="font-sans text-sm text-foreground font-medium block">
                 Reserved (Checkout In-Flight)
               </span>
               <span className="text-[11px] font-sans text-muted-foreground flex items-center gap-1">
-                <Lock className="h-3 w-3 text-amber-400" />
+                <Lock className="h-3 w-3 text-status-pending" />
                 15-Min TTL Atomic Lock
               </span>
             </div>
           </div>
-          <span className="text-sm font-semibold text-amber-400">{reservedPct.toFixed(1)}%</span>
+          <span className="text-sm font-semibold text-status-pending">{reservedPct.toFixed(1)}%</span>
         </div>
 
         {/* Available Shares */}
-        <div className="flex items-center justify-between rounded-lg border border-emerald-900/40 bg-emerald-950/20 p-3">
+        <div className="flex items-center justify-between rounded-lg border border-status-active/30 bg-status-active/5 p-3">
           <div className="flex items-center gap-2.5">
-            <div className="h-3 w-3 rounded-sm bg-emerald-500" />
+            <div className="h-3 w-3 rounded-sm bg-status-active" />
             <div>
               <span className="font-sans text-sm text-foreground font-medium block">
                 Available for Subscription
               </span>
-              <span className="text-[11px] font-sans text-emerald-400/80 flex items-center gap-1">
-                <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+              <span className="text-[11px] font-sans text-status-active/80 flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3 text-status-active" />
                 Open for Immediate Subscription
               </span>
             </div>
           </div>
-          <span className="text-sm font-semibold text-emerald-400">{availablePct.toFixed(1)}%</span>
+          <span className="text-sm font-semibold text-status-active">{availablePct.toFixed(1)}%</span>
         </div>
       </div>
 

@@ -37,10 +37,10 @@ export type MyStableDashboardCampaigns = Record<string, HorseCampaign>;
 
 function kycLabel(status: KycStatus | string): { text: string; className: string } {
   if (status === 'verified') {
-    return { text: 'Verified', className: 'text-emerald-400' };
+    return { text: 'Verified', className: 'text-status-active' };
   }
   if (status === 'pending') {
-    return { text: 'Pending', className: 'text-amber-400' };
+    return { text: 'Pending', className: 'text-status-pending' };
   }
   if (status === 'rejected') {
     return { text: 'Rejected', className: 'text-destructive' };
@@ -138,7 +138,7 @@ export function MyStableDashboard({
         <div className="rounded-xl border border-border bg-card p-5">
           <div className="flex items-center justify-between text-muted-foreground">
             <span className="text-xs uppercase font-mono tracking-wider">Float Deposit Held</span>
-            <ShieldCheck className="h-4 w-4 text-emerald-400" />
+            <ShieldCheck className="h-4 w-4 text-status-active" />
           </div>
           <div className="mt-3 flex items-baseline gap-1">
             <span className="text-2xl font-semibold font-mono text-foreground">${totalFloat.toLocaleString()}</span>
@@ -219,7 +219,7 @@ export function MyStableDashboard({
                         style={{ backgroundImage: `url(${media.horse.heroConformation})` }}
                       />
                       <div className="absolute top-4 left-4">
-                        <span className="rounded-md border border-emerald-900/60 bg-emerald-950/90 backdrop-blur-sm px-2.5 py-1 text-[11px] font-mono text-emerald-400">
+                        <span className="rounded-md border border-status-active/40 bg-status-active/10 px-2.5 py-1 text-[11px] font-mono text-status-active">
                           {holding.status}
                         </span>
                       </div>
@@ -340,7 +340,7 @@ export function MyStableDashboard({
                     </a>
                   </div>
                   {pack.pdsHash !== holding.signed_pds_hash && (
-                    <p className="text-[11px] font-mono text-amber-400">
+                    <p className="text-[11px] font-mono text-status-pending">
                       Holding hash differs from current compiler output. Vault stores the signed hash above.
                     </p>
                   )}

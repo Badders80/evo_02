@@ -192,7 +192,7 @@ export function PricingCard({
         </div>
         <div className="flex justify-between items-center py-1 text-muted-foreground">
           <span>GST Treatment</span>
-          <span className="font-mono text-emerald-400 font-medium">100% GST-Inclusive (15% IRD)</span>
+          <span className="font-mono text-status-active font-medium">100% GST-Inclusive (15% IRD)</span>
         </div>
       </div>
 
