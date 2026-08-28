@@ -90,7 +90,7 @@ function LoginForm() {
           </div>
 
           <h1 className="mt-6 text-3xl font-light tracking-tight text-foreground sm:text-4xl">
-            Sign In to <span className="font-serif italic text-accent">MyStables</span>
+            Sign In to <span className="font-serif italic text-accent">MyStable</span>
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Access your syndicated holdings, race updates, and legal contracts.
