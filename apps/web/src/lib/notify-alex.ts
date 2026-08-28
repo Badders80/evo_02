@@ -105,7 +105,7 @@ export async function notifyAlexOfInterest(params: NotifyParams): Promise<void> 
   });
 
   await transporter.sendMail({
-    from: process.env.SMTP_FROM || "Evolution Stables <noreply@evolutionstables.co.nz>",
+    from: process.env.SMTP_FROM || "Evolution Stables <alex@evolutionstables.nz>",
     to: notifyEmail,
     subject,
     html,
