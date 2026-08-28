@@ -43,6 +43,15 @@ Tokinvest partner logos). Nothing executes without founder input.
   `SUPABASE_AUTH_EXTERNAL_GOOGLE_*` from **`supabase/.env` (gitignored, piped
   from evo_01's `.env.local` — never print).** Login page has "Continue with
   Google" → `/auth/callback?next=…`.
+- **Google flow uses evo_01's inherited OAuth client** (only its NextAuth-era
+  redirect URIs are registered; Console edits are founder-only). GoTrue
+  presents `http://localhost:3000/api/auth/callback/google`; the shim
+  (`scripts/google-callback-shim.mjs`) forwards the code to `/auth/callback`.
+  **Shim must be running for Google login** — it needs host :3000, which the
+  `admin-panel` docker container also wants (`docker stop admin-panel` first,
+  `docker start admin-panel` to restore).
+- Full Google stack: `supabase start` + `pnpm --filter @evo/web dev -p 3010`
+  + `node scripts/google-callback-shim.mjs`. Then `scripts/seed-local-demo.sh`.
 - Password fallback: `alex@evolutionstables.nz` / `nellie-demo-2026` (local only).
 - **Every `supabase stop && supabase start` wipes the local volume** — re-seed
   auth user + profile + demo holding (2% Nellie, $760 float, $76/mo) or the
