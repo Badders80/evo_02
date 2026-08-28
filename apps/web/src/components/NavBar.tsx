@@ -14,7 +14,7 @@ const navLinks = [
   { label: 'About', href: '/#about' },
   { label: 'Mission', href: '/#mission' },
   { label: 'Model', href: '/#digital-syndication' },
-  { label: 'Marketplace', href: '/marketplace' },
+  { label: 'Marketplace', href: '/#marketplace' },
   { label: 'MyStable', href: '/mystable' },
   { label: 'FAQ', href: '/#faq' },
 ];
