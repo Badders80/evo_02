@@ -37,6 +37,20 @@ After sweep: merge `design-alignment` → main → founder-only Vercel cutover
 founder; known candidates flagged (footer hero dup, /marketplace nav link,
 Tokinvest partner logos). Nothing executes without founder input.
 
+## Local auth for click-through (design-alignment)
+
+- Google SSO wired: `supabase/config.toml` `[auth.external.google]` reads
+  `SUPABASE_AUTH_EXTERNAL_GOOGLE_*` from **`supabase/.env` (gitignored, piped
+  from evo_01's `.env.local` — never print).** Login page has "Continue with
+  Google" → `/auth/callback?next=…`.
+- Password fallback: `alex@evolutionstables.nz` / `nellie-demo-2026` (local only).
+- **Every `supabase stop && supabase start` wipes the local volume** — re-seed
+  auth user + profile + demo holding (2% Nellie, $760 float, $76/mo) or the
+  console renders empty. Trigger auto-creates the profile row from auth.users.
+- Google client may need `http://127.0.0.1:54321/auth/v1/callback` added to its
+  Authorized redirect URIs in Google Cloud Console (client 851430309148-*) —
+  only fixable by founder.
+
 ---
 
 ## Prior state — sprint e2e-wire (locked cb4ac12, audited)
