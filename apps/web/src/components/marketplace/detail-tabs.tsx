@@ -129,9 +129,7 @@ export function DetailTabs({
             onClick={() => setActiveTab(tab.key as any)}
             className={`cursor-pointer whitespace-nowrap border-b-2 px-6 py-4 text-xs font-light uppercase tracking-widest transition-all -mb-[2px] ${
               activeTab === tab.key
-                ? activeTab === "pedigree"
-                  ? "border-emerald-400 font-medium text-emerald-400"
-                  : "border-accent font-medium text-accent"
+                ? "border-accent font-medium text-accent"
                 : "border-transparent text-muted-foreground hover:text-frost"
             }`}
           >

@@ -52,10 +52,10 @@ function PedigreeNode({
   const normName = data.name ? data.name.toLowerCase().trim() : "";
 
   const tierStyles: Record<NodeTier, string> = {
-    subject: "min-h-[64px] border-emerald-500/40 bg-surface-base shadow-[0_0_24px_rgba(16,185,129,0.08)] px-3.5",
-    parent: "min-h-[56px] border-border bg-raised/80 hover:border-emerald-500/40",
-    grand: "min-h-[48px] border-border/80 bg-raised/50 hover:border-emerald-500/30",
-    great: "min-h-[42px] border-border/60 bg-raised/30 hover:border-emerald-500/20",
+    subject: "min-h-[64px] border-border/50 bg-surface-base px-3.5",
+    parent: "min-h-[56px] border-border/50 bg-raised/80",
+    grand: "min-h-[48px] border-border/40 bg-raised/50",
+    great: "min-h-[42px] border-border/30 bg-raised/30",
   };
 
   const nameTextStyles: Record<NodeTier, string> = {
@@ -75,7 +75,7 @@ function PedigreeNode({
           isEmpty && tier !== "subject" ? "opacity-30 border-dashed border-border" : "",
           tierStyles[tier],
           isHighlighted
-            ? "border-emerald-500 bg-emerald-500/20 ring-1 ring-emerald-500/60 shadow-[0_0_16px_rgba(16,185,129,0.25)] text-pure-white"
+            ? "border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/40 text-pure-white"
             : isLinebredDuplicate
             ? "border-emerald-500/40 bg-emerald-500/10"
             : "",
@@ -84,17 +84,17 @@ function PedigreeNode({
         {/* Top bar: Role badge & Country code */}
         <div className="flex items-center justify-between w-full gap-1 mb-0.5">
           {data.role === "sire" && (
-            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-600/90 text-pure-white border border-emerald-500/40">
               Sire
             </span>
           )}
           {data.role === "dam" && (
-            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-rose-500/10 text-rose-300 border border-rose-500/20">
+            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-rose-600/80 text-pure-white border border-rose-500/40">
               Dam
             </span>
           )}
           {data.role === "subject" && (
-            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-600/90 text-pure-white border border-emerald-500/40">
               Horse
             </span>
           )}
@@ -102,12 +102,12 @@ function PedigreeNode({
           {tier !== "great" && (
             <div className="flex items-center gap-1 ml-auto">
               {data.country && (
-                <span className={`text-[8.5px] font-mono font-medium ${data.role === "dam" ? "text-rose-400" : "text-emerald-400"}`}>
+                <span className="text-[8.5px] font-mono text-frost font-medium">
                   [{data.country}]
                 </span>
               )}
               {data.year && (
-                <span className={`text-[8.5px] font-mono ${data.role === "dam" ? "text-rose-400" : "text-emerald-400"}`}>
+                <span className="text-[8.5px] font-mono text-muted-foreground">
                   {data.year}
                 </span>
               )}
@@ -127,12 +127,12 @@ function PedigreeNode({
         {tier === "great" && (data.country || data.year) && (
           <div className="flex items-center gap-1 mt-0.5">
             {data.country && (
-              <span className={`text-[8px] font-mono ${data.role === "dam" ? "text-rose-400" : "text-emerald-400"}`}>
+              <span className="text-[8px] font-mono text-muted-foreground">
                 [{data.country}]
               </span>
             )}
             {data.year && (
-              <span className={`text-[8px] font-mono ${data.role === "dam" ? "text-rose-400" : "text-emerald-400"}`}>
+              <span className="text-[8px] font-mono text-muted-foreground">
                 {data.year}
               </span>
             )}
@@ -149,7 +149,7 @@ function PedigreeNode({
 function TreeConnector({ splits = 2 }: { splits?: number }) {
   return (
     <div className="relative w-full h-full flex items-center justify-center" aria-hidden>
-      <svg className="w-full h-full text-border stroke-current" preserveAspectRatio="none">
+      <svg className="w-full h-full text-border/40 stroke-current" preserveAspectRatio="none">
         {splits === 2 && (
           <>
             {/* Left center horizontal arm */}
