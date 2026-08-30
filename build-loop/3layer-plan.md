@@ -27,6 +27,8 @@
 - Dev server :3010 currently 500 → NOT a blocker (pre-existing; will validate via build/typecheck + optional boot)
 
 ## Out of scope
-Visual formatting, pedigree components, highlight_tags chips on cards (separate task), per-horse JSON-LD, race-date smart fallback in MC.
+Visual formatting, pedigree components, per-horse JSON-LD, race-date smart fallback in MC.
+NOTE (2026-08-31): highlight_tags chips on marketplace cards were originally parked here —
+SHIPPED as commit 5206fee (L1 card now renders hook + 4 chips + cutout).
 
 [verified: all file paths read 2026-08-31; key-shape mismatch confirmed writer=snake vs reader+seed=camel]
