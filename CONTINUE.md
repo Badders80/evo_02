@@ -9,7 +9,25 @@
 
 ---
 
-## 🖱️ FOUNDER GATE (~10 min)
+## Session wrap (2026-08-30 evening — horse page build, PAUSED at chunk-6 of 10)
+
+**Plan artifacts:** `build-loop/horse-page/` — plan.md, plan-graph.json (21 nodes/21 edges/11 chunks, verified), review-synthesis.md (kimi plan-audit WARN→fixed, founder pre-authorization recorded), kimi-plan-verdict.md. **Model doc: `build-loop/page-model-notes.md` (founder-locked — READ FIRST on resume).**
+
+**Done (committed on `design-alignment`, gates green, build 34/34 pages):**
+- chunk-1 skeleton `3d0640f` · chunk-2 story `a1cae9e` · chunk-3 media deck `7a8a1f0` · chunk-4 tabs/overview/documents `d81d476` · chunk-5b types `d81d476` · chunk-7 race `fbed63c` · chunk-8 trainer `99f7589` · verification pass `120bcb6`
+- chunk-5 data: local DB migrated (4-gen sire/dam lines all 6 horses; race_log FG=2/PR=6); script at `scripts/migrate-pedigree-racelog.py`
+- Live: /marketplace/[slug] 200s; /horses/:slug → 308; Nellie shows BECOME AN OWNER, Prudentia Fully Subscribed
+- Git: branch NOT pushed (push-protection: old commits 2e5bc31/cb4ac12 hardcode dead local sb_secret; founder said don't push yet, purge-then-push later)
+
+**Remaining (next session, in order):**
+1. **chunk-6 pedigree tab** (`apps/web/src/components/horse/pedigree-tab.tsx`) — WRITE DIRECTLY, no subagent (2 timeouts). Full spec in plan-graph.json chunk + page-model-notes 'PEDIGREE'. Data ready in inventory.pedigree_data.
+2. **chunk-9 rail contents** — status-driven: listed → Become-Owner pill + View-Investment-Terms (opens terms surface); fully_subscribed → gold badge + keen-to-hear CTA. Shell exists in right-rail.tsx (typed `{ status }` prop).
+3. **Wire page.tsx** — currently placeholder divs #story/#tabs; mount StoryBlock, MediaDeck, Tabs with all five panels (panel components exist).
+4. **chunk-10 gate** — CDP browser-walk checklist (sticky rail, video 1s, lightbox, tabs, guest blur) + kimi-code-audit on full diff vs `d1da6e7`.
+5. **Known loose end:** eslint warns horseName/wins/places "unused" in race-tab.tsx:124,131 despite JSX using them at :179-181 — investigate (warning-only, non-blocking).
+- Build lesson: subagents (nemotron) are slow/unreliable writers — orchestrator writes + gates directly; dispatch only isolated chunks, cap timeouts.
+
+## FOUNDER GATE (~10 min)
 
 ```bash
 cd /home/evo/new/evo_02 && pnpm --filter @evo/web dev -p 3010
