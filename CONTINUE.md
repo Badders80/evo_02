@@ -1,6 +1,7 @@
 # CONTINUE — evo_02
 
-**Date:** 2026-08-28 — **PASS 1 COMPLETE + Kimi audit (WARN, F1–F3 fixed) + 404 hydration fix · Pass 2 = founder content sweep, handoff ready**
+**Date:** 2026-08-29 — **PASS 1 COMPLETE + Kimi audit (WARN, F1–F3 fixed) + 404 hydration fix + local Google SSO + FIREBASE TEMPLATE REMOVED · Pass 2 = founder content sweep, handoff ready**
+**Prod auth is now Supabase-native** (evo_01 swap live 2026-08-29, `d3d3a4b`) — evo_02 Supabase auth now aligns with prod layer (Google OAuth client differs: local uses inherited `851430309148-*` + shim, prod uses `153078526638-*` + native callback; reconcile at cutover).
 **Branch:** `design-alignment` (cut from ui-sprint-1 — superseded, never merge that). NOT merged — founder gate pending.
 **Live site:** still served by evo_01/02_website via Vercel. evo_01 working tree is DIRTY — hands off.
 **DoD recap:** full lifecycle built (intake → docs → MC → site → KYC-gated buy). Remaining: founder gate → Pass 2 → cutover.
@@ -28,6 +29,7 @@ After sweep: merge `design-alignment` → main → founder-only Vercel cutover
 - `7098055` W3b — token sweep: all hex (#d4a964/#c39853) → accent tokens; red/emerald/amber/slate → destructive/status tokens
 - `acec420` W4 — MyStable light console: `mystable/layout.tsx` sets `data-theme="light"` (300ms token transition = dark shell → light x.ai console); status tokens in both scopes
 - `8408b6f` audit fixes F1–F3 · `0e588e7` audit docs · `0ebf6b1` not-found.tsx `suppressHydrationWarning` (ClickUp ext class injection on 404)
+- `app-mediated-google` Google OAuth re-homed to our app (consent shows our domain, not *.supabase.co): `/api/auth/google` + `/api/auth/google/callback`, `signInWithIdToken` session mint, CSRF nonce cookies, state carries `next`; shim repointed; unit test added to gate
 - **Kimi audit: WARN — 0 FAILs on shipped claims.** Deferred to Pass 2 (founder calls): subscribe rate-limit/duplicate guard, leads.status constraint + email uniqueness, horse_name persistence, dup `--color-muted`/`--color-heading` defs, `--color-pure-white` misnomer. Full graph: `build-loop/audit-graph.json`.
 - **Gate: `just check` → 10/10 PASS.** Dev verified: `/` 200, `/horses/nellie` 200, `/mystable`→`/login` 200, NavBar/footer/gold lockup server-rendering; 404 route clean post-`0ebf6b1`.
 
@@ -39,26 +41,30 @@ Tokinvest partner logos). Nothing executes without founder input.
 
 ## Local auth for click-through (design-alignment)
 
-- Google SSO wired: `supabase/config.toml` `[auth.external.google]` reads
-  `SUPABASE_AUTH_EXTERNAL_GOOGLE_*` from **`supabase/.env` (gitignored, piped
-  from evo_01's `.env.local` — never print).** Login page has "Continue with
-  Google" → `/auth/callback?next=…`.
-- **Google flow uses evo_01's inherited OAuth client** (only its NextAuth-era
-  redirect URIs are registered; Console edits are founder-only). GoTrue
-  presents `http://localhost:3000/api/auth/callback/google`; the shim
-  (`scripts/google-callback-shim.mjs`) forwards the code to `/auth/callback`.
-  **Shim must be running for Google login** — it needs host :3000, which the
-  `admin-panel` docker container also wants (`docker stop admin-panel` first,
-  `docker start admin-panel` to restore).
+- **Google SSO is app-mediated (2026-08-30):** `/api/auth/google` plants CSRF+nonce
+  httpOnly cookies and redirects to Google from OUR OAuth round-trip — the consent
+  screen shows our client/domain, **never `coqtijrftaklcwgbnqef.supabase.co`**
+  (GoTrue-mediated `signInWithOAuth` consent branding was investor-facing ugly).
+  `/api/auth/google/callback` validates state (`<sha256(csrf)>.<next>`), exchanges
+  the code, mints the session via `signInWithIdToken` — Supabase stays the identity
+  store (ADR-002). Unit-tested in `google_oauth.test.ts` (in `just check`).
+- Env (gitignored): `GOOGLE_OAUTH_CLIENT_ID/SECRET` (piped from supabase/.env) +
+  `GOOGLE_OAUTH_REDIRECT_URI=http://localhost:3000/api/auth/callback/google` (local
+  only — presents the inherited client's registered URI). Unset in prod → URI
+  derives from request origin; **founder Console step at cutover: add
+  `https://www.evolutionstables.nz/api/auth/google/callback` to client
+  `153078526638-*`** (and the local-client edit remains founder-only if used).
+- Shim (`scripts/google-callback-shim.mjs`) now plain-forwards :3000 →
+  `/api/auth/google/callback` (no Supabase state unwrapping). Still needs :3000:
+  **`docker stop admin-panel` first** (LibreChat also binds :3000 — stop it too if
+  running; `docker start` both after). GoTrue's google provider stays enabled in
+  config.toml (harmless; signInWithIdToken validates against it).
 - Full Google stack: `supabase start` + `pnpm --filter @evo/web dev -p 3010`
   + `node scripts/google-callback-shim.mjs`. Then `scripts/seed-local-demo.sh`.
 - Password fallback: `alex@evolutionstables.nz` / `nellie-demo-2026` (local only).
 - **Every `supabase stop && supabase start` wipes the local volume** — re-seed
   auth user + profile + demo holding (2% Nellie, $760 float, $76/mo) or the
   console renders empty. Trigger auto-creates the profile row from auth.users.
-- Google client may need `http://127.0.0.1:54321/auth/v1/callback` added to its
-  Authorized redirect URIs in Google Cloud Console (client 851430309148-*) —
-  only fixable by founder.
 
 ---
 

@@ -1,0 +1,12 @@
+Read evo_02/planning-loop/brief.md (or the brief you were given). You are a strategic reasoning engine reviewing a production rebuild. Expand this brief:
+
+(1) Reframe the problem — is the user asking the right question?
+(2) Surface map — what is real vs theatrical on evo_02 vs live evo_01.
+(3) Logic and dual-source register — name files and which dual-homes are load-bearing vs debt.
+(4) Flow-by-flow verdict — Discover / Capture / Auth / KYC / Buy / MyStable / Operate.
+(5) Redundancy — keep / fold / delete vs evo_01.
+(6) Risks — what breaks, what is assumed, what is unstated.
+(7) Add one layer the user did NOT ask about.
+(8) What to do first — planning actions only, no code.
+
+Output as structured markdown with numbered sections. Be specific — name files, patterns, trade-offs. Do not hedge. Do not write code. Do not recommend editing evo_01 or applying evo_02 migrations to live Evolution-3.0.
