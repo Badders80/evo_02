@@ -603,25 +603,25 @@ export function PedigreeTable({
       {/* Top Bar: Broodmare Sire Card & View Switcher */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         {damSireName ? (
-          <div className="inline-flex items-center gap-2.5 text-xs text-foreground bg-raised border border-border rounded-lg px-3.5 py-2">
-            <span className="text-accent font-semibold uppercase text-[9.5px] tracking-wider px-2 py-0.5 rounded bg-accent/10 border border-accent/20">
+          <div className="inline-flex items-center gap-2.5 text-xs text-foreground bg-surface-base border border-border/60 rounded-full px-2 py-1.5">
+            <span className="text-pure-white font-semibold uppercase text-[9.5px] tracking-wider px-2.5 py-1 rounded-full bg-emerald-600/90 border border-emerald-500/30">
               Broodmare Sire
             </span>
-            <span className="text-heading font-medium text-sm">{damSireName}</span>
+            <span className="text-heading font-medium text-sm pr-1">{damSireName}</span>
           </div>
         ) : <div />}
 
         {hasFullPedigree && (
-          <div className="flex gap-1.5 bg-surface-base p-1 border border-border rounded-lg">
+          <div className="flex gap-1 bg-surface-base p-1 border border-border/60 rounded-full">
             {(["tree", "dam-line", "sire-line"] as const).map((v) => (
               <button
                 key={v}
                 type="button"
                 onClick={() => setView(v)}
-                className={`text-[10px] uppercase tracking-widest font-mono px-3 py-1.5 rounded-md transition-all ${
+                className={`text-[10px] uppercase tracking-widest font-mono px-3.5 py-1.5 rounded-full transition-all ${
                   view === v
-                    ? "border border-accent/30 text-accent bg-accent/10 font-medium"
-                    : "text-muted-foreground hover:text-frost hover:bg-raised"
+                    ? "bg-emerald-600/90 text-emerald-50 font-medium border border-emerald-500/30"
+                    : "text-muted-foreground hover:text-frost hover:bg-raised/60"
                 }`}
               >
                 {v === "tree" ? "Pedigree Matrix" : v.replace("-", " ")}
