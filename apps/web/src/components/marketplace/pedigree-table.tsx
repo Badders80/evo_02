@@ -602,12 +602,14 @@ export function PedigreeTable({
     <div className="space-y-5">
       {/* Top Bar: Broodmare Sire Card & View Switcher */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        {damSireName ? (
+        {tree.damSire?.name ? (
           <div className="inline-flex items-center gap-2.5 text-xs text-foreground bg-surface-base border border-border/60 rounded-full px-2 py-1.5">
             <span className="text-emerald-400 font-semibold uppercase text-[9.5px] tracking-wider px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-700/40">
               Broodmare Sire
             </span>
-            <span className="text-heading font-medium text-sm pr-1">{damSireName}</span>
+            <span className="text-heading font-medium text-sm pr-1">
+              {tree.damSire.name}{tree.damSire.country ? ` (${tree.damSire.country})` : ""}{tree.damSire.year ? ` ${tree.damSire.year}` : ""}
+            </span>
           </div>
         ) : <div />}
 
