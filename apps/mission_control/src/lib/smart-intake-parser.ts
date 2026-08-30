@@ -58,7 +58,7 @@ export const REGISTERED_TRAINERS: RegisteredTrainerEntity[] = [
  {
    id: 'stephen-gray',
    name: 'Stephen Gray Racing',
-   location: 'Copper Belt Lodge, 160 Green Road, RD6, Palmerston North 4476',
+   location: 'Palmerston North, NZ',
    managerEntity: 'Stephen Gray Racing',
    aliases: ['stephen gray racing', 'stephen gray', 'copper belt lodge', 'copper belt', 'palmerston north'],
  },

@@ -74,7 +74,7 @@ SET
     ),
     soft_legal = jsonb_build_object(
         'aboutHorse', $about$Turn Me Loose x Yearn 2023 (barn name Mulan) is a bay 2YO filly by triple Group 1-winning miler Turn Me Loose out of Group 2 Auckland Thoroughbred Breeders' Stakes winner Yearn, by Champion Sire Savabeel. Foaled on 17 August 2023, she represents a deliberate cross of proven Australian miler speed with the durable, black-type form of a New Zealand staying mare. Her immediate family combines precocity with resilience: Turn Me Loose won Group 1 races between 1400 metres and 1600 metres, while Yearn was a stakes-performed miler who banked $339,895 in prizemoney. In early education at Copper Belt Lodge, Mulan has shown the alertness and the balanced action that fit the typical early-2YO campaign of her pedigree, without asking for more than she is ready to give.$about$,
-        'trainerBio', $trainer$Mulan is prepared by Stephen Gray Racing from Copper Belt Lodge, 160 Green Road, RD6, Palmerston North 4476. A Group 1-winning international trainer, Stephen returned to New Zealand after a long Singapore career and now trains from the family yard alongside his father, Kevin Gray.$trainer$,
+        'trainerBio', $trainer$Mulan is prepared by Stephen Gray Racing from Copper Belt Lodge in Palmerston North. A Group 1-winning international trainer, Stephen returned to New Zealand after a long Singapore career and now trains from the family yard alongside his father, Kevin Gray.$trainer$,
         'racingOutlookAndPedigree', $racing$By Turn Me Loose, a three-time Group 1 winner in New Zealand and Australia (2014 NZ 2000 Guineas, 2015 VRC Emirates Stakes, 2016 MRC Futurity Stakes), out of Yearn, a Group 2 Auckland Thoroughbred Breeders' Stakes winner by Champion Sire Savabeel. Mulan's pedigree profile fits an early 2YO speed campaign through the late spring and summer, with the scope to stretch to mile-graded company as a 3YO filly. The target pathway is a 2YO introduction over sprint–miler distances, then progression into the autumn 3YO fillies' events.$racing$
     ),
     marketing = jsonb_build_object(
@@ -206,7 +206,7 @@ SET
     ),
     soft_legal = jsonb_build_object(
         'aboutHorse', $about$First Gear (NZ) is a bay gelding by Derryn out of A'Guin Ace, prepared through his racing campaign by Stephen Gray Racing at Copper Belt Lodge in Palmerston North. He is a completed Evolution Stables syndicate campaign, retained on the storefront as a public track record of what the stable delivers.$about$,
-        'trainerBio', $trainer$First Gear was prepared by Stephen Gray Racing from Copper Belt Lodge, 160 Green Road, RD6, Palmerston North 4476. Stephen Gray Racing is a Group 1-winning international yard; Copper Belt Lodge is the training address, not the trading name.$trainer$,
+        'trainerBio', $trainer$First Gear was prepared by Stephen Gray Racing from Copper Belt Lodge in Palmerston North. Stephen Gray Racing is a Group 1-winning international yard.$trainer$,
         'racingOutlookAndPedigree', $racing$By Derryn (AUS) out of A'Guin Ace (NZ), by O'Reilly. First Gear's campaign is complete. This listing is historical proof of syndicate delivery, not an open subscription.$racing$
     ),
     marketing = jsonb_build_object(
@@ -214,7 +214,7 @@ SET
         'highlightTags', jsonb_build_array('By Derryn (AUS)', 'Stephen Gray Racing', 'Copper Belt Lodge', 'Completed Campaign'),
         'highlights', jsonb_build_array(
             'Completed Campaign: Public track record of an Evolution Stables digitally-syndicated lease.',
-            'Stephen Gray Racing: Prepared at Copper Belt Lodge, 160 Green Road, RD6, Palmerston North 4476.',
+            'Stephen Gray Racing: Prepared at Copper Belt Lodge, Palmerston North.',
             $hl$Pedigree: Derryn (AUS) out of A'Guin Ace (NZ), by O'Reilly.$hl$,
             'Listed Pool: 10 percent historical syndicate. Checkout is closed.',
             'Yard: Copper Belt Lodge is the address. The entity is Stephen Gray Racing.'

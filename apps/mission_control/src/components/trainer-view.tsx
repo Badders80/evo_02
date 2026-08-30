@@ -25,9 +25,9 @@ export function TrainerView() {
  name: 'Stephen Gray Racing',
  entity: 'Stephen Gray Racing',
  licensed: true,
- location: 'Copper Belt Lodge, 160 Green Road, RD6, Palmerston North 4476',
+ location: 'Palmerston North, NZ',
  horses: ['Turn Me Loose x Yearn 2023 (Mulan)', 'First Gear'],
- bio: 'Stephen Gray Racing trains from Copper Belt Lodge, 160 Green Road, RD6, Palmerston North 4476. Copper Belt Lodge is the yard address, not the trading name.',
+ bio: 'Stephen Gray Racing trains from Copper Belt Lodge in Palmerston North. Copper Belt Lodge is the yard, not the trading name.',
  },
  ];
 

@@ -109,7 +109,7 @@ export const CANONICAL_HORSES_CATALOGUE: HorseLookupRecord[] = [
  breedingUrl: 'https://loveracing.nz/Breeding/460867/Yearn-NZ-2013-2023.aspx',
  suggestedTrainer: {
  name: 'Stephen Gray Racing',
- location: 'Copper Belt Lodge, 160 Green Road, RD6, Palmerston North 4476',
+ location: 'Palmerston North, NZ',
  managerEntity: 'Stephen Gray Racing',
  },
  suggestedOwner: 'Stephen Gray Racing',
@@ -178,7 +178,7 @@ export const CANONICAL_HORSES_CATALOGUE: HorseLookupRecord[] = [
  breedingUrl: 'https://loveracing.nz/Breeding/428364/First-Gear-NZ-2021.aspx',
  suggestedTrainer: {
    name: 'Stephen Gray Racing',
-   location: 'Copper Belt Lodge, 160 Green Road, RD6, Palmerston North 4476',
+   location: 'Palmerston North, NZ',
    managerEntity: 'Stephen Gray Racing',
  },
  suggestedOwner: 'Stephen Gray Racing',

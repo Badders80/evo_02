@@ -221,7 +221,7 @@ const INITIAL_HORSES: Record<string, { context: SyndicateLegalContext; status: s
  },
  trainer: {
  name: 'Stephen Gray Racing',
- location: 'Copper Belt Lodge, 160 Green Road, RD6, Palmerston North 4476',
+ location: 'Palmerston North, NZ',
  managerEntity: 'Stephen Gray Racing',
  },
  pricing: {
@@ -247,7 +247,7 @@ const INITIAL_HORSES: Record<string, { context: SyndicateLegalContext; status: s
  aboutHorse:
  'Turn Me Loose x Yearn 2023 (barn name Mulan) is an exceptionally bred 2YO filly representing a pure synthesis of elite New Zealand racing speed and stamina.',
  trainerBio:
- 'Stephen Gray Racing trains from Copper Belt Lodge, 160 Green Road, RD6, Palmerston North 4476.',
+ 'Stephen Gray Racing trains from Copper Belt Lodge in Palmerston North.',
  racingOutlookAndPedigree:
  'Sire Turn Me Loose won three Group 1 titles across Melbourne and Sydney. Dam Yearn won the Group 2 Auckland Breeders Stakes.',
  },
@@ -281,7 +281,7 @@ const INITIAL_HORSES: Record<string, { context: SyndicateLegalContext; status: s
  },
  trainer: {
    name: 'Stephen Gray Racing',
-   location: 'Copper Belt Lodge, 160 Green Road, RD6, Palmerston North 4476',
+   location: 'Palmerston North, NZ',
    managerEntity: 'Stephen Gray Racing',
  },
  pricing: {

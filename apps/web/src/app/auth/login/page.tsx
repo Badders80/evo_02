@@ -93,7 +93,6 @@ function AuthLoginForm() {
         <div className="rounded-3xl border border-border bg-surface-base/80 p-8 shadow-[0_30px_80px_rgba(0,0,0,0.6)] backdrop-blur-md sm:p-10">
           {/* Logo mark — top center (prod parity) */}
           <div className="flex justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/brand/logos/lockups/lockup-horizontal-gold.svg"
               alt="Evolution Stables"

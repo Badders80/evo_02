@@ -122,7 +122,14 @@ console.log('Running knowledge registry tests...');
   }
   assert.equal(/stephen gray stables/.test(blob), false);
 
-  console.log('✅ Live asset lock: Stephen Gray Racing only, research trainers excluded, First Gear completed');
+  // LOCATION LOCK — the street address has drifted into surfaces 3 times (2026-08).
+  // Display location is city-level only; the street address must never ship anywhere.
+  assert.equal(gray.location, 'Palmerston North, NZ');
+  const STREET_ADDRESS = /160 green road|rd6|4476/i;
+  assert.equal(STREET_ADDRESS.test(blob), false, 'street address leaked into trainers');
+  assert.equal(STREET_ADDRESS.test(JSON.stringify(STEPHEN_GRAY_RACING)), false, 'street address leaked into asset lock');
+
+  console.log('✅ Live asset lock: Stephen Gray Racing only, research trainers excluded, First Gear completed, location lock held');
 }
 
 console.log('🎉 All knowledge registry tests passed.');

@@ -22,7 +22,7 @@ export function OwnerView() {
  contactPerson: 'Stephen Gray',
  horses: ['Turn Me Loose x Yearn 2023 (Mulan)', 'First Gear'],
  details:
- 'Stephen Gray Racing, Copper Belt Lodge, 160 Green Road, RD6, Palmerston North 4476. Never styled as Stables. First Gear is a completed visible campaign.',
+ 'Stephen Gray Racing, Copper Belt Lodge, Palmerston North, NZ. Never styled as Stables. First Gear is a completed visible campaign.',
  },
  ];
 
