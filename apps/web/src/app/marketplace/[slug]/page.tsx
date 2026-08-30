@@ -8,7 +8,9 @@ import {
   formatHorseDisplayName,
   getCampaignBySlug,
   getCampaignMedia,
+  getMarketplaceHook,
 } from '@/lib/horses-data';
+import { campaignShareMetadata, SITE_DESCRIPTION } from '@/lib/seo';
 import { getTrainer } from '@evo/db_models';
 import { getStableLinks } from '@/lib/stable-links';
 import { getSupabaseServiceClient } from '@/lib/supabase-service';
@@ -55,10 +57,24 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     notFound();
   }
   const title = formatHorseDisplayName(campaign, { includeBarnName: false });
+  const description = getMarketplaceHook(campaign) || SITE_DESCRIPTION;
+  const shareMeta = campaignShareMetadata(
+    campaign,
+    `/marketplace/${slug}`,
+    `${title} | Evolution Stables`
+  );
   return {
     title: `${title} | Marketplace | Evolution Stables`,
-    description: campaign.marketing.marketplaceHook || campaign.softLegal.aboutHorse,
-    alternates: { canonical: `/marketplace/${slug}` },
+    description,
+    alternates: { ...shareMeta.alternates, canonical: `/marketplace/${slug}` },
+    openGraph: {
+      ...shareMeta.openGraph,
+      description: shareMeta.openGraph?.description || description,
+    },
+    twitter: {
+      ...shareMeta.twitter,
+      description: shareMeta.twitter?.description || description,
+    },
   };
 }
 

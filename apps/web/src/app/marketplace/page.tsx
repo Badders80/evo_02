@@ -3,6 +3,7 @@ import {
   formatHorseDisplayName,
   getAllCampaigns,
   getCampaignMedia,
+  getMarketplaceHook,
 } from '@/lib/horses-data';
 import { MARKETPLACE_CARD_IMAGE } from '@evo/storage/cdn';
 import {
@@ -24,7 +25,7 @@ export default async function MarketplacePage() {
     return {
       slug: campaign.slug,
       name: formatHorseDisplayName(campaign, { includeBarnName: false }),
-      hook: campaign.marketing.marketplaceHook || campaign.softLegal.aboutHorse,
+      hook: getMarketplaceHook(campaign),
       status: campaign.listingStatus,
       image: MARKETPLACE_CARD_IMAGE[campaign.slug] ?? media.horse.heroConformation,
     };
