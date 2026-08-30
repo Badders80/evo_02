@@ -1,32 +1,26 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getCampaignBySlug, getCampaignMedia } from '@/lib/horses-data';
+import Link from 'next/link';
+import Image from 'next/image';
+import fs from 'fs';
+import path from 'path';
+import {
+  formatHorseDisplayName,
+  getCampaignBySlug,
+  getCampaignMedia,
+} from '@/lib/horses-data';
 import { getTrainer } from '@evo/db_models';
 import { getStableLinks } from '@/lib/stable-links';
+import { getSupabaseServiceClient } from '@/lib/supabase-service';
+import { CampaignStatusBadge } from '@/components/marketplace/campaign-status-badge';
+import { DetailTabs } from '@/components/marketplace/detail-tabs';
 import RightRail from '@/components/horse/right-rail';
-import { MediaDeck } from '@/components/horse/media-deck';
-import { StoryBlock } from '@/components/horse/story-block';
-import { Tabs } from '@/components/horse/tabs';
-import { OverviewTab } from '@/components/horse/overview-tab';
-import { PedigreeTab } from '@/components/horse/pedigree-tab';
-import { TrainerTab } from '@/components/horse/trainer-tab';
-import { RaceTab } from '@/components/horse/race-tab';
 import { DocumentsGate } from '@/components/horse/documents-gate';
 import type {
   InventoryHorse,
   PedigreeLine,
   RaceLogEntry,
 } from '@evo/db_models';
-
-/**
- * Horse campaign page — founder-locked LEFT/RIGHT page model
- * (build-loop/page-model-notes.md):
- *   LEFT (⅔): media deck → story → tabs (overview | pedigree | trainer |
- *             race record | documents)
- *   RIGHT (⅓): sticky status-driven investment rail
- * Old /horses/[slug] file is untouched (CUT = hide, never delete); the route
- * redirects here via next.config.ts.
- */
 
 function parseJsonbField<T>(value: unknown): T | null {
   if (value === null || value === undefined) return null;
@@ -40,15 +34,31 @@ function parseJsonbField<T>(value: unknown): T | null {
   return value as T;
 }
 
+function getGalleryImages(slug: string, coverUrl?: string): string[] {
+  const dir = path.join(process.cwd(), 'public', 'images', 'content', 'horses', slug);
+  if (!fs.existsSync(dir)) return [];
+  const validExts = ['.png', '.jpg', '.jpeg', '.webp', '.avif'];
+  const coverBasename = coverUrl ? path.basename(coverUrl) : null;
+  return fs
+    .readdirSync(dir)
+    .filter((f) => validExts.includes(path.extname(f).toLowerCase()))
+    .filter((f) => f !== coverBasename)
+    .sort()
+    .map((f) => `/images/content/horses/${slug}/${f}`)
+    .slice(0, 6);
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const campaign = await getCampaignBySlug(slug);
   if (!campaign) {
     notFound();
   }
+  const title = formatHorseDisplayName(campaign, { includeBarnName: false });
   return {
-    title: `${campaign.legalName} | Marketplace | Evolution Stables`,
-    description: campaign.marketing.marketplaceHook,
+    title: `${title} | Marketplace | Evolution Stables`,
+    description: campaign.marketing.marketplaceHook || campaign.softLegal.aboutHorse,
+    alternates: { canonical: `/marketplace/${slug}` },
   };
 }
 
@@ -59,151 +69,200 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
     notFound();
   }
 
-  // The row is re-fetched for the 4-gen pedigree + race log (typed shapes).
-  // getCampaignBySlug collapses pedigree into display fields; the tab needs
-  // the raw jsonb lines. Same source table, one extra read is fine for RSC.
-  const { getSupabaseServiceClient } = await import('@/lib/supabase-service');
-  const supabase = getSupabaseServiceClient();
-  const { data: rawRow } = await supabase.from('inventory').select('*').eq('slug', slug).single();
+  const { data: rawRow } = await getSupabaseServiceClient()
+    .from('inventory')
+    .select('*')
+    .eq('slug', slug)
+    .single();
   const row = rawRow as InventoryHorse | null;
   const pedigreeData = parseJsonbField<Record<string, unknown>>(row?.pedigree_data) ?? {};
+  const raceLog = (row as unknown as { race_log?: RaceLogEntry[] | null })?.race_log ?? undefined;
 
-  // 4-gen pedigree lines + cross line (snake_case jsonb keys, chunk-5b types).
-  const sireLine = (pedigreeData.sire_line ?? []) as PedigreeLine[];
-  const damLine = (pedigreeData.dam_line ?? []) as PedigreeLine[];
-  const crossLine = (pedigreeData.cross_line ?? null) as {
-    sire_dam_sire?: string;
-    sire_dam_dam?: string;
-    dam_sire_sire?: string;
-    dam_sire_dam?: string;
-  } | null;
-  const loveracingId =
-    typeof pedigreeData.loverracing_id === 'number'
-      ? pedigreeData.loverracing_id
-      : typeof pedigreeData.loveracing_id === 'number'
-        ? pedigreeData.loveracing_id
-        : undefined;
   const breedingRecordUrl =
     typeof pedigreeData.stud_book_url === 'string' && pedigreeData.stud_book_url
       ? pedigreeData.stud_book_url
-      : undefined;
+      : campaign.pedigree.studBookUrl || undefined;
 
-  // Race log (chunk-5b): only first-gear/prudentia carry real data.
-  const raceLog = (row as unknown as { race_log?: RaceLogEntry[] | null })?.race_log ?? undefined;
-
-  // Media deck inputs (HORSE_STILLS: 01 = cover; video only when supplied).
   const media = getCampaignMedia(campaign.slug, campaign.trainer.slug);
-  const gallery = media.horse.paradeGallery;
+  const heroImage = media.horse.heroConformation;
+  const gallery = getGalleryImages(slug, heroImage);
 
-  // Trainer registry + Phase 1.5 stable links (render-only-existing rule).
   const trainerProfile = getTrainer(campaign.trainer.slug);
   const stableLinks = getStableLinks(campaign.trainer.slug);
 
-  // Age computed from foaling date — never hardcoded.
+  const displayName = formatHorseDisplayName(campaign, { includeBarnName: false });
   const age = campaign.pedigree.foalingDate
-    ? String(new Date().getFullYear() - Number(campaign.pedigree.foalingDate.split('-')[0]))
+    ? new Date().getFullYear() - Number(campaign.pedigree.foalingDate.split('-')[0])
     : undefined;
 
-  // Story paragraphs: about_horse woven with trainer_bio (L2 layer).
-  const storyParagraphs = [campaign.softLegal.aboutHorse, campaign.softLegal.trainerBio].filter(
-    (p): p is string => Boolean(p && p.trim())
-  );
+  const story = campaign.softLegal.aboutHorse;
+  const overviewBody = campaign.softLegal.racingOutlookAndPedigree;
 
-  // Documents: compiled legal pack endpoints (PDS/SA live download routes).
   const pdsUrl = `/api/legal/download?slug=${encodeURIComponent(campaign.slug)}&doc=pds`;
   const saUrl = `/api/legal/download?slug=${encodeURIComponent(campaign.slug)}&doc=sa`;
 
-  // NZTR profile URL from loveracing id (race tab external links).
-  const nztrUrl = loveracingId
-    ? `https://loveracing.nz/Common/SystemTemplates/Modal/EntryDetail.aspx?DisplayContext=Modal&HorseID=${loveracingId}`
-    : undefined;
-
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-6xl px-12 pt-28 pb-8 md:px-16 lg:px-20 grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-12 items-start">
-        {/* ── LEFT (⅔) — horse info, scrolls normally ─────────────────── */}
-        <div className="min-w-0 space-y-8">
-          <MediaDeck
-            heroImage={media.horse.heroConformation}
-            gallery={gallery}
-            videoUrl={media.horse.trackworkVideo}
-            sex={campaign.pedigree.gender}
-            colour={campaign.pedigree.colour}
-            sire={campaign.pedigree.sire}
-            dam={campaign.pedigree.dam}
-            breadcrumbName={campaign.legalName}
-          />
+    <div className="min-h-screen bg-canvas font-sans selection:bg-accent selection:text-black">
+      <main className="dot-grid-surface min-h-screen pb-24 pt-32">
+        <div className="mx-auto max-w-6xl px-6 sm:px-10 lg:px-12">
+          {/* Breadcrumb */}
+          <div className="mb-10 flex items-center justify-between text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Link
+                href="/marketplace"
+                className="transition duration-300 hover:text-frost"
+              >
+                Marketplace
+              </Link>
+              <span>/</span>
+              <span className="text-foreground">{displayName}</span>
+            </div>
+            <Link
+              href="/marketplace"
+              className="normal-case tracking-normal text-[12px] font-medium text-accent transition duration-300 hover:text-frost"
+            >
+              ← Back to Marketplace
+            </Link>
+          </div>
 
-          <StoryBlock
-            legalName={campaign.legalName}
-            barnName={campaign.barnName}
-            status={campaign.listingStatus}
-            storyParagraphs={storyParagraphs}
-          />
+          <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[1.6fr,1fr]">
+            {/* LEFT COLUMN */}
+            <div className="space-y-12">
+              {/* Cover media */}
+              <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-surface-base">
+                {heroImage ? (
+                  <>
+                    <Image
+                      src={heroImage}
+                      alt={displayName}
+                      fill
+                      className="object-contain"
+                      priority
+                      sizes="(max-width: 1024px) 100vw, 60vw"
+                    />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                  </>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-xs font-light text-muted-foreground">
+                    Photo incoming
+                  </div>
+                )}
+              </div>
 
-          <Tabs
-            overview={
-              <OverviewTab
-                highlights={campaign.marketing.highlights ?? []}
-                racingOutlook={campaign.softLegal.racingOutlookAndPedigree}
-              />
-            }
-            pedigree={
-              <PedigreeTab
-                subjectName={campaign.legalName}
+              {/* Spec strip */}
+              <div className="grid grid-cols-2 gap-6 rounded-2xl border border-border bg-surface-base p-6 md:grid-cols-[1fr_1fr_1.4fr_1.4fr]">
+                <div>
+                  <p className="mb-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Sex</p>
+                  <p className="text-[14px] font-medium capitalize text-pure-white">{campaign.pedigree.gender || '—'}</p>
+                </div>
+                <div>
+                  <p className="mb-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Colour</p>
+                  <p className="text-[14px] font-medium text-pure-white">{campaign.pedigree.colour || '—'}</p>
+                </div>
+                <div>
+                  <p className="mb-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Sire</p>
+                  <p className="truncate text-[14px] font-medium text-pure-white" title={campaign.pedigree.sire}>
+                    {campaign.pedigree.sire || '—'}
+                  </p>
+                </div>
+                <div>
+                  <p className="mb-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Dam</p>
+                  <p className="truncate text-[14px] font-medium text-pure-white" title={campaign.pedigree.dam}>
+                    {campaign.pedigree.dam || '—'}</p>
+                </div>
+              </div>
+
+              {/* Gallery */}
+              {gallery.length > 0 && (
+                <div className="grid grid-cols-3 gap-3">
+                  {gallery.map((src, i) => (
+                    <div
+                      key={src}
+                      className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-surface-base"
+                    >
+                      <Image
+                        src={src}
+                        alt={`${displayName} — photo ${i + 1}`}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 33vw, 20vw"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* THE STORY */}
+              <section className="space-y-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    The story
+                  </p>
+                  <CampaignStatusBadge status={campaign.listingStatus} />
+                </div>
+                <h1 className="text-[24px] font-light leading-tight tracking-tight text-heading">
+                  {displayName}
+                </h1>
+                <div className="space-y-4 text-[14px] font-light leading-[1.85] text-foreground">
+                  {story ? (
+                    story.split('\n\n').filter(Boolean).map((para, idx) => (
+                      <p key={idx}>{para}</p>
+                    ))
+                  ) : (
+                    <p>—</p>
+                  )}
+                </div>
+              </section>
+
+              {/* Detail Tabs */}
+              <DetailTabs
+                horseName={campaign.legalName}
                 sireName={campaign.pedigree.sire}
                 damName={campaign.pedigree.dam}
-                sireLine={sireLine}
-                damLine={damLine}
-                crossLine={crossLine}
+                damSireName={campaign.pedigree.damSire}
                 sex={campaign.pedigree.gender}
                 colour={campaign.pedigree.colour}
                 age={age}
-                foaled={campaign.pedigree.foalingDate}
-                breedingRecordUrl={breedingRecordUrl}
-              />
-            }
-            trainer={
-              <TrainerTab
-                trainerName={campaign.trainer.name}
-                stableName={campaign.trainer.stable}
-                location={campaign.trainer.location}
-                philosophy={trainerProfile?.philosophy}
-                bio={campaign.softLegal.trainerBio}
-                contactName={trainerProfile?.name}
-                website={stableLinks?.website}
-                facebookUrl={stableLinks?.facebookUrl}
-                instagramUrl={stableLinks?.instagramUrl}
-                xUrl={stableLinks?.xUrl}
-              />
-            }
-            raceRecord={
-              <RaceTab
-                horseName={campaign.legalName}
-                raceLog={raceLog}
-                status={campaign.listingStatus}
+                wins="0"
+                placed="0"
                 breedingUrl={breedingRecordUrl}
-                nztrUrl={nztrUrl}
-              />
-            }
-            documents={
-              <DocumentsGate
+                trainer={{
+                  name: campaign.trainer.name,
+                  stable_name: campaign.trainer.stable,
+                  contact_name: trainerProfile?.name,
+                  location: campaign.trainer.location,
+                  bio: trainerProfile?.philosophy,
+                  website: stableLinks?.website,
+                  people: [],
+                }}
+                foalingDate={campaign.pedigree.foalingDate}
+                pedigreeData={pedigreeData}
+                story={overviewBody}
+                raceLog={raceLog}
+                trainerBio={campaign.softLegal.trainerBio}
                 horseSlug={campaign.slug}
-                pdsUrl={pdsUrl}
-                saUrl={saUrl}
+              documentsPanel={
+                  <DocumentsGate
+                    horseSlug={campaign.slug}
+                    pdsUrl={pdsUrl}
+                    saUrl={saUrl}
+                  />
+                }
               />
-            }
-          />
-        </div>
+            </div>
 
-        {/* ── RIGHT (⅓) — sticky investment rail ──────────────────────── */}
-        <RightRail
-          status={campaign.listingStatus}
-          horseName={campaign.legalName}
-          horseSlug={campaign.slug}
-          wholesaleMonthlyNzd={campaign.wholesaleMonthlyNzd}
-        />
-      </div>
+            {/* RIGHT COLUMN */}
+            <div className="space-y-8 lg:sticky lg:top-28">
+              <RightRail
+                status={campaign.listingStatus}
+                horseName={campaign.legalName}
+                horseSlug={campaign.slug}
+                wholesaleMonthlyNzd={campaign.wholesaleMonthlyNzd}
+              />
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

@@ -10,8 +10,6 @@ export type MarketplaceCard = {
   hook: string;
   status: ListingStatus;
   image: string;
-  trainer: string;
-  location: string;
 };
 
 const FILTERS = [
@@ -133,10 +131,6 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
               </Link>
 
               <div className="flex w-full flex-col justify-end py-2 md:order-first md:w-[60%] md:pr-6">
-                <p className="mb-2 text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
-                  {card.trainer}
-                  {card.location ? ` · ${card.location}` : ''}
-                </p>
                 <h2
                   className="font-light tracking-tight text-heading leading-none text-[32px] md:text-[36px]"
                 >
