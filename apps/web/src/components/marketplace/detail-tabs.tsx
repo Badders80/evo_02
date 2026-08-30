@@ -72,10 +72,11 @@ function getRaceRecordEmptyMessage(status: CampaignStatus): string {
 
 function FormattedText({ text }: { text?: string }) {
   if (!text) return null;
+  const paragraphs = text.split("\\n\\n").filter(Boolean);
   return (
     <>
-      {text.split("\\n\\n").map((para, idx) => (
-        <p key={idx} className="mb-4 last:mb-0">
+      {paragraphs.map((para, idx) => (
+        <p key={`para-${idx}-${para.slice(0, 8)}`} className="mb-4 last:mb-0">
           {para}
         </p>
       ))}

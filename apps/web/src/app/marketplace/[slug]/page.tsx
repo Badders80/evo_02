@@ -125,7 +125,7 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[1.6fr,1fr]">
+          <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[2fr,1fr]">
             {/* LEFT COLUMN */}
             <div className="space-y-12">
               {/* Cover media */}
@@ -206,7 +206,7 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
                 <div className="space-y-4 text-[14px] font-light leading-[1.85] text-foreground">
                   {story ? (
                     story.split('\n\n').filter(Boolean).map((para, idx) => (
-                      <p key={idx}>{para}</p>
+                      <p key={`story-${idx}-${para.slice(0, 12)}`}>{para}</p>
                     ))
                   ) : (
                     <p>—</p>

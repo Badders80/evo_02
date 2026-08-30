@@ -132,7 +132,7 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
 
               <div className="flex w-full flex-col justify-end py-2 md:order-first md:w-[60%] md:pr-6">
                 <h2
-                  className="font-light tracking-tight text-heading leading-none text-[32px] md:text-[36px]"
+                  className="font-light tracking-tight text-heading leading-none text-[24px] md:text-[28px]"
                 >
                   {card.name}
                 </h2>
