@@ -55,6 +55,8 @@ export interface PedigreeData {
   sire_line?: PedigreeLine[];
   dam_line?: PedigreeLine[];
   cross_line?: unknown;
+  // DB payload key is loverracing_id (double-r; matches live jsonb — verified 2026-08-30)
+  loverracing_id?: number;
   loveracing_id?: number;
   performance_profile_url?: string;
   family_number?: string;

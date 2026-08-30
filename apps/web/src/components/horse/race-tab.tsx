@@ -172,7 +172,7 @@ export function RaceTab({
         </div>
       </div>
 
-      {/* ── 2. Summary line ──────────────────────────────────────────── }}
+      {/* ── 2. Summary line ──────────────────────────────────────────── */}
       <p
         className="text-xs font-mono text-muted-foreground"
       >

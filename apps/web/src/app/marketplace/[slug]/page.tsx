@@ -77,7 +77,12 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
     dam_sire_sire?: string;
     dam_sire_dam?: string;
   } | null;
-  const loveracingId = typeof pedigreeData.loveracing_id === 'number' ? pedigreeData.loveracing_id : undefined;
+  const loveracingId =
+    typeof pedigreeData.loverracing_id === 'number'
+      ? pedigreeData.loverracing_id
+      : typeof pedigreeData.loveracing_id === 'number'
+        ? pedigreeData.loveracing_id
+        : undefined;
   const breedingRecordUrl =
     typeof pedigreeData.stud_book_url === 'string' && pedigreeData.stud_book_url
       ? pedigreeData.stud_book_url
@@ -115,7 +120,7 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-6xl px-12 pt-28 pb-8 md:px-16 lg:px-20 grid grid-cols-1 lg:grid-cols-[2fr,1fr] gap-12 items-start">
+      <div className="mx-auto max-w-6xl px-12 pt-28 pb-8 md:px-16 lg:px-20 grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-12 items-start">
         {/* ── LEFT (⅔) — horse info, scrolls normally ─────────────────── */}
         <div className="min-w-0 space-y-8">
           <MediaDeck
