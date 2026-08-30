@@ -52,15 +52,6 @@ function FacebookIcon() {
   );
 }
 
-function MailIcon() {
-  return (
-    <svg className={ICON_CLASSES} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
-      <rect x="2" y="4" width="20" height="16" rx="2" />
-      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-    </svg>
-  );
-}
-
 function IconLink({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
   return (
     <a href={href} aria-label={label} target="_blank" rel="noopener noreferrer">
@@ -88,9 +79,10 @@ export function TrainerTab({
     <div>
       <h3 className="text-lg font-medium text-heading">Trainer Profile</h3>
       <p className="mt-2 text-sm font-medium text-heading">
-        {stableName}
+        {trainerName}
         {location && <span className="text-muted-foreground font-light"> · {location}</span>}
       </p>
+      <p className="text-xs font-light text-muted-foreground">{stableName}</p>
 
       {trimmedPhilosophy && (
         <p className="mt-3 text-[15px] leading-[1.8] font-light text-foreground">{trimmedPhilosophy}</p>
