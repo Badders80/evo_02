@@ -53,16 +53,16 @@ function PedigreeNode({
 
   const tierStyles: Record<NodeTier, string> = {
     subject: "min-h-[64px] border-accent/40 bg-surface-base shadow-[0_0_24px_rgba(212,169,100,0.1)] px-3.5",
-    parent: "min-h-[56px] border-border bg-raised/80 hover:border-steel-border",
-    grand: "min-h-[48px] border-border/80 bg-raised/50 hover:border-steel-border",
-    great: "min-h-[42px] border-border/60 bg-raised/30 hover:border-steel-border",
+    parent: "min-h-[56px] border-accent/20 bg-raised/80 hover:border-accent/50",
+    grand: "min-h-[48px] border-accent/15 bg-raised/50 hover:border-accent/40",
+    great: "min-h-[42px] border-accent/10 bg-raised/30 hover:border-accent/30",
   };
 
   const nameTextStyles: Record<NodeTier, string> = {
     subject: "text-[13px] font-medium text-heading tracking-tight",
-    parent: "text-[11.5px] font-medium text-foreground",
-    grand: "text-[10.5px] font-normal text-muted-foreground",
-    great: "text-[9.5px] font-normal text-muted-steel",
+    parent: "text-[11.5px] font-medium text-pure-white",
+    grand: "text-[10.5px] font-normal text-foreground",
+    great: "text-[9.5px] font-normal text-frost",
   };
 
   return (
@@ -149,7 +149,7 @@ function PedigreeNode({
 function TreeConnector({ splits = 2 }: { splits?: number }) {
   return (
     <div className="relative w-full h-full flex items-center justify-center" aria-hidden>
-      <svg className="w-full h-full text-border stroke-current" preserveAspectRatio="none">
+      <svg className="w-full h-full text-accent/30 stroke-current" preserveAspectRatio="none">
         {splits === 2 && (
           <>
             {/* Left center horizontal arm */}
@@ -239,7 +239,7 @@ function PedigreeChart({
           <div className="w-full py-2">
             {/* Header row labels */}
             <div
-              className="grid text-[10px] uppercase tracking-wider font-mono text-muted-foreground mb-2 px-1 text-center"
+              className="grid text-[10px] uppercase tracking-wider font-mono text-accent/70 mb-2 px-1 text-center"
               style={{
                 gridTemplateColumns: "1.4fr 24px 1.2fr 24px 1.2fr 24px 1.2fr",
               }}
@@ -456,7 +456,7 @@ function FullPedigreeModal({
           <div className="min-w-[760px] py-2">
             {/* Header row */}
             <div
-              className="grid text-[10px] uppercase tracking-wider font-mono text-muted-foreground mb-2 px-1 text-center"
+              className="grid text-[10px] uppercase tracking-wider font-mono text-accent/70 mb-2 px-1 text-center"
               style={{ gridTemplateColumns: GRID_COLS }}
             >
               <span>Subject</span>
