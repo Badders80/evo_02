@@ -9,7 +9,7 @@ const statusConfig: Record<
   coming_soon: { variant: "accent", label: "Coming Soon" },
   coming_soon_details: { variant: "accent", label: "Coming Soon" },
   listed: { variant: "success", label: "Become An Owner" },
-  fully_subscribed: { variant: "warning", label: "Fully Subscribed" },
+  fully_subscribed: { variant: "success", label: "Fully Subscribed" },
   completed: { variant: "default", label: "Completed" },
 };
 
