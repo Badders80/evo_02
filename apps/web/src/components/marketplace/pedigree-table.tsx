@@ -84,17 +84,17 @@ function PedigreeNode({
         {/* Top bar: Role badge & Country code */}
         <div className="flex items-center justify-between w-full gap-1 mb-0.5">
           {data.role === "sire" && (
-            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-600/90 text-pure-white border border-emerald-500/40">
+            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-700/40">
               Sire
             </span>
           )}
           {data.role === "dam" && (
-            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-rose-600/80 text-pure-white border border-rose-500/40">
+            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-rose-950/80 text-rose-400 border border-rose-700/40">
               Dam
             </span>
           )}
           {data.role === "subject" && (
-            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-600/90 text-pure-white border border-emerald-500/40">
+            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-700/40">
               Horse
             </span>
           )}
@@ -604,7 +604,7 @@ export function PedigreeTable({
       <div className="flex flex-wrap items-center justify-between gap-3">
         {damSireName ? (
           <div className="inline-flex items-center gap-2.5 text-xs text-foreground bg-surface-base border border-border/60 rounded-full px-2 py-1.5">
-            <span className="text-pure-white font-semibold uppercase text-[9.5px] tracking-wider px-2.5 py-1 rounded-full bg-emerald-600/90 border border-emerald-500/30">
+            <span className="text-emerald-400 font-semibold uppercase text-[9.5px] tracking-wider px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-700/40">
               Broodmare Sire
             </span>
             <span className="text-heading font-medium text-sm pr-1">{damSireName}</span>
@@ -620,8 +620,8 @@ export function PedigreeTable({
                 onClick={() => setView(v)}
                 className={`text-[10px] uppercase tracking-widest font-mono px-3.5 py-1.5 rounded-full transition-all ${
                   view === v
-                    ? "bg-emerald-600/90 text-emerald-50 font-medium border border-emerald-500/30"
-                    : "text-muted-foreground hover:text-frost hover:bg-raised/60"
+                    ? "bg-emerald-950/80 text-emerald-400 font-medium border border-emerald-700/40"
+                    : "text-foreground/70 hover:text-frost hover:bg-raised/60"
                 }`}
               >
                 {v === "tree" ? "Pedigree Matrix" : v.replace("-", " ")}
