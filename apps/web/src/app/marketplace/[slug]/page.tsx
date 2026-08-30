@@ -125,7 +125,7 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[2fr,1fr]">
+          <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-[2fr,1fr]">
             {/* LEFT COLUMN */}
             <div className="space-y-12">
               {/* Cover media */}
