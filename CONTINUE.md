@@ -9,22 +9,42 @@
 
 ---
 
-## Session wrap (2026-08-30 evening — horse page build, PAUSED at chunk-6 of 10)
+## Session wrap (2026-08-30 late — horse page build COMPLETE, all 11 chunks done, audit PASS)
 
-**Plan artifacts:** `build-loop/horse-page/` — plan.md, plan-graph.json (21 nodes/21 edges/11 chunks, verified), review-synthesis.md (kimi plan-audit WARN→fixed, founder pre-authorization recorded), kimi-plan-verdict.md. **Model doc: `build-loop/page-model-notes.md` (founder-locked — READ FIRST on resume).**
+**Plan artifacts:** `build-loop/horse-page/` — plan.md, plan-graph.json (21 nodes, all 11 chunks `state: done`), review-synthesis.md, kimi-plan-verdict.md. **Model doc: `build-loop/page-model-notes.md` (founder-locked).**
 
-**Done (committed on `design-alignment`, gates green, build 34/34 pages):**
-- chunk-1 skeleton `3d0640f` · chunk-2 story `a1cae9e` · chunk-3 media deck `7a8a1f0` · chunk-4 tabs/overview/documents `d81d476` · chunk-5b types `d81d476` · chunk-7 race `fbed63c` · chunk-8 trainer `99f7589` · verification pass `120bcb6`
+**Complete commit chain on `design-alignment` (LOCAL-ONLY, not pushed):**
+- chunk-1 skeleton `3d0640f` · chunk-2 story `a1cae9e` · chunk-3 media deck `7a8a1f0` · chunk-4 tabs/overview/documents `d81d476` · chunk-5b types `d81d476` · chunk-7 race `fbed63c` + `120bcb6` · chunk-8 trainer `99f7589` · verification `120bcb6`
+- chunk-6 pedigree + chunk-9 rail + page wiring `31db159`
+- chunk-10 walk repairs (grid comma class, race summary comment, loverracing_id key) `4a1f68b`
+- kimi audit fixes (CTA pairing, ARIA, overlay layout) `5ee878c`
+- audit artifacts + chunk states `d…` (see git log)
+
+**Gates (all green):** just check 10/10 (multiple runs) · production build all routes · CDP browser walk Nellie 13/13 + part2 10/10 + terms overlay + linebreeding hover (fresh-launch hover-capable Chromium). Screenshots 01–14 committed in `build-loop/horse-page/screenshots/`.
+
+**Stage-5 audit:** `build-loop/audit-report.md` + `audit-graph.json` — verdict PASS, 0 FAILs, 6 WARNs (deferred: accent-glow token, year-only age, docs click target, native img, video data-gap; 1 rejected founder-locked copy). Kimi pass: 30 findings; 2 CRITICALs real (fixed), 1 CRITICAL false positive (verified against code + browser).
+
+**Known deferred items (founder-visible WARNs, not blockers):**
+- Pedigree glow uses shadow-[rgba] literals — needs a semantic token decision (Tailwind v4 can't var() inside box-shadow color)
+- Age = year-only subtraction (southern-hem foaling can read 1 high)
+- Documents "Download" click target is text-only
+- media-deck uses native <img> (next/image polish later)
+- Video 1s-delay code verified structurally; no horse ships a trackwork video yet (data gap)
+
+**Build lessons this session:**
+- Tailwind v4 arbitrary grid values: commas are invalid — `[2fr,1fr]` emitted broken CSS; underscores `[2fr_1fr]` required.
+- The race-tab eslint "unused" warnings were CORRECT — a JSX comment ended `}}` not `*/}` and swallowed a whole `<p>`. Eslint contradictions deserve line-level reading, not suppression.
+- `just build` clobbers `.next/` dev assets — a running dev server serves 404 CSS/JS afterward; restart dev after any production build.
+- Headless CDP-attach Chromium reports (hover: none) — Tailwind hover styles AND React hover state checks fail there; use a fresh launch with `--blink-settings=primaryHoverType=2…` flags (browser-e2e-wsl reference).
+- DB jsonb key is `loverracing_id` (double-r). Chunk-5b type + page now read both spellings; document in future migrations.
+- Founder-locked copy overrides auditor taste: "None Wins · None Places" stays (kimi flagged grammar; page-model-notes locks it).
+
+**Next (founder gate):** FOUNDER GATE section below — click-through on :3010, Pass 2 sweep, then merge design-alignment → main → founder-only Vercel cutover. Branch push remains purge-then-push (old commits hardcode dead sb_secret).
+
+**Prior-session context (chunks 1–5b/7/8, completed earlier):**
 - chunk-5 data: local DB migrated (4-gen sire/dam lines all 6 horses; race_log FG=2/PR=6); script at `scripts/migrate-pedigree-racelog.py`
-- Live: /marketplace/[slug] 200s; /horses/:slug → 308; Nellie shows BECOME AN OWNER, Prudentia Fully Subscribed
+- Live: /marketplace/[slug] 200s; /horses/:slug → 308; Nellie shows Become an Owner, Prudentia Fully Subscribed
 - Git: branch NOT pushed (push-protection: old commits 2e5bc31/cb4ac12 hardcode dead local sb_secret; founder said don't push yet, purge-then-push later)
-
-**Remaining (next session, in order):**
-1. **chunk-6 pedigree tab** (`apps/web/src/components/horse/pedigree-tab.tsx`) — WRITE DIRECTLY, no subagent (2 timeouts). Full spec in plan-graph.json chunk + page-model-notes 'PEDIGREE'. Data ready in inventory.pedigree_data.
-2. **chunk-9 rail contents** — status-driven: listed → Become-Owner pill + View-Investment-Terms (opens terms surface); fully_subscribed → gold badge + keen-to-hear CTA. Shell exists in right-rail.tsx (typed `{ status }` prop).
-3. **Wire page.tsx** — currently placeholder divs #story/#tabs; mount StoryBlock, MediaDeck, Tabs with all five panels (panel components exist).
-4. **chunk-10 gate** — CDP browser-walk checklist (sticky rail, video 1s, lightbox, tabs, guest blur) + kimi-code-audit on full diff vs `d1da6e7`.
-5. **Known loose end:** eslint warns horseName/wins/places "unused" in race-tab.tsx:124,131 despite JSX using them at :179-181 — investigate (warning-only, non-blocking).
 - Build lesson: subagents (nemotron) are slow/unreliable writers — orchestrator writes + gates directly; dispatch only isolated chunks, cap timeouts.
 
 ## FOUNDER GATE (~10 min)

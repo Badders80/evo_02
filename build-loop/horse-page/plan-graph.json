@@ -248,7 +248,7 @@
         "file:apps/web/src/components/marketplace-listing-grid.tsx"
       ],
       "depends_on": [],
-      "state": "pending",
+      "state": "done",
       "dod": "LEFT/RIGHT grid + sticky RIGHT shell, generateMetadata + not-found + sitemap repoint, next.config redirect (old page file untouched), card links repoint, just check green"
     },
     "chunk-2-story": {
@@ -258,7 +258,7 @@
       "depends_on": [
         "chunk-1-skeleton"
       ],
-      "state": "pending",
+      "state": "done",
       "dod": "Story block renders with status chip + Meet X aka Y + woven paragraphs from aboutHorse/trainerBio"
     },
     "chunk-3-media": {
@@ -268,7 +268,7 @@
       "depends_on": [
         "chunk-1-skeleton"
       ],
-      "state": "pending",
+      "state": "done",
       "dod": "Cover arrows page deck; contain discipline; spec strip; thumb carousel; video slide muted-autoplays after 1s + pauses off-slide; lightbox opens/closes"
     },
     "chunk-4-tabs-shell-overview-docs": {
@@ -280,7 +280,7 @@
       "depends_on": [
         "chunk-2-story"
       ],
-      "state": "pending",
+      "state": "done",
       "dod": "Tab nav sticky within LEFT; overview renders highlights+outlook (graceful empty); documents renders PDS/SA with guest gating"
     },
     "chunk-5-data": {
@@ -289,7 +289,7 @@
         "sql:seed-race-log"
       ],
       "depends_on": [],
-      "state": "pending",
+      "state": "done",
       "dod": "Local supabase rows updated: 4-gen pedigree merged; race_log field added with real first-gear/prudentia logs; SELECTable via psql"
     },
     "chunk-6-tab-pedigree": {
@@ -300,7 +300,7 @@
         "chunk-4-tabs-shell-overview-docs",
         "chunk-5-data"
       ],
-      "state": "pending",
+      "state": "done",
       "dod": "Matrix/DAM/SIRE sub-tabs, linebreeding banner from real data, 4-gen tree, footer strip + external link"
     },
     "chunk-7-tab-race": {
@@ -311,7 +311,7 @@
         "chunk-4-tabs-shell-overview-docs",
         "chunk-5-data"
       ],
-      "state": "pending",
+      "state": "done",
       "dod": "Summary computed from race_log (TML: None Wins \u00b7 None Places; First Gear: real counts); status-aware copy; two external links from loveracing ids"
     },
     "chunk-8-tab-trainer": {
@@ -321,7 +321,7 @@
       "depends_on": [
         "chunk-4-tabs-shell-overview-docs"
       ],
-      "state": "pending",
+      "state": "done",
       "dod": "Bio block + website/socials icon row rendering only existing links (footer icon set)"
     },
     "chunk-10-gate": {
@@ -337,7 +337,7 @@
         "chunk-8-tab-trainer",
         "chunk-9-rail"
       ],
-      "state": "pending",
+      "state": "done",
       "dod": "just check 10/10, curl walk 200s + redirect, kimi audit verdict PASS/WARN-accepted"
     },
     "chunk-9-rail": {
@@ -347,7 +347,7 @@
       "depends_on": [
         "chunk-5b-types"
       ],
-      "state": "pending",
+      "state": "done",
       "dod": "Status-driven rail: listed -> Become-Owner pill + View-Investment-Terms (opens terms surface); fully_subscribed -> gold badge + keen-to-hear CTA; both states verified in browser"
     },
     "chunk-5b-types": {
@@ -357,7 +357,7 @@
       "depends_on": [
         "chunk-5-data"
       ],
-      "state": "pending",
+      "state": "done",
       "dod": "db_models InventoryHorse: race_log jsonb optional + 4-gen pedigree optional fields; types regenerated; null-safe fallbacks so unfilled horses render"
     }
   },

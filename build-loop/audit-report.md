@@ -1,37 +1,61 @@
-# Audit Report — sprint e2e-wire (Stage 5)
+# Horse-Page Audit Report — chunk-6/9/10 + wiring (Stage 5)
 
-**Auditor:** Hermes (kimi-code-audit procedure, diff-scope vs `2e5bc31` + uncommitted tree)
-**Date:** 2026-08-25 · **Verdict: PASS** (0 FAIL, 0 WARN)
+**Date:** 2026-08-30 · **Auditors:** orchestrator deterministic verification + `kimi-k2.7-code:cloud` (30 findings)
+**Scope:** `git diff d1da6e7` — horse components, marketplace/[slug] page, stable-links, db_models types
+**Commits audited:** `31db159` (chunks 6+9+wiring) → `4a1f68b` (walk repairs) → `5ee878c` (audit fixes)
 
-## Claims verified
+## Verdict: **PASS** — 0 FAILs, 6 WARNs (4 deferred-polish, 1 data-gap, 1 founder-call), all shipped claims verified
+
+## Claim table
 
 | # | Claim | Result | Evidence |
-|---|-------|--------|----------|
-| 1 | C1 server action `publish-campaign.ts` exists, `'use server'`, maps through adapter, returns {ok, inventoryId, pdsHash, saHash} | PASS | `apps/mission_control/src/app/actions/publish-campaign.ts:1,7-22` |
-| 2 | Adapter validates required fields (slug/legalName/barnName/wholesaleMonthlyNzd + pedigree.sire/dam/gender/breeder + trainer.name/stable/location + owner.entity) | PASS | `intake-adapter.ts:29-80` |
-| 3 | C1 smoke walked: `ok:true`, 64-hex hashes, row deleted | PASS | `build-loop/fin-walk-proof.md` §3 (tsx eval output) |
-| 4 | C2 auth fail-closed: token check BEFORE parsing, timing-safe compare | PASS | `route.ts:12-25` |
-| 5 | Curl pair: no token 401, wrong token 401, correct 201 | PASS | `fin-walk-proof.md` §1-2 |
-| 6 | Token never in client bundles | PASS | grep `OPERATOR_API_TOKEN` in `apps/mission_control/src/components` + `apps/web/src` = 0 |
-| 7 | C3 test in `pnpm test` with unique slug + try/finally cleanup | PASS | `mission_control/package.json:11`; `campaign-pipeline.test.ts:11,50-52` |
-| 8 | C4 media fallback wired (horses-data.ts uses fallback; placeholder SVG exists) | PASS | `horses-data.ts:15`; `media-fallback.ts:3` |
-| 9 | C5 Tokinvest purge: only `brand_dna/voice.ts` remains | PASS | grep -ril tokinvest = `packages/brand_dna/src/voice.ts` |
-| 10 | Shares invariant: `total_shares = totalStakePct / stakeStepPct`, default 5.0 | PASS | `campaign-pipeline.ts:169-172` |
-| 11 | Service-role grants on inventory | PASS | `00001_initial_schema.sql:299` |
-| 12 | Gate green at audit time | PASS | `just check` tail: 10/10 PASSED |
-| 13 | Envs gitignored | PASS | `git check-ignore -v` both `.env.local` → `.gitignore:21` |
-| 14 | FIN walked proof + cleanup (0 e2e rows) | PASS | `fin-walk-proof.md` §4-5 |
-| 15 | No commits this sprint (per rules) | PASS | `git log --oneline -2` = baseline only; 40 modified/untracked files |
+|---|---|---|---|
+| F1 | 4-gen pedigree data in DB, all 6 horses | PASS | psql: sire_line/dam_line lengths 8–16 across 6 rows |
+| F2 | race_log real data (FG=2, PR=6) | PASS | psql jsonb_array_length |
+| F3 | Race summary computed, never hardcoded | PASS | "First Gear (NZ): 1 Win · 1 Place" in DOM (race-tab.tsx:131) |
+| F4 | LEFT/RIGHT true thirds | PASS | computed cols 629px/315px = 66.7/33.3 (after comma-class fix) |
+| F5 | 4-gen tree + chips + [country] year | PASS | screenshot 10 (vision-verified) |
+| F6 | Linebreeding banner data-driven | PASS | TML: Danehill×2 → banner (shot 13); other 5: hidden |
+| F7 | Hover highlights matching lines | PASS | fresh-launch hover run: 2/2 Danehill cards accented |
+| F8 | Documents guest blur | PASS | 3 blurred regions + Restricted overlay |
+| F9 | Status-driven rail, no state leakage | PASS | Nellie listed CTAs + real terms overlay; Prudentia gold card, no Become-Owner |
+| F10 | CUT rule: old page intact | PASS | 2-line diff only; 308 redirect works |
+| F11 | loverracing_id key | PASS | fixed 4a1f68b; kimi's re-flag was a **false positive** (line 82 correct; browser-proven) |
+| F12 | just check 10/10 | PASS | 3 consecutive green runs |
+| F13 | Production build | PASS | all routes build |
+| F14 | Branch local-only (no push) | PASS | no upstream; origin ref absent |
+| F15 | Race summary "unused" eslint mystery | PASS | root-caused: `}}` comment swallowed the `<p>` — fixed; eslint silent |
+| F16 | CTA label/action pairing | PASS | kimi CRITICAL 1 — fixed 5ee878c; terms overlay shows SSOT pricing |
+| F17 | Tab ARIA | PASS | kimi CRITICAL 2 — fixed 5ee878c (role=tab everywhere, tabpanel wired) |
+| F18 | No commercial fiction | PASS | all terms figures from computeDslPricing |
 
-## Cross-cutting invariants checked
+## WARNs (deferred, founder-visible)
 
-- **Shares invariant:** `total_shares = listed_stake_pct / stake_step_pct` (`campaign-pipeline.ts:171-172`); FIN row showed `total_shares: 10.0` for 5.0% @ 0.5 step ✓
-- **Hash format:** pds/sa hashes asserted 64-hex in smoke + observed in REST row ✓
-- **Schema vs types:** `database.types.ts` regenerated alongside `00001` change (git status) ✓
-- **No prod contact, no pushes, no merges:** verified via git status + branch `sprint-1-nellie-loop` ✓
+| # | Item | Why deferred |
+|---|---|---|
+| W1 | Pedigree glow uses `shadow-[…rgba(212,169,100,…)]` | Tailwind v4 can't var()-reference inside box-shadow color; needs a semantic token decision |
+| W2 | Age = year-only subtraction | Southern-hemisphere foaling windows can read 1 high; display-only |
+| W3 | Documents "Download" click target small | card-level anchor deferred |
+| W4 | Native `<img>` vs next/image | perf polish, not a bug |
+| W6 | Video 1s-delay live-verified? | code verified (media-deck.tsx:78–97) but **no horse ships a trackwork video yet** — data gap, not code gap |
 
-## Notes / caveats
+**Rejected finding:** kimi #8 ("None Wins · None Places" grammar) — founder-locked prod copy (page-model-notes.md:151).
 
-- The C1 executor's original attempt was killed (exit 143); its JSX/type errors were repaired by the orchestrator — covered in plan-graph chunk-C1 state and this report.
-- Stage 5 here is the **build-loop audit** (self-run with evidence). A paid-model independent audit was left founder-gated (per handoff).
-- `tsconfig.tsbuildinfo` churn in git status is expected (tsc incremental), not code.
+## Audit-of-the-auditor note
+
+Kimi's CRITICAL #3 (loveracingId ternary "returns the wrong key") was a **false positive** — it misread the branch. This is exactly why every finding was verified against code + browser before applying. Its other two CRITICALs (CTA pairing, ARIA roles) were real and are fixed.
+
+## Notable real bugs found & fixed during the gate (self-audit)
+
+1. `lg:grid-cols-[2fr,1fr]` — comma is not a CSS column separator; Tailwind emitted invalid `grid-template-columns: 2fr,1fr`. → `[2fr_1fr]` (4a1f68b)
+2. `loveracing_id` double-r key mismatch — NZTR link never rendered. → reads both keys (4a1f68b)
+3. JSX comment `}}` swallowed the race summary paragraph — the original eslint warnings were *correct*, and an earlier commit message falsely claimed the fix. Fixed properly in 4a1f68b.
+
+## Walk evidence
+
+- Nellie 13/13, part-2 (Prudentia/FirstGear/lightbox/deck/tabs) 10/10, terms overlay verified.
+- Screenshots `build-loop/horse-page/screenshots/01–14` (committed).
+
+**Structured graph:** `build-loop/audit-graph.json` (24 findings, 27 evidence edges).
+
+**Merge/commit remains founder-gated. Branch stays local-only.**
