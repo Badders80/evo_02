@@ -26,6 +26,7 @@ export default async function MarketplacePage() {
       slug: campaign.slug,
       name: formatHorseDisplayName(campaign, { includeBarnName: false }),
       hook: getMarketplaceHook(campaign),
+      highlightTags: campaign.marketing.highlightTags,
       status: campaign.listingStatus,
       image: MARKETPLACE_CARD_IMAGE[campaign.slug] ?? media.horse.heroConformation,
     };

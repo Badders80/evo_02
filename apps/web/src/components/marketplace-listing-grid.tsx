@@ -8,6 +8,7 @@ export type MarketplaceCard = {
   slug: string;
   name: string;
   hook: string;
+  highlightTags: string[];
   status: ListingStatus;
   image: string;
 };
@@ -143,6 +144,18 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
                 >
                   {card.hook}
                 </p>
+                {card.highlightTags.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {card.highlightTags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full border border-border bg-surface-base px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <div className="pt-6">
                   <Link
                     href={`/marketplace/${card.slug}`}
