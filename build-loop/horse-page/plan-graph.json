@@ -1,0 +1,369 @@
+{
+  "plan": "horse-page",
+  "based_on": "build-loop/page-model-notes.md (founder-locked model)",
+  "output_format": {
+    "kind": "files + local-supabase seed update + gates",
+    "verification": "route 200s on /marketplace/[slug] via curl; just check 10/10; tab parity vs prod screenshots in page-model-notes.md"
+  },
+  "nodes": [
+    {
+      "id": "file:apps/web/src/app/marketplace/[slug]/page.tsx",
+      "type": "file",
+      "description": "New horse page: LEFT/RIGHT grid, sticky RIGHT shell, story, tabs mount"
+    },
+    {
+      "id": "file:apps/web/src/app/horses/[slug]/page.tsx",
+      "type": "file",
+      "description": "OLD PAGE FILE UNTOUCHED (CUT=hide); redirect happens in next.config.ts redirects"
+    },
+    {
+      "id": "file:apps/web/src/components/marketplace-listing-grid.tsx",
+      "type": "file",
+      "description": "Card links repoint /horses/ -> /marketplace/"
+    },
+    {
+      "id": "file:apps/web/src/components/horse/media-deck.tsx",
+      "type": "file",
+      "description": "Cover + arrows + spec strip + thumb carousel + video slide + lightbox"
+    },
+    {
+      "id": "file:apps/web/src/components/horse/story-block.tsx",
+      "type": "file",
+      "description": "THE STORY eyebrow + status chip + Meet X aka Y + paragraphs"
+    },
+    {
+      "id": "file:apps/web/src/components/horse/tabs.tsx",
+      "type": "file",
+      "description": "Tab shell: overview | pedigree | trainer | race record | documents"
+    },
+    {
+      "id": "file:apps/web/src/components/horse/overview-tab.tsx",
+      "type": "file",
+      "description": "L3: highlights + racing outlook"
+    },
+    {
+      "id": "file:apps/web/src/components/horse/pedigree-tab.tsx",
+      "type": "file",
+      "description": "Matrix sub-tabs + linebreeding + 4-gen tree + footer strip"
+    },
+    {
+      "id": "file:apps/web/src/components/horse/race-tab.tsx",
+      "type": "file",
+      "description": "Computed summary + status-aware empty copy + two external links"
+    },
+    {
+      "id": "file:apps/web/src/components/horse/trainer-tab.tsx",
+      "type": "file",
+      "description": "Bio + website/socials icon row (footer icon set)"
+    },
+    {
+      "id": "file:apps/web/src/components/horse/documents-tab.tsx",
+      "type": "file",
+      "description": "PDS/SA cards + guest gating overlay"
+    },
+    {
+      "id": "file:apps/web/src/components/horse/right-rail.tsx",
+      "type": "file",
+      "description": "Sticky status-driven rail: listed CTA / fully-subscribed state"
+    },
+    {
+      "id": "sql:seed-pedigree-4gen",
+      "type": "sql",
+      "description": "Local supabase: merge pedigrees.json 4-gen into inventory.pedigree_data"
+    },
+    {
+      "id": "sql:seed-race-log",
+      "type": "sql",
+      "description": "Local supabase: new race_log jsonb field + first-gear/prudentia data"
+    },
+    {
+      "id": "cmd:just-check",
+      "type": "gate",
+      "description": "just check 10/10 green"
+    },
+    {
+      "id": "cmd:walk",
+      "type": "gate",
+      "description": "CDP browser checklist (sticky rail, video 1s, lightbox, tabs, guest blur) + psql assertions; curl as smoke only"
+    },
+    {
+      "id": "audit:kimi",
+      "type": "audit",
+      "description": "Stage 5 kimi-code-audit on full diff"
+    },
+    {
+      "id": "file:apps/web/src/lib/horses-data.ts",
+      "type": "file-existing",
+      "description": "Existing data layer (getAllCampaigns/getCampaignMedia/formatHorseDisplayName)"
+    },
+    {
+      "id": "file:apps/web/src/components/ui/LogoCarousel.tsx",
+      "type": "file-existing",
+      "description": "Existing carousel primitive (AS FEATURED IN)"
+    },
+    {
+      "id": "file:apps/web/src/components/CtaLeadModal.tsx",
+      "type": "file-existing",
+      "description": "Existing overlay pattern (lightbox reference)"
+    },
+    {
+      "id": "file:packages/db_models/src/types.ts",
+      "type": "file",
+      "description": "db_models: InventoryHorse gains race_log jsonb (optional) + optional 4-gen pedigree fields, null-safe"
+    }
+  ],
+  "edges": [
+    {
+      "from": "file:apps/web/src/lib/horses-data.ts",
+      "to": "file:apps/web/src/app/marketplace/[slug]/page.tsx",
+      "reason": "page consumes getAllCampaigns/getCampaignMedia/formatHorseDisplayName",
+      "source": "existing imports in marketplace/page.tsx"
+    },
+    {
+      "from": "file:apps/web/src/components/ui/LogoCarousel.tsx",
+      "to": "file:apps/web/src/components/horse/media-deck.tsx",
+      "reason": "thumb carousel reuses carousel mechanics",
+      "source": "founder note L4"
+    },
+    {
+      "from": "file:apps/web/src/components/CtaLeadModal.tsx",
+      "to": "file:apps/web/src/components/horse/media-deck.tsx",
+      "reason": "lightbox follows CtaLeadModal overlay pattern",
+      "source": "founder note L5"
+    },
+    {
+      "from": "sql:seed-pedigree-4gen",
+      "to": "file:apps/web/src/components/horse/pedigree-tab.tsx",
+      "reason": "4-gen tree renders from inventory.pedigree_data \u2014 data must land first",
+      "source": "plan dependency"
+    },
+    {
+      "from": "sql:seed-race-log",
+      "to": "file:apps/web/src/components/horse/race-tab.tsx",
+      "reason": "computed summary + timeline render from race_log",
+      "source": "plan dependency"
+    },
+    {
+      "from": "file:apps/web/src/components/horse/tabs.tsx",
+      "to": "file:apps/web/src/components/horse/overview-tab.tsx",
+      "reason": "tab shell mounts panels",
+      "source": "component design"
+    },
+    {
+      "from": "file:apps/web/src/components/horse/tabs.tsx",
+      "to": "file:apps/web/src/components/horse/pedigree-tab.tsx",
+      "reason": "tab shell mounts panels",
+      "source": "component design"
+    },
+    {
+      "from": "file:apps/web/src/components/horse/tabs.tsx",
+      "to": "file:apps/web/src/components/horse/race-tab.tsx",
+      "reason": "tab shell mounts panels",
+      "source": "component design"
+    },
+    {
+      "from": "file:apps/web/src/components/horse/tabs.tsx",
+      "to": "file:apps/web/src/components/horse/trainer-tab.tsx",
+      "reason": "tab shell mounts panels",
+      "source": "component design"
+    },
+    {
+      "from": "file:apps/web/src/components/horse/tabs.tsx",
+      "to": "file:apps/web/src/components/horse/documents-tab.tsx",
+      "reason": "tab shell mounts panels",
+      "source": "component design"
+    },
+    {
+      "from": "file:apps/web/src/app/marketplace/[slug]/page.tsx",
+      "to": "file:apps/web/src/components/horse/media-deck.tsx",
+      "reason": "page mounts deck in LEFT",
+      "source": "page design"
+    },
+    {
+      "from": "file:apps/web/src/app/marketplace/[slug]/page.tsx",
+      "to": "file:apps/web/src/components/horse/story-block.tsx",
+      "reason": "page mounts story in LEFT",
+      "source": "page design"
+    },
+    {
+      "from": "file:apps/web/src/app/marketplace/[slug]/page.tsx",
+      "to": "file:apps/web/src/components/horse/right-rail.tsx",
+      "reason": "page mounts rail in RIGHT (sticky)",
+      "source": "page design"
+    },
+    {
+      "from": "file:apps/web/src/app/horses/[slug]/page.tsx",
+      "to": "file:apps/web/src/app/marketplace/[slug]/page.tsx",
+      "reason": "redirect target must exist first",
+      "source": "plan dependency"
+    },
+    {
+      "from": "file:apps/web/src/components/marketplace-listing-grid.tsx",
+      "to": "file:apps/web/src/app/marketplace/[slug]/page.tsx",
+      "reason": "card links repoint to new route",
+      "source": "plan dependency"
+    },
+    {
+      "from": "file:apps/web/src/app/marketplace/[slug]/page.tsx",
+      "to": "cmd:just-check",
+      "reason": "gate validates all new code",
+      "source": "gate definition"
+    },
+    {
+      "from": "cmd:just-check",
+      "to": "cmd:walk",
+      "reason": "walk after gates green",
+      "source": "done-means-walked"
+    },
+    {
+      "from": "cmd:walk",
+      "to": "audit:kimi",
+      "reason": "audit after walk proves behavior",
+      "source": "build-loop stage 5"
+    },
+    {
+      "from": "sql:seed-race-log",
+      "to": "file:packages/db_models/src/types.ts",
+      "reason": "types mirror schema added in seed",
+      "source": "audit fix 3"
+    },
+    {
+      "from": "file:packages/db_models/src/types.ts",
+      "to": "file:apps/web/src/components/horse/right-rail.tsx",
+      "reason": "status-driven rail consumes typed campaign status",
+      "source": "audit fix 1"
+    },
+    {
+      "from": "file:packages/db_models/src/types.ts",
+      "to": "cmd:just-check",
+      "reason": "typecheck validates regenerated types",
+      "source": "audit fix 3"
+    }
+  ],
+  "chunks": {
+    "chunk-1-skeleton": {
+      "nodes": [
+        "file:apps/web/src/app/marketplace/[slug]/page.tsx",
+        "file:apps/web/src/app/horses/[slug]/page.tsx",
+        "file:apps/web/src/components/marketplace-listing-grid.tsx"
+      ],
+      "depends_on": [],
+      "state": "pending",
+      "dod": "LEFT/RIGHT grid + sticky RIGHT shell, generateMetadata + not-found + sitemap repoint, next.config redirect (old page file untouched), card links repoint, just check green"
+    },
+    "chunk-2-story": {
+      "nodes": [
+        "file:apps/web/src/components/horse/story-block.tsx"
+      ],
+      "depends_on": [
+        "chunk-1-skeleton"
+      ],
+      "state": "pending",
+      "dod": "Story block renders with status chip + Meet X aka Y + woven paragraphs from aboutHorse/trainerBio"
+    },
+    "chunk-3-media": {
+      "nodes": [
+        "file:apps/web/src/components/horse/media-deck.tsx"
+      ],
+      "depends_on": [
+        "chunk-1-skeleton"
+      ],
+      "state": "pending",
+      "dod": "Cover arrows page deck; contain discipline; spec strip; thumb carousel; video slide muted-autoplays after 1s + pauses off-slide; lightbox opens/closes"
+    },
+    "chunk-4-tabs-shell-overview-docs": {
+      "nodes": [
+        "file:apps/web/src/components/horse/tabs.tsx",
+        "file:apps/web/src/components/horse/overview-tab.tsx",
+        "file:apps/web/src/components/horse/documents-tab.tsx"
+      ],
+      "depends_on": [
+        "chunk-2-story"
+      ],
+      "state": "pending",
+      "dod": "Tab nav sticky within LEFT; overview renders highlights+outlook (graceful empty); documents renders PDS/SA with guest gating"
+    },
+    "chunk-5-data": {
+      "nodes": [
+        "sql:seed-pedigree-4gen",
+        "sql:seed-race-log"
+      ],
+      "depends_on": [],
+      "state": "pending",
+      "dod": "Local supabase rows updated: 4-gen pedigree merged; race_log field added with real first-gear/prudentia logs; SELECTable via psql"
+    },
+    "chunk-6-tab-pedigree": {
+      "nodes": [
+        "file:apps/web/src/components/horse/pedigree-tab.tsx"
+      ],
+      "depends_on": [
+        "chunk-4-tabs-shell-overview-docs",
+        "chunk-5-data"
+      ],
+      "state": "pending",
+      "dod": "Matrix/DAM/SIRE sub-tabs, linebreeding banner from real data, 4-gen tree, footer strip + external link"
+    },
+    "chunk-7-tab-race": {
+      "nodes": [
+        "file:apps/web/src/components/horse/race-tab.tsx"
+      ],
+      "depends_on": [
+        "chunk-4-tabs-shell-overview-docs",
+        "chunk-5-data"
+      ],
+      "state": "pending",
+      "dod": "Summary computed from race_log (TML: None Wins \u00b7 None Places; First Gear: real counts); status-aware copy; two external links from loveracing ids"
+    },
+    "chunk-8-tab-trainer": {
+      "nodes": [
+        "file:apps/web/src/components/horse/trainer-tab.tsx"
+      ],
+      "depends_on": [
+        "chunk-4-tabs-shell-overview-docs"
+      ],
+      "state": "pending",
+      "dod": "Bio block + website/socials icon row rendering only existing links (footer icon set)"
+    },
+    "chunk-10-gate": {
+      "nodes": [
+        "cmd:just-check",
+        "cmd:walk",
+        "audit:kimi"
+      ],
+      "depends_on": [
+        "chunk-3-media",
+        "chunk-6-tab-pedigree",
+        "chunk-7-tab-race",
+        "chunk-8-tab-trainer",
+        "chunk-9-rail"
+      ],
+      "state": "pending",
+      "dod": "just check 10/10, curl walk 200s + redirect, kimi audit verdict PASS/WARN-accepted"
+    },
+    "chunk-9-rail": {
+      "nodes": [
+        "file:apps/web/src/components/horse/right-rail.tsx"
+      ],
+      "depends_on": [
+        "chunk-5b-types"
+      ],
+      "state": "pending",
+      "dod": "Status-driven rail: listed -> Become-Owner pill + View-Investment-Terms (opens terms surface); fully_subscribed -> gold badge + keen-to-hear CTA; both states verified in browser"
+    },
+    "chunk-5b-types": {
+      "nodes": [
+        "file:packages/db_models/src/types.ts"
+      ],
+      "depends_on": [
+        "chunk-5-data"
+      ],
+      "state": "pending",
+      "dod": "db_models InventoryHorse: race_log jsonb optional + 4-gen pedigree optional fields; types regenerated; null-safe fallbacks so unfilled horses render"
+    }
+  },
+  "founder_decisions_open": {
+    "D1_ratio": "default LEFT 2fr/RIGHT 1fr (true thirds); alt prod 1.6fr/1fr",
+    "D2_pedigree_gating": "default: prod blur-for-guests; alt: public",
+    "D3_video": "default: muted+loop+pause-off-slide; alt: no loop"
+  }
+}

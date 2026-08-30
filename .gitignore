@@ -43,3 +43,4 @@ build-loop/chunk-c3-prompt.txt
 build-loop/paid-audit-deepseek-v4-pro-r2.out
 
 __pycache__/
+*.tsbuildinfo

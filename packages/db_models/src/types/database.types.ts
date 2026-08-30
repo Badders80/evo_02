@@ -11,6 +11,57 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
+export interface RaceLogEntry {
+  date: string;
+  venue: string;
+  race: string;
+  trackCondition?: string;
+  result?: string;
+  margin?: string;
+  distance_m?: number;
+  race_class?: string;
+  jockey?: string;
+  prizemoney_nzd?: number;
+  starting_price?: string;
+}
+
+export interface PedigreeLine {
+  name: string;
+  country?: string;
+  year?: string;
+  partner?: {
+    name: string;
+    country?: string;
+    year?: string;
+  };
+}
+
+export interface PedigreeData {
+  // Keys match the actual jsonb payload (snake_case, verified against local DB)
+  sire?: string;
+  dam?: string;
+  dam_sire?: string;
+  lineage_summary?: string;
+  foaling_date?: string;
+  foaling_year?: number;
+  gender?: string;
+  colour?: string;
+  breeder?: string;
+  microchip?: string;
+  life_number?: string;
+  stud_book_url?: string;
+
+  // 4-gen migration fields (nullable runtime fallback)
+  sire_line?: PedigreeLine[];
+  dam_line?: PedigreeLine[];
+  cross_line?: unknown;
+  loveracing_id?: number;
+  performance_profile_url?: string;
+  family_number?: string;
+  verified?: boolean;
+  verified_at?: string;
+}
+
 export type PaymentStyle =
   | 'subscription_float'
   | 'upfront';
@@ -129,11 +180,12 @@ export interface Database {
           sa_hash: string;
           pds_url: string;
           sa_url: string;
-          pedigree_data: Json | null;
+          pedigree_data: PedigreeData | null;
           soft_legal?: Json | null;
           marketing?: Json | null;
           created_at: string;
           updated_at: string;
+          race_log?: RaceLogEntry[];
         };
         Insert: {
           id?: string;
@@ -164,11 +216,12 @@ export interface Database {
           sa_hash: string;
           pds_url: string;
           sa_url: string;
-          pedigree_data?: Json | null;
+          pedigree_data?: PedigreeData | null;
           soft_legal?: Json | null;
           marketing?: Json | null;
           created_at?: string;
           updated_at?: string;
+          race_log?: RaceLogEntry[];
         };
         Update: {
           id?: string;
@@ -199,7 +252,7 @@ export interface Database {
           sa_hash?: string;
           pds_url?: string;
           sa_url?: string;
-          pedigree_data?: Json | null;
+          pedigree_data?: PedigreeData | null;
           soft_legal?: Json | null;
           marketing?: Json | null;
           created_at?: string;

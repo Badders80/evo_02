@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -224,6 +225,15 @@ export function MarketplaceSection() {
               </div>
             </div>
           </div>
+        </div>
+        <div className="mt-20">
+          <Link
+            href="/marketplace"
+            className="inline-flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-foreground transition-colors hover:text-accent"
+          >
+            <span>View current offerings</span>
+            <span aria-hidden>→</span>
+          </Link>
         </div>
       </div>
     </section>

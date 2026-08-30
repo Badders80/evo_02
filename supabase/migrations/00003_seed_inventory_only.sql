@@ -100,7 +100,7 @@ INSERT INTO public.inventory (
     '11111111-0000-0000-0000-000000000003',
     'prudentia',
     'Prudentia (NZ)',
-    'Prudentia',
+    '',
     'Proisir (AUS)',
     'Little Bit Irish (NZ)',
     'Lance O''Sullivan & Andrew Scott',

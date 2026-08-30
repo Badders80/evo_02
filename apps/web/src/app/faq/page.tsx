@@ -75,7 +75,7 @@ export default function FaqPage() {
           <p className="text-xs text-muted-foreground mt-1">Our bloodstock desk is available for bespoke queries.</p>
         </div>
         <Link
-          href="/#marketplace"
+          href="/marketplace"
           className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-xs font-semibold text-canvas hover:bg-accent-hover transition-all"
         >
           <span>Explore Available Horses</span>

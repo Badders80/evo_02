@@ -15,6 +15,14 @@
 
 ## Surfaces & the questions to ask
 
+### 0. FX Lab (`/design-lab`) — founder tooling, DELETE BEFORE CUTOVER
+- Catalogue of every effect/style in the build, each named FX-01..FX-13 with
+  its source file — so KEEP/CUT/TONE-DOWN calls can quote an FX id.
+- Uses the real shipped primitives (GlowPillButton, sweeps, tokens) — not a re-implementation.
+- **Known dead effect found while cataloguing:** `animate-border-shimmer`
+  (CtaLeadModal.tsx:214,233) has no `@keyframes` in globals.css — shimmer never plays. Founder call: define keyframe or delete class.
+- **CUT this route at cutover** (it's unlinked; no nav references).
+
 ### 1. Landing page (`/`) — ported from evo_01
 - Hero (TypeWriter tagline, gold lockup, horse-double background)
 - About · How It Works · Digital Syndication · Marketplace teaser
@@ -23,6 +31,12 @@
 - CTA lead modal (email capture → `/api/subscribe` → leads table + SMTP notify)
 - **Ask:** any sections you don't want public? Any FAQ items stale? Partner
   logos to drop (Tokinvest logos are still in the tree — flag if unwanted)?
+
+### 1b. Marketplace listing (`/marketplace`) — **cutover required**
+- Horse grid (available / coming soon / completed) from inventory
+- Cards open `/horses/[slug]` (not live `/marketplace/[id]`)
+- Nav "Marketplace" goes here, not landing `#marketplace`
+- **Ask:** grid look KEEP/CUT? Any horses that should not show?
 
 ### 2. Horse detail (`/horses/nellie`) + about tab
 - Hero conformation image, pedigree, performance, trainer block

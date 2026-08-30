@@ -108,6 +108,23 @@ export function getHorseCdnUrls(
   };
 }
 
+/**
+ * Marketplace card image: the SAME cover photo as prod (background-removed
+ * cutout hero asset, alpha-verified). Local copies live in
+ * apps/web/public/images/content/horses/*-BG.png (copied from the prod tree).
+ * Display-layer only — gallery paths and HORSE_STILLS are untouched.
+ */
+export const MARKETPLACE_CARD_IMAGE: Record<string, string> = {
+  nellie: '/images/content/horses/nellie-BG.png',
+  'lady-ketchikan': '/images/content/horses/nellie-BG.png',
+  hottathanafantasy: '/images/content/horses/hottathanafantasy-BG.png',
+  'i-stole-a-manolo': '/images/content/horses/i-stole-a-manolo-BG.png',
+  'tml-x-yearn': '/images/content/horses/tml-x-yearn-BG.png',
+  'first-gear': '/images/content/horses/first-gear-BG.png',
+  // Prudentia's marketplace tile shows the composed cover (as on prod), not the cutout.
+  prudentia: '/images/content/horses/prudentia-cover.png',
+};
+
 export function getTrainerCdnUrls(trainerSlug: string, _cdnHost = DEFAULT_CDN_HOST) {
   const portrait = TRAINER_PORTRAITS[trainerSlug];
   return {

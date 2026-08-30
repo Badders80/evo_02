@@ -68,7 +68,14 @@ export function formatHorseDisplayName(
   horse: { legalName: string; barnName?: string },
   options: { includeBarnName?: boolean } = { includeBarnName: true }
 ): string {
-  if (!horse.barnName || !options.includeBarnName || horse.barnName.toLowerCase() === horse.legalName.toLowerCase()) {
+  // A barn name that equals the legal name (or legal name minus its " (NZ)"-style
+  // country suffix) is not a nickname — displaying it would duplicate the name.
+  const legalBare = horse.legalName.replace(/\s*\([A-Z]{2,3}\)\s*$/, '').trim();
+  const isSame =
+    !horse.barnName ||
+    horse.barnName.toLowerCase() === horse.legalName.toLowerCase() ||
+    horse.barnName.toLowerCase() === legalBare.toLowerCase();
+  if (!horse.barnName || !options.includeBarnName || isSame) {
     return horse.legalName;
   }
   return `${horse.legalName} (${horse.barnName})`;
@@ -160,15 +167,15 @@ function rowToCampaign(row: InventoryHorse): HorseCampaign {
 
   const sire = String(pedigreeData.sire ?? row.sire ?? '');
   const dam = String(pedigreeData.dam ?? row.dam ?? '');
-  const damSire = String(pedigreeData.damSire ?? '');
-  const lineageSummary = String(pedigreeData.lineageSummary ?? '');
-  const foalingDate = String(pedigreeData.foalingDate ?? '');
+  const damSire = String(pedigreeData.damSire ?? pedigreeData.dam_sire ?? '');
+  const lineageSummary = String(pedigreeData.lineageSummary ?? pedigreeData.lineage_summary ?? '');
+  const foalingDate = String(pedigreeData.foalingDate ?? pedigreeData.foaling_date ?? '');
   const gender = String(pedigreeData.gender ?? '');
   const colour = String(pedigreeData.colour ?? '');
   const breeder = String(pedigreeData.breeder ?? '');
   const microchip = String(pedigreeData.microchip ?? '');
   const lifeNumber = String(pedigreeData.lifeNumber ?? '');
-  const studBookUrl = String(pedigreeData.studBookUrl ?? '');
+  const studBookUrl = String(pedigreeData.studBookUrl ?? pedigreeData.stud_book_url ?? '');
 
   const campaign: HorseCampaign = {
     slug: row.slug,

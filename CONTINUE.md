@@ -3,6 +3,7 @@
 **Date:** 2026-08-29 — **PASS 1 COMPLETE + Kimi audit (WARN, F1–F3 fixed) + 404 hydration fix + local Google SSO + FIREBASE TEMPLATE REMOVED · Pass 2 = founder content sweep, handoff ready**
 **Prod auth is now Supabase-native** (evo_01 swap live 2026-08-29, `d3d3a4b`) — evo_02 Supabase auth now aligns with prod layer (Google OAuth client differs: local uses inherited `851430309148-*` + shim, prod uses `153078526638-*` + native callback; reconcile at cutover).
 **Branch:** `design-alignment` (cut from ui-sprint-1 — superseded, never merge that). NOT merged — founder gate pending.
+**Page model:** `build-loop/page-model-notes.md` — LEFT/RIGHT page model planning notes (founder walkthroughs).
 **Live site:** still served by evo_01/02_website via Vercel. evo_01 working tree is DIRTY — hands off.
 **DoD recap:** full lifecycle built (intake → docs → MC → site → KYC-gated buy). Remaining: founder gate → Pass 2 → cutover.
 

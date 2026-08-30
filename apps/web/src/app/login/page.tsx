@@ -314,7 +314,7 @@ function LoginForm() {
         {/* Footer Note */}
         <div className="text-center text-xs text-muted-foreground">
           <span>Need help or new to Evolution? </span>
-          <Link href="/#marketplace" className="text-accent hover:underline">
+          <Link href="/marketplace" className="text-accent hover:underline">
             Explore Available Horses
           </Link>
         </div>

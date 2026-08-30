@@ -64,7 +64,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
       <div className="border-b border-border bg-card/40">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <Link
-            href="/#marketplace"
+            href="/marketplace"
             className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-accent transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
@@ -138,7 +138,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
           {/* Main Hero Conformation Image */}
           <div className="relative overflow-hidden rounded-xl border border-border bg-card lg:col-span-8 aspect-[16/10]">
             <div
-              className="h-full w-full bg-cover bg-center"
+              className="h-full w-full bg-contain bg-center bg-no-repeat"
               style={{ backgroundImage: `url(${media.horse.heroConformation})` }}
             />
             <div className="absolute bottom-4 left-4 rounded-md border border-border/80 bg-background/80 backdrop-blur-md px-3 py-1.5 text-xs font-mono text-foreground">

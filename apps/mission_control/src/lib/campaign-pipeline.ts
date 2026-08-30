@@ -201,16 +201,16 @@ function buildInventoryInsert(
     pds_url: '',
     sa_url: '',
     pedigree_data: {
-      dam_sire: intake.pedigree.damSire ?? null,
-      foaling_date: intake.pedigree.foalingDate ?? null,
+      dam_sire: intake.pedigree.damSire ?? undefined,
+      foaling_date: intake.pedigree.foalingDate ?? undefined,
       foaling_year: deriveFoalingYear(intake.pedigree),
       gender: intake.pedigree.gender,
-      colour: intake.pedigree.colour ?? null,
+      colour: intake.pedigree.colour ?? undefined,
       breeder: intake.pedigree.breeder,
-      microchip: intake.pedigree.microchip ?? null,
-      life_number: intake.pedigree.lifeNumber ?? null,
-      stud_book_url: intake.pedigree.studBookUrl ?? null,
-      lineage_summary: intake.pedigree.lineageSummary ?? null,
+      microchip: intake.pedigree.microchip ?? undefined,
+      life_number: intake.pedigree.lifeNumber ?? undefined,
+      stud_book_url: intake.pedigree.studBookUrl ?? undefined,
+      lineage_summary: intake.pedigree.lineageSummary ?? undefined,
     },
     soft_legal: intake.softLegal
       ? {
