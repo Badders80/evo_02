@@ -92,7 +92,7 @@ export function DigitalSyndicationSection() {
         </p>
 
         {/* Two Column Layout */}
-        <div className="grid gap-16 lg:grid-cols-[1fr,1fr] lg:gap-48 xl:gap-56">
+        <div className="grid gap-16 lg:grid-cols-[1fr_1fr] lg:gap-48 xl:gap-56">
           {/* LEFT COLUMN */}
           <div className="space-y-8">
             {/* Headline */}

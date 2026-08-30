@@ -206,7 +206,7 @@ export function PressShowcaseSection() {
           <p className="text-[11px] font-light tracking-[0.2em] uppercase mb-12 text-muted-foreground">
             NEWS AND UPDATES
           </p>
-          <div ref={newsHeaderRef} className="grid grid-cols-1 lg:grid-cols-[6fr,4fr] gap-0">
+          <div ref={newsHeaderRef} className="grid grid-cols-1 lg:grid-cols-[6fr_4fr] gap-0">
             <a
               href={leadArticle.url}
               target="_blank"
