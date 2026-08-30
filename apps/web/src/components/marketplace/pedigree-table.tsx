@@ -102,12 +102,12 @@ function PedigreeNode({
           {tier !== "great" && (
             <div className="flex items-center gap-1 ml-auto">
               {data.country && (
-                <span className="text-[8.5px] font-mono text-muted-steel font-medium">
+                <span className={`text-[8.5px] font-mono font-medium ${data.role === "dam" ? "text-rose-400" : "text-emerald-400"}`}>
                   [{data.country}]
                 </span>
               )}
               {data.year && (
-                <span className="text-[8.5px] font-mono text-muted-foreground">
+                <span className={`text-[8.5px] font-mono ${data.role === "dam" ? "text-rose-400" : "text-emerald-400"}`}>
                   {data.year}
                 </span>
               )}
@@ -127,12 +127,12 @@ function PedigreeNode({
         {tier === "great" && (data.country || data.year) && (
           <div className="flex items-center gap-1 mt-0.5">
             {data.country && (
-              <span className="text-[8px] font-mono text-muted-steel">
+              <span className={`text-[8px] font-mono ${data.role === "dam" ? "text-rose-400" : "text-emerald-400"}`}>
                 [{data.country}]
               </span>
             )}
             {data.year && (
-              <span className="text-[8px] font-mono text-muted-foreground">
+              <span className={`text-[8px] font-mono ${data.role === "dam" ? "text-rose-400" : "text-emerald-400"}`}>
                 {data.year}
               </span>
             )}
