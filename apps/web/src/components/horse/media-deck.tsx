@@ -71,7 +71,6 @@ export function MediaDeck({ heroImage, gallery, videoUrl, sex, colour, sire, dam
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
-  const lightboxVideoRef = React.useRef<HTMLVideoElement | null>(null);
   const playTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 1s-delay muted autoplay on arrival; pause when leaving the slide.
@@ -118,7 +117,7 @@ export function MediaDeck({ heroImage, gallery, videoUrl, sex, colour, sire, dam
           <button
             type="button"
             className="absolute inset-0 flex cursor-zoom-in items-center justify-center"
-            aria-label="Open image full size"
+            aria-label={slide.type === 'video' ? 'Open video full size' : 'Open image full size'}
             onClick={() => setLightboxOpen(true)}
           >
             {slide.type === 'image' ? (
@@ -137,7 +136,7 @@ export function MediaDeck({ heroImage, gallery, videoUrl, sex, colour, sire, dam
         </button>
 
         <div className="absolute bottom-3 right-3 rounded-md border border-border/80 bg-background/80 px-3 py-1.5 font-mono text-xs text-foreground backdrop-blur-md">
-          {`0${currentIndex + 1} · ${totalSlides}`}
+          {`${String(currentIndex + 1).padStart(2, '0')} · ${String(totalSlides).padStart(2, '0')}`}
         </div>
       </div>
 
@@ -188,7 +187,6 @@ export function MediaDeck({ heroImage, gallery, videoUrl, sex, colour, sire, dam
               <img src={slide.src} alt={`Horse media slide ${currentIndex + 1}`} className="max-h-[90vh] max-w-[90vw] object-contain" />
             ) : (
               <video
-                ref={lightboxVideoRef}
                 src={slide.src}
                 muted
                 loop

@@ -24,24 +24,22 @@ export function DocumentsTab({
   if (!isInvestor) {
     return (
       <div className="relative">
+        {/* Blurred card region (audit fix: removed empty blur div; overlay
+            children stack vertically) */}
         <div
           className="
-            blur-[6px]
-            pointer-events-none
-            select-none
-        " />
-        <div
-          className="
-            absolute
-            inset-0
+            relative
             flex
+            flex-col
             items-center
             justify-center
             rounded-xl
             p-6
             bg-black/40
-          "
-        >
+            blur-[6px]
+            pointer-events-none
+            select-none
+        ">
           <div className="text-sm font-medium text-heading">
             Restricted: Investors Only
           </div>
@@ -49,9 +47,8 @@ export function DocumentsTab({
             Documents for this campaign are restricted to verified investors.
           </div>
         </div>
-
-        {/* Cards region below the overlay */}
-        <div className="mt-8">
+        {/* Placeholder cards below the overlay to suggest content without revealing it */}
+        <div className="mt-8" aria-hidden="true">
           {/* PDS Card */}
           <div
             className="

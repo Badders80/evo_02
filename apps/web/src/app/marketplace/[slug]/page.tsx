@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getCampaignBySlug, getCampaignMedia, getCampaignPricing, isCheckoutOpen } from '@/lib/horses-data';
+import { getCampaignBySlug, getCampaignMedia } from '@/lib/horses-data';
 import { getTrainer } from '@evo/db_models';
 import { getStableLinks } from '@/lib/stable-links';
 import RightRail from '@/components/horse/right-rail';
@@ -200,6 +200,7 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
           status={campaign.listingStatus}
           horseName={campaign.legalName}
           horseSlug={campaign.slug}
+          wholesaleMonthlyNzd={campaign.wholesaleMonthlyNzd}
         />
       </div>
     </div>

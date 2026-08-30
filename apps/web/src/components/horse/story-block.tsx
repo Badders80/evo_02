@@ -68,12 +68,10 @@ function shouldShowAka(legalName: string, barnName: string | null | undefined): 
   // Condition 2: barnName differs from legalName case-insensitively
   if (legalNormalised === barnNormalised) return false;
 
-  // Condition 3: legalName does not already contain barnName in parentheses
-  //    E.g. legalName='Prudentia (NZ)', barnName='Prudentia' → bareLegal='Prudentia',
-  //    barnNormalised === legalNormalised → the parenthetical already conveys the
-  //    alternative name, so we skip the "aka".
-  if (legalNormalised === barnNormalised) return false;
-
+  // Condition 3: legalName already contains the bare legal name (e.g.
+  //  legalName='Prudentia (NZ)' strips to 'Prudentia' which matches
+  //  barnName — the parenthetical suffix already conveys the identity, so
+  //  we skip the "aka"; no second comparison needed — same test as cond 2.
   return true;
 }
 
@@ -98,7 +96,7 @@ export function StoryBlock({
         <div
           className={STATUS_CLASSES[status]}
         >
-          <span className="h-2 w-2 rounded-full mr-1" />
+          <span className="h-2 w-2 rounded-full mr-1 bg-current" aria-hidden="true" />
           <span>{STATUS_LABELS[status]}</span>
         </div>
       </div>

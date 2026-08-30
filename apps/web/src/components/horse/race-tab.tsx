@@ -74,12 +74,15 @@ function EmptyState({ status }: { status: string }) {
 
 /** Render a single timeline row for a race entry. */
 function TimelineRow({ entry }: { entry: RaceLogEntry }) {
-  const date = new Date(entry.date);
-  const formattedDate = date.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+  const parsed = new Date(entry.date);
+  const isValid = !Number.isNaN(parsed.getTime());
+  const formattedDate = isValid
+    ? parsed.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+    : entry.date; // audit fix 10: never render "Invalid Date"
 
   const resultClass = entry.result
     ? entry.result.trim() === '1st'
@@ -190,7 +193,7 @@ export function RaceTab({
       {hasData && raceLog ? (
         <div>
           {sortedLog.map((entry, idx) => (
-            <TimelineRow key={idx} entry={entry} />
+            <TimelineRow key={`${entry.date}-${entry.venue}-${idx}`} entry={entry} />
           ))}
         </div>
       ) : null}
