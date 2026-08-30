@@ -7,6 +7,17 @@ import { getSupabaseBrowserClient } from '@/lib/supabase-client';
 import { safeNextPath } from '@/lib/safe-next-path';
 import { Mail, Lock, Sparkles, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 
+/** ?error= codes returned by /auth/callback and /api/auth/google[/callback]. */
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
+  auth_callback_failed: 'Sign-in could not be completed. Please try again.',
+  google_not_configured: 'Google sign-in is not available right now — use magic link or password below.',
+  google_denied: 'Google sign-in was cancelled.',
+  google_callback_invalid: 'Google sign-in could not be verified. Please try again.',
+  google_csrf: 'Sign-in session expired. Please try again.',
+  google_token_exchange: 'Google sign-in failed. Please try again.',
+  google_signin_failed: 'Google sign-in could not create your session. Please try again.',
+};
+
 export default function LoginPage() {
   return (
     <Suspense fallback={<div className="min-h-[80vh]" />}>
@@ -23,7 +34,9 @@ function LoginForm() {
   const [mode, setMode] = useState<'magic-link' | 'password'>('magic-link');
   const [loading, setLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(
+    () => AUTH_ERROR_MESSAGES[searchParams.get('error') ?? ''] ?? null,
+  );
 
   const supabase = getSupabaseBrowserClient();
 
@@ -79,26 +92,14 @@ function LoginForm() {
     }
   };
 
-  const handleGoogleAuth = async () => {
+  const handleGoogleAuth = () => {
     setLoading(true);
     setErrorMsg(null);
-
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
-        },
-      });
-      if (error) {
-        setErrorMsg(error.message);
-        setLoading(false);
-      }
-      // On success the browser navigates away to Google; no further handling.
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'An unexpected error occurred.');
-      setLoading(false);
-    }
+    // App-mediated OAuth: /api/auth/google plants CSRF/nonce cookies and
+    // redirects to Google from OUR client, so the consent screen shows
+    // evolutionstables.nz — never *.supabase.co. The callback route mints
+    // the Supabase session via signInWithIdToken.
+    window.location.href = `/api/auth/google?next=${encodeURIComponent(nextPath)}`;
   };
 
   return (
