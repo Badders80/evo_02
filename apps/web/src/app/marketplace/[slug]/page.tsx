@@ -31,7 +31,7 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
         <div id="tabs" className="space-y-8">
           {/* chunk-4+ */}
         </div>
-        <RightRail campaign={campaign} />
+        <RightRail status={campaign.listingStatus} />
       </div>
     </div>
   );

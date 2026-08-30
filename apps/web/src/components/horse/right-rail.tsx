@@ -1,10 +1,7 @@
-import { STATUS_META } from '@/components/marketplace-listing-grid';
 
 type ListingStatus = 'listed' | 'fully_subscribed' | 'coming_soon' | 'completed';
 
 function statusChip(status: ListingStatus) {
-  const meta = STATUS_META[status as keyof typeof STATUS_META];
-
   if (status === 'listed') {
     return (
       <div className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 bg-status-active/10 border-status-active/40 text-status-active text-[8px] font-medium uppercase tracking-widest`}>
@@ -40,10 +37,11 @@ function statusChip(status: ListingStatus) {
   );
 }
 
-export default function RightRail({ campaign }: { campaign: any }) {
+export default function RightRail({ status }: { status: 'listed' | 'fully_subscribed' | 'coming_soon' | 'completed' | string }) {
+  if (typeof status !== 'string') return null;
   return (
     <aside className="lg:sticky lg:top-28 space-y-6">
-      {statusChip(campaign.listingStatus)}
+      {statusChip(status as ListingStatus)}
       <div className="rounded-2xl border border-border bg-card p-6">
         {/* chunk-9 fills */}
       </div>

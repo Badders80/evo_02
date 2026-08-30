@@ -177,8 +177,8 @@ export function RaceTab({
         className="text-xs font-mono text-muted-foreground"
       >
         {wins + places === 0
-          ? 'Summary: None Wins · None Places'
-          : `${wins} Win${wins !== 1 ? 's' : ''} · ${places} Place${places !== 1 ? 's' : ''}`}
+          ? `${horseName}: None Wins · None Places`
+          : `${horseName}: ${wins} Win${wins !== 1 ? 's' : ''} · ${places} Place${places !== 1 ? 's' : ''}`}
       </p>
 
       {/* ── 3. Empty state ───────────────────────────────────────────── */}
