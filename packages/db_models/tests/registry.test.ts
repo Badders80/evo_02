@@ -129,6 +129,11 @@ console.log('Running knowledge registry tests...');
   assert.equal(STREET_ADDRESS.test(blob), false, 'street address leaked into trainers');
   assert.equal(STREET_ADDRESS.test(JSON.stringify(STEPHEN_GRAY_RACING)), false, 'street address leaked into asset lock');
 
+  // SPELL LOCK — official spelling is Gray (matches stephengrayracing.com). The
+  // homepage press-showcase shipped "Stephen Grey Racing" as partner alt text once.
+  const GREY = /stephen greys? racing/i;
+  assert.equal(GREY.test(blob), false, 'Grey spelling leaked into trainers');
+
   console.log('✅ Live asset lock: Stephen Gray Racing only, research trainers excluded, First Gear completed, location lock held');
 }
 

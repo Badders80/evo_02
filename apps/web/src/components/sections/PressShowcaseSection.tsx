@@ -137,7 +137,7 @@ export function PressShowcaseSection() {
     { name: "Singularry", src: "/images/partners/singularry.webp" },
     { name: "Investing.com", src: "/images/partners/investing-com.png" },
     { name: "NZTR", src: "/images/partners/nztr-white.png" },
-    { name: "Stephen Grey Racing", src: "/images/partners/stephen-grey-racing.png" },
+    { name: "Stephen Gray Racing", src: "/images/partners/stephen-grey-racing.png" },
     { name: "Arabian Business", src: "/images/partners/arabian-business.png" },
   ];
 
