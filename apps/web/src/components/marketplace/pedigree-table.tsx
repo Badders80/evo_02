@@ -52,17 +52,17 @@ function PedigreeNode({
   const normName = data.name ? data.name.toLowerCase().trim() : "";
 
   const tierStyles: Record<NodeTier, string> = {
-    subject: "min-h-[64px] border-accent/40 bg-surface-base shadow-[0_0_24px_rgba(212,169,100,0.1)] px-3.5",
-    parent: "min-h-[56px] border-accent/20 bg-raised/80 hover:border-accent/50",
-    grand: "min-h-[48px] border-accent/15 bg-raised/50 hover:border-accent/40",
-    great: "min-h-[42px] border-accent/10 bg-raised/30 hover:border-accent/30",
+    subject: "min-h-[64px] border-emerald-500/40 bg-surface-base shadow-[0_0_24px_rgba(16,185,129,0.08)] px-3.5",
+    parent: "min-h-[56px] border-border bg-raised/80 hover:border-emerald-500/40",
+    grand: "min-h-[48px] border-border/80 bg-raised/50 hover:border-emerald-500/30",
+    great: "min-h-[42px] border-border/60 bg-raised/30 hover:border-emerald-500/20",
   };
 
   const nameTextStyles: Record<NodeTier, string> = {
     subject: "text-[13px] font-medium text-heading tracking-tight",
-    parent: "text-[11.5px] font-medium text-pure-white",
-    grand: "text-[10.5px] font-normal text-foreground",
-    great: "text-[9.5px] font-normal text-frost",
+    parent: "text-[11.5px] font-medium text-foreground",
+    grand: "text-[10.5px] font-normal text-muted-foreground",
+    great: "text-[9.5px] font-normal text-muted-steel",
   };
 
   return (
@@ -75,16 +75,16 @@ function PedigreeNode({
           isEmpty && tier !== "subject" ? "opacity-30 border-dashed border-border" : "",
           tierStyles[tier],
           isHighlighted
-            ? "border-accent bg-accent/20 ring-1 ring-accent/60 shadow-[0_0_16px_rgba(212,169,100,0.25)] text-pure-white"
+            ? "border-emerald-500 bg-emerald-500/20 ring-1 ring-emerald-500/60 shadow-[0_0_16px_rgba(16,185,129,0.25)] text-pure-white"
             : isLinebredDuplicate
-            ? "border-accent/40 bg-accent/10"
+            ? "border-emerald-500/40 bg-emerald-500/10"
             : "",
         ].join(" ")}
       >
         {/* Top bar: Role badge & Country code */}
         <div className="flex items-center justify-between w-full gap-1 mb-0.5">
           {data.role === "sire" && (
-            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-accent/15 text-accent border border-accent/30">
+            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
               Sire
             </span>
           )}
@@ -94,7 +94,7 @@ function PedigreeNode({
             </span>
           )}
           {data.role === "subject" && (
-            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-raised text-frost border border-steel-border">
+            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
               Horse
             </span>
           )}
@@ -149,7 +149,7 @@ function PedigreeNode({
 function TreeConnector({ splits = 2 }: { splits?: number }) {
   return (
     <div className="relative w-full h-full flex items-center justify-center" aria-hidden>
-      <svg className="w-full h-full text-accent/30 stroke-current" preserveAspectRatio="none">
+      <svg className="w-full h-full text-border stroke-current" preserveAspectRatio="none">
         {splits === 2 && (
           <>
             {/* Left center horizontal arm */}
@@ -239,7 +239,7 @@ function PedigreeChart({
           <div className="w-full py-2">
             {/* Header row labels */}
             <div
-              className="grid text-[10px] uppercase tracking-wider font-mono text-accent/70 mb-2 px-1 text-center"
+              className="grid text-[10px] uppercase tracking-wider font-mono text-muted-steel mb-2 px-1 text-center"
               style={{
                 gridTemplateColumns: "1.4fr 24px 1.2fr 24px 1.2fr 24px 1.2fr",
               }}
@@ -387,10 +387,10 @@ function PedigreeChart({
 
       {/* Linebreeding alert — BOTTOM */}
       {linebredDuplicates.size > 0 && (
-        <div className="flex items-center gap-2 text-[11px] text-muted-foreground bg-accent/5 border border-accent/20 rounded-lg px-3 py-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shrink-0" />
+        <div className="flex items-center gap-2 text-[11px] text-muted-foreground bg-emerald-500/5 border border-emerald-500/20 rounded-lg px-3 py-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
           <span>
-            Linebreeding detected: <strong className="text-accent font-medium">{linebredDuplicates.size} repeated ancestor{linebredDuplicates.size > 1 ? "s" : ""}</strong> in 4 generations. Hover over names to highlight matching lines.
+            Linebreeding detected: <strong className="text-emerald-400 font-medium">{linebredDuplicates.size} repeated ancestor{linebredDuplicates.size > 1 ? "s" : ""}</strong> in 4 generations. Hover over names to highlight matching lines.
           </span>
         </div>
       )}
@@ -445,9 +445,9 @@ function FullPedigreeModal({
 
         {linebredDuplicates.size > 0 && (
           <div className="flex items-center gap-2 text-[11px] text-muted-foreground bg-accent/5 border border-accent/20 rounded-lg px-3 py-1.5 mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
             <span>
-              Linebreeding detected: <strong className="text-accent font-medium">{linebredDuplicates.size} repeated ancestor{linebredDuplicates.size > 1 ? "s" : ""}</strong> in 4 generations. Hover over names to highlight matching lines.
+              Linebreeding detected: <strong className="text-emerald-400 font-medium">{linebredDuplicates.size} repeated ancestor{linebredDuplicates.size > 1 ? "s" : ""}</strong> in 4 generations. Hover over names to highlight matching lines.
             </span>
           </div>
         )}
@@ -456,7 +456,7 @@ function FullPedigreeModal({
           <div className="min-w-[760px] py-2">
             {/* Header row */}
             <div
-              className="grid text-[10px] uppercase tracking-wider font-mono text-accent/70 mb-2 px-1 text-center"
+              className="grid text-[10px] uppercase tracking-wider font-mono text-muted-steel mb-2 px-1 text-center"
               style={{ gridTemplateColumns: GRID_COLS }}
             >
               <span>Subject</span>
