@@ -6,7 +6,7 @@ export const TRAINERS: TrainerProfile[] = [
     slug: 'barbara-kennedy',
     name: 'Barbara Kennedy',
     stableName: 'Barbara Kennedy Racing',
-    location: 'Byerley Park, Karaka, NZ',
+    location: 'Karaka, NZ',
     base: 'Byerley Park',
     philosophy:
       'Boutique racing stable specialising in individualised conditioning, campaign strategy, and hands-on preparation at the renowned Byerley Park training complex in Karaka.',

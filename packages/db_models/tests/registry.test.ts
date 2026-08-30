@@ -105,8 +105,7 @@ console.log('Running knowledge registry tests...');
   assert.equal(getLockedHorse('tml-x-yearn')?.ownerSlug, 'stephen-gray');
   assert.equal(STEPHEN_GRAY_RACING.name, 'Stephen Gray Racing');
   assert.equal(STEPHEN_GRAY_RACING.stableName, 'Stephen Gray Racing');
-  assert.ok(STEPHEN_GRAY_RACING.location.includes('160 Green Road'));
-  assert.ok(STEPHEN_GRAY_RACING.location.includes('Palmerston North'));
+  assert.equal(STEPHEN_GRAY_RACING.location, 'Palmerston North, NZ');
   assert.equal(STEPHEN_GRAY_RACING.base, 'Copper Belt Lodge');
 
   const trainerSlugs = TRAINERS.map((t) => t.slug);

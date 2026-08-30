@@ -121,7 +121,7 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
                 href={`/marketplace/${card.slug}`}
                 className="relative block w-full flex-shrink-0 overflow-hidden rounded-2xl md:order-last md:w-[40%]"
               >
-                <div className="relative aspect-[16/9] w-full bg-canvas">
+                <div className="relative aspect-[16/9] w-full bg-canvas dot-grid-surface">
                   <img
                     src={card.image}
                     alt={card.name}
@@ -138,9 +138,7 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
                   {card.location ? ` · ${card.location}` : ''}
                 </p>
                 <h2
-                  className={`font-light tracking-tight text-heading leading-none ${
-                    isFeatured ? 'text-[32px] md:text-[36px]' : 'text-[26px]'
-                  }`}
+                  className="font-light tracking-tight text-heading leading-none text-[32px] md:text-[36px]"
                 >
                   {card.name}
                 </h2>

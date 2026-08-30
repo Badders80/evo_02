@@ -13,7 +13,7 @@ export const STEPHEN_GRAY_RACING = {
   slug: 'stephen-gray',
   name: 'Stephen Gray Racing',
   stableName: 'Stephen Gray Racing',
-  location: 'Copper Belt Lodge, 160 Green Road, RD6, Palmerston North 4476',
+  location: 'Palmerston North, NZ',
   base: 'Copper Belt Lodge',
   website: 'https://stephengrayracing.com/contact/',
   contactPerson: 'Stephen Gray',

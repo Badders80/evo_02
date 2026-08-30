@@ -22,7 +22,7 @@ const nellieContext: SyndicateLegalContext = {
   },
   trainer: {
     name: 'Barbara Kennedy',
-    location: 'Byerley Park, NZ',
+    location: 'Karaka, NZ',
     managerEntity: 'Evolution Stables',
   },
   pricing: {
@@ -62,7 +62,7 @@ const mulanContext: SyndicateLegalContext = {
   },
   trainer: {
     name: 'Stephen Gray Racing',
-    location: 'Copper Belt Lodge, 160 Green Road, RD6, Palmerston North 4476',
+    location: 'Karaka, NZ',
     managerEntity: 'Stephen Gray Racing',
   },
   pricing: {
@@ -130,7 +130,7 @@ export function runTests(): void {
   // 2. Term Sheet structure & anchors
   assertIncludes(nelliePack.pack.termSheetMarkdown, 'DSL Term Sheet', 'Term Sheet title');
   assertIncludes(nelliePack.pack.termSheetMarkdown, 'Owner:** Bax Bloodstock', 'Nellie Owner');
-  assertIncludes(nelliePack.pack.termSheetMarkdown, 'Trainer:** Barbara Kennedy (Byerley Park, NZ)', 'Nellie Trainer');
+  assertIncludes(nelliePack.pack.termSheetMarkdown, 'Trainer:** Barbara Kennedy (Karaka, NZ)', 'Nellie Trainer');
   assertIncludes(nelliePack.pack.termSheetMarkdown, '5.0% available', 'Nellie total syndicated %');
   assertIncludes(nelliePack.pack.termSheetMarkdown, 'Minimum Investment:** 1.0% — increments of 0.5% thereafter', 'Nellie min investment / step wording');
   assertIncludes(nelliePack.pack.termSheetMarkdown, '$76.00 / month per 1% stake', 'Nellie keep rate');

@@ -180,7 +180,9 @@ function rowToCampaign(row: InventoryHorse): HorseCampaign {
   const campaign: HorseCampaign = {
     slug: row.slug,
     legalName: row.legal_name,
-    barnName: row.barn_name || undefined,
+    // founder: Manolo's barn_name='Manolo' is a derived non-nickname, not a real yard name.
+    // Suppress at the data layer so formatHorseDisplayName shows only the legal name.
+    barnName: row.slug === 'i-stole-a-manolo' ? undefined : (row.barn_name || undefined),
     wholesaleMonthlyNzd: Number(row.cost_monthly_nzd),
     totalSyndicateStakePct: listedStakePct,
     stakeStepPct,
