@@ -89,7 +89,7 @@ export function Header() {
             </Link>
           ) : (
             <Link
-              href="/login"
+              href="/auth/login"
               className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3.5 py-1.5 text-xs font-medium tracking-wide text-foreground transition-all hover:border-accent hover:text-accent"
             >
               <span>Sign In</span>

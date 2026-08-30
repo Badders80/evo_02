@@ -29,8 +29,8 @@ export const TRAINERS: TrainerProfile[] = [
     location: STEPHEN_GRAY_RACING.location,
     base: STEPHEN_GRAY_RACING.base,
     philosophy:
-      'Group 1-winning international trainer with over 825 winners across Singapore and New Zealand. Trades as Stephen Gray Racing from Copper Belt Lodge, 160 Green Road, RD6, Palmerston North 4476.',
-    highlightTags: ['Stephen Gray Racing', 'Copper Belt Lodge'],
+      'Group 1-winning international trainer with over 825 winners across Singapore and New Zealand, training out of Copper Belt Lodge in Palmerston North.',
+    highlightTags: ['Stephen Gray Racing', 'Palmerston North'],
   },
 ] as const;
 

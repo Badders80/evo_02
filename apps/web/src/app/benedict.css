@@ -1,0 +1,25 @@
+/* Benedict display font — founder pass-3 spec ("Meet <name>" story heading).
+ *
+ * STATUS: FALLBACK-ONLY. Benedict is a commercial typeface (not on Google
+ * Fonts or Fontsource). The @font-face below activates automatically once the
+ * licensed file is dropped at apps/web/public/fonts/Benedict.woff2.
+ * Until then the stack falls through to Georgia (serif, similar proportions).
+ *
+ * Usage: font-family: var(--font-benedict)  →  utility class .font-benedict
+ */
+
+@font-face {
+  font-family: 'Benedict';
+  src: url('/fonts/Benedict.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-benedict: 'Benedict', Georgia, 'Times New Roman', serif;
+}
+
+.font-benedict {
+  font-family: var(--font-benedict);
+}

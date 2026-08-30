@@ -10,6 +10,8 @@ export interface MediaDeckProps {
   colour?: string;
   sire?: string;
   dam?: string;
+  /** Breadcrumb name shown top-left (prod style: MARKETPLACE / <NAME>). */
+  breadcrumbName?: string;
 }
 
 interface Slide {
@@ -52,18 +54,18 @@ function buildDeck(heroImage: string, gallery: string[], videoUrl?: string): Sli
 const ARROW_CLASSES =
   'absolute top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/30 backdrop-blur-sm text-white hover:bg-black/50 transition-all duration-300 h-10 w-10 flex items-center justify-center';
 const SPEC_LABEL = 'text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground';
-const SPEC_VALUE = 'mt-1 text-[14px] font-light text-heading';
+const SPEC_VALUE = 'mt-1 text-[15px] font-light text-heading';
 
 function SpecCell({ label, value }: { label: string; value?: string }) {
   return (
-    <div className="bg-card p-4">
+    <div className="px-5 py-4 text-center md:text-left">
       <p className={SPEC_LABEL}>{label}</p>
       <p className={SPEC_VALUE}>{value || '—'}</p>
     </div>
   );
 }
 
-export function MediaDeck({ heroImage, gallery, videoUrl, sex, colour, sire, dam }: MediaDeckProps) {
+export function MediaDeck({ heroImage, gallery, videoUrl, sex, colour, sire, dam, breadcrumbName }: MediaDeckProps) {
   const deck = React.useMemo(() => buildDeck(heroImage, gallery, videoUrl), [heroImage, gallery, videoUrl]);
   const totalSlides = deck.length;
   const videoIndex = videoUrl ? 1 : -1; // deck order: hero, [video], ...gallery
@@ -111,41 +113,54 @@ export function MediaDeck({ heroImage, gallery, videoUrl, sex, colour, sire, dam
 
   return (
     <div className="w-full">
-      {/* Main viewport — the ONLY aspect-locked, clipping container */}
-      <div className="relative w-full aspect-[16/10] overflow-hidden rounded-2xl border border-border bg-canvas">
-        {slide && (
-          <button
-            type="button"
-            className="absolute inset-0 flex cursor-zoom-in items-center justify-center"
-            aria-label={slide.type === 'video' ? 'Open video full size' : 'Open image full size'}
-            onClick={() => setLightboxOpen(true)}
-          >
-            {slide.type === 'image' ? (
-              <img src={slide.src} alt={`Horse media slide ${currentIndex + 1}`} className="h-full w-full object-contain" />
-            ) : (
-              <video ref={videoRef} src={slide.src} muted loop playsInline className="h-full w-full object-contain" />
-            )}
-          </button>
+      {/* ── Prod-style hero: full-bleed dot-grid canvas + breadcrumb ─────── */}
+      <div className="dot-grid-surface relative -mx-12 -mt-28 bg-canvas px-12 pt-28 md:-mx-16 md:px-16 lg:-mx-20 lg:-mt-28 lg:px-20">
+        {/* Breadcrumb — MARKETPLACE / <NAME>, top-left */}
+        {breadcrumbName && (
+          <p className="pt-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+            <span>MARKETPLACE</span>
+            <span className="mx-2 text-border">/</span>
+            <span className="text-foreground">{breadcrumbName}</span>
+          </p>
         )}
 
-        <button type="button" onClick={prev} className={`${ARROW_CLASSES} left-3`} aria-label="Previous image">
-          {CHEVRON_LEFT}
-        </button>
-        <button type="button" onClick={next} className={`${ARROW_CLASSES} right-3`} aria-label="Next image">
-          {CHEVRON_RIGHT}
-        </button>
+        {/* Large centered horse cutout (prod: ~60-70vh, object-contain) */}
+        <div className="relative flex h-[62vh] min-h-[380px] w-full items-center justify-center py-6">
+          {slide && (
+            <button
+              type="button"
+              className="absolute inset-0 flex cursor-zoom-in items-center justify-center"
+              aria-label={slide.type === 'video' ? 'Open video full size' : 'Open image full size'}
+              onClick={() => setLightboxOpen(true)}
+            >
+              {slide.type === 'image' ? (
+                <img src={slide.src} alt={`Horse media slide ${currentIndex + 1}`} className="max-h-full max-w-full object-contain" />
+              ) : (
+                <video ref={videoRef} src={slide.src} muted loop playsInline className="max-h-full max-w-full object-contain" />
+              )}
+            </button>
+          )}
 
-        <div className="absolute bottom-3 right-3 rounded-md border border-border/80 bg-background/80 px-3 py-1.5 font-mono text-xs text-foreground backdrop-blur-md">
-          {`${String(currentIndex + 1).padStart(2, '0')} · ${String(totalSlides).padStart(2, '0')}`}
+          <button type="button" onClick={prev} className={`${ARROW_CLASSES} left-3`} aria-label="Previous image">
+            {CHEVRON_LEFT}
+          </button>
+          <button type="button" onClick={next} className={`${ARROW_CLASSES} right-3`} aria-label="Next image">
+            {CHEVRON_RIGHT}
+          </button>
+
+          <div className="absolute bottom-4 right-4 rounded-md border border-border/80 bg-background/80 px-3 py-1.5 font-mono text-xs text-foreground backdrop-blur-md">
+            {`${String(currentIndex + 1).padStart(2, '0')} · ${String(totalSlides).padStart(2, '0')}`}
+          </div>
         </div>
-      </div>
 
-      {/* Spec strip — sibling of the viewport, never clipped */}
-      <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-border bg-border md:grid-cols-4">
-        <SpecCell label="Sex" value={sex} />
-        <SpecCell label="Colour" value={colour} />
-        <SpecCell label="Sire" value={sire} />
-        <SpecCell label="Dam" value={dam} />
+        {/* Base-info pill strip — single rounded container, 4 columns,
+            label ABOVE value (prod hero style) */}
+        <div className="mb-8 grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-border bg-card/60 backdrop-blur-sm md:grid-cols-4">
+          <SpecCell label="Sex" value={sex} />
+          <SpecCell label="Colour" value={colour} />
+          <SpecCell label="Sire" value={sire} />
+          <SpecCell label="Dam" value={dam} />
+        </div>
       </div>
 
       {/* Thumbnail row */}

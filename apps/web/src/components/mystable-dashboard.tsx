@@ -77,7 +77,7 @@ export function MyStableDashboard({
   const handleSignOut = async () => {
     const supabase = getSupabaseBrowserClient();
     await supabase.auth.signOut();
-    window.location.href = '/login';
+    window.location.href = '/auth/login';
   };
 
   return (

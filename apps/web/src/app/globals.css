@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "@evo/brand_dna/theme.css";
+@import "./benedict.css";
 
 /* ============================================================
    Evolution Stables — Design Token Layer (W1, design-alignment)

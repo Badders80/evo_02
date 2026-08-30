@@ -197,7 +197,7 @@ export function NavBar() {
             </div>
           ) : (
             <Link
-              href="/login"
+              href="/auth/login"
               className={isCompact ? 'hidden' : 'lg:block'}
             >
               <GlowPillButton>
@@ -264,7 +264,7 @@ export function NavBar() {
                 </div>
               ) : (
                 <Link
-                  href="/login"
+                  href="/auth/login"
                   className="block"
                   onClick={() => setIsMenuOpen(false)}
                 >

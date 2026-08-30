@@ -131,6 +131,7 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
             colour={campaign.pedigree.colour}
             sire={campaign.pedigree.sire}
             dam={campaign.pedigree.dam}
+            breadcrumbName={campaign.legalName}
           />
 
           <StoryBlock

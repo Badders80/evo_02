@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
 
   if (request.nextUrl.pathname.startsWith('/mystable') && !user) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = '/login';
+    redirectUrl.pathname = '/auth/login';
     redirectUrl.search = '';
     redirectUrl.searchParams.set('next', '/mystable');
     const redirectResponse = NextResponse.redirect(redirectUrl);

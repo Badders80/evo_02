@@ -1,12 +1,12 @@
-/* PedigreeTab — founder-locked pedigree surface (chunk-6).
+/* PedigreeTab — founder-locked pedigree surface (chunk-6 + pass-3 prod style).
  *
- * Ported from prod pedigree-tree.ts (verified builder semantics) + the
- * founder-locked page model (page-model-notes.md 'PEDIGREE'):
- *   - Sub-tabs: PEDIGREE MATRIX | DAM LINE | SIRE LINE
- *   - Linebreeding banner from real pedigree_data (getLinebreedingDuplicates)
- *   - 4-gen tree: Subject → Parents → Grandparents → Great-grandparents,
- *     SIRE/DAM chips + [country] + year badges; subject card glows
- *   - Footer strip: Sex · Colour · Age · Foaled + FULL BREEDING RECORD ↗
+ * Pass-3: restored to the ORIGINAL production treatment:
+ *   - Header row: BROODMARE SIRE chip (left) + pill sub-tabs (right)
+ *   - Horizontal cascading 4-gen tree: SUBJECT → PARENTS → GRANDPARENTS →
+ *     GREAT-GRANDPARENTS columns with connector stubs, SIRE green / DAM red
+ *     role chips, [country] year badges
+ *   - Panel stays INSIDE the page's left two-thirds column; an EXPAND control
+ *     opens the same tree full-screen (Esc / overlay click / close button)
  *
  * Line semantics (prod buildPedigreeTree, verified against local DB data):
  *   sire_line[0]        = the sire itself; .partner = the sire's DAM
@@ -64,7 +64,6 @@ const SUB_TABS: { key: SubTab; label: string }[] = [
   { key: 'sire-line', label: 'SIRE LINE' },
 ];
 
-const SUB_TAB_BUTTON_BASE = 'flex-1 py-2 text-[10px] font-medium uppercase tracking-[0.2em] transition-colors';
 const LINE_LABEL = 'text-[9px] font-mono uppercase tracking-[0.25em] text-muted-foreground';
 
 /** Normalised name key for linebreeding comparison (prod pattern: lowercase + trim). */
@@ -169,6 +168,13 @@ export function getLinebreedingDuplicates(tree: PedigreeTreeNodes): Set<string> 
   return duplicates;
 }
 
+/** Role chip colours — prod: SIRE green, DAM red-pink. */
+function roleChipClass(role?: NodeData['role'], highlight?: boolean): string {
+  if (role === 'sire') return highlight ? 'text-status-active' : 'text-status-active/80';
+  if (role === 'dam') return highlight ? 'text-rose-300' : 'text-rose-300/80';
+  return 'text-muted-foreground';
+}
+
 /** A single ancestor card in the matrix: SIRE/DAM chip + name + [country] year. */
 function AncestorCard({
   node,
@@ -203,7 +209,7 @@ function AncestorCard({
       }`}
     >
       {showRoleChip && node.role && (
-        <span className={`text-[8px] font-mono uppercase tracking-[0.2em] ${highlight ? 'text-accent' : 'text-muted-foreground'}`}>
+        <span className={`text-[8px] font-mono uppercase tracking-[0.2em] ${roleChipClass(node.role, highlight)}`}>
           {node.role}
         </span>
       )}
@@ -219,15 +225,32 @@ function AncestorCard({
   );
 }
 
-/** PEDIGREE MATRIX sub-tab — the 4-gen tree. */
+/** Horizontal cascade column header (prod: SUBJECT / PARENTS / …). */
+function ColumnLabel({ children }: { children: React.ReactNode }) {
+  return <p className="mb-2 text-center font-mono text-[8px] uppercase tracking-[0.25em] text-muted-foreground">{children}</p>;
+}
+
+/** Connector stub drawn from each node toward the previous column. */
+function NodeWithStub({ children, withStub = true }: { children: React.ReactNode; withStub?: boolean }) {
+  return (
+    <div className="flex items-center">
+      {withStub && <span className="h-px w-4 shrink-0 bg-border" aria-hidden="true" />}
+      <div className="min-w-0 flex-1">{children}</div>
+    </div>
+  );
+}
+
+/** PEDIGREE MATRIX sub-tab — horizontal cascading 4-gen tree (prod style). */
 function PedigreeMatrix({
   tree,
   highlightName,
   setHighlightName,
+  large = false,
 }: {
   tree: PedigreeTreeNodes;
   highlightName: string | null;
   setHighlightName: (name: string | null) => void;
+  large?: boolean;
 }) {
   const hoverProps = (node: NodeData) => ({
     node,
@@ -236,45 +259,68 @@ function PedigreeMatrix({
     onLeave: () => setHighlightName(null),
   });
 
+  const colGap = large ? 'gap-1' : 'gap-1';
+  const stack = large ? 'justify-around gap-3' : 'justify-around gap-2';
+
   return (
-    <div className="min-w-[480px] space-y-4">
-      {/* Generation 0 — subject (glowing card) */}
-      <div className="flex justify-center">
-        <div className="rounded-lg border border-accent/60 bg-accent/10 px-8 py-3 text-center shadow-[0_0_20px_rgba(212,169,100,0.3)]">
-          <span className="text-[8px] font-mono uppercase tracking-[0.2em] text-accent">Subject</span>
-          <p className="text-[14px] font-light text-heading">{tree.horse.name}</p>
+    <div className={large ? 'min-w-[880px]' : 'min-w-[640px]'}>
+      <div className={`grid grid-cols-[1fr_auto_1fr_auto_1fr_auto_1.2fr] items-stretch ${colGap}`}>
+        {/* SUBJECT */}
+        <div className="flex flex-col">
+          <ColumnLabel>Subject</ColumnLabel>
+          <div className={`flex flex-1 flex-col ${stack}`}>
+            <div className="flex items-center">
+              <div className="min-w-0 flex-1">
+                <div
+                  className={`rounded-lg border border-accent/60 bg-accent/10 text-center shadow-[0_0_20px_rgba(212,169,100,0.3)] ${
+                    large ? 'px-6 py-4' : 'px-4 py-3'
+                  }`}
+                >
+                  <span className="text-[8px] font-mono uppercase tracking-[0.2em] text-accent">Horse</span>
+                  <p className={`font-light text-heading ${large ? 'text-[16px]' : 'text-[14px]'}`}>{tree.horse.name}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Generation 1 — sire / dam */}
-      <div className="grid grid-cols-2 gap-2">
-        <AncestorCard {...hoverProps(tree.sire)} />
-        <AncestorCard {...hoverProps(tree.dam)} />
-      </div>
-
-      {/* Generation 2 — 4 grandparents */}
-      <div className="space-y-2">
-        <p className={LINE_LABEL}>Grandparents</p>
-        <div className="grid grid-cols-4 gap-2">
-          <AncestorCard {...hoverProps(tree.sireSire)} />
-          <AncestorCard {...hoverProps(tree.sireDam)} />
-          <AncestorCard {...hoverProps(tree.damSire)} />
-          <AncestorCard {...hoverProps(tree.damDam)} />
+        {/* PARENTS */}
+        <div className="flex flex-col">
+          <ColumnLabel>Parents</ColumnLabel>
+          <div className={`flex flex-1 flex-col ${stack}`}>
+            <NodeWithStub>
+              <AncestorCard {...hoverProps(tree.sire)} />
+            </NodeWithStub>
+            <NodeWithStub>
+              <AncestorCard {...hoverProps(tree.dam)} />
+            </NodeWithStub>
+          </div>
         </div>
-      </div>
 
-      {/* Generation 3 — 8 great-grandparents */}
-      <div className="space-y-2">
-        <p className={LINE_LABEL}>Great-Grandparents</p>
-        <div className="grid grid-cols-4 gap-2">
-          <AncestorCard {...hoverProps(tree.sireSireSire)} />
-          <AncestorCard {...hoverProps(tree.sireSireDam)} />
-          <AncestorCard {...hoverProps(tree.sireDamSire)} />
-          <AncestorCard {...hoverProps(tree.sireDamDam)} />
-          <AncestorCard {...hoverProps(tree.damSireSire)} />
-          <AncestorCard {...hoverProps(tree.damSireDam)} />
-          <AncestorCard {...hoverProps(tree.damDamSire)} />
-          <AncestorCard {...hoverProps(tree.damDamDam)} />
+        {/* GRANDPARENTS */}
+        <div className="flex flex-col">
+          <ColumnLabel>Grandparents</ColumnLabel>
+          <div className={`flex flex-1 flex-col ${stack}`}>
+            <NodeWithStub><AncestorCard {...hoverProps(tree.sireSire)} /></NodeWithStub>
+            <NodeWithStub><AncestorCard {...hoverProps(tree.sireDam)} /></NodeWithStub>
+            <NodeWithStub><AncestorCard {...hoverProps(tree.damSire)} /></NodeWithStub>
+            <NodeWithStub><AncestorCard {...hoverProps(tree.damDam)} /></NodeWithStub>
+          </div>
+        </div>
+
+        {/* GREAT-GRANDPARENTS */}
+        <div className="flex flex-col">
+          <ColumnLabel>Great-Grandparents</ColumnLabel>
+          <div className={`flex flex-1 flex-col ${large ? 'justify-around gap-1.5' : 'justify-around gap-1'}`}>
+            <NodeWithStub><AncestorCard {...hoverProps(tree.sireSireSire)} /></NodeWithStub>
+            <NodeWithStub><AncestorCard {...hoverProps(tree.sireSireDam)} /></NodeWithStub>
+            <NodeWithStub><AncestorCard {...hoverProps(tree.sireDamSire)} /></NodeWithStub>
+            <NodeWithStub><AncestorCard {...hoverProps(tree.sireDamDam)} /></NodeWithStub>
+            <NodeWithStub><AncestorCard {...hoverProps(tree.damSireSire)} /></NodeWithStub>
+            <NodeWithStub><AncestorCard {...hoverProps(tree.damSireDam)} /></NodeWithStub>
+            <NodeWithStub><AncestorCard {...hoverProps(tree.damDamSire)} /></NodeWithStub>
+            <NodeWithStub><AncestorCard {...hoverProps(tree.damDamDam)} /></NodeWithStub>
+          </div>
         </div>
       </div>
     </div>
@@ -316,7 +362,9 @@ function LineList({
               >
                 <span className="min-w-0">
                   {idx === 0 && (
-                    <span className="mr-1.5 text-[8px] font-mono uppercase tracking-[0.2em] text-muted-foreground">{role}</span>
+                    <span className={`mr-1.5 text-[8px] font-mono uppercase tracking-[0.2em] ${roleChipClass(role === 'SIRE' ? 'sire' : 'dam', isHighlighted)}`}>
+                      {role}
+                    </span>
                   )}
                   <span className={`truncate text-[13px] font-light ${isHighlighted ? 'text-accent' : 'text-heading'}`}>
                     {entry.name}
@@ -360,6 +408,7 @@ export function PedigreeTab({
 }: PedigreeTabProps) {
   const [activeSubTab, setActiveSubTab] = React.useState<SubTab>('matrix');
   const [highlightName, setHighlightName] = React.useState<string | null>(null);
+  const [expanded, setExpanded] = React.useState(false);
 
   const hasSireLine = Boolean(sireLine && sireLine.length > 0);
   const hasDamLine = Boolean(damLine && damLine.length > 0);
@@ -373,6 +422,19 @@ export function PedigreeTab({
   const duplicates = React.useMemo(() => getLinebreedingDuplicates(tree), [tree]);
   const hasLinebreeding = duplicates.size > 0;
 
+  // Broodmare sire = the dam's sire (prod semantics: dam_line[0].partner).
+  const broodmareSire = parseNameMeta(damLine?.[0]?.partner?.name);
+
+  // Esc closes the fullscreen pedigree modal.
+  React.useEffect(() => {
+    if (!expanded) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setExpanded(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [expanded]);
+
   if (!hasSireLine && !hasDamLine) {
     return (
       <div className="space-y-4">
@@ -382,6 +444,106 @@ export function PedigreeTab({
       </div>
     );
   }
+
+  const subTabPanels = (large = false) => (
+    <>
+      {activeSubTab === 'matrix' && (
+        <PedigreeMatrix tree={tree} highlightName={highlightName} setHighlightName={setHighlightName} large={large} />
+      )}
+      {activeSubTab === 'dam-line' && hasDamLine && (
+        <LineList entries={damLine!} role="DAM" highlightName={highlightName} setHighlightName={setHighlightName} />
+      )}
+      {activeSubTab === 'sire-line' && hasSireLine && (
+        <LineList entries={sireLine!} role="SIRE" highlightName={highlightName} setHighlightName={setHighlightName} />
+      )}
+    </>
+  );
+
+  const headerRow = (
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      {/* BROODMARE SIRE chip — prod style, left */}
+      <div className="flex items-center gap-3">
+        {broodmareSire.name && broodmareSire.name !== '—' ? (
+          <span className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/5 px-3 py-1">
+            <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-muted-foreground">BROODMARE SIRE</span>
+            <span className="text-[11px] font-light text-heading">{broodmareSire.name}</span>
+            {broodmareSire.country && (
+              <span className="font-mono text-[9px] text-muted-foreground">[{broodmareSire.country}]</span>
+            )}
+          </span>
+        ) : (
+          <span />
+        )}
+      </div>
+
+      {/* Sub-tab pills — prod style, right */}
+      <div className="flex items-center gap-2" role="tablist" aria-label="Pedigree sub-tabs">
+        {SUB_TABS.map((tab) => {
+          const isActive = activeSubTab === tab.key;
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => setActiveSubTab(tab.key)}
+              className={`rounded-full px-3 py-1.5 text-[9px] font-medium uppercase tracking-[0.2em] transition-all duration-200 ${
+                isActive
+                  ? 'border border-accent/60 bg-accent/15 text-accent'
+                  : 'border border-border text-muted-foreground hover:border-accent/40 hover:text-foreground'
+              }`}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+        {/* EXPAND — fullscreen escape hatch (tree stays in left 2/3 inline) */}
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          aria-label="Expand pedigree full screen"
+          className="rounded-full border border-border px-3 py-1.5 text-[9px] font-medium uppercase tracking-[0.2em] text-muted-foreground transition-all duration-200 hover:border-accent/40 hover:text-accent"
+        >
+          EXPAND ⤢
+        </button>
+      </div>
+    </div>
+  );
+
+  const footerStrip = (
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-border pt-4">
+      {sex && (
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          Sex: <span className="text-foreground">{sex}</span>
+        </span>
+      )}
+      {colour && (
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          Colour: <span className="text-foreground">{colour}</span>
+        </span>
+      )}
+      {age && (
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          Age: <span className="text-foreground">{age}</span>
+        </span>
+      )}
+      {foaled && (
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          Foaled: <span className="text-foreground">{foaled}</span>
+        </span>
+      )}
+      {breedingRecordUrl && (
+        <a
+          href={breedingRecordUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ml-auto text-[10px] font-mono uppercase tracking-widest text-accent hover:underline"
+        >
+          FULL BREEDING RECORD ↗
+        </a>
+      )}
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -397,75 +559,46 @@ export function PedigreeTab({
         </div>
       )}
 
-      {/* ── Sub-tabs: PEDIGREE MATRIX | DAM LINE | SIRE LINE ───────────── */}
-      <div className="flex border-b border-border" role="tablist" aria-label="Pedigree sub-tabs">
-        {SUB_TABS.map((tab) => {
-          const isActive = activeSubTab === tab.key;
-          return (
-            <button
-              key={tab.key}
-              type="button"
-              role="tab"
-              aria-selected={isActive}
-              onClick={() => setActiveSubTab(tab.key)}
-              className={`${SUB_TAB_BUTTON_BASE} ${
-                isActive ? 'border-b-2 border-accent text-accent' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+      {/* ── Prod header row: BROODMARE SIRE chip | pill sub-tabs + EXPAND ── */}
+      {headerRow}
 
-      {/* ── Sub-tab panels ─────────────────────────────────────────────── */}
-      <div className="overflow-x-auto pb-2">
-        {activeSubTab === 'matrix' && (
-          <PedigreeMatrix tree={tree} highlightName={highlightName} setHighlightName={setHighlightName} />
-        )}
-        {activeSubTab === 'dam-line' && hasDamLine && (
-          <LineList entries={damLine!} role="DAM" highlightName={highlightName} setHighlightName={setHighlightName} />
-        )}
-        {activeSubTab === 'sire-line' && hasSireLine && (
-          <LineList entries={sireLine!} role="SIRE" highlightName={highlightName} setHighlightName={setHighlightName} />
-        )}
-      </div>
+      {/* ── Sub-tab panel — horizontal cascade, LEFT TWO-THIRDS ONLY ────── */}
+      <div className="overflow-x-auto pb-2">{subTabPanels(false)}</div>
 
-      {/* ── Footer strip: Sex · Colour · Age · Foaled + external link ──── */}
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-border pt-4">
-        {sex && (
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-            Sex: <span className="text-foreground">{sex}</span>
-          </span>
-        )}
-        {colour && (
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-            Colour: <span className="text-foreground">{colour}</span>
-          </span>
-        )}
-        {age && (
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-            Age: <span className="text-foreground">{age}</span>
-          </span>
-        )}
-        {foaled && (
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-            Foaled: <span className="text-foreground">{foaled}</span>
-          </span>
-        )}
-        {breedingRecordUrl && (
-          <a
-            href={breedingRecordUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-auto text-[10px] font-mono uppercase tracking-widest text-accent hover:underline"
-          >
-            FULL BREEDING RECORD ↗
-          </a>
-        )}
-      </div>
+      {/* ── Footer strip ─────────────────────────────────────────────────── */}
+      {footerStrip}
+
+      {/* ── Fullscreen modal (escape hatch for the 2/3 width constraint) ── */}
+      {expanded && (
+        <div
+          className="fixed inset-0 z-[999] overflow-y-auto bg-black/95 p-6 backdrop-blur-sm md:p-10"
+          onClick={() => setExpanded(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${subjectName} pedigree — full screen`}
+        >
+          <div className="mx-auto max-w-7xl" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-6 flex items-center justify-between">
+              <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                {subjectName} — FULL PEDIGREE
+              </p>
+              <button
+                type="button"
+                onClick={() => setExpanded(false)}
+                className="rounded-full border border-border px-4 py-2 text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground transition-all hover:border-accent/40 hover:text-accent"
+                aria-label="Close full screen pedigree"
+              >
+                CLOSE ✕
+              </button>
+            </div>
+            <div className="rounded-2xl border border-border bg-card/60 p-6 backdrop-blur-sm">
+              {headerRow}
+              <div className="mt-6 overflow-x-auto">{subTabPanels(true)}</div>
+              <div className="mt-6">{footerStrip}</div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-export default PedigreeTab;

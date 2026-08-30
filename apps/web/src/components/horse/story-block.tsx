@@ -1,14 +1,17 @@
 /* StoryBlock — pure server-presentational component for the horse page story section.
  * No 'use client', no hooks. Receives data from the horse campaign and renders:
  *   - Eyebrow "THE STORY" + status chip
- *   - "Meet {legalName} aka {barnName}" heading (aka omitted when inappropriate)
+ *   - "Meet {legalName}" heading — Benedict font, gold #d4a964 (pass-3 founder
+ *     spec). When a REAL nickname exists it renders as "(aka Coco)" inline at
+ *     30% smaller than the main heading text. No nickname → name only.
  *   - Story paragraph text blocks
  *
  * Props (all immutable/read-only; suitable for Next.js 15 RSC):
  *   legalName:  legal/original name of the horse (always rendered)
- *   barnName?:  optional yard/barn nickname; when it genuinely differs and
- *               legalName doesn't already wrap it in parentheses, it is shown
- *               as "Meet legalName aka barnName"
+ *   barnName?:  optional yard/barn nickname; shown as "(aka {barnName})" at
+ *               70% of the heading size ONLY when it genuinely differs from
+ *               the legal name (derived non-nicknames are suppressed upstream
+ *               at the data layer — see horses-data.ts rowToCampaign)
  *   status:     listing status — drives the colour/label of the status chip
  *   storyParagraphs: array of paragraph strings; a blank array renders nothing
  */
@@ -49,31 +52,27 @@ function stripParentheticalSuffix(name: string): string {
   return name.replace(/\s*\([^)]*\)\s*$/, '').trim();
 }
 
-/** Determine whether the chip "aka" should be shown.
- *  The "aka" label is shown only when ALL of these hold:
+/** Determine whether the "(aka …)" segment should be shown.
+ *  Shown only when ALL of these hold:
  *   1. barnName is present and non-empty after trim
  *   2. barnName differs from the bare legalName (case-insensitive,
  *      stripping any parenthetical suffix such as " (NZ)")
- *   3. legalName does NOT already contain barnName wrapped in parentheses
- *  If any condition fails, we render just "Meet {legalName}" without "aka".
+ *  If any condition fails, we render just "Meet {legalName}" — no aka.
  */
 function shouldShowAka(legalName: string, barnName: string | null | undefined): boolean {
   const name = barnName ?? '';
   if (!name.trim()) return false;
-
   const bareLegal = stripParentheticalSuffix(legalName);
-  const barnNormalised = name.trim().toLowerCase();
-  const legalNormalised = bareLegal.toLowerCase();
-
-  // Condition 2: barnName differs from legalName case-insensitively
-  if (legalNormalised === barnNormalised) return false;
-
-  // Condition 3: legalName already contains the bare legal name (e.g.
-  //  legalName='Prudentia (NZ)' strips to 'Prudentia' which matches
-  //  barnName — the parenthetical suffix already conveys the identity, so
-  //  we skip the "aka"; no second comparison needed — same test as cond 2.
-  return true;
+  return name.trim().toLowerCase() !== bareLegal.toLowerCase();
 }
+
+/** Pass-3 founder spec: Benedict display font, gold #d4a964 (token text-accent). */
+const HEADING_CLASSES =
+  'font-benedict mt-4 text-[28px] font-light tracking-tight text-accent md:text-[36px]';
+
+/** Nickname segment renders 30% smaller than the heading (0.7em scales with it). */
+const AKA_CLASSES =
+  'ml-2 align-baseline font-light text-accent/80 text-[0.7em]';
 
 export function StoryBlock({
   legalName,
@@ -81,9 +80,7 @@ export function StoryBlock({
   status,
   storyParagraphs,
 }: StoryBlockProps) {
-  const akaLabel = shouldShowAka(legalName, barnName)
-    ? `Meet ${legalName} aka ${barnName}`
-    : `Meet ${legalName}`;
+  const showAka = shouldShowAka(legalName, barnName);
 
   return (
     <>
@@ -101,9 +98,14 @@ export function StoryBlock({
         </div>
       </div>
 
-      {/* 2. Heading */}
-      <h2 className="mt-4 text-[28px] font-light tracking-tight text-heading md:text-[36px]">
-        {akaLabel}
+      {/* 2. Heading — Benedict, gold; "(aka X)" at 30% smaller when real */}
+      <h2 className={HEADING_CLASSES}>
+        Meet {legalName}
+        {showAka && (
+          <span className={AKA_CLASSES}>
+            (aka {barnName})
+          </span>
+        )}
       </h2>
 
       {/* 3. Paragraphs — map over storyParagraphs; blank array renders nothing */}
@@ -124,17 +126,18 @@ export function StoryBlock({
 }
 
 /* ── NOTES FOR FUTURE EDITORS ──────────────────────────────────────────
+ * Pass-3 changes (founder-locked):
+ *   - Heading font: .font-benedict (Benedict woff2 when the founder drops
+ *     it in public/fonts/, Georgia serif fallback until then)
+ *   - Heading colour: text-accent = #d4a964
+ *   - Nickname: "(aka Coco)" wrapped in parentheses at start AND end,
+ *     rendered at 0.7em (30% smaller), same gold at 80% opacity
+ *   - Manolo has NO nickname: barn_name='Manolo' is suppressed at the data
+ *     layer (horses-data.ts rowToCampaign), so Manolo renders name only.
  * Edge cases handled by shouldShowAka():
- *   - barnName empty string           → no "aka"
- *   - barnName === legalName (case)   → no "aka" (they're the same)
- *   - legalName like 'Prudentia (NZ)' with barnName 'Prudentia' → bare legal
- *     strips to 'Prudentia', matches barnName → no "aka" (parenthetical already
- *     conveys the nickname)
- *   - legalName already containing 'aka' → the component still applies the
- *     normal aka logic; if the legalName truly contains the word "aka" as part
- *     of its identity, the heading will read "Meet X aka Y" where X may itself
- *     contain "aka"; callers should ensure the underlying data is authored so
- *     that this produces readable output.
+ *   - barnName empty string           → no aka
+ *   - barnName === legalName (case)   → no aka (they're the same)
+ *   - legalName 'Prudentia (NZ)' + barnName 'Prudentia' → no aka
  * - storyParagraphs = [] → nothing rendered (no empty-state box)
  * - Component is RSC-compatible: no 'use client', no hooks, no async calls.
  */
