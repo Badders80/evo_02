@@ -81,6 +81,32 @@ export function formatHorseDisplayName(
   return `${horse.legalName} (${horse.barnName})`;
 }
 
+/**
+ * First sentence of a text block (fallback source for the marketplace card hook).
+ * A sentence ends at the first `.`, `!`, or `?` followed by whitespace or end of input.
+ * Never returns more than the first sentence — the card must not dump the full story.
+ */
+export function firstSentence(text: string): string {
+  const t = text.trim();
+  if (!t) return '';
+  const match = t.match(/^.*?[.!?](?:\s|$)/);
+  return (match?.[0] ?? t).trim();
+}
+
+/**
+ * L1 marketplace hook (locked 2026-08-31): use marketing.marketplaceHook when present;
+ * otherwise fall back to the FIRST SENTENCE of soft_legal.aboutHorse; otherwise ''.
+ * The card renders name + tags regardless — the hook is never a full story dump.
+ */
+export function getMarketplaceHook(campaign: {
+  marketing: { marketplaceHook: string };
+  softLegal: { aboutHorse: string };
+}): string {
+  const hook = campaign.marketing.marketplaceHook.trim();
+  if (hook) return hook;
+  return firstSentence(campaign.softLegal.aboutHorse);
+}
+
 export function isCheckoutOpen(campaign: HorseCampaign): boolean {
   return campaign.listingStatus === 'listed';
 }
@@ -147,8 +173,10 @@ function statusToListingStatus(status: string): ListingStatus {
 
 function rowToCampaign(row: InventoryHorse): HorseCampaign {
   const pedigreeData = parseJsonb<Record<string, unknown>>(row.pedigree_data) ?? {};
-  const softLegal = parseJsonb<Partial<HorseSoftLegalContent>>(row.soft_legal) ?? {};
-  const marketing = parseJsonb<Partial<HorseMarketingContent>>(row.marketing) ?? {};
+  // Raw jsonb maps — typed as plain records so both camelCase (canonical) and legacy
+  // snake_case keys are readable at runtime (dual-shape read, locked 2026-08-31).
+  const softLegal = parseJsonb<Record<string, unknown>>(row.soft_legal) ?? {};
+  const marketing = parseJsonb<Record<string, unknown>>(row.marketing) ?? {};
 
   const trainer = resolveTrainer(row.trainer_name, row.trainer_location);
   const owner = resolveOwner(row.slug);
@@ -187,14 +215,24 @@ function rowToCampaign(row: InventoryHorse): HorseCampaign {
     totalSyndicateStakePct: listedStakePct,
     stakeStepPct,
     softLegal: {
-      aboutHorse: softLegal.aboutHorse ?? '',
-      trainerBio: softLegal.trainerBio ?? '',
-      racingOutlookAndPedigree: softLegal.racingOutlookAndPedigree ?? '',
+      // Dual-shape read (locked 2026-08-31): canonical camelCase, backward-compatible
+      // snake_case fallback for rows written before the writer was canonicalized.
+      aboutHorse: String(softLegal.aboutHorse ?? softLegal.about_horse ?? ''),
+      trainerBio: String(softLegal.trainerBio ?? softLegal.trainer_bio ?? ''),
+      racingOutlookAndPedigree: String(
+        softLegal.racingOutlookAndPedigree ?? softLegal.racing_outlook_and_pedigree ?? ''
+      ),
     },
     marketing: {
-      marketplaceHook: marketing.marketplaceHook ?? '',
-      highlightTags: Array.isArray(marketing.highlightTags) ? marketing.highlightTags : [],
-      highlights: Array.isArray(marketing.highlights) ? marketing.highlights : undefined,
+      marketplaceHook: String(marketing.marketplaceHook ?? marketing.marketplace_hook ?? ''),
+      highlightTags: Array.isArray(marketing.highlightTags)
+        ? (marketing.highlightTags as string[])
+        : Array.isArray(marketing.highlight_tags)
+          ? (marketing.highlight_tags as string[])
+          : [],
+      highlights: Array.isArray(marketing.highlights)
+        ? (marketing.highlights as string[])
+        : undefined,
     },
     listingStatus: statusToListingStatus(row.status),
     owner,
