@@ -214,15 +214,15 @@ function buildInventoryInsert(
     },
     soft_legal: intake.softLegal
       ? {
-          about_horse: intake.softLegal.aboutHorse ?? null,
-          trainer_bio: intake.softLegal.trainerBio ?? null,
-          racing_outlook_and_pedigree: intake.softLegal.racingOutlookAndPedigree ?? null,
+          aboutHorse: intake.softLegal.aboutHorse ?? null,
+          trainerBio: intake.softLegal.trainerBio ?? null,
+          racingOutlookAndPedigree: intake.softLegal.racingOutlookAndPedigree ?? null,
         }
       : null,
     marketing: intake.marketing
       ? {
-          marketplace_hook: intake.marketing.marketplaceHook ?? null,
-          highlight_tags: intake.marketing.highlightTags ?? null,
+          marketplaceHook: intake.marketing.marketplaceHook ?? null,
+          highlightTags: intake.marketing.highlightTags ?? null,
           highlights: intake.marketing.highlights ?? null,
         }
       : null,
@@ -244,6 +244,12 @@ export async function createCampaignFromIntake(
   }
   if (!intake.totalSyndicateStakePct || intake.totalSyndicateStakePct <= 0) {
     throw new Error('totalSyndicateStakePct is required and must be greater than 0');
+  }
+  if (!intake.softLegal?.aboutHorse?.trim()) {
+    throw new Error('Campaign intake requires softLegal.aboutHorse (The story)');
+  }
+  if (!intake.softLegal?.racingOutlookAndPedigree?.trim()) {
+    throw new Error('Campaign intake requires softLegal.racingOutlookAndPedigree (Overview tab)');
   }
 
   const pricing = computeDslPricing(intake.wholesaleMonthlyNzd, 1.0);

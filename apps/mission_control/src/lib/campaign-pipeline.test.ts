@@ -47,6 +47,15 @@ async function runTest() {
     owner: {
       entity: 'Evolution Stables',
     },
+    softLegal: {
+      aboutHorse: 'Test story paragraph for the E2E wire test horse.',
+      trainerBio: 'Test trainer biography.',
+      racingOutlookAndPedigree: 'Test racing outlook and pedigree summary.',
+    },
+    marketing: {
+      marketplaceHook: 'Test marketplace hook line.',
+      highlightTags: ['Tag One', 'Tag Two'],
+    },
     closeStyle: 'fourteen_day',
     paymentModel: 'subscription_float',
   };
@@ -135,5 +144,57 @@ function validBase(): Record<string, unknown> {
 
 runRejectCases().catch((err) => {
   console.error('Reject-case test failed:', err);
+  process.exit(1);
+});
+
+// Required story fields (locked 2026-08-31): aboutHorse + racingOutlookAndPedigree.
+// createCampaignFromIntake must reject BEFORE any DB write — the guard runs ahead of
+// pricing/legal-pack compilation and the Supabase client, so no live stack is needed.
+async function runRequiredStoryFieldCases() {
+  const base: CampaignIntakePayload = {
+    slug: `story-guard-${Date.now()}`,
+    legalName: 'Story Guard Test',
+    barnName: 'Story Guard Test',
+    wholesaleMonthlyNzd: 76,
+    totalSyndicateStakePct: 5,
+    pedigree: { sire: 'S', dam: 'D', gender: 'Filly', breeder: 'B' },
+    trainer: { name: 'T', stable: 'St', location: 'L' },
+    owner: { entity: 'Evolution Stables' },
+    softLegal: {
+      aboutHorse: 'A proper story paragraph.',
+      trainerBio: 'Bio.',
+      racingOutlookAndPedigree: 'A proper racing outlook summary.',
+    },
+  };
+
+  // Missing aboutHorse -> throw aboutHorse
+  await assert.rejects(
+    createCampaignFromIntake({ ...base, softLegal: { ...base.softLegal!, aboutHorse: '' } }),
+    /aboutHorse/,
+    'createCampaignFromIntake must reject missing/empty aboutHorse'
+  );
+
+  // Missing racingOutlookAndPedigree -> throw racingOutlookAndPedigree
+  await assert.rejects(
+    createCampaignFromIntake({
+      ...base,
+      softLegal: { ...base.softLegal!, racingOutlookAndPedigree: '   ' },
+    }),
+    /racingOutlookAndPedigree/,
+    'createCampaignFromIntake must reject missing/empty racingOutlookAndPedigree'
+  );
+
+  // No softLegal at all -> throw aboutHorse (first required field)
+  await assert.rejects(
+    createCampaignFromIntake({ ...base, softLegal: undefined }),
+    /aboutHorse/,
+    'createCampaignFromIntake must reject payload with no softLegal'
+  );
+
+  console.log('✅ PASS: createCampaignFromIntake rejects missing story fields (aboutHorse + racingOutlookAndPedigree)');
+}
+
+runRequiredStoryFieldCases().catch((err) => {
+  console.error('Required-story-field test failed:', err);
   process.exit(1);
 });
