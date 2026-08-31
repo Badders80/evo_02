@@ -33,7 +33,7 @@
 3. Race-date smart fallback in MC — when no race dates, MC writes "As [horse] is developing, no race dates are confirmed…" (authoring-side, NOT website).
 4. Dev server auto-start on boot (systemd user service) — or keep manual.
 
-**Known dirty file (NOT mine, pre-existing):** `apps/web/src/components/marketplace/pedigree-table.tsx` — uncommitted pedigree work from before this sprint. Commit or stash when ready.
+**Known dirty file (NOT mine, pre-existing):** `apps/web/src/components/marketplace/pedigree-table.tsx` — was uncommitted pedigree work from before this sprint. **COMMITTED 2026-08-31 `7c8c102`** (subject glow, prod-style metadata bar, centered subject) — founder eyeball-approved. Tree clean.
 
 ---
 
