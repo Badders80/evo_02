@@ -113,54 +113,41 @@ export function MediaDeck({ heroImage, gallery, videoUrl, sex, colour, sire, dam
 
   return (
     <div className="w-full">
-      {/* ── Prod-style hero: full-bleed dot-grid canvas + breadcrumb ─────── */}
-      <div className="dot-grid-surface relative -mx-12 -mt-28 bg-canvas px-12 pt-28 md:-mx-16 md:px-16 lg:-mx-20 lg:-mt-28 lg:px-20">
-        {/* Breadcrumb — MARKETPLACE / <NAME>, top-left */}
-        {breadcrumbName && (
-          <p className="pt-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-            <span>MARKETPLACE</span>
-            <span className="mx-2 text-border">/</span>
-            <span className="text-foreground">{breadcrumbName}</span>
-          </p>
+      {/* Hero — constant aspect box (prod base), carousel controls */}
+      <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl">
+        {slide && (
+          <button
+            type="button"
+            className="absolute inset-0 flex cursor-zoom-in items-center justify-center"
+            aria-label={slide.type === 'video' ? 'Open video full size' : 'Open image full size'}
+            onClick={() => setLightboxOpen(true)}
+          >
+            {slide.type === 'image' ? (
+              <img src={slide.src} alt={`Horse media slide ${currentIndex + 1}`} className="max-h-full max-w-full object-contain" />
+            ) : (
+              <video ref={videoRef} src={slide.src} muted loop playsInline className="max-h-full max-w-full object-contain" />
+            )}
+          </button>
         )}
 
-        {/* Large centered horse cutout (prod: ~60-70vh, object-contain) */}
-        <div className="relative flex h-[62vh] min-h-[380px] w-full items-center justify-center py-6">
-          {slide && (
-            <button
-              type="button"
-              className="absolute inset-0 flex cursor-zoom-in items-center justify-center"
-              aria-label={slide.type === 'video' ? 'Open video full size' : 'Open image full size'}
-              onClick={() => setLightboxOpen(true)}
-            >
-              {slide.type === 'image' ? (
-                <img src={slide.src} alt={`Horse media slide ${currentIndex + 1}`} className="max-h-full max-w-full object-contain" />
-              ) : (
-                <video ref={videoRef} src={slide.src} muted loop playsInline className="max-h-full max-w-full object-contain" />
-              )}
-            </button>
-          )}
+        <button type="button" onClick={prev} className={`${ARROW_CLASSES} left-3`} aria-label="Previous image">
+          {CHEVRON_LEFT}
+        </button>
+        <button type="button" onClick={next} className={`${ARROW_CLASSES} right-3`} aria-label="Next image">
+          {CHEVRON_RIGHT}
+        </button>
 
-          <button type="button" onClick={prev} className={`${ARROW_CLASSES} left-3`} aria-label="Previous image">
-            {CHEVRON_LEFT}
-          </button>
-          <button type="button" onClick={next} className={`${ARROW_CLASSES} right-3`} aria-label="Next image">
-            {CHEVRON_RIGHT}
-          </button>
-
-          <div className="absolute bottom-4 right-4 rounded-md border border-border/80 bg-background/80 px-3 py-1.5 font-mono text-xs text-foreground backdrop-blur-md">
-            {`${String(currentIndex + 1).padStart(2, '0')} · ${String(totalSlides).padStart(2, '0')}`}
-          </div>
+        <div className="absolute bottom-4 right-4 rounded-md border border-border/80 bg-background/80 px-3 py-1.5 font-mono text-xs text-foreground backdrop-blur-md">
+          {`${String(currentIndex + 1).padStart(2, '0')} · ${String(totalSlides).padStart(2, '0')}`}
         </div>
+      </div>
 
-        {/* Base-info pill strip — single rounded container, 4 columns,
-            label ABOVE value (prod hero style) */}
-        <div className="mb-8 grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-border bg-card/60 backdrop-blur-sm md:grid-cols-4">
-          <SpecCell label="Sex" value={sex} />
-          <SpecCell label="Colour" value={colour} />
-          <SpecCell label="Sire" value={sire} />
-          <SpecCell label="Dam" value={dam} />
-        </div>
+      {/* Base-info strip — prod style: surface-base card, 4 columns */}
+      <div className="mt-4 grid grid-cols-2 gap-6 rounded-2xl border border-border bg-surface-base p-6 md:grid-cols-4">
+        <SpecCell label="Sex" value={sex} />
+        <SpecCell label="Colour" value={colour} />
+        <SpecCell label="Sire" value={sire} />
+        <SpecCell label="Dam" value={dam} />
       </div>
 
       {/* Thumbnail row */}

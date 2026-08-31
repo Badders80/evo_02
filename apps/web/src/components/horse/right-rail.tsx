@@ -52,8 +52,8 @@ function statusChip(status: ListingStatus) {
 
   if (status === 'coming_soon') {
     return (
-      <div className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 border-accent/40 bg-accent/10 text-accent text-[8px] font-medium uppercase tracking-widest`}>
-        <span className="h-2 w-2 rounded-full bg-accent" />
+      <div className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 bg-status-active/10 border-status-active/40 text-status-active text-[8px] font-medium uppercase tracking-widest`}>
+        <span className="h-2 w-2 rounded-full bg-status-active" />
         <span>Coming Soon</span>
       </div>
     );
