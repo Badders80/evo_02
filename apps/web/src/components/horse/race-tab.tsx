@@ -141,6 +141,10 @@ export function RaceTab({
       )
     : [];
 
+  // Show the most recent 6 starts; the FULL NZTR RECORD link covers the rest.
+  // Summary above is computed from the FULL raceLog, never from this slice.
+  const recentLog = sortedLog.slice(0, 6);
+
   return (
     <div className="space-y-6">
       {/* ── 1. Header row ────────────────────────────────────────────── */}
@@ -189,10 +193,10 @@ export function RaceTab({
         <EmptyState status={status} />
       )}
 
-      {/* ── 4. Timeline ──────────────────────────────────────────────── */}
+      {/* ── 4. Timeline (most recent 6) ──────────────────────────────── */}
       {hasData && raceLog ? (
         <div>
-          {sortedLog.map((entry, idx) => (
+          {recentLog.map((entry, idx) => (
             <TimelineRow key={`${entry.date}-${entry.venue}-${idx}`} entry={entry} />
           ))}
         </div>
