@@ -1,11 +1,84 @@
 # CONTINUE — evo_02
 
-**Date:** 2026-08-31 — **3-LAYER STORYTELLING SPRINT WRAPPED (7 commits, kimi-audited 10/10 PASS, hermes verify ok:true)** · Pass 1 complete + Kimi audit (WARN, F1–F3 fixed) + 404 hydration fix + local Google SSO + FIREBASE TEMPLATE REMOVED · Pass 2 = founder content sweep, handoff ready
+**Date:** 2026-08-31 — **HORSE PAGE DEPTH SPRINT COMPLETE (chunks 1-7 + E1/E2, all gated + verified). Branch `design-alignment` local-only, 9 commits. Next: kimi audit → Sprint 2 (E3 terms) → Sprint 3 (E4 post-purchase) → cutover.**
 **Prod auth is now Supabase-native** (evo_01 swap live 2026-08-29, `d3d3a4b`) — evo_02 Supabase auth now aligns with prod layer (Google OAuth client differs: local uses inherited `851430309148-*` + shim, prod uses `153078526638-*` + native callback; reconcile at cutover).
 **Branch:** `design-alignment` (cut from ui-sprint-1 — superseded, never merge that). NOT merged — founder gate pending.
 **Page model:** `build-loop/page-model-notes.md` — LEFT/RIGHT page model planning notes (founder walkthroughs).
 **Live site:** still served by evo_01/02_website via Vercel. evo_01 working tree is DIRTY — hands off.
-**DoD recap:** full lifecycle built (intake → docs → MC → site → KYC-gated buy). Remaining: founder gate → Pass 2 → cutover.
+
+---
+
+## Session wrap (2026-08-31 — Horse Page Depth: chunks 1-7 + E1/E2 SHIPPED, verified)
+
+**Goal:** horse pages deep enough that an investor says "they know this horse well enough for my money." All 7 plan chunks + Sprint 1 (E1/E2) complete, gated, verified.
+
+**Commits (design-alignment, LOCAL-ONLY):**
+- `faa6632` chunk-1: migration 00008 (race_log column, both locations) + scripts/sync-race-log.py (knowledge repo → inventory, snake→camel)
+- `aeef745` chunk-3: MC schema — campaignNarrative/trainerQuote/nextUp/latestUpdateUrl/updateCount (legal_engine types → writer → intake-adapter → reader + HorseCampaign)
+- `464f13c` chunk-4: TrainerProfile.bio + full Wexford/Stephen Gray bios
+- `9c529c8` fix: new fields persist at inventory insert (test caught the gap) + round-trip test
+- `6e81322` chunk-2: race summary computed from race_log (TDD, never hardcoded) + trainer bio line
+- `e9d3e5f` scripts/apply-content.py — founder-approved drafts → inventory.soft_legal + Silent Gavel voice check
+- `5ed626e` chunk-6: CampaignStatusBlock (what's-next + update link + count + quote)
+- `2755701` fix: block renders ALL present blocks (was returning first only)
+- `f4ca17e` E1+E2: full marketplace card clickable + MediaDeck carousel wired
+
+**Gates:** `just check` 10/10 · `hermes verify --json --skip-start` ok:true · live walk /marketplace + 3 horse pages 200 · MediaDeck carousel + card click verified in HTML.
+
+**Content applied (founder folder-gate PASSED):** Prudentia (R65→R75, welfare-first spell, 31 updates), Coco (Andrew Scott quote, spring trials), First Gear (attractive offer from Australia, 6 winners from 6 foals, completed showcase). Drafts in `01_evolution/horses/{slug}/content-draft.md`. **Prudentia + First Gear trainer quotes carry `[DRAFT — verify with trainer]` — founder must verify before live.**
+
+**Key fixes this session (subagent timeouts → orchestrator finished):**
+- Subagents time out at 600s on packaging — work usually lands; ALWAYS check git status + files before re-dispatching.
+- Subagent wrote jest-style test (repo uses tsx + node:assert) + literal `\n` corruption in marketplace-listing-grid.tsx — both caught by typecheck, fixed.
+- CampaignStatusBlock returned first block only — composed all present blocks.
+- `hermes verify` full readiness probe collides with running dev server (EADDRINUSE) — use `--skip-start`; stale-boot 500s on [slug] → restart dev, not code.
+
+**Planning artifacts (build-loop/):** `horse-page-depth-plan.md` (strategy, locked rules) · `plan.md` + `plan-graph.json` (7 chunks, structurally valid) · `review-synthesis.md` (2-model review, all fixes applied) · `e3-right-rail-deepdive.md` (pre-purchase terms, founder decisions locked) · `go-live-dod.md` (6-layer skeleton + sprint map) · `reviewer-a-findings.json`.
+
+**Locked rules (founder):** $$$$ rule (never lead with dollars — "attractive offer from Australia" NOT "$300k") · hook principle (dial-movers bait the click, values-aligned) · Silent Gavel (voice SSOT evo_00/doc/) · Flight Club (selling ownership without selling it) · 04_comms = build debt (SMTP for automated emails).
+
+**Dev server:** does NOT auto-start on reboot — `cd /home/evo/new/evo_02/apps/web && pnpm dev --port 3010` (background). Stale-boot server 500s on [slug] with missing vendor-chunk error → restart, not code.
+
+---
+
+## NEXT — Sprint map (founder-approved order)
+
+| Sprint | Scope | Status |
+|---|---|---|
+| 1 | E1 + E2 (quick wins) | ✅ DONE (f4ca17e) |
+| 2 | **E3 — pre-purchase terms** (right-rail drop-downs from term-sheet DNA, acceptance gate at checkout tail, term-sheet order in MC: term sheet → PDS → SA) | ⏳ NEXT — deep-dive ready: `build-loop/e3-right-rail-deepdive.md` |
+| 3 | **E4 — post-purchase** (welcome email via SMTP, investor → bcc_lists/{slug}.json, MyStable success state, vault docs surfaced) | ⏳ depends on E3 checkout tail |
+| 4 | Cutover (purge-then-push, merge, Vercel, prod OAuth client 153078526638-* add /api/auth/google/callback, PURCHASES_ENABLED, archive evo_01) | ⛔ founder |
+
+**Before Sprint 2:** kimi-code-audit on the full diff (chunks 1-7 + E1/E2) → audit-report.md + audit-graph.json. Founder verifies the 2 trainer quotes. E3 deferred questions: downloadable investment summary? pillars validated? acceptance record location?
+
+**Go-live DoD:** `build-loop/go-live-dod.md` — 6 layers (Content/Commercial/Identity/Operations/Infra/Verification). Critical path: E1+E2 ✅ → E3 → E4 → real PDS/SA (founder/legal) → cutover → test purchase. Pricing/return LOCKED (legal_engine + DSL_MANUAL).
+
+---
+
+## Prior state — sprint e2e-wire (locked cb4ac12, audited)
+
+- Share-math: lot/share/unit = increment (0.5%); min = floor (1%); percentages only; stakePctToStepUnits at checkout boundary.
+- Operator auth: fail-closed 401, timing-safe sha256, httpOnly `mc_op`.
+- Known non-blockers: prudentia/hotta MC seeds simplified (publish-gated); horses-data.ts legacy payload fields.
+
+### Commands
+
+- `just check` (10/10 must pass) · web :3010, mission_control :3011 · Supabase :54321
+- pnpm: run from repo root ONLY, `export PNPM_HOME="$HOME/.local/share/pnpm"` first.
+
+## Locked (don't reopen)
+
+- One site. design-alignment replaces `main` after gate + Pass 2 — no splice.
+- Nellie only for buy. No MC restyle. Payouts = v2. First Gear = KYC names only.
+- Tokinvest horses = `upfront`. New DSLs = `subscription_float`.
+- Owner/lessor = "Evolution Stables" (never "Ltd"/"Bloodstock").
+
+## Do not
+
+- Merge/push until founder signs off (click-through + Pass 2).
+- Apply 00001–00008 to Evolution-3.0 (prod).
+- Treat website Terms as the legal pack. Merge ui-sprint-1.
 
 ---
 

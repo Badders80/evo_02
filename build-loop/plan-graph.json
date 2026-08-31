@@ -1,392 +1,65 @@
 {
-  "sprint": "e2e-wire",
-  "output_format": {
-    "kind": "files + walked proof + green gate",
-    "verification": "just check green; authenticated POST /api/campaign/create returns 201 with 64-hex hashes; /horses/e2e-wire-test renders from Supabase in web dev server; test row deleted after proof"
-  },
   "nodes": [
-    {
-      "id": "cmd:supabase-status",
-      "type": "gate",
-      "description": "C0 preflight: supabase status healthy before anything else"
-    },
-    {
-      "id": "cmd:baseline-commit",
-      "type": "gate",
-      "description": "C0: just check green, commit all working-tree changes as pre-sprint snapshot"
-    },
-    {
-      "id": "file:intake-adapter.ts",
-      "type": "file",
-      "description": "C1: SyndicateLegalContext/ExtractedIntakeData -> CampaignIntakePayload adapter, explicit field mapping + required-field validation (apps/mission_control/src/lib/)"
-    },
-    {
-      "id": "file:publish-server-action.ts",
-      "type": "file",
-      "description": "C1: 'use server' Server Action reading OPERATOR_API_TOKEN server-side, invoking createCampaignFromIntake directly (apps/mission_control/src/app/actions/publish-campaign.ts)"
-    },
-    {
-      "id": "file:horse-workspace-publish.tsx",
-      "type": "file",
-      "description": "C1: distinct Publish-to-Storefront button invoking the Server Action (no token in browser); Save & Re-Hash kept separate (apps/mission_control/src/components/horse-workspace.tsx)"
-    },
-    {
-      "id": "cmd:publish-smoke",
-      "type": "gate",
-      "description": "C1: curl POST with token returns 201 and inventory row exists"
-    },
-    {
-      "id": "file:campaign-create-auth.ts",
-      "type": "file",
-      "description": "C2: timing-safe bearer OPERATOR_API_TOKEN check BEFORE try-block, fail-closed 401 (apps/mission_control/src/app/api/campaign/create/route.ts)"
-    },
-    {
-      "id": "file:env-example-updates",
-      "type": "file",
-      "description": "C2: document OPERATOR_API_TOKEN in both apps' .env.example (+ gitignored .env.local at execution)"
-    },
-    {
-      "id": "cmd:auth-curl-pair",
-      "type": "gate",
-      "description": "C2: curl without token = 401; with token = 201"
-    },
-    {
-      "id": "file:campaign-pipeline.test.ts",
-      "type": "file",
-      "description": "C3: integration test - createCampaignFromIntake vs local Supabase, assert {inventoryId, legalPack} + 64-hex hashes (lib-level), unique slug per run, try/finally cleanup (apps/mission_control/src/lib/)"
-    },
-    {
-      "id": "cmd:test-in-gate",
-      "type": "gate",
-      "description": "C3: new test passes inside pnpm turbo test"
-    },
-    {
-      "id": "file:media-fallback-hero.tsx",
-      "type": "file",
-      "description": "C4: branded placeholder hero when slug absent from HORSE_STILLS (web-side wrapper)"
-    },
-    {
-      "id": "cmd:fallback-render-check",
-      "type": "gate",
-      "description": "C4: unknown slug renders placeholder, no broken img"
-    },
-    {
-      "id": "file:debt-close-lint-types",
-      "type": "file",
-      "description": "C5: unused vars prefixed/removed; 'tokinvest' stripped from type unions EXCEPT brand_dna/voice.ts banned-term list; ADR note appended to archived review-synthesis.md"
-    },
-    {
-      "id": "cmd:tokinvest-grep",
-      "type": "gate",
-      "description": "C5: grep -ri tokinvest apps packages --include='*.ts' --exclude-dir=dist returns only voice.ts"
-    },
-    {
-      "id": "file:continue-evo02.md",
-      "type": "file",
-      "description": "C7: rewrite evo_02/CONTINUE.md - E2E done state, next actions truthful"
-    },
-    {
-      "id": "file:continue-evo00-pointer.md",
-      "type": "file",
-      "description": "C7: sync evo_00/CONTINUE.md handoff pointer"
-    },
-    {
-      "id": "cmd:e2e-walked-proof",
-      "type": "gate",
-      "description": "FIN: MC UI publish via Server Action -> row appears -> web dev serves /horses/<test-slug> from Supabase -> row deleted"
-    },
-    {
-      "id": "cmd:just-check-final",
-      "type": "gate",
-      "description": "FIN: just check fully green"
-    },
-    {
-      "id": "task:stage5-audit",
-      "type": "task",
-      "description": "FIN: independent diff-scope audit, PASS/WARN table -> audit-report.md"
-    }
+    {"id": "sql:00008-race-log", "type": "sql", "description": "Migration 00008: ADD COLUMN race_log JSONB to inventory (BOTH supabase/migrations/ AND packages/db_models/src/schema/)"},
+    {"id": "script:sync-race-log", "type": "script", "description": "scripts/sync-race-log.py — knowledge repo race-record.json → inventory.race_log (snake→camel mapping, absolute path to knowledge repo)"},
+    {"id": "file:race-summary-test", "type": "file", "description": "apps/web/src/lib/race-summary.test.ts — TDD: written FIRST (red), covers null/undefined raceLog, isPlace=1st/2nd/3rd, prizemoney null/string"},
+    {"id": "file:race-summary-lib", "type": "file", "description": "apps/web/src/lib/race-summary.ts — computeRaceSummary(raceLog) → {wins, places, earnings}; null-safe"},
+    {"id": "file:page-tsx", "type": "file", "description": "apps/web/src/app/marketplace/[slug]/page.tsx — edit 1: remove hardcoded wins/placed, wire raceLog, trainer bio line (bio ?? philosophy)"},
+    {"id": "file:page-tsx-render", "type": "file", "description": "apps/web/src/app/marketplace/[slug]/page.tsx — edit 2: render what's-next + update link (serialized after edit 1)"},
+    {"id": "file:detail-tabs", "type": "file", "description": "apps/web/src/components/marketplace/detail-tabs.tsx — compute summary from raceLog internally; verify no other usages of wins/placed props before removing"},
+    {"id": "file:legal-types", "type": "file", "description": "packages/legal_engine/src/types.ts — HorseSoftLegalContent + campaignNarrative/trainerQuote/nextUp/latestUpdateUrl/updateCount"},
+    {"id": "file:writer", "type": "file", "description": "apps/mission_control/src/lib/campaign-pipeline.ts — buildSoftLegal carries new fields"},
+    {"id": "file:intake-adapter", "type": "file", "description": "apps/mission_control/src/lib/intake-adapter.ts — RawPublishPayload softLegal new fields"},
+    {"id": "file:reader", "type": "file", "description": "apps/web/src/lib/horses-data.ts — dual-shape read of new fields + HorseCampaign type"},
+    {"id": "file:trainer-types", "type": "file", "description": "packages/db_models/src/types/knowledge.types.ts — TrainerProfile.bio (check other consumers of TrainerProfile)"},
+    {"id": "file:trainers-data", "type": "file", "description": "packages/db_models/src/data/trainers.ts — full Wexford + Stephen Gray bios (philosophy stays short for PDS)"},
+    {"id": "file:content-draft-prudentia", "type": "file", "description": "01_evolution/horses/prudentia/content-draft.md — subagent-drafted, folder-gated, dollar-lead check pre-apply"},
+    {"id": "file:content-draft-coco", "type": "file", "description": "01_evolution/horses/hottathanafantasy/content-draft.md — subagent-drafted, folder-gated, dollar-lead check pre-apply"},
+    {"id": "file:content-draft-firstgear", "type": "file", "description": "01_evolution/horses/first-gear/content-draft.md — subagent-drafted, folder-gated, dollar-lead check pre-apply"},
+    {"id": "sql:apply-content", "type": "sql", "description": "Apply founder-approved content to inventory.soft_legal (campaignNarrative, trainerQuote, nextUp, latestUpdateUrl, updateCount)"},
+    {"id": "file:story-block", "type": "file", "description": "NEW component or extend page: what's-next block + 'Read the latest investor update' link + update count (story-block is pure RSC — needs new props or new component)"},
+    {"id": "cmd:just-check", "type": "gate", "description": "just check (lint typecheck test) green"},
+    {"id": "cmd:hermes-verify", "type": "gate", "description": "hermes verify --json --skip-start ok:true (Hermes CLI — exists)"},
+    {"id": "cmd:dollar-lead-check", "type": "gate", "description": "Automated check: no '$' in story/hook/nextUp fields (founder $$$$ rule)"},
+    {"id": "cmd:kimi-audit", "type": "gate", "description": "kimi-code-audit on full diff → audit-report.md + audit-graph.json"},
+    {"id": "gate:founder-folder", "type": "gate", "description": "Founder approves content drafts in knowledge repo before apply"}
   ],
   "edges": [
-    {
-      "from": "cmd:supabase-status",
-      "to": "cmd:baseline-commit",
-      "reason": "stack health before snapshot",
-      "source": "review B7"
-    },
-    {
-      "from": "cmd:baseline-commit",
-      "to": "file:intake-adapter.ts",
-      "reason": "clean snapshot before any new edits",
-      "source": "plan C0"
-    },
-    {
-      "from": "cmd:baseline-commit",
-      "to": "file:campaign-pipeline.test.ts",
-      "reason": "clean snapshot before parallel wave",
-      "source": "plan C0"
-    },
-    {
-      "from": "cmd:baseline-commit",
-      "to": "file:media-fallback-hero.tsx",
-      "reason": "clean snapshot before parallel wave",
-      "source": "plan C0"
-    },
-    {
-      "from": "cmd:baseline-commit",
-      "to": "file:debt-close-lint-types",
-      "reason": "clean snapshot before parallel wave",
-      "source": "plan C0"
-    },
-    {
-      "from": "file:intake-adapter.ts",
-      "to": "file:publish-server-action.ts",
-      "reason": "action maps payload through the adapter",
-      "source": "import analysis"
-    },
-    {
-      "from": "file:publish-server-action.ts",
-      "to": "file:horse-workspace-publish.tsx",
-      "reason": "button invokes the action; browser never sees token",
-      "source": "review B1"
-    },
-    {
-      "from": "file:horse-workspace-publish.tsx",
-      "to": "cmd:publish-smoke",
-      "reason": "smoke proves the wired publish path",
-      "source": "plan dependency"
-    },
-    {
-      "from": "file:horse-workspace-publish.tsx",
-      "to": "file:campaign-create-auth.ts",
-      "reason": "same region serialized after client wiring",
-      "source": "plan C1->C2"
-    },
-    {
-      "from": "file:campaign-create-auth.ts",
-      "to": "file:env-example-updates",
-      "reason": "env documented once check exists",
-      "source": "review B2"
-    },
-    {
-      "from": "file:env-example-updates",
-      "to": "cmd:auth-curl-pair",
-      "reason": "curl pair needs the token value present",
-      "source": "review B2"
-    },
-    {
-      "from": "file:campaign-create-auth.ts",
-      "to": "cmd:auth-curl-pair",
-      "reason": "401/201 pair proves fail-closed auth",
-      "source": "plan dependency"
-    },
-    {
-      "from": "file:campaign-pipeline.test.ts",
-      "to": "cmd:test-in-gate",
-      "reason": "test must run inside turbo gate not ad-hoc",
-      "source": "plan dependency"
-    },
-    {
-      "from": "file:media-fallback-hero.tsx",
-      "to": "cmd:fallback-render-check",
-      "reason": "placeholder must render for unknown slug",
-      "source": "plan dependency"
-    },
-    {
-      "from": "file:debt-close-lint-types",
-      "to": "cmd:tokinvest-grep",
-      "reason": "grep is the zero-debt proof",
-      "source": "plan dependency"
-    },
-    {
-      "from": "cmd:auth-curl-pair",
-      "to": "file:continue-evo02.md",
-      "reason": "desk file records only completed truth",
-      "source": "plan C7"
-    },
-    {
-      "from": "cmd:publish-smoke",
-      "to": "file:continue-evo02.md",
-      "reason": "desk file records only completed truth",
-      "source": "plan C7"
-    },
-    {
-      "from": "cmd:test-in-gate",
-      "to": "file:continue-evo02.md",
-      "reason": "desk file records only completed truth",
-      "source": "plan C7"
-    },
-    {
-      "from": "cmd:fallback-render-check",
-      "to": "file:continue-evo02.md",
-      "reason": "desk file records only completed truth",
-      "source": "plan C7"
-    },
-    {
-      "from": "cmd:tokinvest-grep",
-      "to": "file:continue-evo02.md",
-      "reason": "desk file records only completed truth",
-      "source": "plan C7"
-    },
-    {
-      "from": "file:continue-evo02.md",
-      "to": "file:continue-evo00-pointer.md",
-      "reason": "control plane pointer follows desk rewrite",
-      "source": "plan C7"
-    },
-    {
-      "from": "file:continue-evo00-pointer.md",
-      "to": "cmd:e2e-walked-proof",
-      "reason": "walk happens last on settled code",
-      "source": "plan FIN"
-    },
-    {
-      "from": "cmd:e2e-walked-proof",
-      "to": "cmd:just-check-final",
-      "reason": "final gate on final tree",
-      "source": "plan FIN"
-    },
-    {
-      "from": "cmd:just-check-final",
-      "to": "task:stage5-audit",
-      "reason": "audit only a green tree",
-      "source": "build-loop stage order"
-    }
+    {"from": "sql:00008-race-log", "to": "script:sync-race-log", "reason": "column must exist before sync", "source": "plan dependency"},
+    {"from": "script:sync-race-log", "to": "file:race-summary-lib", "reason": "race summary needs populated race_log", "source": "plan dependency"},
+    {"from": "file:race-summary-test", "to": "file:race-summary-lib", "reason": "TDD: test written first (red), then impl (green)", "source": "reviewer A#4 + B#12"},
+    {"from": "file:race-summary-lib", "to": "file:detail-tabs", "reason": "detail-tabs consumes computeRaceSummary", "source": "plan dependency"},
+    {"from": "file:detail-tabs", "to": "file:page-tsx", "reason": "page passes raceLog, removes hardcoded wins", "source": "plan dependency"},
+    {"from": "file:legal-types", "to": "file:writer", "reason": "writer types from legal_engine", "source": "plan dependency"},
+    {"from": "file:legal-types", "to": "file:intake-adapter", "reason": "adapter types from legal_engine", "source": "plan dependency"},
+    {"from": "file:writer", "to": "file:reader", "reason": "reader must read what writer writes (same jsonb shape)", "source": "plan dependency"},
+    {"from": "file:reader", "to": "file:page-tsx", "reason": "page renders campaign fields from reader", "source": "plan dependency"},
+    {"from": "file:reader", "to": "file:page-tsx-render", "reason": "page edit 2 needs reader to expose new fields", "source": "reviewer A#3"},
+    {"from": "file:trainer-types", "to": "file:trainers-data", "reason": "bio field before bios populated", "source": "plan dependency"},
+    {"from": "file:trainers-data", "to": "file:page-tsx", "reason": "page bio line (bio ?? philosophy) needs trainers data", "source": "reviewer A#13"},
+    {"from": "file:content-draft-prudentia", "to": "gate:founder-folder", "reason": "founder approves before apply", "source": "plan dependency"},
+    {"from": "file:content-draft-coco", "to": "gate:founder-folder", "reason": "founder approves before apply", "source": "plan dependency"},
+    {"from": "file:content-draft-firstgear", "to": "gate:founder-folder", "reason": "founder approves before apply", "source": "plan dependency"},
+    {"from": "gate:founder-folder", "to": "sql:apply-content", "reason": "approved content applied to inventory", "source": "reviewer A#6 + B#13"},
+    {"from": "sql:apply-content", "to": "file:reader", "reason": "reader must read what apply writes", "source": "reviewer A#6"},
+    {"from": "sql:apply-content", "to": "file:story-block", "reason": "approved content renders on page", "source": "plan dependency"},
+    {"from": "file:story-block", "to": "file:page-tsx-render", "reason": "page renders what's-next + update link", "source": "plan dependency"},
+    {"from": "file:page-tsx", "to": "cmd:just-check", "reason": "all wiring must pass gates", "source": "plan dependency"},
+    {"from": "cmd:just-check", "to": "cmd:hermes-verify", "reason": "verify after tests green", "source": "plan dependency"},
+    {"from": "cmd:hermes-verify", "to": "cmd:dollar-lead-check", "reason": "$$$$ rule enforced before audit", "source": "reviewer A#10 + B#21"},
+    {"from": "cmd:dollar-lead-check", "to": "cmd:kimi-audit", "reason": "audit after all checks", "source": "plan dependency"}
   ],
   "chunks": {
-    "chunk-C0": {
-      "nodes": [
-        "cmd:supabase-status",
-        "cmd:baseline-commit"
-      ],
-      "depends_on": [],
-      "state": "done"
-    },
-    "chunk-C1": {
-      "nodes": [
-        "file:intake-adapter.ts",
-        "file:publish-server-action.ts",
-        "file:horse-workspace-publish.tsx",
-        "cmd:publish-smoke"
-      ],
-      "depends_on": [
-        "chunk-C0"
-      ],
-      "state": "done"
-    },
-    "chunk-C2": {
-      "nodes": [
-        "file:campaign-create-auth.ts",
-        "file:env-example-updates",
-        "cmd:auth-curl-pair"
-      ],
-      "depends_on": [
-        "chunk-C1"
-      ],
-      "state": "done"
-    },
-    "chunk-C3": {
-      "nodes": [
-        "file:campaign-pipeline.test.ts",
-        "cmd:test-in-gate"
-      ],
-      "depends_on": [
-        "chunk-C0"
-      ],
-      "state": "done"
-    },
-    "chunk-C4": {
-      "nodes": [
-        "file:media-fallback-hero.tsx",
-        "cmd:fallback-render-check"
-      ],
-      "depends_on": [
-        "chunk-C0"
-      ],
-      "state": "done"
-    },
-    "chunk-C5": {
-      "nodes": [
-        "file:debt-close-lint-types",
-        "cmd:tokinvest-grep"
-      ],
-      "depends_on": [
-        "chunk-C0"
-      ],
-      "state": "done"
-    },
-    "chunk-C7": {
-      "nodes": [
-        "file:continue-evo02.md",
-        "file:continue-evo00-pointer.md"
-      ],
-      "depends_on": [
-        "chunk-C1",
-        "chunk-C2",
-        "chunk-C3",
-        "chunk-C4",
-        "chunk-C5"
-      ],
-      "state": "done"
-    },
-    "chunk-FIN": {
-      "nodes": [
-        "cmd:e2e-walked-proof",
-        "cmd:just-check-final",
-        "task:stage5-audit"
-      ],
-      "depends_on": [
-        "chunk-C7"
-      ],
-      "state": "done"
-    }
+    "chunk-1": {"nodes": ["sql:00008-race-log", "script:sync-race-log"], "depends_on": [], "state": "pending"},
+    "chunk-2": {"nodes": ["file:race-summary-test", "file:race-summary-lib", "file:detail-tabs", "file:page-tsx"], "depends_on": ["chunk-1", "chunk-4"], "state": "pending"},
+    "chunk-3": {"nodes": ["file:legal-types", "file:writer", "file:intake-adapter", "file:reader"], "depends_on": [], "state": "pending"},
+    "chunk-4": {"nodes": ["file:trainer-types", "file:trainers-data"], "depends_on": [], "state": "pending"},
+    "chunk-5": {"nodes": ["file:content-draft-prudentia", "file:content-draft-coco", "file:content-draft-firstgear", "gate:founder-folder", "sql:apply-content"], "depends_on": ["chunk-3"], "state": "pending"},
+    "chunk-6": {"nodes": ["file:story-block", "file:page-tsx-render"], "depends_on": ["chunk-5", "chunk-2", "chunk-3"], "state": "pending"},
+    "chunk-7": {"nodes": ["cmd:just-check", "cmd:hermes-verify", "cmd:dollar-lead-check", "cmd:kimi-audit"], "depends_on": ["chunk-2", "chunk-4", "chunk-6"], "state": "pending"}
   },
-  "waves": [
-    {
-      "wave": 1,
-      "chunks": [
-        "chunk-C4"
-      ],
-      "note": "only truly independent chunk (web-only, no shared types)"
-    },
-    {
-      "wave": 2,
-      "chunks": [
-        "chunk-C5"
-      ],
-      "note": "type unions before dependents compile against them (review A-F1)"
-    },
-    {
-      "wave": 3,
-      "chunks": [
-        "chunk-C3"
-      ],
-      "note": "integration test runs against post-C5 types"
-    },
-    {
-      "wave": 4,
-      "chunks": [
-        "chunk-C1"
-      ],
-      "note": "server action + publish button"
-    },
-    {
-      "wave": 5,
-      "chunks": [
-        "chunk-C2"
-      ],
-      "note": "route auth + env docs after client wiring"
-    },
-    {
-      "wave": 6,
-      "chunks": [
-        "chunk-C7"
-      ]
-    },
-    {
-      "wave": 7,
-      "chunks": [
-        "chunk-FIN"
-      ]
-    }
-  ]
+  "output_format": {
+    "kind": "files + migration + content drafts",
+    "verification": "just check green, hermes verify ok:true, dollar-lead check clean, kimi audit PASS, browser walk 3 horses, no dollar leads in story/hook"
+  }
 }
