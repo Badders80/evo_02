@@ -29,6 +29,7 @@
 - `2755701` fix: block renders ALL present blocks (was returning first only)
 - `f4ca17e` E1+E2: full marketplace card clickable + MediaDeck carousel wired
 - `33e7225` audit fix F2: MediaDeck gallery from paradeGallery (was empty dir) + dead imports dropped
+- `243bd63` founder review fix: hero = prod base (aspect-[16/10], no negative-margin bleed, breadcrumb visible, no rail spillover) + coming_soon badges green (status-active) not gold
 
 **Gates:** `just check` 10/10 · `hermes verify --json --skip-start` ok:true · live walk /marketplace + 3 horse pages 200 · MediaDeck carousel + card click verified in HTML.
 
