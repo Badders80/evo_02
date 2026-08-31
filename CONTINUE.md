@@ -1,6 +1,6 @@
 # CONTINUE — evo_02
 
-**Date:** 2026-08-31 — **HORSE PAGE DEPTH SPRINT COMPLETE (chunks 1-7 + E1/E2, all gated + verified). Branch `design-alignment` local-only, 11 commits. Kimi audit DONE (13 PASS / 1 FAIL / 1 WARN, F2 fixed). Next: F1 data backfill (founder call) → Sprint 2 (E3 terms) → Sprint 3 (E4 post-purchase) → cutover.**
+**Date:** 2026-08-31 — **SESSION 2 WRAP: audit done (13 PASS/1 FAIL/1 WARN), F1+F2 resolved, 5 founder review fixes shipped, Stitch MCP wired. Branch `design-alignment` local-only, 22 commits. Next: E3 via Stitch MCP (founder designs right-rail in Stitch → agent implements) → Sprint 3 (E4) → cutover.**
 **Prod auth is now Supabase-native** (evo_01 swap live 2026-08-29, `d3d3a4b`) — evo_02 Supabase auth now aligns with prod layer (Google OAuth client differs: local uses inherited `851430309148-*` + shim, prod uses `153078526638-*` + native callback; reconcile at cutover).
 **Branch:** `design-alignment` (cut from ui-sprint-1 — superseded, never merge that). NOT merged — founder gate pending.
 **Page model:** `build-loop/page-model-notes.md` — LEFT/RIGHT page model planning notes (founder walkthroughs).
@@ -51,16 +51,39 @@
 
 ---
 
+## Session wrap (2026-08-31 — Session 2: audit + founder review fixes + Stitch MCP)
+
+**What happened this session (all on `design-alignment`, LOCAL-ONLY, 22 commits, tree clean):**
+
+1. **Kimi audit DONE** — `build-loop/audit-report.md` + `audit-graph.json`: **13 PASS / 1 FAIL / 1 WARN** on the horse-page-depth sprint diff (`faa6632~1..8fe7eaa`). Auditor `kimi-k2.7-code:cloud` (paid), evidence-attachment pattern (real psql/curl/turbo output, not summaries).
+2. **F1 RESOLVED** (`512bf32`) — race_log backfill. Founder decision: **show last 6 + link to official** (no popup, no scroll wall). Prudentia's 6 already ARE the last 6 ✓. First-gear backfilled to full 11-start record from loveracing.nz (HorseID 428364, curl_cffi scrape; prize sum $24,975 = repo total, exact). **Castletown corrected: live page 5th of 9 (old entry said 2nd — repo totals confirm old entry wrong).** Race tab: summary from FULL log (1 Win · 2 Places), timeline shows most recent 6, FULL NZTR RECORD link covers the rest. Reusable parser: `scripts/scrape-race-log.py`. Knowledge repo `race-record.json` starts backfilled to 11 (evo_01 tree touched — hands-off rule noted).
+3. **F2 RESOLVED** (`33e7225`) — MediaDeck gallery was reading empty `public/images/content/horses/{slug}`; real stills at `public/horses/{slug}/01-04` via HORSE_STILLS. Now sources `getCampaignMedia().horse.paradeGallery`. Live: `01 · 04` prudentia, `01 · 04` first-gear, `01 · 02` hottathanafantasy.
+4. **5 founder review fixes** (screenshots 1-6, prod reference `evolutionstables.nz`):
+   - `243bd63` — hero = prod base: `aspect-[16/10]` constant box, no negative-margin bleed (breadcrumb visible, no rail spillover), coming_soon badges green (status-active) not gold
+   - `d989f0c` — hero shaded pillbox (`bg-surface-base` fill behind photo) + AGE | SEX | COLOUR | SIRE | DAM spec strip
+   - `da4ecc2` — spec strip → content-sized flex cells hugging left (no 5-col spread; Sire/Dam no longer wrap ugly)
+   - `ddcdee9` + `c6af68d` — age reads "5yr" (lowercase yr); status pills = prod amber outline: **Fully Subscribed AND Completed = warning variant** (was green/solid). Coming Soon stays green (prod shows it green).
+5. **Stitch MCP WIRED** — official Google endpoint `https://stitch.googleapis.com/mcp`, HTTP transport, `X-Goog-Api-Key` header. Config in `~/.hermes/config.yaml` under `mcp_servers.stitch` (set via `hermes config set` — config file is agent-write-protected). **15 tools verified live** (create_project, generate_screen_from_text, edit_screens, generate_variants, list_screens, get_screen, upload_design_md, create_design_system, apply_design_system, etc.). Key stored: `STITCH-KEY-REDACTED`. **NOTE: MCP servers load at Hermes startup — no hot-reload. Restart Hermes to get `mcp_stitch_*` native tools; until then drive the endpoint via curl (proven working).**
+6. **E3 flow board** (`build-loop/e3-flow-board.html`) — draggable right-rail section board (The Deal / What's Included / What If / Your Return / Exit & Transfer) + locked acceptance gate strip. **SUPERSEDED by Stitch MCP** — founder designs the right-rail visually in Stitch instead (drag/edit via `edit_screens`). Board kept as reference; public copy removed (planning artifact, not for prod).
+
+**Gates (all green at HEAD `a80c739`):** forced `turbo run lint typecheck test` 22/22 (0 cached) · `hermes verify --json --skip-start` ok:true (build + 8 test phases) · live walk 200 × 5 (/marketplace + prudentia + first-gear + hottathanafantasy + i-stole-a-manolo + tml-x-yearn).
+
+**Dev server:** does NOT auto-start on reboot — `cd /home/evo/new/evo_02/apps/web && pnpm dev --port 3010` (background). Stale-boot server 500s on [slug] with missing vendor-chunk error → restart, not code. `hermes verify`'s prod build clobbers dev `.next/` every run — always restart dev after verify.
+
+**Founder TODOs before live (unchanged):** verify the 2 trainer quotes carrying `[DRAFT — verify with trainer]` (Prudentia + First Gear). Fix first-gear `latestUpdateUrl` prose (C15, hidden by updateCount=null gate).
+
+---
+
 ## NEXT — Sprint map (founder-approved order)
 
 | Sprint | Scope | Status |
 |---|---|---|
 | 1 | E1 + E2 (quick wins) | ✅ DONE (f4ca17e) |
-| 2 | **E3 — pre-purchase terms** (right-rail drop-downs from term-sheet DNA, acceptance gate at checkout tail, term-sheet order in MC: term sheet → PDS → SA) | ⏳ NEXT — deep-dive ready: `build-loop/e3-right-rail-deepdive.md` |
+| 2 | **E3 — pre-purchase terms** (right-rail drop-downs from term-sheet DNA, acceptance gate at checkout tail, term-sheet order in MC: term sheet → PDS → SA) | ⏳ NEXT — **via Stitch MCP**: founder designs right-rail + acceptance gate screens in Stitch (stitch.withgoogle.com), agent implements from fetched design. Deep-dive: `build-loop/e3-right-rail-deepdive.md` (decisions LOCKED: drop-downs not FAQ, scroll-through + checkbox acceptance, PDS folds into aboutHorse, 5 pillars refined) |
 | 3 | **E4 — post-purchase** (welcome email via SMTP, investor → bcc_lists/{slug}.json, MyStable success state, vault docs surfaced) | ⏳ depends on E3 checkout tail |
 | 4 | Cutover (purge-then-push, merge, Vercel, prod OAuth client 153078526638-* add /api/auth/google/callback, PURCHASES_ENABLED, archive evo_01) | ⛔ founder |
 
-**Before Sprint 2:** ~~kimi-code-audit on the full diff~~ **DONE 2026-08-31** (13 PASS / 1 FAIL / 1 WARN; F2 fixed `33e7225`; F1 = race-log data backfill — founder call: now or defer). Founder verifies the 2 trainer quotes. E3 deferred questions: downloadable investment summary? pillars validated? acceptance record location?
+**Before Sprint 2:** ~~kimi-code-audit on the full diff~~ **DONE 2026-08-31** (13 PASS / 1 FAIL / 1 WARN; F1 + F2 both resolved). Founder verifies the 2 trainer quotes. E3 deferred questions: downloadable investment summary? pillars validated? acceptance record location? **Stitch MCP: restart Hermes to load `mcp_stitch_*` tools (no hot-reload).**
 
 **Go-live DoD:** `build-loop/go-live-dod.md` — 6 layers (Content/Commercial/Identity/Operations/Infra/Verification). Critical path: E1+E2 ✅ → E3 → E4 → real PDS/SA (founder/legal) → cutover → test purchase. Pricing/return LOCKED (legal_engine + DSL_MANUAL).
 
