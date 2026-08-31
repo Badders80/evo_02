@@ -18,6 +18,7 @@ import { CampaignStatusBadge } from '@/components/marketplace/campaign-status-ba
 import { DetailTabs } from '@/components/marketplace/detail-tabs';
 import RightRail from '@/components/horse/right-rail';
 import { DocumentsGate } from '@/components/horse/documents-gate';
+import { CampaignStatusBlock } from '@/components/horse/campaign-status-block';
 import type {
   InventoryHorse,
   PedigreeLine,
@@ -230,6 +231,13 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
                 </div>
               </section>
 
+              {/* Campaign Status Block — what's-next, investor update link + count, trainer quote */}
+              <CampaignStatusBlock
+                nextUp={campaign.softLegal.nextUp}
+                latestUpdateUrl={campaign.softLegal.latestUpdateUrl}
+                updateCount={campaign.softLegal.updateCount}
+                trainerQuote={campaign.softLegal.trainerQuote}
+              />
               {/* Detail Tabs */}
               <DetailTabs
                 horseName={campaign.legalName}
