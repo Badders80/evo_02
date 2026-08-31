@@ -1,11 +1,39 @@
 # CONTINUE — evo_02
 
-**Date:** 2026-08-29 — **PASS 1 COMPLETE + Kimi audit (WARN, F1–F3 fixed) + 404 hydration fix + local Google SSO + FIREBASE TEMPLATE REMOVED · Pass 2 = founder content sweep, handoff ready**
+**Date:** 2026-08-31 — **3-LAYER STORYTELLING SPRINT WRAPPED (7 commits, kimi-audited 10/10 PASS, hermes verify ok:true)** · Pass 1 complete + Kimi audit (WARN, F1–F3 fixed) + 404 hydration fix + local Google SSO + FIREBASE TEMPLATE REMOVED · Pass 2 = founder content sweep, handoff ready
 **Prod auth is now Supabase-native** (evo_01 swap live 2026-08-29, `d3d3a4b`) — evo_02 Supabase auth now aligns with prod layer (Google OAuth client differs: local uses inherited `851430309148-*` + shim, prod uses `153078526638-*` + native callback; reconcile at cutover).
 **Branch:** `design-alignment` (cut from ui-sprint-1 — superseded, never merge that). NOT merged — founder gate pending.
 **Page model:** `build-loop/page-model-notes.md` — LEFT/RIGHT page model planning notes (founder walkthroughs).
 **Live site:** still served by evo_01/02_website via Vercel. evo_01 working tree is DIRTY — hands off.
 **DoD recap:** full lifecycle built (intake → docs → MC → site → KYC-gated buy). Remaining: founder gate → Pass 2 → cutover.
+
+---
+
+## Session wrap (2026-08-31 — 3-Layer Horse Storytelling, SHIPPED + audited)
+
+**Locked model (founder-approved):** L1 invites the click · L2 sells the story · L3 carries the substance. One MC-authored origin (inventory jsonb, camelCase), three presentation depths, complement-never-duplicate.
+
+| Layer | Surface | Field | Rule |
+|---|---|---|---|
+| L1 | Marketplace card | `marketing.marketplaceHook` + `highlightTags` chips | hook, else first sentence of aboutHorse — never full story |
+| L2 | "The story" | `soft_legal.aboutHorse` | verbatim; required at intake |
+| L3 | Overview tab | `soft_legal.racingOutlookAndPedigree` | verbatim under "About [Horse]" (heading kept); required at intake |
+
+**Commits (design-alignment, LOCAL-ONLY):** `c533414` writer→camelCase + required-field guard · `326b874` reader dual-shape + firstSentence/getMarketplaceHook · `6f0cc6d` card hook + page meta/OG · `85dab7d` sitemap + robots · `203c5cb` plan/chunks/audit artifacts · `5206fee` highlight tag chips on cards · `c2a0c94` plan doc update. Artifacts: `build-loop/3layer-plan.md`, `3layer-chunks.md`, `3layer-audit-report.md` (10/10 PASS), `3layer-audit-graph.json`.
+
+**Gates:** `turbo run test typecheck --force` 16/16 · `hermes verify --json --skip-start` ok:true · live walk /marketplace 200 (24 chips), /marketplace/nellie 200, /sitemap.xml 200, /robots.txt OK.
+
+**Key-shape fix (root cause):** MC writer wrote snake_case jsonb (`about_horse`), reader+seed used camelCase → MC-created campaigns rendered empty. Writer now camelCase; reader reads both shapes (pattern already existed for pedigree_data).
+
+**Dev server:** does NOT auto-start on reboot — `cd /home/evo/new/evo_02/apps/web && pnpm dev --port 3010` (background). Stale-boot server 500s on [slug] with missing vendor-chunk error → restart, not code.
+
+**Parked (founder-visible, not blockers):**
+1. tml barn-name inline cleanup — aboutHorse embeds "(barn name Mulan)"; dupes the future `Meet {Legal} aka {Nick}` header. One-time seed-content edit for tml row.
+2. Per-horse JSON-LD — `horseWebPageJsonLd` exists in `apps/web/src/lib/seo.ts`, unused on /marketplace/[slug]. Wire in SEO phase.
+3. Race-date smart fallback in MC — when no race dates, MC writes "As [horse] is developing, no race dates are confirmed…" (authoring-side, NOT website).
+4. Dev server auto-start on boot (systemd user service) — or keep manual.
+
+**Known dirty file (NOT mine, pre-existing):** `apps/web/src/components/marketplace/pedigree-table.tsx` — uncommitted pedigree work from before this sprint. Commit or stash when ready.
 
 ---
 
