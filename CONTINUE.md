@@ -1,6 +1,6 @@
 # CONTINUE — evo_02
 
-**Date:** 2026-08-31 — **HORSE PAGE DEPTH SPRINT COMPLETE (chunks 1-7 + E1/E2, all gated + verified). Branch `design-alignment` local-only, 9 commits. Next: kimi audit → Sprint 2 (E3 terms) → Sprint 3 (E4 post-purchase) → cutover.**
+**Date:** 2026-08-31 — **HORSE PAGE DEPTH SPRINT COMPLETE (chunks 1-7 + E1/E2, all gated + verified). Branch `design-alignment` local-only, 11 commits. Kimi audit DONE (13 PASS / 1 FAIL / 1 WARN, F2 fixed). Next: F1 data backfill (founder call) → Sprint 2 (E3 terms) → Sprint 3 (E4 post-purchase) → cutover.**
 **Prod auth is now Supabase-native** (evo_01 swap live 2026-08-29, `d3d3a4b`) — evo_02 Supabase auth now aligns with prod layer (Google OAuth client differs: local uses inherited `851430309148-*` + shim, prod uses `153078526638-*` + native callback; reconcile at cutover).
 **Branch:** `design-alignment` (cut from ui-sprint-1 — superseded, never merge that). NOT merged — founder gate pending.
 **Page model:** `build-loop/page-model-notes.md` — LEFT/RIGHT page model planning notes (founder walkthroughs).
@@ -12,6 +12,12 @@
 
 **Goal:** horse pages deep enough that an investor says "they know this horse well enough for my money." All 7 plan chunks + Sprint 1 (E1/E2) complete, gated, verified.
 
+**Kimi audit (2026-08-31, `kimi-k2.7-code:cloud` + orchestrator):** `build-loop/audit-report.md` + `audit-graph.json` — **13 PASS / 1 FAIL / 1 WARN**.
+- **F1 (FAIL) — race_log incomplete vs DoD:** prudentia=6/10 starts, first-gear=2/11. NOT a sync bug — knowledge repo `race-record.json` `starts` arrays are partial (totals live in metadata: total_starts=10/11). Sync copied source faithfully. **Fix = data backfill from loveracing.nz** (loveracing_id + performance_profile_url present in repo) then re-run `scripts/sync-race-log.py`. Founder call: backfill now or defer to Sprint 2.
+- **F2 (WARN) — MediaDeck rendered hero only** (`01 · 01`): `getGalleryImages` read empty `public/images/content/horses/{slug}`; real stills at `public/horses/{slug}/01-04` via HORSE_STILLS. **FIXED `33e7225`** — gallery now from `getCampaignMedia().horse.paradeGallery`; dead `Image`/`PedigreeLine` imports dropped. Verified: 22/22 forced turbo, live `01 · 04` prudentia, `01 · 04` first-gear, `01 · 02` hottathanafantasy.
+- **C15 (content defect, not rendered):** first-gear `latestUpdateUrl` is prose, not a URL — hidden by updateCount=null gate. Fix content when next authoring pass runs.
+- **2 new lint warnings fixed** (page.tsx dead imports). Remaining 15 warnings pre-existing.
+
 **Commits (design-alignment, LOCAL-ONLY):**
 - `faa6632` chunk-1: migration 00008 (race_log column, both locations) + scripts/sync-race-log.py (knowledge repo → inventory, snake→camel)
 - `aeef745` chunk-3: MC schema — campaignNarrative/trainerQuote/nextUp/latestUpdateUrl/updateCount (legal_engine types → writer → intake-adapter → reader + HorseCampaign)
@@ -22,6 +28,7 @@
 - `5ed626e` chunk-6: CampaignStatusBlock (what's-next + update link + count + quote)
 - `2755701` fix: block renders ALL present blocks (was returning first only)
 - `f4ca17e` E1+E2: full marketplace card clickable + MediaDeck carousel wired
+- `33e7225` audit fix F2: MediaDeck gallery from paradeGallery (was empty dir) + dead imports dropped
 
 **Gates:** `just check` 10/10 · `hermes verify --json --skip-start` ok:true · live walk /marketplace + 3 horse pages 200 · MediaDeck carousel + card click verified in HTML.
 
@@ -50,7 +57,7 @@
 | 3 | **E4 — post-purchase** (welcome email via SMTP, investor → bcc_lists/{slug}.json, MyStable success state, vault docs surfaced) | ⏳ depends on E3 checkout tail |
 | 4 | Cutover (purge-then-push, merge, Vercel, prod OAuth client 153078526638-* add /api/auth/google/callback, PURCHASES_ENABLED, archive evo_01) | ⛔ founder |
 
-**Before Sprint 2:** kimi-code-audit on the full diff (chunks 1-7 + E1/E2) → audit-report.md + audit-graph.json. Founder verifies the 2 trainer quotes. E3 deferred questions: downloadable investment summary? pillars validated? acceptance record location?
+**Before Sprint 2:** ~~kimi-code-audit on the full diff~~ **DONE 2026-08-31** (13 PASS / 1 FAIL / 1 WARN; F2 fixed `33e7225`; F1 = race-log data backfill — founder call: now or defer). Founder verifies the 2 trainer quotes. E3 deferred questions: downloadable investment summary? pillars validated? acceptance record location?
 
 **Go-live DoD:** `build-loop/go-live-dod.md` — 6 layers (Content/Commercial/Identity/Operations/Infra/Verification). Critical path: E1+E2 ✅ → E3 → E4 → real PDS/SA (founder/legal) → cutover → test purchase. Pricing/return LOCKED (legal_engine + DSL_MANUAL).
 
