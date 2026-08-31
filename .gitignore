@@ -34,13 +34,12 @@ Thumbs.db
 !.vscode/extensions.json
 .idea/
 
-build-loop/c1-executor.out
-
-build-loop/chunk-c1-prompt.txt
-
-build-loop/chunk-c3-prompt.txt
-
-build-loop/paid-audit-deepseek-v4-pro-r2.out
-
 __pycache__/
 *.tsbuildinfo
+
+# build-loop transient junk (executor logs, raw audit payloads)
+build-loop/**/*.out
+build-loop/**/*-prompt.txt
+build-loop/**/*-req.json
+build-loop/**/*-raw.json
+build-loop/.monitor-stamp
