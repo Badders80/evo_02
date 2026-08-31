@@ -131,6 +131,7 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
                 heroImage={heroImage}
                 gallery={gallery}
                 videoUrl={videoUrl}
+                age={age}
                 sex={campaign.pedigree.gender}
                 colour={campaign.pedigree.colour}
                 sire={campaign.pedigree.sire}

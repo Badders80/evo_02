@@ -6,6 +6,7 @@ export interface MediaDeckProps {
   heroImage: string;
   gallery: string[];
   videoUrl?: string;
+  age?: number;
   sex?: string;
   colour?: string;
   sire?: string;
@@ -65,7 +66,7 @@ function SpecCell({ label, value }: { label: string; value?: string }) {
   );
 }
 
-export function MediaDeck({ heroImage, gallery, videoUrl, sex, colour, sire, dam, breadcrumbName }: MediaDeckProps) {
+export function MediaDeck({ heroImage, gallery, videoUrl, age, sex, colour, sire, dam, breadcrumbName }: MediaDeckProps) {
   const deck = React.useMemo(() => buildDeck(heroImage, gallery, videoUrl), [heroImage, gallery, videoUrl]);
   const totalSlides = deck.length;
   const videoIndex = videoUrl ? 1 : -1; // deck order: hero, [video], ...gallery
@@ -113,8 +114,8 @@ export function MediaDeck({ heroImage, gallery, videoUrl, sex, colour, sire, dam
 
   return (
     <div className="w-full">
-      {/* Hero — constant aspect box (prod base), carousel controls */}
-      <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl">
+      {/* Hero — constant aspect box (prod base: shaded surface-base fill behind photo) */}
+      <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-surface-base">
         {slide && (
           <button
             type="button"
@@ -142,8 +143,9 @@ export function MediaDeck({ heroImage, gallery, videoUrl, sex, colour, sire, dam
         </div>
       </div>
 
-      {/* Base-info strip — prod style: surface-base card, 4 columns */}
-      <div className="mt-4 grid grid-cols-2 gap-6 rounded-2xl border border-border bg-surface-base p-6 md:grid-cols-4">
+      {/* Base-info strip — prod style: surface-base card, AGE | SEX | COLOUR | SIRE | DAM */}
+      <div className="mt-4 grid grid-cols-2 gap-6 rounded-2xl border border-border bg-surface-base p-6 md:grid-cols-5">
+        <SpecCell label="Age" value={age !== undefined ? String(age) : undefined} />
         <SpecCell label="Sex" value={sex} />
         <SpecCell label="Colour" value={colour} />
         <SpecCell label="Sire" value={sire} />
