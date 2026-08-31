@@ -19,6 +19,7 @@ import { DetailTabs } from '@/components/marketplace/detail-tabs';
 import RightRail from '@/components/horse/right-rail';
 import { DocumentsGate } from '@/components/horse/documents-gate';
 import { CampaignStatusBlock } from '@/components/horse/campaign-status-block';
+import { MediaDeck } from '@/components/horse/media-deck';
 import type {
   InventoryHorse,
   PedigreeLine,
@@ -102,6 +103,7 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
 
   const media = getCampaignMedia(campaign.slug, campaign.trainer.slug);
   const heroImage = media.horse.heroConformation;
+  const videoUrl = media.horse.trackworkVideo;
   const gallery = getGalleryImages(slug, heroImage);
 
   const trainerProfile = getTrainer(campaign.trainer.slug);
@@ -145,69 +147,16 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
           <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-[2fr_1fr]">
             {/* LEFT COLUMN */}
             <div className="space-y-12">
-              {/* Cover media */}
-              <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-surface-base">
-                {heroImage ? (
-                  <>
-                    <Image
-                      src={heroImage}
-                      alt={displayName}
-                      fill
-                      className="object-contain"
-                      priority
-                      sizes="(max-width: 1024px) 100vw, 60vw"
-                    />
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                  </>
-                ) : (
-                  <div className="flex h-full items-center justify-center text-xs font-light text-muted-foreground">
-                    Photo incoming
-                  </div>
-                )}
-              </div>
-
-              {/* Spec strip */}
-              <div className="grid grid-cols-2 gap-6 rounded-2xl border border-border bg-surface-base p-6 md:grid-cols-[1fr_1fr_1.4fr_1.4fr]">
-                <div>
-                  <p className="mb-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Sex</p>
-                  <p className="text-[14px] font-medium capitalize text-pure-white">{campaign.pedigree.gender || '—'}</p>
-                </div>
-                <div>
-                  <p className="mb-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Colour</p>
-                  <p className="text-[14px] font-medium text-pure-white">{campaign.pedigree.colour || '—'}</p>
-                </div>
-                <div>
-                  <p className="mb-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Sire</p>
-                  <p className="truncate text-[14px] font-medium text-pure-white" title={campaign.pedigree.sire}>
-                    {campaign.pedigree.sire || '—'}
-                  </p>
-                </div>
-                <div>
-                  <p className="mb-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Dam</p>
-                  <p className="truncate text-[14px] font-medium text-pure-white" title={campaign.pedigree.dam}>
-                    {campaign.pedigree.dam || '—'}</p>
-                </div>
-              </div>
-
-              {/* Gallery */}
-              {gallery.length > 0 && (
-                <div className="grid grid-cols-3 gap-3">
-                  {gallery.map((src, i) => (
-                    <div
-                      key={src}
-                      className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-surface-base"
-                    >
-                      <Image
-                        src={src}
-                        alt={`${displayName} — photo ${i + 1}`}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 33vw, 20vw"
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
+              {/* MediaDeck — hero + spec strip + thumbnail carousel (video-ready) */}
+              <MediaDeck
+                heroImage={heroImage}
+                gallery={gallery}
+                videoUrl={videoUrl}
+                sex={campaign.pedigree.gender}
+                colour={campaign.pedigree.colour}
+                sire={campaign.pedigree.sire}
+                dam={campaign.pedigree.dam}
+              />
 
               {/* THE STORY */}
               <section className="space-y-4">

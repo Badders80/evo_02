@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { ListingStatus } from '@evo/db_models';
 
 export type MarketplaceCard = {
@@ -68,6 +69,7 @@ function StatusBadge({ status }: { status: ListingStatus }) {
 
 export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) {
   const [filter, setFilter] = useState<FilterKey>('all');
+  const router = useRouter();
 
   const filtered = useMemo(() => {
     const next = cards.filter((card) => {
@@ -112,9 +114,12 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
           return (
             <article
               key={card.slug}
-              className={`group flex flex-col items-stretch gap-6 rounded-3xl border border-border bg-card/60 p-5 backdrop-blur-md transition-all duration-700 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.45)] md:flex-row md:gap-8 md:p-6 ${
+              className={`group flex cursor-pointer flex-col items-stretch gap-6 rounded-3xl border border-border bg-card/60 p-5 backdrop-blur-md transition-all duration-700 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.45)] md:flex-row md:gap-8 md:p-6 ${
                 isFeatured ? 'md:gap-12 md:p-8' : ''
               }`}
+              onClick={() => router.push(`/marketplace/${card.slug}`)}
+              role="link"
+              aria-label={card.name}
             >
               <Link
                 href={`/marketplace/${card.slug}`}
