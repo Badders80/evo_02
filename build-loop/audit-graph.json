@@ -1,65 +1,93 @@
 {
-  "audit": "horse-page chunk-6/9/10 + wiring",
-  "date": "2026-08-30",
-  "auditor": "orchestrator deterministic checks + kimi-k2.7-code:cloud (30 findings)",
-  "diff_scope": "git diff d1da6e7 -- apps/web/src/components/horse/ apps/web/src/app/marketplace/[slug]/page.tsx apps/web/src/lib/stable-links.ts packages/db_models/src/types/database.types.ts",
-  "commits": ["31db159", "4a1f68b", "5ee878c"],
+  "audit": "horse-page-depth-sprint",
+  "date": "2026-08-31",
+  "branch": "design-alignment",
+  "head": "8fe7eaa",
+  "diff_scope": "faa6632~1..8fe7eaa",
+  "auditor": "kimi-k2.7-code:cloud + orchestrator deterministic verification",
+  "verdict": "PASS with 1 FAIL + 1 WARN (13/15 claims verified)",
   "findings": [
-    {"id": "F1", "claim": "All 6 horses carry 4-gen sire_line/dam_line in inventory.pedigree_data", "result": "PASS", "detail": "6/6 rows: sire_line len 9–16, dam_line len 8–12"},
-    {"id": "F2", "claim": "race_log jsonb holds real data for first-gear (2) and prudentia (6)", "result": "PASS", "detail": "jsonb_array_length: first-gear=2, prudentia=6; others null"},
-    {"id": "F3", "claim": "Race summary computed from data, never hardcoded", "result": "PASS", "detail": "First Gear renders '1 Win · 1 Place' (1st Trentham, 2nd Wanganui) via computeSummary"},
-    {"id": "F4", "claim": "LEFT 2fr / RIGHT 1fr true-thirds grid", "result": "PASS", "detail": "Computed columns 629.3px/314.7px = 66.7/33.3 after 4a1f68b comma-class fix"},
-    {"id": "F5", "claim": "4-gen pedigree tree renders with SIRE/DAM chips + [country] year", "result": "PASS", "detail": "Nellie: Subject→Almanzor/Night Danza→4 grandparents→8 great-grandparents; screenshot 10"},
-    {"id": "F6", "claim": "Linebreeding banner fires from real data only", "result": "PASS", "detail": "TML-x-yearn: Danehill ×2 → banner renders; other 5 horses: banner hidden (computed, not hardcoded); screenshot 13"},
-    {"id": "F7", "claim": "Hover highlights matching linebreeding lines", "result": "PASS", "detail": "Fresh-launch hover-capable Chromium: hovering 1 Danehill card accents both (2/2)"},
-    {"id": "F8", "claim": "Documents guest blur + Restricted overlay", "result": "PASS", "detail": "Guest: 3 blurred regions + 'Restricted: Investors Only'; walk check documents-guest-blur"},
-    {"id": "F9", "claim": "Rail is status-driven (listed vs fully_subscribed)", "result": "PASS", "detail": "Nellie listed: Become an Owner + View Investment Terms + terms overlay w/ real pricing ($76/mo keep per 1%); Prudentia: Fully Subscribed + keen-to-hear; no Become-Owner leak"},
-    {"id": "F10", "claim": "Old /horses/[slug] page file untouched (CUT = hide never delete)", "result": "PASS", "detail": "diff d1da6e7 shows only 2 line changes (href fix + bg-contain fix), file intact, route 308-redirects"},
-    {"id": "F11", "claim": "loveracing_id (double-r) key read correctly", "result": "PASS", "detail": "Was a real bug (page read single-r) — fixed in 4a1f68b; kimi CRITICAL 3 claiming the FIX was buggy was a false positive: line 82 returns pedigreeData.loverracing_id; browser-proven on first-gear"},
-    {"id": "F12", "claim": "just check 10/10 green after all changes", "result": "PASS", "detail": "lint + typecheck + tests all PASS, three consecutive runs"},
-    {"id": "F13", "claim": "Production build green", "result": "PASS", "detail": "All routes build (dynamic /marketplace/[slug] included)"},
-    {"id": "F14", "claim": "Branch not pushed (push-protection, founder purge-then-push later)", "result": "PASS", "detail": "git branch -vv shows no upstream; origin/design-alignment does not exist"},
-    {"id": "F15", "claim": "Race summary <p> rendered (eslint 'unused' contradiction)", "result": "PASS", "detail": "Root cause: JSX comment ended '}}' not '*/}' swallowing the <p>; fixed in 4a1f68b; eslint warnings gone"},
-    {"id": "F16", "claim": "Rail CTA labels paired with correct actions", "result": "PASS", "detail": "kimi CRITICAL 1 confirmed real; fixed in 5ee878c — View Investment Terms opens terms overlay (real computeDslPricing numbers), Become-an-owner routes to /login?next="},
-    {"id": "F17", "claim": "Tab ARIA semantics correct", "result": "PASS", "detail": "kimi CRITICAL 2 confirmed real; fixed in 5ee878c — all buttons role=tab, panels role=tabpanel with id/aria-controls wiring"},
-    {"id": "F18", "claim": "No commercial fiction in rail terms", "result": "PASS", "detail": "All figures from @evo/legal_engine computeDslPricing; no hardcoded prices"},
-    {"id": "W1", "claim": "Accent glow uses design tokens only", "result": "WARN", "detail": "pedigree subject/linebreeding glow uses shadow-[...rgba(212,169,100,...)] — Tailwind v4 cannot var()-reference inside box-shadow colors; founder-visible; candidate semantic token in a future pass"},
-    {"id": "W2", "claim": "Age computed correctly", "result": "WARN", "detail": "page.tsx age = currentYear − foalingYear; southern-hemisphere foaling (Aug–Dec) can read 1 high before birthday; low stakes, display-only"},
-    {"id": "W3", "claim": "Documents download click target", "result": "WARN", "detail": "Only 'Download' text is the anchor (kimi 7); card-level anchor deferred"},
-    {"id": "W4", "claim": "Images use next/image", "result": "WARN", "detail": "media-deck uses native <img> (kimi 28); performance polish deferred"},
-    {"id": "W5", "claim": "'None Wins · None Places' copy", "result": "REJECTED", "detail": "kimi 8 flagged grammar; copy is founder-locked (page-model-notes: prod exact pattern) — not changed"},
-    {"id": "W6", "claim": "Video 1s-delay autoplay verified live", "result": "WARN", "detail": "Code verified structurally (media-deck.tsx:78–97, muted+loop+playsInline); no horse ships a trackwork video yet so no live slide exists — data gap, not code gap"}
+    {
+      "id": "finding-1",
+      "claim": "race_log synced to FULL knowledge-repo record (Prudentia 10 starts, First Gear 11 starts)",
+      "result": "FAIL",
+      "detail": "psql jsonb_array_length: prudentia=6, first-gear=2, hottathanafantasy=0. Knowledge repo race-record.json starts arrays are partial (prudentia total_starts=10 but len(starts)=6; first-gear total_starts=11 but len(starts)=2). Sync script copied source faithfully; source data incomplete. DoD count mismatch is a source-data gap, not a sync bug."
+    },
+    {
+      "id": "finding-2",
+      "claim": "E2: MediaDeck carousel wired into horse page with gallery",
+      "result": "WARN",
+      "detail": "MediaDeck component complete and wired, but live render shows 1 slide (01 · 01, single thumbnail). getGalleryImages reads public/images/content/horses/{slug} (empty dir) while 4 real images live at public/horses/{slug}/01-04 and are listed in HORSE_STILLS (packages/storage/src/cdn.ts). getCampaignMedia().horse.paradeGallery would supply them."
+    },
+    {
+      "id": "finding-3",
+      "claim": "Gates green (just check 10/10, hermes verify, live walk)",
+      "result": "PASS",
+      "detail": "just check 10/10; forced turbo run lint typecheck test --force 22/22, 0 cached; lint 0 errors, 17 warnings (2 new dead imports page.tsx:4 Image, page.tsx:25 PedigreeLine); live walk 4 routes 200."
+    },
+    {
+      "id": "finding-4",
+      "claim": "$$$$ rule: no dollar figure leads story/hook/nextUp/narrative",
+      "result": "PASS",
+      "detail": "grep -F '$' over all 4 fields x 3 horses = 0 matches."
+    },
+    {
+      "id": "finding-5",
+      "claim": "first-gear latestUpdateUrl is a valid URL",
+      "result": "WARN",
+      "detail": "Value is prose: 'https://www.evolutionstables.nz/updates/first-gear (campaign concluded — see the full race record and pedigree for the complete story)'. Not rendered (updateCount=null gates the link block) but field shape is wrong; content fix required."
+    }
   ],
   "evidence_edges": [
-    {"finding": "F1", "source": "supabase psql: SELECT slug, jsonb_array_length(pedigree_data->'sire_line') … 2026-08-30", "reason": "6 rows returned, all with non-empty lines"},
-    {"finding": "F2", "source": "supabase psql: jsonb_array_length(race_log)", "reason": "first-gear=2, prudentia=6, others null"},
-    {"finding": "F3", "source": "walk_part2.js firstgear-race-summary", "reason": "DOM text matched 'First Gear (NZ): 1 Win · 1 Place'"},
-    {"finding": "F3", "source": "apps/web/src/components/horse/race-tab.tsx:131", "reason": "computeSummary(raceLog) drives the line"},
-    {"finding": "F4", "source": "debug_ratio.js computed grid-template-columns", "reason": "'629.328px 314.656px' = 2:1"},
-    {"finding": "F4", "source": "apps/web/src/app/marketplace/[slug]/page.tsx:123", "reason": "lg:grid-cols-[2fr_1fr] after fix"},
-    {"finding": "F5", "source": "build-loop/horse-page/screenshots/10-nellie-pedigree-tree-scrolled.png", "reason": "visual: 4 generations with chips and badges"},
-    {"finding": "F6", "source": "scripts linebreeding computation over all 6 horses (psql jsonb)", "reason": "only tml-x-yearn has a duplicate (danehill: 2)"},
-    {"finding": "F6", "source": "build-loop/horse-page/screenshots/13-tml-linebreeding-banner.png", "reason": "banner visible with exact founder copy"},
-    {"finding": "F7", "source": "hover_verify.js fresh-launch run", "reason": "hoverOk=true, danehillCards=2, accentedDanehillCards=2"},
-    {"finding": "F8", "source": "walk_nellie.js documents-guest-blur", "reason": "restricted=true blurredCards=3"},
-    {"finding": "F9", "source": "walk_nellie.js rail-listed + check_terms.js", "reason": "listed rail renders both CTAs; terms overlay shows SSOT pricing"},
-    {"finding": "F9", "source": "walk_part2.js prudentia-rail-gold", "reason": "fully_subscribed rail: no Become-Owner, keen-to-hear present"},
-    {"finding": "F10", "source": "git diff d1da6e7 --stat -- 'apps/web/src/app/horses/[slug]/page.tsx'", "reason": "2 line changes only; file exists"},
-    {"finding": "F10", "source": "curl -w %{http_code} /horses/nellie", "reason": "308 → /marketplace/nellie"},
-    {"finding": "F11", "source": "apps/web/src/app/marketplace/[slug]/page.tsx:80-85", "reason": "first branch returns pedigreeData.loverracing_id (double-r)"},
-    {"finding": "F11", "source": "walk_part2.js firstgear-race-links", "reason": "FULL NZTR RECORD link renders (nztr=true)"},
-    {"finding": "F12", "source": "just check output 2026-08-30 (3 runs)", "reason": "'All lint, typecheck, and test gates PASSED' 10/10 tasks"},
-    {"finding": "F13", "source": "just build output 2026-08-30", "reason": "6/6 tasks successful, route table includes /marketplace/[slug]"},
-    {"finding": "F14", "source": "git branch -vv / git log origin/design-alignment failure", "reason": "no upstream tracking; remote ref absent"},
-    {"finding": "F15", "source": "apps/web/src/components/horse/race-tab.tsx:175", "reason": "comment now ends '*/}'; eslint unused warnings cleared"},
-    {"finding": "F16", "source": "apps/web/src/components/horse/right-rail.tsx (5ee878c)", "reason": "View Investment Terms → TermsOverlay(computeDslPricing); Become-an-owner → /login?next="},
-    {"finding": "F16", "source": "check_terms.js", "reason": "dialog opens with $76/mo keep, $380 join, $7,571 list — matches computeDslPricing(7000,1.0)"},
-    {"finding": "F17", "source": "apps/web/src/components/horse/tabs.tsx:35-53", "reason": "role=tab on all buttons; role=tabpanel+id on rendered panel"},
-    {"finding": "F18", "source": "apps/web/src/components/horse/right-rail.tsx TermsOverlay", "reason": "rows built solely from DslPricing interface values"},
-    {"finding": "W1", "source": "apps/web/src/components/horse/pedigree-tab.tsx:313,334", "reason": "shadow-[0_0_12px_rgba(212,169,100,0.25)] literal"},
-    {"finding": "W2", "source": "apps/web/src/app/marketplace/[slug]/page.tsx:103-105", "reason": "year-only subtraction"},
-    {"finding": "W3", "source": "apps/web/src/components/horse/documents-tab.tsx:145-155", "reason": "anchor wraps only the word 'Download'"},
-    {"finding": "W5", "source": "build-loop/page-model-notes.md:151", "reason": "prod exact pattern 'None Wins · None Places' quoted as founder-approved"},
-    {"finding": "W6", "source": "apps/web/src/components/horse/media-deck.tsx:78-97", "reason": "1s setTimeout + muted/loop/playsInline present; no video asset exists to observe"}
+    {
+      "finding": "finding-1",
+      "source": "psql: SELECT slug, jsonb_array_length(race_log) FROM inventory",
+      "reason": "prudentia=6, first-gear=2, hottathanafantasy=0"
+    },
+    {
+      "finding": "finding-1",
+      "source": "/home/evo/evo_01/01_evolution/horses/prudentia/race-record.json",
+      "reason": "total_starts=10 but len(starts)=6; totals are metadata only"
+    },
+    {
+      "finding": "finding-1",
+      "source": "/home/evo/evo_01/01_evolution/horses/first-gear/race-record.json",
+      "reason": "total_starts=11 but len(starts)=2"
+    },
+    {
+      "finding": "finding-2",
+      "source": "curl http://localhost:3010/marketplace/prudentia (live HTML)",
+      "reason": "counter '01 · 01', single aria-label='Slide 1' thumbnail; gallery=[] in RSC payload"
+    },
+    {
+      "finding": "finding-2",
+      "source": "apps/web/src/app/marketplace/[slug]/page.tsx:41-53",
+      "reason": "getGalleryImages reads public/images/content/horses/{slug} which is empty"
+    },
+    {
+      "finding": "finding-2",
+      "source": "packages/storage/src/cdn.ts:36-46",
+      "reason": "HORSE_STILLS lists /horses/{slug}/01-04 for prudentia and first-gear"
+    },
+    {
+      "finding": "finding-3",
+      "source": "pnpm exec turbo run lint typecheck test --force (real run)",
+      "reason": "Tasks: 22 successful, 22 total; Cached: 0 cached"
+    },
+    {
+      "finding": "finding-3",
+      "source": "curl -s -o /dev/null -w '%{http_code}' x4",
+      "reason": "200 on /marketplace, /marketplace/prudentia, /marketplace/hottathanafantasy, /marketplace/first-gear"
+    },
+    {
+      "finding": "finding-4",
+      "source": "grep -F '$' /tmp/content-dump.txt",
+      "reason": "0 matches across 16 lines (4 fields x 3 horses + headers)"
+    },
+    {
+      "finding": "finding-5",
+      "source": "psql: SELECT soft_legal->>'latestUpdateUrl' FROM inventory WHERE slug='first-gear'",
+      "reason": "value contains prose suffix after URL"
+    }
   ]
 }

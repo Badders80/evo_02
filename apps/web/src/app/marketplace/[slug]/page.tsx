@@ -1,9 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
-import fs from 'fs';
-import path from 'path';
 import {
   formatHorseDisplayName,
   getCampaignBySlug,
@@ -20,11 +17,7 @@ import RightRail from '@/components/horse/right-rail';
 import { DocumentsGate } from '@/components/horse/documents-gate';
 import { CampaignStatusBlock } from '@/components/horse/campaign-status-block';
 import { MediaDeck } from '@/components/horse/media-deck';
-import type {
-  InventoryHorse,
-  PedigreeLine,
-  RaceLogEntry,
-} from '@evo/db_models';
+import type { InventoryHorse, RaceLogEntry } from '@evo/db_models';
 
 function parseJsonbField<T>(value: unknown): T | null {
   if (value === null || value === undefined) return null;
@@ -36,20 +29,6 @@ function parseJsonbField<T>(value: unknown): T | null {
     }
   }
   return value as T;
-}
-
-function getGalleryImages(slug: string, coverUrl?: string): string[] {
-  const dir = path.join(process.cwd(), 'public', 'images', 'content', 'horses', slug);
-  if (!fs.existsSync(dir)) return [];
-  const validExts = ['.png', '.jpg', '.jpeg', '.webp', '.avif'];
-  const coverBasename = coverUrl ? path.basename(coverUrl) : null;
-  return fs
-    .readdirSync(dir)
-    .filter((f) => validExts.includes(path.extname(f).toLowerCase()))
-    .filter((f) => f !== coverBasename)
-    .sort()
-    .map((f) => `/images/content/horses/${slug}/${f}`)
-    .slice(0, 6);
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -104,7 +83,7 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
   const media = getCampaignMedia(campaign.slug, campaign.trainer.slug);
   const heroImage = media.horse.heroConformation;
   const videoUrl = media.horse.trackworkVideo;
-  const gallery = getGalleryImages(slug, heroImage);
+  const gallery = media.horse.paradeGallery ?? [];
 
   const trainerProfile = getTrainer(campaign.trainer.slug);
   const stableLinks = getStableLinks(campaign.trainer.slug);
