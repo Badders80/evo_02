@@ -41,6 +41,8 @@ export interface TrainerProfile {
   philosophy: string;
   /** Highlight tags safe for campaign marketing. */
   highlightTags?: string[];
+/** Long-form biography. */
+  bio?: string;
 }
 
 export interface JockeyAffinity {
