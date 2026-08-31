@@ -514,7 +514,7 @@ function ListedInvestmentCard({
           <label htmlFor="stake-slider" className="text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
             Selected Stake
           </label>
-          <div className="font-mono text-base font-medium text-accent">
+          <div className="font-mono text-base font-medium text-heading">
             {stakePct.toFixed(1)}%
           </div>
         </div>
@@ -557,11 +557,11 @@ function ListedInvestmentCard({
         </div>
       </div>
 
-      {/* Primary CTA: Gold Pill Button */}
+      {/* Primary CTA: High contrast button (Crisp White / Gold) */}
       <button
         type="button"
         onClick={() => setGateOpen(true)}
-        className="w-full rounded-full bg-accent py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-accent-foreground transition-all duration-300 hover:brightness-110 active:scale-[0.98]"
+        className="w-full rounded-full bg-foreground py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-background transition-all duration-300 hover:opacity-90 active:scale-[0.98]"
       >
         Become an Owner
       </button>
