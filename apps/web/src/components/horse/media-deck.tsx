@@ -59,7 +59,7 @@ const SPEC_VALUE = 'mt-1 text-[15px] font-light text-heading';
 
 function SpecCell({ label, value }: { label: string; value?: string }) {
   return (
-    <div className="px-5 py-4 text-center md:text-left">
+    <div className="text-left">
       <p className={SPEC_LABEL}>{label}</p>
       <p className={SPEC_VALUE}>{value || '—'}</p>
     </div>
@@ -143,8 +143,9 @@ export function MediaDeck({ heroImage, gallery, videoUrl, age, sex, colour, sire
         </div>
       </div>
 
-      {/* Base-info strip — prod style: surface-base card, AGE | SEX | COLOUR | SIRE | DAM */}
-      <div className="mt-4 grid grid-cols-2 gap-6 rounded-2xl border border-border bg-surface-base p-6 md:grid-cols-5">
+      {/* Base-info strip — prod style: surface-base card, AGE | SEX | COLOUR | SIRE | DAM.
+          Content-sized cells hugging the left (founder: compact cells left, no spread). */}
+      <div className="mt-4 flex flex-wrap gap-x-10 gap-y-4 rounded-2xl border border-border bg-surface-base p-6">
         <SpecCell label="Age" value={age !== undefined ? String(age) : undefined} />
         <SpecCell label="Sex" value={sex} />
         <SpecCell label="Colour" value={colour} />
