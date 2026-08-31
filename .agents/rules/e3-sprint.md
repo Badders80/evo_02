@@ -39,6 +39,9 @@
 8. **Acceptance gate flow (locked):** investor sees horse → decides X% → sees cost → PDS scroll-through + checkbox → SA scroll-through + checkbox → checkout. Button disabled until both checked.
 9. **Deferred (do not build):** "Download Terms Summary (PDF)" secondary CTA — founder decision pending. Acceptance record location — deep-dive §7 open question; if the design implies a record, flag it.
 10. **Commit discipline.** One bounded change per commit on `design-alignment` (LOCAL-ONLY). Never push. Never merge.
+11. **Slider math (locked share-math, CONTINUE.md):** min 1%, step 0.5%, percentages only. Pricing via `pricingForUnits(campaign.wholesaleMonthlyNzd, units)` from `nellie-loop.ts` — never invent pricing math. `stakePctToStepUnits` stays at the checkout boundary.
+12. **Approval gate (build-loop GATE 1):** after planning + review, STOP and present to the founder. No execution of any kind until the founder approves. "Ready to proceed" is not approval.
+13. **Gate content source:** the PDS/SA shown in the acceptance gate come from the existing compiled legal pack (`getCompiledLegalPackForCampaign` in `horses-data.ts`) — no new legal_engine work, no new document rendering.
 
 ## Verification (before "done")
 
