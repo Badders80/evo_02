@@ -239,15 +239,13 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
                 sex={campaign.pedigree.gender}
                 colour={campaign.pedigree.colour}
                 age={age}
-                wins="0"
-                placed="0"
                 breedingUrl={breedingRecordUrl}
                 trainer={{
                   name: campaign.trainer.name,
                   stable_name: campaign.trainer.stable,
                   contact_name: trainerProfile?.name,
                   location: campaign.trainer.location,
-                  bio: trainerProfile?.philosophy,
+                  bio: trainerProfile?.bio ?? trainerProfile?.philosophy,
                   website: stableLinks?.website,
                   people: [],
                 }}

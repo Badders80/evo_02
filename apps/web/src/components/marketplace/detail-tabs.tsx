@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { PedigreeTable } from "./pedigree-table";
 import { getCampaignStatus, type CampaignStatus } from "@/lib/campaign-status";
+import { computeRaceSummary } from "@/lib/race-summary";
 import { normalizePedigreeName } from "@/lib/pedigree-name";
 import type { RaceLogEntry } from "@evo/db_models";
 
@@ -36,8 +37,6 @@ interface DetailTabsProps {
   sex: string;
   colour: string;
   age?: number;
-  wins: string;
-  placed: string;
   loveracingId?: number;
   breedingUrl?: string | null;
   performanceProfileUrl?: string | null;
@@ -92,8 +91,6 @@ export function DetailTabs({
   sex,
   colour,
   age,
-  wins,
-  placed,
   loveracingId,
   breedingUrl,
   performanceProfileUrl,
@@ -112,6 +109,7 @@ export function DetailTabs({
   const normalizedDamName = normalizePedigreeName(damName || "");
   const status = getCampaignStatus({ listing_status: "listed" } as any);
   const races = raceLog ?? [];
+  const summary = computeRaceSummary(races);
 
   return (
     <div className="border-t border-border pt-12">
@@ -212,8 +210,8 @@ export function DetailTabs({
               <div>
                 <h4 className="text-md font-medium text-heading">Race Timeline & Starts</h4>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Summary: {wins || "0"} Win{Number(wins) !== 1 ? "s" : ""} ·{" "}
-                  {placed || "0"} Place{Number(placed) !== 1 ? "s" : ""}
+                  Summary: {summary.wins} Win{summary.wins !== 1 ? "s" : ""} · {" "}
+                  {summary.places} Place{summary.places !== 1 ? "s" : ""}
                 </p>
               </div>
               {(breedingUrl || performanceProfileUrl) && (
