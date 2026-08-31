@@ -32,9 +32,11 @@ export function CampaignStatusBlock({
   updateCount?: number | null;
   trainerQuote?: string | null;
 }) {
+  const blocks: React.ReactNode[] = [];
+
   /* ---- 1. What's Next block ---- */
   if (nextUp && nextUp.trim()) {
-    return (
+    blocks.push(
       <div key="next-up" className="space-y-2">
         <p className={LABEL_CLASSES}>What's Next</p>
         <p className={BODY_CLASSES}>{nextUp.trim()}</p>
@@ -44,7 +46,7 @@ export function CampaignStatusBlock({
 
   /* ---- 2. Investor update link + count ---- */
   if (latestUpdateUrl && latestUpdateUrl.trim() && (updateCount ?? 0) > 0) {
-    return (
+    blocks.push(
       <div key="investor-update" className="space-y-2">
         <p className={LABEL_CLASSES}>Investor updates</p>
         <a
@@ -64,12 +66,14 @@ export function CampaignStatusBlock({
 
   /* ---- 3. Trainer quote (pull-quote) ---- */
   if (trainerQuote && trainerQuote.trim()) {
-    return (
+    blocks.push(
       <div key="trainer-quote" className={PULL_QUOTE_CLASSES}>
         <span className="font-light">{trainerQuote.trim()}</span>
       </div>
     );
   }
 
-  return null;
+  if (blocks.length === 0) return null;
+
+  return <div className="space-y-6">{blocks}</div>;
 }
