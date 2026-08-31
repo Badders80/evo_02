@@ -82,13 +82,25 @@ async function runTest() {
     // Locked share invariant (2026-08-26): 5% stake / 0.5% step = 10 shares, in BOTH the
     // legal context and the persisted DB row.
     const { data: row, error: rowError } = await (supabase.from('inventory') as any)
-      .select('listed_stake_pct, stake_step_pct, total_shares')
+      .select('listed_stake_pct, stake_step_pct, total_shares, soft_legal')
       .eq('slug', slug)
       .single();
     assert.ok(!rowError, `Row fetch failed: ${rowError?.message}`);
     assert.equal(row?.listed_stake_pct, 5, 'listed_stake_pct should be 5');
     assert.equal(row?.stake_step_pct, 0.5, 'stake_step_pct should be 0.5');
     assert.equal(row?.total_shares, 10, 'total_shares should be 10 (5 / 0.5)');
+
+    // New MC content fields must round-trip writer → jsonb (chunk-3 DoD).
+    const softLegal = row?.soft_legal ?? {};
+    assert.equal(
+      softLegal.campaignNarrative,
+      'Test campaign narrative about the horse\'s journey and recent achievements.',
+      'campaignNarrative must persist to inventory.soft_legal'
+    );
+    assert.equal(softLegal.trainerQuote, 'Test trainer quote about working with this horse.', 'trainerQuote must persist');
+    assert.equal(softLegal.nextUp, 'Next race: Canterbury Cup, 2000m', 'nextUp must persist');
+    assert.equal(softLegal.latestUpdateUrl, 'https://evolution.stables/horses/test/update', 'latestUpdateUrl must persist');
+    assert.equal(softLegal.updateCount, 3, 'updateCount must persist');
 
     console.log(`✅ PASS: campaign-pipeline test — inventoryId=${result.inventoryId} pdsHash=${result.legalPack.pdsHash.slice(0, 8)}… saHash=${result.legalPack.saHash.slice(0, 8)}…`);
   } finally {

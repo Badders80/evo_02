@@ -222,6 +222,11 @@ function buildInventoryInsert(
           aboutHorse: intake.softLegal.aboutHorse ?? null,
           trainerBio: intake.softLegal.trainerBio ?? null,
           racingOutlookAndPedigree: intake.softLegal.racingOutlookAndPedigree ?? null,
+          campaignNarrative: intake.softLegal.campaignNarrative ?? null,
+          trainerQuote: intake.softLegal.trainerQuote ?? null,
+          nextUp: intake.softLegal.nextUp ?? null,
+          latestUpdateUrl: intake.softLegal.latestUpdateUrl ?? null,
+          updateCount: intake.softLegal.updateCount ?? null,
         }
       : null,
     marketing: intake.marketing
