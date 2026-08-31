@@ -10,7 +10,7 @@ const statusConfig: Record<
   coming_soon_details: { variant: "success", label: "Coming Soon" },
   listed: { variant: "success", label: "Become An Owner" },
   fully_subscribed: { variant: "success", label: "Fully Subscribed" },
-  completed: { variant: "default", label: "Completed" },
+  completed: { variant: "warning", label: "Completed" },
 };
 
 export function CampaignStatusBadge({

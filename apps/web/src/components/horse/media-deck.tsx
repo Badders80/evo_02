@@ -146,7 +146,7 @@ export function MediaDeck({ heroImage, gallery, videoUrl, age, sex, colour, sire
       {/* Base-info strip — prod style: surface-base card, AGE | SEX | COLOUR | SIRE | DAM.
           Content-sized cells hugging the left (founder: compact cells left, no spread). */}
       <div className="mt-4 flex flex-wrap gap-x-10 gap-y-4 rounded-2xl border border-border bg-surface-base p-6">
-        <SpecCell label="Age" value={age !== undefined ? String(age) : undefined} />
+        <SpecCell label="Age" value={age !== undefined ? `${age}yr` : undefined} />
         <SpecCell label="Sex" value={sex} />
         <SpecCell label="Colour" value={colour} />
         <SpecCell label="Sire" value={sire} />
