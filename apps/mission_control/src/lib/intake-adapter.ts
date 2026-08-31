@@ -13,6 +13,11 @@ export interface RawPublishPayload {
     aboutHorse?: string;
     trainerBio?: string;
     racingOutlookAndPedigree?: string;
+    campaignNarrative?: string;
+    trainerQuote?: string;
+    nextUp?: string;
+    latestUpdateUrl?: string;
+    updateCount?: number;
   };
   marketing?: MarketingInput;
   closeStyle?: 'fourteen_day' | 'three_x_remaining';

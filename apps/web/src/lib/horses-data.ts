@@ -222,6 +222,15 @@ function rowToCampaign(row: InventoryHorse): HorseCampaign {
       racingOutlookAndPedigree: String(
         softLegal.racingOutlookAndPedigree ?? softLegal.racing_outlook_and_pedigree ?? ''
       ),
+      campaignNarrative: String(
+        softLegal.campaignNarrative ?? softLegal.campaign_narrative ?? ''
+      ),
+      trainerQuote: String(softLegal.trainerQuote ?? softLegal.trainer_quote ?? ''),
+      nextUp: String(softLegal.nextUp ?? softLegal.next_up ?? ''),
+      latestUpdateUrl: String(
+        softLegal.latestUpdateUrl ?? softLegal.latest_update_url ?? ''
+      ),
+      updateCount: Number(softLegal.updateCount ?? softLegal.update_count ?? 0),
     },
     marketing: {
       marketplaceHook: String(marketing.marketplaceHook ?? marketing.marketplace_hook ?? ''),

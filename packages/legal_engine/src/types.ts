@@ -48,6 +48,11 @@ export interface HorseSoftLegalContent {
   aboutHorse: string;
   trainerBio: string;
   racingOutlookAndPedigree: string;
+  campaignNarrative?: string;
+  trainerQuote?: string;
+  nextUp?: string;
+  latestUpdateUrl?: string;
+  updateCount?: number;
 }
 
 export interface HorseMarketingContent {

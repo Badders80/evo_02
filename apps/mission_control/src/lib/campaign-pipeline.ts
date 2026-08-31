@@ -110,6 +110,11 @@ function buildSoftLegal(
     aboutHorse: input?.aboutHorse ?? '',
     trainerBio: input?.trainerBio ?? '',
     racingOutlookAndPedigree: input?.racingOutlookAndPedigree ?? pedigree.lineageSummary ?? '',
+    campaignNarrative: input?.campaignNarrative,
+    trainerQuote: input?.trainerQuote,
+    nextUp: input?.nextUp,
+    latestUpdateUrl: input?.latestUpdateUrl,
+    updateCount: input?.updateCount,
   };
 }
 

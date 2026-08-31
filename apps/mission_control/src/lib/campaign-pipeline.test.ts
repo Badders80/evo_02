@@ -51,6 +51,11 @@ async function runTest() {
       aboutHorse: 'Test story paragraph for the E2E wire test horse.',
       trainerBio: 'Test trainer biography.',
       racingOutlookAndPedigree: 'Test racing outlook and pedigree summary.',
+      campaignNarrative: 'Test campaign narrative about the horse\'s journey and recent achievements.',
+      trainerQuote: 'Test trainer quote about working with this horse.',
+      nextUp: 'Next race: Canterbury Cup, 2000m',
+      latestUpdateUrl: 'https://evolution.stables/horses/test/update',
+      updateCount: 3,
     },
     marketing: {
       marketplaceHook: 'Test marketplace hook line.',
