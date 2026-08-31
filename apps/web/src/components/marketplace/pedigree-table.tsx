@@ -52,14 +52,14 @@ function PedigreeNode({
   const normName = data.name ? data.name.toLowerCase().trim() : "";
 
   const tierStyles: Record<NodeTier, string> = {
-    subject: "min-h-[64px] border-border/50 bg-surface-base px-3.5",
+    subject: "min-h-[80px] border-emerald-500/40 bg-surface-base px-4 py-3 shadow-[0_0_18px_rgba(16,185,129,0.12)]",
     parent: "min-h-[56px] border-border/50 bg-raised/80",
     grand: "min-h-[48px] border-border/40 bg-raised/50",
     great: "min-h-[42px] border-border/30 bg-raised/30",
   };
 
   const nameTextStyles: Record<NodeTier, string> = {
-    subject: "text-[13px] font-medium text-heading tracking-tight",
+    subject: "text-[14px] font-medium text-heading tracking-tight",
     parent: "text-[11.5px] font-medium text-foreground",
     grand: "text-[10.5px] font-normal text-muted-foreground",
     great: "text-[9.5px] font-normal text-muted-steel",
@@ -71,7 +71,7 @@ function PedigreeNode({
         onMouseEnter={() => !isEmpty && onHover?.(normName)}
         onMouseLeave={() => onHover?.(null)}
         className={[
-          "relative box-border flex w-full flex-col justify-between rounded-lg border px-2.5 py-1.5 transition-all duration-200",
+          "relative box-border flex w-full flex-col rounded-lg border px-2.5 py-2 transition-all duration-200",
           isEmpty && tier !== "subject" ? "opacity-30 border-dashed border-border" : "",
           tierStyles[tier],
           isHighlighted
@@ -79,65 +79,52 @@ function PedigreeNode({
             : isLinebredDuplicate
             ? "border-emerald-500/40 bg-emerald-500/10"
             : "",
+          tier === "subject" ? "text-center" : "",
         ].join(" ")}
       >
-        {/* Top bar: Role badge & Country code */}
-        <div className="flex items-center justify-between w-full gap-1 mb-0.5">
+        {/* Top row: role badge + country/year on one line (prod style) */}
+        <div className="flex items-center justify-between w-full gap-2">
           {data.role === "sire" && (
-            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-700/40">
+            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-700/40">
               Sire
             </span>
           )}
           {data.role === "dam" && (
-            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-rose-950/80 text-rose-400 border border-rose-700/40">
+            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-rose-950/80 text-rose-400 border border-rose-700/40">
               Dam
             </span>
           )}
           {data.role === "subject" && (
-            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.2 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-700/40">
+            <span className="text-[8px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-700/40">
               Horse
             </span>
           )}
 
-          {tier !== "great" && (
-            <div className="flex items-center gap-1 ml-auto">
-              {data.country && (
-                <span className="text-[8.5px] font-mono text-frost font-medium">
-                  [{data.country}]
-                </span>
-              )}
-              {data.year && (
-                <span className="text-[8.5px] font-mono text-muted-foreground">
-                  {data.year}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Horse Name */}
-        <span
-          className={["block w-full truncate leading-tight text-left", isHighlighted ? "text-pure-white font-medium" : nameTextStyles[tier]].join(" ")}
-          title={data.name}
-        >
-          {data.name}
-        </span>
-
-        {/* Country & Year — inline after name for great-grandparents (tightens cell) */}
-        {tier === "great" && (data.country || data.year) && (
-          <div className="flex items-center gap-1 mt-0.5">
+          <div className="flex items-center gap-1 ml-auto">
             {data.country && (
-              <span className="text-[8px] font-mono text-muted-foreground">
+              <span className="text-[8.5px] font-mono text-frost font-medium">
                 [{data.country}]
               </span>
             )}
             {data.year && (
-              <span className="text-[8px] font-mono text-muted-foreground">
+              <span className="text-[8.5px] font-mono text-muted-foreground">
                 {data.year}
               </span>
             )}
           </div>
-        )}
+        </div>
+
+        {/* Horse Name */}
+        <span
+          className={[
+            "block w-full truncate leading-tight mt-1",
+            tier === "subject" ? "text-center" : "text-left",
+            isHighlighted ? "text-pure-white font-medium" : nameTextStyles[tier],
+          ].join(" ")}
+          title={data.name}
+        >
+          {data.name}
+        </span>
       </div>
     </div>
   );
@@ -203,34 +190,7 @@ function PedigreeChart({
       {/* Mobile scroll hint */}
       <div className="md:hidden flex items-center justify-between text-[11px] text-muted-foreground bg-raised border border-border rounded-lg px-3 py-1.5">
         <span>Pedigree Matrix</span>
-        <span className="text-accent font-mono text-[10px]">Scroll right →</span>
-      </div>
-
-      {/* Metadata bar — TOP */}
-      <div className="flex flex-wrap gap-x-6 gap-y-2 text-[11px] font-light pb-3 border-b border-border">
-        <span className="text-muted-foreground">
-          Sex: <span className="text-foreground capitalize font-medium">{sex || "—"}</span>
-        </span>
-        <span className="text-muted-foreground">
-          Colour: <span className="text-foreground capitalize font-medium">{colour || "—"}</span>
-        </span>
-        {age && (
-          <span className="text-muted-foreground">
-            Age: <span className="text-foreground font-medium">{age} Years</span>
-          </span>
-        )}
-        {formattedFoalingDate && (
-          <span className="text-muted-foreground">
-            Foaled: <span className="text-foreground font-medium">{formattedFoalingDate}</span>
-          </span>
-        )}
-        <button
-          type="button"
-          onClick={onShowFullPedigree}
-          className="text-accent hover:text-accent-hover hover:underline ml-auto font-mono text-[10.5px] uppercase tracking-wider cursor-pointer transition-colors"
-        >
-          Full Breeding Record ↗
-        </button>
+        <span className="text-emerald-400 font-mono text-[10px]">Scroll right →</span>
       </div>
 
       {/* Grid container — 4 generations, compact to fit left column */}
@@ -261,13 +221,15 @@ function PedigreeChart({
                 rowGap: "4px",
               }}
             >
-              {/* Gen 0: Subject — spans all 8 rows */}
-              <div className="col-start-1 row-start-1 row-span-8 flex items-center pr-1">
-                <PedigreeNode
-                  data={tree.horse}
-                  tier="subject"
-                  onHover={setHoveredName}
-                />
+              {/* Gen 0: Subject — spans all 8 rows, centered vertically (prod style) */}
+              <div className="col-start-1 row-start-1 row-span-8 flex items-center justify-center pr-1">
+                <div className="w-full">
+                  <PedigreeNode
+                    data={tree.horse}
+                    tier="subject"
+                    onHover={setHoveredName}
+                  />
+                </div>
               </div>
 
               {/* Connector 1: Subject → Parents */}
@@ -385,7 +347,7 @@ function PedigreeChart({
         </div>
       </div>
 
-      {/* Linebreeding alert — BOTTOM */}
+      {/* Linebreeding alert */}
       {linebredDuplicates.size > 0 && (
         <div className="flex items-center gap-2 text-[11px] text-muted-foreground bg-emerald-500/5 border border-emerald-500/20 rounded-lg px-3 py-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
@@ -394,6 +356,33 @@ function PedigreeChart({
           </span>
         </div>
       )}
+
+      {/* Metadata bar — BOTTOM (prod style) */}
+      <div className="flex flex-wrap gap-x-6 gap-y-2 text-[11px] font-light pt-3 border-t border-border">
+        <span className="text-muted-foreground">
+          Sex: <span className="text-foreground capitalize font-medium">{sex || "—"}</span>
+        </span>
+        <span className="text-muted-foreground">
+          Colour: <span className="text-foreground capitalize font-medium">{colour || "—"}</span>
+        </span>
+        {age && (
+          <span className="text-muted-foreground">
+            Age: <span className="text-foreground font-medium">{age} Years</span>
+          </span>
+        )}
+        {formattedFoalingDate && (
+          <span className="text-muted-foreground">
+            Foaled: <span className="text-foreground font-medium">{formattedFoalingDate}</span>
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={onShowFullPedigree}
+          className="text-emerald-400 hover:text-emerald-300 hover:underline ml-auto font-mono text-[10.5px] uppercase tracking-wider cursor-pointer transition-colors"
+        >
+          Full Breeding Record ↗
+        </button>
+      </div>
     </div>
   );
 }
