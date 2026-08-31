@@ -1,65 +1,81 @@
 {
   "nodes": [
-    {"id": "sql:00008-race-log", "type": "sql", "description": "Migration 00008: ADD COLUMN race_log JSONB to inventory (BOTH supabase/migrations/ AND packages/db_models/src/schema/)"},
-    {"id": "script:sync-race-log", "type": "script", "description": "scripts/sync-race-log.py — knowledge repo race-record.json → inventory.race_log (snake→camel mapping, absolute path to knowledge repo)"},
-    {"id": "file:race-summary-test", "type": "file", "description": "apps/web/src/lib/race-summary.test.ts — TDD: written FIRST (red), covers null/undefined raceLog, isPlace=1st/2nd/3rd, prizemoney null/string"},
-    {"id": "file:race-summary-lib", "type": "file", "description": "apps/web/src/lib/race-summary.ts — computeRaceSummary(raceLog) → {wins, places, earnings}; null-safe"},
-    {"id": "file:page-tsx", "type": "file", "description": "apps/web/src/app/marketplace/[slug]/page.tsx — edit 1: remove hardcoded wins/placed, wire raceLog, trainer bio line (bio ?? philosophy)"},
-    {"id": "file:page-tsx-render", "type": "file", "description": "apps/web/src/app/marketplace/[slug]/page.tsx — edit 2: render what's-next + update link (serialized after edit 1)"},
-    {"id": "file:detail-tabs", "type": "file", "description": "apps/web/src/components/marketplace/detail-tabs.tsx — compute summary from raceLog internally; verify no other usages of wins/placed props before removing"},
-    {"id": "file:legal-types", "type": "file", "description": "packages/legal_engine/src/types.ts — HorseSoftLegalContent + campaignNarrative/trainerQuote/nextUp/latestUpdateUrl/updateCount"},
-    {"id": "file:writer", "type": "file", "description": "apps/mission_control/src/lib/campaign-pipeline.ts — buildSoftLegal carries new fields"},
-    {"id": "file:intake-adapter", "type": "file", "description": "apps/mission_control/src/lib/intake-adapter.ts — RawPublishPayload softLegal new fields"},
-    {"id": "file:reader", "type": "file", "description": "apps/web/src/lib/horses-data.ts — dual-shape read of new fields + HorseCampaign type"},
-    {"id": "file:trainer-types", "type": "file", "description": "packages/db_models/src/types/knowledge.types.ts — TrainerProfile.bio (check other consumers of TrainerProfile)"},
-    {"id": "file:trainers-data", "type": "file", "description": "packages/db_models/src/data/trainers.ts — full Wexford + Stephen Gray bios (philosophy stays short for PDS)"},
-    {"id": "file:content-draft-prudentia", "type": "file", "description": "01_evolution/horses/prudentia/content-draft.md — subagent-drafted, folder-gated, dollar-lead check pre-apply"},
-    {"id": "file:content-draft-coco", "type": "file", "description": "01_evolution/horses/hottathanafantasy/content-draft.md — subagent-drafted, folder-gated, dollar-lead check pre-apply"},
-    {"id": "file:content-draft-firstgear", "type": "file", "description": "01_evolution/horses/first-gear/content-draft.md — subagent-drafted, folder-gated, dollar-lead check pre-apply"},
-    {"id": "sql:apply-content", "type": "sql", "description": "Apply founder-approved content to inventory.soft_legal (campaignNarrative, trainerQuote, nextUp, latestUpdateUrl, updateCount)"},
-    {"id": "file:story-block", "type": "file", "description": "NEW component or extend page: what's-next block + 'Read the latest investor update' link + update count (story-block is pure RSC — needs new props or new component)"},
-    {"id": "cmd:just-check", "type": "gate", "description": "just check (lint typecheck test) green"},
-    {"id": "cmd:hermes-verify", "type": "gate", "description": "hermes verify --json --skip-start ok:true (Hermes CLI — exists)"},
-    {"id": "cmd:dollar-lead-check", "type": "gate", "description": "Automated check: no '$' in story/hook/nextUp fields (founder $$$$ rule)"},
-    {"id": "cmd:kimi-audit", "type": "gate", "description": "kimi-code-audit on full diff → audit-report.md + audit-graph.json"},
-    {"id": "gate:founder-folder", "type": "gate", "description": "Founder approves content drafts in knowledge repo before apply"}
+    {
+      "id": "file:apps/web/src/tests/e3_right_rail.test.ts",
+      "type": "file",
+      "description": "Unit tests for E3 right rail copy, slider math, and legal pack gate"
+    },
+    {
+      "id": "file:apps/web/src/components/horse/right-rail.tsx",
+      "type": "file",
+      "description": "Right rail accordion (5 pillars) + stake slider + acceptance gate modal"
+    },
+    {
+      "id": "file:apps/web/src/app/marketplace/[slug]/page.tsx",
+      "type": "file",
+      "description": "Server page supplying compiled legal pack & pricing props to RightRail"
+    },
+    {
+      "id": "cmd:typecheck",
+      "type": "gate",
+      "description": "pnpm --filter @evo/web typecheck passes"
+    },
+    {
+      "id": "cmd:just_check",
+      "type": "gate",
+      "description": "just check passes 10/10 from repo root"
+    }
   ],
   "edges": [
-    {"from": "sql:00008-race-log", "to": "script:sync-race-log", "reason": "column must exist before sync", "source": "plan dependency"},
-    {"from": "script:sync-race-log", "to": "file:race-summary-lib", "reason": "race summary needs populated race_log", "source": "plan dependency"},
-    {"from": "file:race-summary-test", "to": "file:race-summary-lib", "reason": "TDD: test written first (red), then impl (green)", "source": "reviewer A#4 + B#12"},
-    {"from": "file:race-summary-lib", "to": "file:detail-tabs", "reason": "detail-tabs consumes computeRaceSummary", "source": "plan dependency"},
-    {"from": "file:detail-tabs", "to": "file:page-tsx", "reason": "page passes raceLog, removes hardcoded wins", "source": "plan dependency"},
-    {"from": "file:legal-types", "to": "file:writer", "reason": "writer types from legal_engine", "source": "plan dependency"},
-    {"from": "file:legal-types", "to": "file:intake-adapter", "reason": "adapter types from legal_engine", "source": "plan dependency"},
-    {"from": "file:writer", "to": "file:reader", "reason": "reader must read what writer writes (same jsonb shape)", "source": "plan dependency"},
-    {"from": "file:reader", "to": "file:page-tsx", "reason": "page renders campaign fields from reader", "source": "plan dependency"},
-    {"from": "file:reader", "to": "file:page-tsx-render", "reason": "page edit 2 needs reader to expose new fields", "source": "reviewer A#3"},
-    {"from": "file:trainer-types", "to": "file:trainers-data", "reason": "bio field before bios populated", "source": "plan dependency"},
-    {"from": "file:trainers-data", "to": "file:page-tsx", "reason": "page bio line (bio ?? philosophy) needs trainers data", "source": "reviewer A#13"},
-    {"from": "file:content-draft-prudentia", "to": "gate:founder-folder", "reason": "founder approves before apply", "source": "plan dependency"},
-    {"from": "file:content-draft-coco", "to": "gate:founder-folder", "reason": "founder approves before apply", "source": "plan dependency"},
-    {"from": "file:content-draft-firstgear", "to": "gate:founder-folder", "reason": "founder approves before apply", "source": "plan dependency"},
-    {"from": "gate:founder-folder", "to": "sql:apply-content", "reason": "approved content applied to inventory", "source": "reviewer A#6 + B#13"},
-    {"from": "sql:apply-content", "to": "file:reader", "reason": "reader must read what apply writes", "source": "reviewer A#6"},
-    {"from": "sql:apply-content", "to": "file:story-block", "reason": "approved content renders on page", "source": "plan dependency"},
-    {"from": "file:story-block", "to": "file:page-tsx-render", "reason": "page renders what's-next + update link", "source": "plan dependency"},
-    {"from": "file:page-tsx", "to": "cmd:just-check", "reason": "all wiring must pass gates", "source": "plan dependency"},
-    {"from": "cmd:just-check", "to": "cmd:hermes-verify", "reason": "verify after tests green", "source": "plan dependency"},
-    {"from": "cmd:hermes-verify", "to": "cmd:dollar-lead-check", "reason": "$$$$ rule enforced before audit", "source": "reviewer A#10 + B#21"},
-    {"from": "cmd:dollar-lead-check", "to": "cmd:kimi-audit", "reason": "audit after all checks", "source": "plan dependency"}
+    {
+      "from": "file:apps/web/src/tests/e3_right_rail.test.ts",
+      "to": "file:apps/web/src/components/horse/right-rail.tsx",
+      "reason": "TDD: unit tests define invariants for right-rail component",
+      "source": "chunk dependency"
+    },
+    {
+      "from": "file:apps/web/src/components/horse/right-rail.tsx",
+      "to": "file:apps/web/src/app/marketplace/[slug]/page.tsx",
+      "reason": "page.tsx renders RightRail and feeds it legal pack props",
+      "source": "import analysis"
+    },
+    {
+      "from": "file:apps/web/src/app/marketplace/[slug]/page.tsx",
+      "to": "cmd:typecheck",
+      "reason": "typecheck validates component types and props",
+      "source": "build gate"
+    },
+    {
+      "from": "cmd:typecheck",
+      "to": "cmd:just_check",
+      "reason": "just check runs full turbo lint, typecheck, and test suite",
+      "source": "hard gate"
+    }
   ],
   "chunks": {
-    "chunk-1": {"nodes": ["sql:00008-race-log", "script:sync-race-log"], "depends_on": [], "state": "pending"},
-    "chunk-2": {"nodes": ["file:race-summary-test", "file:race-summary-lib", "file:detail-tabs", "file:page-tsx"], "depends_on": ["chunk-1", "chunk-4"], "state": "pending"},
-    "chunk-3": {"nodes": ["file:legal-types", "file:writer", "file:intake-adapter", "file:reader"], "depends_on": [], "state": "pending"},
-    "chunk-4": {"nodes": ["file:trainer-types", "file:trainers-data"], "depends_on": [], "state": "pending"},
-    "chunk-5": {"nodes": ["file:content-draft-prudentia", "file:content-draft-coco", "file:content-draft-firstgear", "gate:founder-folder", "sql:apply-content"], "depends_on": ["chunk-3"], "state": "pending"},
-    "chunk-6": {"nodes": ["file:story-block", "file:page-tsx-render"], "depends_on": ["chunk-5", "chunk-2", "chunk-3"], "state": "pending"},
-    "chunk-7": {"nodes": ["cmd:just-check", "cmd:hermes-verify", "cmd:dollar-lead-check", "cmd:kimi-audit"], "depends_on": ["chunk-2", "chunk-4", "chunk-6"], "state": "pending"}
+    "chunk-1": {
+      "nodes": ["file:apps/web/src/tests/e3_right_rail.test.ts"],
+      "depends_on": [],
+      "state": "pending"
+    },
+    "chunk-2": {
+      "nodes": ["file:apps/web/src/components/horse/right-rail.tsx"],
+      "depends_on": ["chunk-1"],
+      "state": "pending"
+    },
+    "chunk-3": {
+      "nodes": ["file:apps/web/src/app/marketplace/[slug]/page.tsx"],
+      "depends_on": ["chunk-2"],
+      "state": "pending"
+    },
+    "chunk-4": {
+      "nodes": ["cmd:typecheck", "cmd:just_check"],
+      "depends_on": ["chunk-3"],
+      "state": "pending"
+    }
   },
   "output_format": {
-    "kind": "files + migration + content drafts",
-    "verification": "just check green, hermes verify ok:true, dollar-lead check clean, kimi audit PASS, browser walk 3 horses, no dollar leads in story/hook"
+    "kind": "components + page wiring + unit tests",
+    "verification": "just check 10/10 green + typecheck green + live walk on :3010"
   }
 }
