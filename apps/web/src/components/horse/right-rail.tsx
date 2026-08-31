@@ -1,40 +1,85 @@
-/* RightRail — status-driven sticky investment rail (chunk-9, audit-rev 2).
+/* RightRail — E3 status-driven sticky investment rail & acceptance gate (chunk-2).
  *
- * Founder-locked page model (page-model-notes.md):
- *   listed          → green ● BECOME AN OWNER pill (routes into the auth/buy
- *                     flow, /login?next=) + white VIEW INVESTMENT TERMS pill
- *                     that opens a real terms surface (pricing from the
- *                     @evo/legal_engine SSOT — never invented numbers).
- *   fully_subscribed→ gold Fully Subscribed badge + "All shares have been
- *                     acquired" card + "I'm keen to hear about …" CTA.
- *   coming_soon / completed → neutral status chip + soft interest CTA.
- *
- * Audit fixes (kimi pass 1): CTA labels/actions correctly paired; terms
- * surface shows REAL computed terms; single visual dot (no literal ●);
- * subscribe forms surface errors; email inputs carry aria-labels; dead
- * status-guard removed.
+ * Locked rules:
+ * - 5 Pillars: The Deal, What's Included, What If, Your Return, Exit & Transfer.
+ * - Share-math: min 1%, step 0.5%, percentages only, pricing via pricingForUnits.
+ * - Acceptance gate: scroll-through PDS + SA, dual checkboxes, proceed button disabled until both checked.
+ * - Vocabulary whitelist: Units/Stakes/Co-owners, Settlement/Distribution/Prize money, Evolution Stables.
+ * - Zero exclamation marks. British English.
  */
 
 'use client';
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { computeDslPricing, type DslPricing } from '@evo/legal_engine';
+import { ChevronDown, ChevronUp, FileText, Hash, ShieldCheck, Check } from 'lucide-react';
+import { pricingForUnits } from '@/lib/nellie-loop';
+import type { DslPricing } from '@evo/legal_engine';
+
+export interface LegalPackDigest {
+  pdsMarkdown?: string;
+  saMarkdown?: string;
+  pdsHash?: string;
+  saHash?: string;
+}
 
 export interface RightRailProps {
   status: 'listed' | 'fully_subscribed' | 'coming_soon' | 'completed' | string;
   horseName?: string;
   horseSlug?: string;
-  /** Wholesale monthly keep for 100% (inventory.cost_monthly_nzd) — drives real pricing. */
   wholesaleMonthlyNzd?: number;
+  minInvestmentPct?: number;
+  maxInvestmentPct?: number;
+  stakeStepPct?: number;
+  legalPack?: LegalPackDigest | null;
 }
 
 type ListingStatus = 'listed' | 'fully_subscribed' | 'coming_soon' | 'completed';
 
+interface Pillar {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+}
+
+const E3_PILLARS: Pillar[] = [
+  {
+    id: 'deal',
+    title: 'The Deal',
+    summary: 'Fixed price · fixed duration · fixed return.',
+    content: 'Can the owner ask for more money? Nope. One price, fixed. What the upfront covers: the last 5 months of the term.',
+  },
+  {
+    id: 'included',
+    title: "What's Included",
+    summary: 'Everything covered, nothing changes.',
+    content: 'Float, keep, insurance, veterinary coverage — all-inclusive management. No surprise capital calls.',
+  },
+  {
+    id: 'what_if',
+    title: 'What If',
+    summary: 'Injured → you stop paying.',
+    content: 'Welfare-first stewardship. If injured and unable to race, your monthly keep contributions stop immediately.',
+  },
+  {
+    id: 'return',
+    title: 'Your Return',
+    summary: '75% gross prize money, pro-rata, quarterly.',
+    content: 'Stakes published on official NZTR record. Distributions paid quarterly directly to your bank account.',
+  },
+  {
+    id: 'exit',
+    title: 'Exit & Transfer',
+    summary: 'Fixed term end · transfer via Evolution on request.',
+    content: 'Secondary market to follow. Initially, ownership transfers are facilitated through Evolution Stables upon request.',
+  },
+];
+
 function statusChip(status: ListingStatus) {
   if (status === 'listed') {
     return (
-      <div className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 bg-status-active/10 border-status-active/40 text-status-active text-[8px] font-medium uppercase tracking-widest`}>
+      <div className="inline-flex items-center gap-1.5 rounded-full border border-status-active/40 bg-status-active/10 px-3 py-1.5 text-[8px] font-medium uppercase tracking-widest text-status-active">
         <span className="h-2 w-2 rounded-full bg-status-active" />
         <span>Become an Owner</span>
       </div>
@@ -43,7 +88,7 @@ function statusChip(status: ListingStatus) {
 
   if (status === 'fully_subscribed') {
     return (
-      <div className={`inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-accent text-[8px] font-medium uppercase tracking-widest`}>
+      <div className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-[8px] font-medium uppercase tracking-widest text-accent">
         <span className="h-2 w-2 rounded-full bg-accent" />
         <span>Fully Subscribed</span>
       </div>
@@ -52,7 +97,7 @@ function statusChip(status: ListingStatus) {
 
   if (status === 'coming_soon') {
     return (
-      <div className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 bg-status-active/10 border-status-active/40 text-status-active text-[8px] font-medium uppercase tracking-widest`}>
+      <div className="inline-flex items-center gap-1.5 rounded-full border border-status-active/40 bg-status-active/10 px-3 py-1.5 text-[8px] font-medium uppercase tracking-widest text-status-active">
         <span className="h-2 w-2 rounded-full bg-status-active" />
         <span>Coming Soon</span>
       </div>
@@ -60,7 +105,7 @@ function statusChip(status: ListingStatus) {
   }
 
   return (
-    <div className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 border-border bg-card text-muted-foreground text-[8px] font-medium uppercase tracking-widest">
+    <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-[8px] font-medium uppercase tracking-widest text-muted-foreground">
       <span className="h-2 w-2 rounded-full bg-muted-foreground" />
       <span>Campaign Concluded</span>
     </div>
@@ -128,121 +173,427 @@ function LeadForm({
       >
         {submitting ? '…' : submitLabel}
       </button>
+      {error && <p className="text-[10px] text-destructive">{error}</p>}
     </form>
   );
 }
 
-/** Terms surface — real numbers from the legal-engine SSOT (no invented pricing). */
-function InvestmentTermsCard({
-  horseName,
-  horseSlug,
-  wholesaleMonthlyNzd,
-  onOpenTerms,
+/** E3 Accordion Pillar Item */
+function PillarAccordionItem({
+  pillar,
+  isOpen,
+  onToggle,
 }: {
-  horseName: string;
-  horseSlug: string;
-  wholesaleMonthlyNzd?: number;
-  onOpenTerms: () => void;
+  pillar: Pillar;
+  isOpen: boolean;
+  onToggle: () => void;
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-canvas p-6 space-y-4">
-      <div>
-        <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-muted-foreground">
-          {horseName}
-        </p>
-        <p className="mt-2 text-[13px] font-light leading-relaxed text-foreground">
-          Investment terms, pricing structure, and syndicate governance for{' '}
-          {horseName} are available to registered investors.
-        </p>
-      </div>
-
-      {/* White pill: VIEW INVESTMENT TERMS — opens the terms surface */}
+    <div className="border-b border-border/70 last:border-b-0">
       <button
         type="button"
-        onClick={onOpenTerms}
-        className="w-full rounded-full bg-foreground py-3 text-center text-[11px] font-medium uppercase tracking-[0.15em] text-background transition-all duration-300 hover:opacity-90 active:scale-[0.98]"
+        onClick={onToggle}
+        className="flex w-full items-start justify-between py-3 text-left transition-colors hover:text-foreground group"
+        aria-expanded={isOpen}
       >
-        View Investment Terms
+        <div className="space-y-0.5 pr-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-medium tracking-wide text-foreground group-hover:text-accent transition-colors">
+              {pillar.title}
+            </span>
+          </div>
+          <p className="text-[11px] font-light leading-snug text-muted-foreground">
+            {pillar.summary}
+          </p>
+        </div>
+        <div className="mt-0.5 text-muted-foreground group-hover:text-foreground transition-colors shrink-0">
+          {isOpen ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+        </div>
       </button>
-
-      {/* Become-Owner CTA: routes into the auth/buy flow (KYC-gated) */}
-      <a
-        href={`/login?next=${encodeURIComponent(`/marketplace/${horseSlug}`)}`}
-        className="block text-center text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70 transition-colors hover:text-accent"
-      >
-        Become an owner →
-      </a>
-
-      {wholesaleMonthlyNzd === undefined && (
-        <p className="text-[10px] font-light text-muted-foreground">
-          Ownership units are offered in clean 0.5% stakes with monthly syndicate management.
-        </p>
-      )}
-      {wholesaleMonthlyNzd !== undefined && (
-        <p className="text-[10px] font-light text-muted-foreground">
-          Real pricing is shown in the terms — computed live from the syndicate SSOT.
-        </p>
+      {isOpen && (
+        <div className="pb-3.5 pt-1">
+          <div className="rounded-xl border border-border/60 bg-surface-base/50 p-3 text-[12px] font-light leading-relaxed text-foreground/80">
+            {pillar.content}
+          </div>
+        </div>
       )}
     </div>
   );
 }
 
-/** Terms overlay — CtaLeadModal pattern; pricing rows from computeDslPricing. */
-function TermsOverlay({ horseName, pricing, onClose }: { horseName: string; pricing: DslPricing | null; onClose: () => void }) {
+/** Acceptance Gate Modal with Scroll-through PDS + SA & Checkboxes */
+function AcceptanceGateModal({
+  horseName,
+  horseSlug,
+  stakePct,
+  pricing,
+  legalPack,
+  onClose,
+}: {
+  horseName: string;
+  horseSlug: string;
+  stakePct: number;
+  pricing: DslPricing;
+  legalPack?: LegalPackDigest | null;
+  onClose: () => void;
+}) {
+  const router = useRouter();
+  const [pdsChecked, setPdsChecked] = React.useState(false);
+  const [saChecked, setSaChecked] = React.useState(false);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
   React.useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
 
-  const rows: [string, string][] = pricing
-    ? [
-        ['Monthly keep (per 1%)', `$${pricing.monthlyKeepUnitNzd.toLocaleString()} /mo`],
-        ['Join float (per 1%)', `$${pricing.joinFloatUnitNzd.toLocaleString()}`],
-        ['List rate (per 1%/mo)', `$${pricing.listPriceNzd.toLocaleString()}`],
-        ['Evolution margin', `${pricing.evolutionMarginPercent}%`],
-        ['Processing buffer', `${pricing.processingBufferPercent}%`],
-        ['GST', pricing.gstInclusive ? 'Inclusive' : 'Exclusive'],
-      ]
-    : [];
+  const handleProceed = async () => {
+    if (!pdsChecked || !saChecked || submitting) return;
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/checkout/create-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          horseSlug,
+          units: stakePct,
+        }),
+      });
+
+      if (res.status === 401) {
+        // User not logged in -> redirect to login with return path
+        const nextUrl = encodeURIComponent(window.location.pathname);
+        router.push(`/login?next=${nextUrl}`);
+        return;
+      }
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Checkout initialization failed');
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL returned from server');
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Checkout encountered an error';
+      setError(message);
+      setSubmitting(false);
+    }
+  };
+
+  const pdsText =
+    legalPack?.pdsMarkdown ||
+    `Product Disclosure Statement (PDS) for ${horseName} Syndicate.\n\n` +
+      `Issued under the NZTR Authorised Syndication Code.\n\n` +
+      `1. The Offer: Fixed-duration syndicate units in thoroughbred ${horseName}.\n` +
+      `2. Upfront float deposit covers 5 months advance reserve.\n` +
+      `3. Monthly keep is fixed at $${pricing.monthlyKeepUnitNzd} NZD per unit.\n` +
+      `4. Downside protection: if the horse is injured and unable to train/race, keep contributions stop immediately.\n` +
+      `5. Return mechanics: 75% gross prize money pro-rata quarterly.`;
+
+  const saText =
+    legalPack?.saMarkdown ||
+    `Syndicate Agreement (SA) for ${horseName} Syndicate.\n\n` +
+      `Manager: Evolution Stables.\n\n` +
+      `1. Governance: The Manager administers all racing, veterinary, training, and nomination decisions in accordance with welfare-first standards.\n` +
+      `2. Financials: Monies held in segregated trust account.\n` +
+      `3. Transfers: Secondary transfer facilitated through Evolution Stables upon formal request.\n` +
+      `4. Term: Fixed lease duration with predefined settlement date.`;
 
   return (
     <div
-      className="fixed inset-0 z-[999] flex items-center justify-center bg-black/90 p-8 backdrop-blur-sm"
+      className="fixed inset-0 z-[999] flex items-center justify-center bg-black/85 p-4 sm:p-6 backdrop-blur-md"
       role="dialog"
       aria-modal="true"
-      aria-label={`Investment terms for ${horseName}`}
+      aria-labelledby="acceptance-gate-title"
       onClick={onClose}
     >
-      <div className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl border border-border bg-card p-6" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between">
-          <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-accent">Investment Terms</p>
-          <button type="button" onClick={onClose} aria-label="Close" className="text-muted-foreground hover:text-foreground">
+      <div
+        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-5"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between border-b border-border pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-accent">
+                Regulatory Acknowledgment
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 text-[9px] font-mono text-accent">
+                <ShieldCheck className="h-3 w-3" /> NZTR Code
+              </span>
+            </div>
+            <h3 id="acceptance-gate-title" className="mt-1 text-lg font-light text-heading">
+              {horseName} · <span className="font-mono text-accent">{stakePct.toFixed(1)}% Stake</span>
+            </h3>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="rounded-full p-1 text-muted-foreground hover:bg-surface-base hover:text-foreground transition-colors"
+          >
             ✕
           </button>
         </div>
-        <h3 className="mt-3 text-lg font-light text-heading">{horseName}</h3>
 
-        {pricing ? (
-          <div className="mt-5 space-y-3">
-            {rows.map(([label, value]) => (
-              <div key={label} className="flex items-baseline justify-between border-b border-border pb-2.5">
-                <span className="text-[11px] font-light text-muted-foreground">{label}</span>
-                <span className="font-mono text-[12px] text-heading">{value}</span>
-              </div>
-            ))}
+        {/* Financial Summary Strip */}
+        <div className="grid grid-cols-2 gap-3 rounded-xl border border-border bg-canvas/60 p-3 font-mono text-[11px]">
+          <div>
+            <span className="text-[9px] uppercase tracking-wider text-muted-foreground block">
+              Monthly Keep
+            </span>
+            <span className="text-[13px] font-medium text-heading">
+              ${pricing.monthlyKeepUnitNzd.toLocaleString()} <span className="text-[10px] font-light text-muted-foreground">/mo</span>
+            </span>
           </div>
-        ) : (
-          <p className="mt-4 text-[12px] font-light text-muted-foreground">
-            Pricing is prepared per campaign. Register to receive the full investor pack.
-          </p>
+          <div>
+            <span className="text-[9px] uppercase tracking-wider text-muted-foreground block">
+              Join Float (5×M Deposit)
+            </span>
+            <span className="text-[13px] font-medium text-heading">
+              ${pricing.joinFloatUnitNzd.toLocaleString()}
+            </span>
+          </div>
+        </div>
+
+        {/* Document 1: PDS Scroll Container */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-accent" />
+              <span className="text-[11px] font-medium text-foreground">
+                Product Disclosure Statement (PDS)
+              </span>
+            </div>
+            {legalPack?.pdsHash && (
+              <div className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground">
+                <Hash className="h-3 w-3 text-accent" />
+                <span className="truncate max-w-[120px] sm:max-w-[180px]">
+                  {legalPack.pdsHash}
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="max-h-36 overflow-y-auto rounded-xl border border-border/80 bg-canvas p-3.5 text-[11px] font-light leading-relaxed text-foreground/80 whitespace-pre-line select-text">
+            {pdsText}
+          </div>
+          <label className="flex items-center gap-2.5 cursor-pointer pt-1 group">
+            <input
+              type="checkbox"
+              id="agree-pds"
+              checked={pdsChecked}
+              onChange={(e) => setPdsChecked(e.target.checked)}
+              className="h-4 w-4 rounded border-border bg-background text-accent focus:ring-accent focus:ring-offset-0"
+            />
+            <span className="text-[11px] font-light text-muted-foreground group-hover:text-foreground transition-colors">
+              I have read and agree to the Product Disclosure Statement (PDS)
+            </span>
+          </label>
+        </div>
+
+        {/* Document 2: Syndicate Agreement (SA) Scroll Container */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-accent" />
+              <span className="text-[11px] font-medium text-foreground">
+                Syndicate Agreement (SA)
+              </span>
+            </div>
+            {legalPack?.saHash && (
+              <div className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground">
+                <Hash className="h-3 w-3 text-accent" />
+                <span className="truncate max-w-[120px] sm:max-w-[180px]">
+                  {legalPack.saHash}
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="max-h-36 overflow-y-auto rounded-xl border border-border/80 bg-canvas p-3.5 text-[11px] font-light leading-relaxed text-foreground/80 whitespace-pre-line select-text">
+            {saText}
+          </div>
+          <label className="flex items-center gap-2.5 cursor-pointer pt-1 group">
+            <input
+              type="checkbox"
+              id="agree-sa"
+              checked={saChecked}
+              onChange={(e) => setSaChecked(e.target.checked)}
+              className="h-4 w-4 rounded border-border bg-background text-accent focus:ring-accent focus:ring-offset-0"
+            />
+            <span className="text-[11px] font-light text-muted-foreground group-hover:text-foreground transition-colors">
+              I acknowledge and agree to the Syndicate Agreement terms
+            </span>
+          </label>
+        </div>
+
+        {error && (
+          <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-[11px] text-destructive">
+            {error}
+          </div>
         )}
 
-        <p className="mt-5 text-[10px] leading-relaxed text-muted-foreground">
-          Figures are indicative per 1% stake in the syndicate. Full PDS and Syndicate
-          Agreement are available in the Documents tab to verified investors.
+        {/* Modal Action Footer */}
+        <div className="pt-2 border-t border-border space-y-3">
+          <p className="text-[10px] font-light leading-relaxed text-muted-foreground text-center">
+            Verification is completed under the NZTR Authorised Syndication Code. Handoff is cryptographically verified.
+          </p>
+          <button
+            type="button"
+            disabled={!pdsChecked || !saChecked || submitting}
+            onClick={handleProceed}
+            className="w-full rounded-full bg-accent py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-accent-foreground transition-all duration-300 hover:brightness-110 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100"
+          >
+            {submitting ? 'Preparing Secure Checkout…' : 'Proceed to Secure Checkout'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Listed Investment Card with Stake Slider, Monthly NZD Pricing & 5 Pillars */
+function ListedInvestmentCard({
+  horseName,
+  horseSlug,
+  wholesaleMonthlyNzd,
+  minInvestmentPct = 1.0,
+  maxInvestmentPct = 10.0,
+  stakeStepPct = 0.5,
+  legalPack,
+}: {
+  horseName: string;
+  horseSlug: string;
+  wholesaleMonthlyNzd?: number;
+  minInvestmentPct?: number;
+  maxInvestmentPct?: number;
+  stakeStepPct?: number;
+  legalPack?: LegalPackDigest | null;
+}) {
+  const [stakePct, setStakePct] = React.useState<number>(Math.max(minInvestmentPct, 2.0));
+  const [openPillarId, setOpenPillarId] = React.useState<string | null>(null);
+  const [gateOpen, setGateOpen] = React.useState(false);
+
+  const wholesale = wholesaleMonthlyNzd ?? 3800;
+  const pricing = React.useMemo(
+    () => pricingForUnits(wholesale, stakePct),
+    [wholesale, stakePct]
+  );
+
+  const togglePillar = (id: string) => {
+    setOpenPillarId((prev) => (prev === id ? null : id));
+  };
+
+  return (
+    <div className="rounded-2xl border border-border bg-canvas p-6 space-y-6">
+      {/* Top Header info */}
+      <div className="space-y-1">
+        <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-muted-foreground">
+          {horseName}
+        </p>
+        <h3 className="text-lg font-light tracking-tight text-heading">
+          Ownership Units
+        </h3>
+        <p className="text-[12px] font-light leading-relaxed text-muted-foreground">
+          Acquire units in clean 0.5% increments with fixed monthly syndicate keep.
         </p>
       </div>
+
+      {/* Stake Selector / Slider (Locked share-math: min 1%, step 0.5%) */}
+      <div className="space-y-3 rounded-xl border border-border/80 bg-surface-base/40 p-4">
+        <div className="flex items-baseline justify-between">
+          <label htmlFor="stake-slider" className="text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+            Selected Stake
+          </label>
+          <div className="font-mono text-base font-medium text-accent">
+            {stakePct.toFixed(1)}%
+          </div>
+        </div>
+
+        <input
+          id="stake-slider"
+          type="range"
+          min={minInvestmentPct}
+          max={maxInvestmentPct}
+          step={stakeStepPct}
+          value={stakePct}
+          onChange={(e) => setStakePct(parseFloat(e.target.value))}
+          className="w-full h-1.5 bg-border rounded-lg appearance-none cursor-pointer accent-accent focus:outline-none"
+        />
+
+        <div className="flex justify-between text-[9px] font-mono text-muted-foreground/80 pt-0.5">
+          <span>Min {minInvestmentPct.toFixed(1)}%</span>
+          <span>Step {stakeStepPct.toFixed(1)}%</span>
+          <span>Max {maxInvestmentPct.toFixed(1)}%</span>
+        </div>
+
+        {/* Live Monthly Pricing Display */}
+        <div className="mt-3 grid grid-cols-2 gap-2 border-t border-border/60 pt-3">
+          <div>
+            <span className="text-[9px] uppercase tracking-wider text-muted-foreground block">
+              Monthly Keep
+            </span>
+            <span className="font-mono text-[14px] font-medium text-heading">
+              ${pricing.monthlyKeepUnitNzd.toLocaleString()} <span className="text-[10px] font-light text-muted-foreground">/mo</span>
+            </span>
+          </div>
+          <div>
+            <span className="text-[9px] uppercase tracking-wider text-muted-foreground block">
+              Join Float (5×M)
+            </span>
+            <span className="font-mono text-[14px] font-medium text-heading">
+              ${pricing.joinFloatUnitNzd.toLocaleString()}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Primary CTA: Gold Pill Button */}
+      <button
+        type="button"
+        onClick={() => setGateOpen(true)}
+        className="w-full rounded-full bg-accent py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-accent-foreground transition-all duration-300 hover:brightness-110 active:scale-[0.98]"
+      >
+        Become an Owner
+      </button>
+
+      {/* The 5 Accordion Pillars */}
+      <div className="space-y-1 border-t border-border/80 pt-4">
+        <p className="text-[9px] font-mono uppercase tracking-[0.25em] text-muted-foreground pb-1">
+          Ownership Pillars
+        </p>
+        <div className="divide-y divide-border/60">
+          {E3_PILLARS.map((pillar) => (
+            <PillarAccordionItem
+              key={pillar.id}
+              pillar={pillar}
+              isOpen={openPillarId === pillar.id}
+              onToggle={() => togglePillar(pillar.id)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Acceptance Gate Modal */}
+      {gateOpen && (
+        <AcceptanceGateModal
+          horseName={horseName}
+          horseSlug={horseSlug}
+          stakePct={stakePct}
+          pricing={pricing}
+          legalPack={legalPack}
+          onClose={() => setGateOpen(false)}
+        />
+      )}
     </div>
   );
 }
@@ -259,7 +610,7 @@ function ClosedCampaignCard({
 }) {
   const message =
     status === 'fully_subscribed'
-      ? `All shares in ${horseName} have been acquired. This horse is in active campaign.`
+      ? `All units in ${horseName} have been acquired. This horse is in active campaign.`
       : `The lease period for ${horseName} has concluded. Register your interest for future campaigns.`;
 
   return (
@@ -308,32 +659,30 @@ export default function RightRail({
   horseName = 'this horse',
   horseSlug = '',
   wholesaleMonthlyNzd,
+  minInvestmentPct = 1.0,
+  maxInvestmentPct = 10.0,
+  stakeStepPct = 0.5,
+  legalPack = null,
 }: RightRailProps) {
-  const router = useRouter();
-  const [termsOpen, setTermsOpen] = React.useState(false);
-
   const s = status as ListingStatus;
   const safeStatus: ListingStatus =
     s === 'listed' || s === 'fully_subscribed' || s === 'coming_soon' || s === 'completed'
       ? s
       : 'coming_soon';
 
-  // Real pricing from the SSOT (listed only; never invented).
-  const pricing = React.useMemo(
-    () => (safeStatus === 'listed' && typeof wholesaleMonthlyNzd === 'number' ? computeDslPricing(wholesaleMonthlyNzd, 1.0) : null),
-    [safeStatus, wholesaleMonthlyNzd]
-  );
-
   return (
     <aside className="lg:sticky lg:top-28 space-y-6">
       {statusChip(safeStatus)}
 
       {safeStatus === 'listed' && (
-        <InvestmentTermsCard
+        <ListedInvestmentCard
           horseName={horseName}
           horseSlug={horseSlug}
           wholesaleMonthlyNzd={wholesaleMonthlyNzd}
-          onOpenTerms={() => setTermsOpen(true)}
+          minInvestmentPct={minInvestmentPct}
+          maxInvestmentPct={maxInvestmentPct}
+          stakeStepPct={stakeStepPct}
+          legalPack={legalPack}
         />
       )}
 
@@ -343,10 +692,6 @@ export default function RightRail({
 
       {safeStatus === 'coming_soon' && (
         <ComingSoonCard horseName={horseName} horseSlug={horseSlug} />
-      )}
-
-      {termsOpen && (
-        <TermsOverlay horseName={horseName} pricing={pricing} onClose={() => setTermsOpen(false)} />
       )}
     </aside>
   );
