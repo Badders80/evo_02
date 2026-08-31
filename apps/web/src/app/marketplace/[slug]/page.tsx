@@ -6,6 +6,7 @@ import {
   getCampaignBySlug,
   getCampaignMedia,
   getMarketplaceHook,
+  getCompiledLegalPackForCampaign,
 } from '@/lib/horses-data';
 import { campaignShareMetadata, SITE_DESCRIPTION } from '@/lib/seo';
 import { getTrainer } from '@evo/db_models';
@@ -204,12 +205,26 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
 
             {/* RIGHT COLUMN */}
             <div className="space-y-8 lg:sticky lg:top-28">
-              <RightRail
-                status={campaign.listingStatus}
-                horseName={campaign.legalName}
-                horseSlug={campaign.slug}
-                wholesaleMonthlyNzd={campaign.wholesaleMonthlyNzd}
-              />
+              {(() => {
+                const legalPack = getCompiledLegalPackForCampaign(campaign);
+                return (
+                  <RightRail
+                    status={campaign.listingStatus}
+                    horseName={campaign.legalName}
+                    horseSlug={campaign.slug}
+                    wholesaleMonthlyNzd={campaign.wholesaleMonthlyNzd}
+                    minInvestmentPct={1.0}
+                    maxInvestmentPct={campaign.capTableFixture.availablePct > 0 ? campaign.capTableFixture.availablePct : 10.0}
+                    stakeStepPct={campaign.stakeStepPct || 0.5}
+                    legalPack={{
+                      pdsMarkdown: legalPack.pdsMarkdown,
+                      saMarkdown: legalPack.saMarkdown,
+                      pdsHash: legalPack.pdsHash,
+                      saHash: legalPack.saHash,
+                    }}
+                  />
+                );
+              })()}
             </div>
           </div>
         </div>
