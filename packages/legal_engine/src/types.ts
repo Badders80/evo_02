@@ -48,6 +48,7 @@ export interface HorseSoftLegalContent {
   aboutHorse: string;
   trainerBio: string;
   racingOutlookAndPedigree: string;
+  raceExpectation?: string;
   campaignNarrative?: string;
   trainerQuote?: string;
   nextUp?: string;

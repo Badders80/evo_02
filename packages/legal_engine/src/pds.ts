@@ -21,6 +21,7 @@ export function canonicalizeSoftLegal(c?: Partial<HorseSoftLegalContent>): Horse
     aboutHorse: clean(c?.aboutHorse),
     trainerBio: clean(c?.trainerBio),
     racingOutlookAndPedigree: clean(c?.racingOutlookAndPedigree),
+    raceExpectation: clean(c?.raceExpectation),
   };
 }
 
@@ -35,6 +36,9 @@ export function generatePdsMarkdown(context: SyndicateLegalContext): string {
     : '';
   const outlookSection = soft.racingOutlookAndPedigree
     ? `\n\n### §2.3 Racing Outlook & Pedigree\n\n${soft.racingOutlookAndPedigree}\n`
+    : '';
+  const raceExpectationSection = soft.raceExpectation
+    ? `\n\n### §2.4 Racing Expectation\n\n${soft.raceExpectation}\n`
     : '';
 
   return `# Product Disclosure Statement
@@ -68,7 +72,7 @@ ${aboutSection}### §2.2 Key Details
 | Sire | ${h.sire} |
 | Dam | ${h.dam} |
 | Microchip | ${h.microchip || 'Recorded with NZTR'} |
-| Trainer | ${t.name} (${t.location}) |${outlookSection}
+| Trainer | ${t.name} (${t.location}) |${outlookSection}${raceExpectationSection}
 ---
 
 ## §3. Commercial Model

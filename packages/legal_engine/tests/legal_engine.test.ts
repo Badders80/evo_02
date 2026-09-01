@@ -234,6 +234,7 @@ export function runTests(): void {
       aboutHorse: 'Prudentia (NZ) is a New Zealand-bred four-year-old mare who recorded a maiden victory over 1400m at Tauranga.',
       trainerBio: 'Prudentia is trained by Wexford Stables under the leadership of Lance O\'Sullivan ONZM and Andrew Scott in Matamata.',
       racingOutlookAndPedigree: 'Prudentia carries a pedigree built for performance, by champion sire Proisir.',
+      raceExpectation: 'Prudentia is spelling and expected back in work early in the new year.',
     },
   };
   const prudentiaPack = compileLegalPack(prudentiaSoftContext);
@@ -243,6 +244,8 @@ export function runTests(): void {
   assertIncludes(prudentiaPack.pack.pdsMarkdown, '### §2.2 Key Details', 'PDS §2.2 Key Details Table Header');
   assertIncludes(prudentiaPack.pack.pdsMarkdown, '### §2.3 Racing Outlook & Pedigree', 'PDS §2.3 Racing Outlook Header');
   assertIncludes(prudentiaPack.pack.pdsMarkdown, 'by champion sire Proisir', 'PDS §2.3 Racing Outlook Content');
+  assertIncludes(prudentiaPack.pack.pdsMarkdown, '### §2.4 Racing Expectation', 'PDS §2.4 Racing Expectation Header');
+  assertIncludes(prudentiaPack.pack.pdsMarkdown, 'expected back in work early in the new year', 'PDS §2.4 Racing Expectation Content');
   console.log('✅ Soft content PDS Section 2 layout verified');
 
   // 12. Hash determinism across trailing spaces and CRLF
@@ -253,6 +256,7 @@ export function runTests(): void {
       aboutHorse: 'Prudentia (NZ) is a New Zealand-bred four-year-old mare who recorded a maiden victory over 1400m at Tauranga.   \r\n\r\n',
       trainerBio: 'Prudentia is trained by Wexford Stables under the leadership of Lance O\'Sullivan ONZM and Andrew Scott in Matamata.  \r\n',
       racingOutlookAndPedigree: 'Prudentia carries a pedigree built for performance, by champion sire Proisir.   ',
+      raceExpectation: 'Prudentia is spelling and expected back in work early in the new year.   \r\n',
     },
   };
   const whitespacePack = compileLegalPack(whitespaceContext);

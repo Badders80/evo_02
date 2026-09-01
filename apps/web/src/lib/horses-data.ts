@@ -222,6 +222,7 @@ function rowToCampaign(row: InventoryHorse): HorseCampaign {
       racingOutlookAndPedigree: String(
         softLegal.racingOutlookAndPedigree ?? softLegal.racing_outlook_and_pedigree ?? ''
       ),
+      raceExpectation: String(softLegal.raceExpectation ?? softLegal.race_expectation ?? ''),
       campaignNarrative: String(
         softLegal.campaignNarrative ?? softLegal.campaign_narrative ?? ''
       ),
