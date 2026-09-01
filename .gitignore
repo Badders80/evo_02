@@ -43,3 +43,7 @@ build-loop/**/*-prompt.txt
 build-loop/**/*-req.json
 build-loop/**/*-raw.json
 build-loop/.monitor-stamp
+
+# build-loop raw payload dumps (audit/trace inputs — findings live in audit-graph.json only)
+build-loop/**/*-input.txt
+build-loop/**/*-result.txt
