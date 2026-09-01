@@ -1,22 +1,29 @@
-# Today — 2026-09-01 (parallel work while E3 runs in Antigravity)
+# Today — 2026-09-01 (post Session 4: Investor Flows scoping LOCKED)
 
 ## In flight
-- [ ] **E3 — right-rail + acceptance gate** (Antigravity, Stitch MCP) — waiting on its approval gate; founder reviews plan before execution
-- [ ] **C15 — first-gear latestUpdateUrl** (dispatched, DB-only) — was prose+404 URL → null. Verify: `build-loop/c15-result.txt`
+- [ ] **Rung 4 — purchase content spec** — exact content per Flow C step (choose → accept → checkout → pay → own). Prompt: `build-loop/carry-on-prompt-rung4.md`. Output: `build-loop/purchase-content-spec.md` → then wireframes.
 
-## Queued (safe now — no E3 file overlap)
-- [ ] **E4 plan doc** — build-loop/ only; makes E3→E4 handoff instant (welcome email, bcc lists, MyStable success state, vault docs)
+## Queued (after rung 4 content)
+- [ ] **Wireframes** — 4 screens: marketplace, horse page (rail + gate modal), login, KYC (port from prod UX)
+- [ ] **E4 plan doc** — welcome email + bcc lists + MyStable success state (content spec'd in rung 4, build after)
 
-## Blocked (touches E3's files — wait for E3 to land)
-- [ ] **JSON-LD** — `horseWebPageJsonLd` exists in `lib/seo.ts`, unused on /marketplace/[slug]. Same file E3 edits → defer to avoid merge conflict
+## Blocked / queued fixes (from Session 4 audit — all small)
+- [ ] Stepper+input replaces slider (`right-rail.tsx`) — opens at min, DSL-driven bounds
+- [ ] Min bound reads `campaign.min_stake_pct` (currently hardcoded 1.0, `marketplace/[slug]/page.tsx:216`)
+- [ ] Cancel-stake Option A: `?units=` in `cancel_url` (`create-session/route.ts:106`) + page pre-fill
+- [ ] Login redirect carries stake: `next` = pathname + units (`right-rail.tsx:271-272`)
+- [ ] OAuth error path preserves `next` (`api/auth/google/callback/route.ts:37`)
+- [ ] Password path friendly errors (7 codes mapped; raw Supabase messages shown)
+- [ ] KYC badge: pending ("Being reviewed") / rejected ("Re-verify required") labels (`mystable-dashboard.tsx:39-48`)
 
 ## Founder TODOs (need you, not agent)
+- [ ] Transfer fee % — "standard fees apply" (likely 5%+3%, undecided)
+- [ ] Reservation-expired UX: auto re-reserve vs manual (open decision)
+- [ ] KYC port: `rejected` enum vs prod `requires_input` reconcile
 - [ ] Verify 2 trainer quotes carrying `[DRAFT — verify with trainer]` (Prudentia + First Gear)
-- [ ] Close 3 deferred E3 decisions: PDF CTA · acceptance record location (schema change? → founder-gated migration) · pillars validation
-- [ ] E3 approval gate: review Antigravity's plan when it stops
 
 ## Cutover prep (Phase 3, founder-gated — plan only, no action)
-- [ ] Test-purchase runbook (create session → pay → webhook → holding → email → vault → MyStable)
+- [ ] Test-purchase runbook (create session → pay → webhook → holding → email → vault → MyStable) — THIS run is the DoD proof
 - [ ] Stripe live checklist (live keys, prod webhook endpoint)
 - [ ] Cutover sequence: prod OAuth callback `153078526638-*` → Vercel → `PURCHASES_ENABLED` → archive evo_01
 

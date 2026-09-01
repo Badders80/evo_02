@@ -1,0 +1,1 @@
+C15: first-gear latestUpdateUrl → null (was prose+404 URL). soft_legal otherwise unchanged. Verified via re-GET.

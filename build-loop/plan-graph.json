@@ -56,22 +56,22 @@
     "chunk-1": {
       "nodes": ["file:apps/web/src/tests/e3_right_rail.test.ts"],
       "depends_on": [],
-      "state": "pending"
+      "state": "done"
     },
     "chunk-2": {
       "nodes": ["file:apps/web/src/components/horse/right-rail.tsx"],
       "depends_on": ["chunk-1"],
-      "state": "pending"
+      "state": "done"
     },
     "chunk-3": {
       "nodes": ["file:apps/web/src/app/marketplace/[slug]/page.tsx"],
       "depends_on": ["chunk-2"],
-      "state": "pending"
+      "state": "done"
     },
     "chunk-4": {
       "nodes": ["cmd:typecheck", "cmd:just_check"],
       "depends_on": ["chunk-3"],
-      "state": "pending"
+      "state": "done"
     }
   },
   "output_format": {

@@ -1,53 +1,83 @@
 # CONTINUE — evo_02
 
-**Date:** 2026-08-31 — **SESSION 2 WRAP: audit done (13 PASS/1 FAIL/1 WARN), F1+F2 resolved, 5 founder review fixes shipped, Stitch MCP wired. Branch `design-alignment` local-only, 22 commits. Next: E3 via Stitch MCP (founder designs right-rail in Stitch → agent implements) → Sprint 3 (E4) → cutover.**
-**Prod auth is now Supabase-native** (evo_01 swap live 2026-08-29, `d3d3a4b`) — evo_02 Supabase auth now aligns with prod layer (Google OAuth client differs: local uses inherited `851430309148-*` + shim, prod uses `153078526638-*` + native callback; reconcile at cutover).
-**Branch:** `design-alignment` (cut from ui-sprint-1 — superseded, never merge that). NOT merged — founder gate pending.
-**Page model:** `build-loop/page-model-notes.md` — LEFT/RIGHT page model planning notes (founder walkthroughs).
-**Live site:** still served by evo_01/02_website via Vercel. evo_01 working tree is DIRTY — hands off.
+**Date:** 2026-09-01 — **SESSION 5 WRAP: Rung 4 content DONE — agreed flow sculpted end-to-end (hook → term sheet → accept → verify → pay → own) in `build-loop/purchase-content-spec.md` (THE AGREED FLOW section) + `build-loop/purchase-journey-report.md` (narrative report). New locks: audit-tracker rule, terminology rule (stake-only investor-facing), KYC-at-checkout position. raceExpectation → PDS §2.4 SHIPPED (uncommitted, kimi audit running). Next: founder signoff on agreed flow → wireframes (Stitch) → build (stepper rework, KYC port, E4).**
+**Dual-surface rule (LOCKED):** "current state" = check BOTH `evo_01/02_website` (LIVE prod — Firebase, full KYC stack) AND evo_02 (:3010, Supabase). Gap in evo_02 + exists in prod = PORT, not rebuild. KYC is a port (Firebase → Supabase), UX already designed + walked.
+**Branch:** `design-alignment` (LOCAL-ONLY, never push). Cutover founder-only.
+**Live site:** still served by evo_01/02_website via Vercel. evo_01 working tree is DIRTY — hands off (read-only reference for ports).
 
 ---
 
-## Session wrap (2026-08-31 — Horse Page Depth: chunks 1-7 + E1/E2 SHIPPED, verified)
+## Session wrap (2026-09-01 — Session 5: Rung 4 purchase content — DONE, agreed flow sculpted + NEW LOCKS + raceExpectation shipped)
 
-**Goal:** horse pages deep enough that an investor says "they know this horse well enough for my money." All 7 plan chunks + Sprint 1 (E1/E2) complete, gated, verified.
+**Goal:** Work the EXACT content of each purchase step (choose → accept → checkout → pay → own) so wireframes can be built. No code — BA deliverable only.
 
-**Kimi audit (2026-08-31, `kimi-k2.7-code:cloud` + orchestrator):** `build-loop/audit-report.md` + `audit-graph.json` — **13 PASS / 1 FAIL / 1 WARN**.
-- **F1 (FAIL) — race_log incomplete vs DoD:** ~~prudentia=6/10 starts, first-gear=2/11~~ **RESOLVED 2026-08-31 `512bf32`.** Founder decision: show last 6 + link to official (no popup, no scroll wall). Prudentia's 6 already ARE the last 6 ✓. First-gear backfilled to full 11-start record from loveracing.nz (HorseID 428364, curl_cffi scrape; prize sum $24,975 = repo total, exact). **Castletown corrected: live page 5th of 9 (old entry said 2nd — repo totals confirm old entry wrong).** Race tab now: summary from FULL log (1 Win · 2 Places), timeline shows most recent 6, FULL NZTR RECORD link covers the rest. Reusable parser: `scripts/scrape-race-log.py`. Knowledge repo `race-record.json` starts backfilled to 11 (evo_01 tree touched — hands-off rule noted).
-- **F2 (WARN) — MediaDeck rendered hero only** (`01 · 01`): `getGalleryImages` read empty `public/images/content/horses/{slug}`; real stills at `public/horses/{slug}/01-04` via HORSE_STILLS. **FIXED `33e7225`** — gallery now from `getCampaignMedia().horse.paradeGallery`; dead `Image`/`PedigreeLine` imports dropped. Verified: 22/22 forced turbo, live `01 · 04` prudentia, `01 · 04` first-gear, `01 · 02` hottathanafantasy.
-- **C15 (content defect, not rendered):** first-gear `latestUpdateUrl` is prose, not a URL — hidden by updateCount=null gate. Fix content when next authoring pass runs.
-- **2 new lint warnings fixed** (page.tsx dead imports). Remaining 15 warnings pre-existing.
+**Deliverable:** `build-loop/purchase-content-spec.md` — e3-content-tree node-block style, every string/state/edge case per step, grounded in code (right-rail.tsx, create-session/route.ts, webhooks/stripe/route.ts, nellie-loop.ts, mystable-dashboard.tsx, pricing-card.tsx, marketplace/[slug]/page.tsx). Voice applied throughout: Private Banker Standard, Silent Gavel, Fight Club rule, whitelist, zero exclamation marks, British English, never lead with dollars.
 
-**Commits (design-alignment, LOCAL-ONLY):**
-- `faa6632` chunk-1: migration 00008 (race_log column, both locations) + scripts/sync-race-log.py (knowledge repo → inventory, snake→camel)
-- `aeef745` chunk-3: MC schema — campaignNarrative/trainerQuote/nextUp/latestUpdateUrl/updateCount (legal_engine types → writer → intake-adapter → reader + HorseCampaign)
-- `464f13c` chunk-4: TrainerProfile.bio + full Wexford/Stephen Gray bios
-- `9c529c8` fix: new fields persist at inventory insert (test caught the gap) + round-trip test
-- `6e81322` chunk-2: race summary computed from race_log (TDD, never hardcoded) + trainer bio line
-- `e9d3e5f` scripts/apply-content.py — founder-approved drafts → inventory.soft_legal + Silent Gavel voice check
-- `5ed626e` chunk-6: CampaignStatusBlock (what's-next + update link + count + quote)
-- `2755701` fix: block renders ALL present blocks (was returning first only)
-- `f4ca17e` E1+E2: full marketplace card clickable + MediaDeck carousel wired
-- `33e7225` audit fix F2: MediaDeck gallery from paradeGallery (was empty dir) + dead imports dropped
-- `243bd63` founder review fix: hero = prod base (aspect-[16/10], no negative-margin bleed, breadcrumb visible, no rail spillover) + coming_soon badges green (status-active) not gold
-- `d989f0c` founder review fix 2: hero shaded pillbox (bg-surface-base fill behind photo) + AGE | SEX | COLOUR | SIRE | DAM spec strip (5 cols)
-- `da4ecc2` founder review fix 3: spec strip → content-sized flex cells hugging left (no 5-col spread; Sire/Dam no longer wrap ugly)
+**What the spec covers:**
+- **Step 1 Choose:** stepper+input behavior spec (open at min, ▲/▼ step, over/under/non-multiple warnings), locked fine print line, pricing figures, 5 pillars referenced (not rewritten).
+- **Step 2 Accept:** gate modal states, scroll-locked checkboxes, hash display, KYC prompt placement (read-then-verify) with pending/rejected copy.
+- **Step 3 Checkout:** full server-code → investor-copy error mapping table (KYC_REQUIRED, RESERVE_FAILED, kill switch, etc.), reservation countdown + expired copy.
+- **Step 4 Pay:** Stripe line-item naming, success → /mystable?checkout=success, cancel → ?units= pre-fill (Option A).
+- **Step 5 Own:** MyStable success state, E4 welcome email full copy (Yard Journal format), vault + billing expectations.
+- **Open items resolved with recommendations:** reservation-expired (auto re-reserve on retry, manual-triggered honest copy) · KYC rejected vs requires_input (keep rejected, map requires_input → rejected at port).
+- **New flags found in code:** rail opens at Math.max(min, 2.0) (violates locked open-at-min) · fine print line not in code · availablePct ≤ 0 renders buyable rail · two checkout surfaces (E3 rail + legacy PricingCard) · kill-switch CTA visibility.
+- **Acceptance criteria** per step — feeds the test-purchase runbook (DoD proof).
 
-**Gates:** `just check` 10/10 · `hermes verify --json --skip-start` ok:true · live walk /marketplace + 3 horse pages 200 · MediaDeck carousel + card click verified in HTML.
+**Founder decisions — ALL LOCKED 2026-09-01 (Session 5):** ① reservation-expired: **explicit [ Reserve Again ], honest copy — no silent auto-reserve** ② KYC rejected: **keep `rejected` enum, map `requires_input` → `rejected` at port; failed check = MANUAL-ASSISTANCE path** ("A member of Evolution Stables will contact you shortly to help complete the process" — matches prod's manual-assistance UX, port it; resolution = founder/ops: approve/deny/re-verify) ③ `availablePct` ≤ 0 → **treat as Fully Subscribed** ④ **consolidate on E3 rail; PricingCard stays legacy, untouched, not retired** (known location if ever needed; no pop-up styling port). Kill-switch CTA: keep visible, honest 503 copy (recommendation, non-blocking).
+**Founder decisions — LOCKED LATER IN SESSION 5 (agreed flow):** ⑤ **AUDIT-TRACKER RULE — 100% audit tracker, NOT browsing clicks.** Commitment events only, logged at source the instant they happen regardless of sale outcome: PDS accepted · SA accepted · NZTR declaration accepted · identity check completed · checkout started · payment completed/cancelled/expired. Each row: who + exact document hash + when. Serves investor disputes ("I paid, where is my horse") AND regulator/NZTR/FMA/counsel requests without reconstruction. ⑥ **TERMINOLOGY RULE — investor-facing always "stake" + percentage** ("2.0% stake"); "Units" retired from investor-facing copy (rails, Stripe line item, CTA matrix — survives only in code internals); "Tokens" banned everywhere. ⑦ **KYC AT CHECKOUT (not upfront)** — compliance floor = before contract execution/prize money (SOP §9.1); protects casual investor (they verify only after deciding); reading stays public; NZTR declaration (18+/no disqualification/NZ resident or international — same check for everyone) rides the KYC port, collected on the verify screen.
+**AGREED FLOW (fluid-but-agreed, NOT locked):** Step 1 HOOK (rail: "Become an Owner" · "easier than you think" · From $76/mo per 1% · 75% gross prize money* · Stake available 5% · CTA "Ownership Terms and Conditions") → Step 2 TERM SHEET pop-up (stake pill + price pill moving together, opens 1%, 0.5% steps, tiny bounds line; upfront payment 3+2 months w/ PDS §4 link; duration start—end; 75% return; race-expectation one-liner from PDS §2.4; CTA "Invest in {Horse}") → Step 3 ACCEPT (PDS/SA scroll+tick, hashes, tick = recorded acceptance — audit event at tick time, pre-payment) → Step 4 VERIFY (NZTR declaration + Stripe Identity, one screen, manual-assistance on fail) → Step 5 PAY (Stripe line item "{Horse} ({units}% Stake) — Initial 5×M float deposit", success → /mystable?checkout=success, cancel → ?units= pre-fill + honest 15-min countdown + [ Reserve Again ]) → Step 6 OWN (MyStable success, welcome email E4, vault, keep from Month 2). Proceed label on Accept modal fluid ("Proceed to Secure Checkout" vs "Continue"). Full detail: `build-loop/purchase-content-spec.md` THE AGREED FLOW section.
+**raceExpectation → PDS §2.4 (SHIPPED, uncommitted, AUDIT PASS):** new optional `raceExpectation` field (legal_engine types + canonicalize + §2.4 section rendered only when present; horses-data dual-shape reader; test fixtures + assertions updated). **AUDIT: PASS — 6/6 claims (build-loop/audit-graph-raceexpectation.json).** legal_engine + web suites GREEN (multiple runs). Audit ran locally — both dispatched audit subagents (deleg_654f76bd) timed out on the slow free model; orchestrator verified directly per build lesson. Seed values (NOT applied — seed paths forbidden): Nellie "Nellie is in pre-training at Byerley Park, with a spring preparation leading into the autumn 3YO fillies' series." · Prudentia "Prudentia is spelling and expected back in work early in the new year."
+**PURCHASES_ENABLED (LOCKED 2026-09-01):** **ON in dev (:3010) — `apps/web/.env.local` already has `PURCHASES_ENABLED=true` + `sk_test_` key (verified). Test mode cannot move real money — full journey walkable (create session → pay → webhook → holding → email → vault) = DoD proof. PROD stays OFF until founder go-live signal with live keys. This amends the AGENTS.md "No PURCHASES_ENABLED" gate for dev only.**
 
-**Content applied (founder folder-gate PASSED):** Prudentia (R65→R75, welfare-first spell, 31 updates), Coco (Andrew Scott quote, spring trials), First Gear (attractive offer from Australia, 6 winners from 6 foals, completed showcase). Drafts in `01_evolution/horses/{slug}/content-draft.md`. **Prudentia + First Gear trainer quotes carry `[DRAFT — verify with trainer]` — founder must verify before live.**
+**Next (after founder signs):** wireframes from spec (Stitch) → build: stepper rework + min_stake_pct fix + fine print, KYC port (Firebase → Supabase), E4 email + bcc, MyStable success state, cancel_url ?units= fix.
 
-**Key fixes this session (subagent timeouts → orchestrator finished):**
-- Subagents time out at 600s on packaging — work usually lands; ALWAYS check git status + files before re-dispatching.
-- Subagent wrote jest-style test (repo uses tsx + node:assert) + literal `\n` corruption in marketplace-listing-grid.tsx — both caught by typecheck, fixed.
-- CampaignStatusBlock returned first block only — composed all present blocks.
-- `hermes verify` full readiness probe collides with running dev server (EADDRINUSE) — use `--skip-start`; stale-boot 500s on [slug] → restart dev, not code.
+---
 
-**Planning artifacts (build-loop/):** `horse-page-depth-plan.md` (strategy, locked rules) · `plan.md` + `plan-graph.json` (7 chunks, structurally valid) · `review-synthesis.md` (2-model review, all fixes applied) · `e3-right-rail-deepdive.md` (pre-purchase terms, founder decisions locked) · `go-live-dod.md` (6-layer skeleton + sprint map) · `reviewer-a-findings.json`.
+## Session wrap (2026-09-01 — Session 4: Investor Flows scoping — ALL DECISIONS LOCKED)
 
-**Locked rules (founder):** $$$$ rule (never lead with dollars — "attractive offer from Australia" NOT "$300k") · hook principle (dial-movers bait the click, values-aligned) · Silent Gavel (voice SSOT evo_00/doc/) · Flight Club (selling ownership without selling it) · 04_comms = build debt (SMTP for automated emails).
+**Goal:** Lock the investor journey (login · KYC · purchase) end-to-end so wireframes can be built. No code this session — scoping + decision-locking only.
 
-**Dev server:** does NOT auto-start on reboot — `cd /home/evo/new/evo_02/apps/web && pnpm dev --port 3010` (background). Stale-boot server 500s on [slug] with missing vendor-chunk error → restart, not code.
+**The 4-rung customer journey (LOCKED 2026-09-01):**
+1. **Public** — homepage → marketplace → horse page, full rail visible (pillars, pricing, projections, race stats). No login wall (SEO + no forced signup).
+2. **Logged in** — + gate modal: PDS/SA readable in-modal, SHA-256 hashes shown. Checkout still blocked.
+3. **KYC'ed** — checkout unlocked. **Read-then-verify confirmed** (docs readable pre-KYC, pay blocked until verified — supersedes e3-flow-map "KYC gate — blocked" node).
+4. **Owner** — MyStable: holdings, feed, vault, billing.
+
+**Decisions locked this session (all in investor-flows-report.md):**
+- **Stake entry: stepper+input REPLACES slider** (E3 shipped as slider — rework queued). Box opens at minimum, up/down stepper moves in increments, manual entry with out-of-range warning both directions. Fine print: "Minimum investment ___% · Stake available ___% · Contact us for more info" (covers larger-stake interest — no separate tag).
+- **Min/step/max are DSL-driven per horse** (`min_stake_pct`, `stake_step_pct`, `availablePct`). **Min currently hardcoded 1.0** (`marketplace/[slug]/page.tsx:216`) — must read `campaign.min_stake_pct`. Max = available % (Nellie 5.0%).
+- **Cancel-stake: RESOLVED — Option A** (carry units in `cancel_url`): `create-session/route.ts:106` appends `?units=`, horse page pre-fills from param. Currently NOT preserved (stake-loss bug, fix queued).
+- **Transfer facilitation: "standard fees apply"** (fee % TBD by founder — likely 5%+3% but undecided). Incoming buyer re-verified (Ops SOP §9.1). NOT in code (no SA clause, no transfer flow).
+- **KYC = PORT from production** (evo_01/02_website: `/api/kyc/create-session|callback|status` + `/auth/verify` + `/marketplace/[id]/kyc-processing`, Firebase claims, resume + sync + manual-assistance UX). Reconcile `rejected` enum (evo_02) vs `requires_input` (prod) at port.
+- **Auth fixes queued:** 7 OAuth codes mapped (not 9); password path shows raw Supabase messages — map before E4. OAuth error path drops `next` (`api/auth/google/callback/route.ts:37`) — fix before E4.
+- **KYC badge:** collapses pending/rejected into "Unverified" (`mystable-dashboard.tsx:39-48`) — add pending ("Being reviewed") / rejected ("Re-verify required") labels.
+
+**Open items (2, from e3-flow-map):** reservation-expired UX (auto re-reserve vs manual — currently manual) · KYC port details (rejected vs requires_input reconcile).
+
+**Gaps gating "investor can buy a horse" (DoD):** 1. KYC port · 2. E4 post-purchase (welcome email + bcc + MyStable success polish) · 3. 2 open decisions · 4. Test-purchase runbook (create session → pay → webhook → holding → email → vault → MyStable — THIS run is the DoD proof) · 5. Transfer facilitation ("standard fees apply", not in code).
+
+**Artifacts:** `build-loop/investor-flows-report.md` (scoping SSOT, all corrections applied) · `build-loop/service-blueprint.md` (NNGroup-format blueprints for Flows A/B/C + webhook sequence) · `build-loop/e3-flow-map.md` (updated) · `build-loop/e3-content-tree.md` (updated).
+
+**Dual-surface rule baked into:** memory (every turn) · codebase-implementation-audit skill (named pitfall) · evolution-workspace-topology skill (evo_01 row: EXCEPT 02_website = LIVE prod).
+
+---
+
+## Session wrap (2026-09-01 — Session 3: E3 Pre-Purchase Terms SHIPPED, gated, verified)
+
+**Goal:** Implement E3 Pre-Purchase Terms (right-rail accordion with 5 pillars, stake slider with locked share-math, live monthly NZD pricing, and scroll-through acceptance gate modal for PDS and Syndicate Agreement).
+
+**What happened this session (all on `design-alignment`, LOCAL-ONLY, 25 commits, tree clean):**
+1. **Stitch Project Ingestion** — Stitch project `589024617828390803` ("E3 Pre-Purchase Terms") fetched via MCP tool endpoint (`list_screens`, `get_screen`).
+2. **Locked Rules Enforced** — `build-loop/e3-right-rail-deepdive.md` & `.agents/rules/e3-sprint.md` Rules 1–13:
+   - 5 Accordion Pillars: *The Deal*, *What's Included*, *What If*, *Your Return*, *Exit & Transfer* (Private Banker Standard, vocabulary whitelist, zero exclamation marks).
+   - Slider math (Rule 11): 1.0% min floor, 0.5% step, percentages only, `pricingForUnits(wholesaleMonthlyNzd, units)` (5% margin + 3% buffer embedded, 5×M join deposit).
+   - Acceptance gate (Rule 13): scrollable PDS + SA viewports sourced directly from server-compiled `getCompiledLegalPackForCampaign`, dual checkboxes required to enable `[ Proceed to Secure Checkout ]`.
+3. **Commits (design-alignment, LOCAL-ONLY):**
+   - `4e88898` `test(web): e3 right rail invariants and slider pricing unit tests` — TDD test suite validating share-math, pricing formulas, hash integrity, and vocabulary whitelist.
+   - `40a5c3a` `feat(web): e3 right-rail 5-pillar accordion and acceptance gate modal` — `apps/web/src/components/horse/right-rail.tsx`.
+   - `5659a71` `feat(web): wire compiled legal pack and stake parameters to marketplace right-rail` — `apps/web/src/app/marketplace/[slug]/page.tsx`.
+
+**Gates (all green):** `just check` 10/10 PASS · `pnpm --filter @evo/web typecheck` clean · dev server :3010 live walk /marketplace/nellie, /marketplace/prudentia, /marketplace/tml-x-yearn 200.
 
 ---
 
@@ -79,8 +109,8 @@
 | Sprint | Scope | Status |
 |---|---|---|
 | 1 | E1 + E2 (quick wins) | ✅ DONE (f4ca17e) |
-| 2 | **E3 — pre-purchase terms** (right-rail drop-downs from term-sheet DNA, acceptance gate at checkout tail, term-sheet order in MC: term sheet → PDS → SA) | ⏳ NEXT — **via Stitch MCP**: founder designs right-rail + acceptance gate screens in Stitch (stitch.withgoogle.com), agent implements from fetched design. Deep-dive: `build-loop/e3-right-rail-deepdive.md` (decisions LOCKED: drop-downs not FAQ, scroll-through + checkbox acceptance, PDS folds into aboutHorse, 5 pillars refined) |
-| 3 | **E4 — post-purchase** (welcome email via SMTP, investor → bcc_lists/{slug}.json, MyStable success state, vault docs surfaced) | ⏳ depends on E3 checkout tail |
+| 2 | **E3 — pre-purchase terms** (right-rail drop-downs from term-sheet DNA, acceptance gate at checkout tail, slider math, 5 pillars) | ✅ DONE (5659a71) |
+| 3 | **E4 — post-purchase** (welcome email via SMTP, investor → bcc_lists/{slug}.json, MyStable success state, vault docs surfaced) | ⏳ NEXT — depends on E3 checkout tail |
 | 4 | Cutover (purge-then-push, merge, Vercel, prod OAuth client 153078526638-* add /api/auth/google/callback, PURCHASES_ENABLED, archive evo_01) | ⛔ founder |
 
 **Before Sprint 2:** ~~kimi-code-audit on the full diff~~ **DONE 2026-08-31** (13 PASS / 1 FAIL / 1 WARN; F1 + F2 both resolved). Founder verifies the 2 trainer quotes. E3 deferred questions: downloadable investment summary? pillars validated? acceptance record location? **Stitch MCP: restart Hermes to load `mcp_stitch_*` tools (no hot-reload).**

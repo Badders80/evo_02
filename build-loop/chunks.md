@@ -7,34 +7,34 @@
 
 ---
 
-### Chunk 1: E3 Unit Test Suite (TDD)
+### Chunk 1: E3 Unit Test Suite (TDD) — [DONE]
 - **Node:** `file:apps/web/src/tests/e3_right_rail.test.ts`
 - **Depends On:** none
 - **Files:** `apps/web/src/tests/e3_right_rail.test.ts`
 - **Description:** Tests for share-math (1% floor, 0.5% step), `pricingForUnits` calculations, 5 pillars copy compliance (whitelist vocabulary, 0 exclamation marks), and legal pack hash invariants.
-- **Commit Message:** `test(web): e3 right rail invariants and slider pricing unit tests`
+- **Commit:** `4e88898` `test(web): e3 right rail invariants and slider pricing unit tests`
 
 ---
 
-### Chunk 2: Right-Rail Accordion & Acceptance Gate Component
+### Chunk 2: Right-Rail Accordion & Acceptance Gate Component — [DONE]
 - **Node:** `file:apps/web/src/components/horse/right-rail.tsx`
 - **Depends On:** `chunk-1`
 - **Files:** `apps/web/src/components/horse/right-rail.tsx`
 - **Description:** Implement 5-pillar accordion drop-downs (The Deal, What's Included, What If, Your Return, Exit & Transfer), interactive stake slider with live NZD pricing via `pricingForUnits`, and the dark glassmorphic Acceptance Gate modal with PDS/SA scrollable viewports, dual checkboxes, and disabled checkout button.
-- **Commit Message:** `feat(web): e3 right-rail 5-pillar accordion and acceptance gate modal`
+- **Commit:** `40a5c3a` `feat(web): e3 right-rail 5-pillar accordion and acceptance gate modal`
 
 ---
 
-### Chunk 3: Marketplace Page Integration
+### Chunk 3: Marketplace Page Integration — [DONE]
 - **Node:** `file:apps/web/src/app/marketplace/[slug]/page.tsx`
 - **Depends On:** `chunk-2`
 - **Files:** `apps/web/src/app/marketplace/[slug]/page.tsx`
 - **Description:** Wire server-compiled legal pack (`getCompiledLegalPackForCampaign`) and stake parameters to `<RightRail />`.
-- **Commit Message:** `feat(web): wire compiled legal pack and stake parameters to marketplace right-rail`
+- **Commit:** `5659a71` `feat(web): wire compiled legal pack and stake parameters to marketplace right-rail`
 
 ---
 
-### Chunk 4: Verification & Gate Pass
+### Chunk 4: Verification & Gate Pass — [DONE]
 - **Node:** `cmd:just_check`
 - **Depends On:** `chunk-3`
 - **Commands:** `just check`, `pnpm --filter @evo/web typecheck`, dev server walk on :3010.

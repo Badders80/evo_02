@@ -2,7 +2,7 @@
 
 **Status:** content reference (from live :3010, 2026-09-01 — matches founder paste)
 **Purpose:** content SSOT for the E3 flow. Lock this, then move to Stitch for visuals.
-**Node types:** `[header]` `[subheader]` `[body]` `[figure]` `[slider]` `[dropdown]` `[CTA]` `[checkbox]` `[badge]` `[doc]` `[note]`
+**Node types:** `[header]` `[subheader]` `[body]` `[figure]` `[stepper]` `[dropdown]` `[CTA]` `[checkbox]` `[badge]` `[doc]` `[note]`
 
 ---
 
@@ -13,10 +13,12 @@
 [subheader] Ownership Units
 [body]      Acquire units in clean 0.5% increments with fixed monthly syndicate keep.
 
-[slider]    Selected Stake — 2.0%
-            Min 1.0% · Step 0.5% · Max 5.0%
+[stepper]   Stake — opens at minimum (e.g. 1.0%)
+            ▲ / ▼ move in 0.5% increments · manual entry allowed
+            out-of-range (over max / under min) → small warning
 [figure]    Monthly Keep — $152 /mo
 [figure]    Join Float (5×M) — $760
+[note]      Minimum investment 1.0% · Stake available 5.0% · Contact us for more info
 
 [CTA]       Become an Owner ──────────────► SCREEN 2 (gate modal)
 
@@ -40,10 +42,12 @@ Fully Subscribed / Completed ► amber pill, NO rail CTA (rail hidden or read-on
 Coming Soon                  ► green pill, NO rail CTA
 ```
 
-**FORK B — stake bounds (per horse, from campaign data):**
+**FORK B — stake bounds (per horse, DSL-driven — LOCKED 2026-09-01):**
 ```
-Nellie:  Min 1.0% · Step 0.5% · Max 5.0%
-other horses: bounds come from campaign.stakeStepPct / availability — never hardcoded
+min = campaign.min_stake_pct (NOT hardcoded — page currently hardcodes 1.0, fix queued)
+step = campaign.stake_step_pct (0.5 default)
+max = campaign.capTableFixture.availablePct (Nellie: 5.0%)
+Nellie example: Min 1.0% · Step 0.5% · Max 5.0%
 ```
 
 ---
@@ -79,7 +83,7 @@ other horses: bounds come from campaign.stakeStepPct / availability — never ha
 **FORK C — checkout outcome:**
 ```
 payment success ──► MyStable success state (E4 — not this sprint)
-payment cancel   ──► back to horse page, stake + selections preserved
+payment cancel   ──► back to horse page, stake pre-filled via ?units= (Option A, RESOLVED 2026-09-01)
 ```
 
 **FORK D — documents (per horse):**
