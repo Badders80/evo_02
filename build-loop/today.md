@@ -1,7 +1,7 @@
 # Today — 2026-09-01 (post Session 4: Investor Flows scoping LOCKED)
 
 ## In flight
-- [ ] **Rung 4 — purchase content spec** — exact content per Flow C step (choose → accept → checkout → pay → own). Prompt: `build-loop/carry-on-prompt-rung4.md`. Output: `build-loop/purchase-content-spec.md` → then wireframes.
+- [ ] **Rung 4 — purchase content spec** — exact content per Flow C step (choose → accept → checkout → pay → own). Prompt: `build-loop/e3-rung4/carry-on-prompt-rung4.md`. Output: `build-loop/purchase-content-spec.md` → then wireframes.
 
 ## Queued (after rung 4 content)
 - [ ] **Wireframes** — 4 screens: marketplace, horse page (rail + gate modal), login, KYC (port from prod UX)

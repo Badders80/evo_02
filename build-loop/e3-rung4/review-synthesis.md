@@ -35,4 +35,4 @@
 
 ## 3. Approval Gate Status
 
-**Status:** AWAITING FOUNDER APPROVAL (`APPROVED:` marker required before Stage 3 / execution).
+**Status:** APPROVED 2026-09-01 — 4/4 chunks DONE (recorded in `e3-rung4/plan-graph.json`). Stage 5 audit + wireframe phase complete; superseded by wireframes/build per CONTINUE.md.
