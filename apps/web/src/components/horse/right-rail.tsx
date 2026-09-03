@@ -166,77 +166,77 @@ function ListedInvestmentCard({
   const pricing = React.useMemo(() => pricingForUnits(wholesale, 1.0), [wholesale]);
 
   return (
-    <div className="rounded-3xl border border-border bg-surface backdrop-blur-2xl p-8 space-y-8 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
-      <div className="space-y-3">
-        <p className="text-gold text-[11px] font-bold uppercase tracking-[0.2em]">Ownership</p>
-        <h3 className="text-3xl font-bold leading-tight text-heading tracking-tight">
+    <div className="rounded-3xl border border-border bg-surface backdrop-blur-2xl px-6 py-4 space-y-3.5 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
+      <div className="space-y-2">
+        <p className="text-gold text-[11px] font-medium uppercase tracking-[0.2em]">Ownership</p>
+        <h3 className="text-[22px] font-light leading-tight tracking-tight text-heading">
           Becoming an owner is easier than you think.
         </h3>
       </div>
       <div className="w-10 h-px bg-gold" />
 
       {/* Stat rows — figures aligned to the feature-row text column (icon 22px + gap 16px = 38px) */}
-      <div className="pl-[38px] space-y-8">
+      <div className="pl-[38px] space-y-3.5">
         <div>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground/70 block mb-1">Price</p>
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground block mb-1">Price</p>
           <div className="flex items-baseline gap-2">
-            <span className="text-5xl font-bold tracking-tighter text-heading">
+            <span className="text-[30px] font-light tracking-tight text-heading leading-tight">
               ${pricing.monthlyKeepUnitNzd.toLocaleString()}
             </span>
-            <span className="text-muted text-lg">per month</span>
+            <span className="text-base font-light text-muted">per month</span>
           </div>
           <p className="text-muted font-light text-sm">for a {minInvestmentPct.toFixed(1)}% stake</p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground/70 block mb-1">Return</p>
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground block mb-1">Return</p>
           <div className="flex items-baseline gap-2">
-            <span className="text-5xl font-bold tracking-tighter text-heading">75%</span>
-            <span className="text-muted text-lg">return</span>
+            <span className="text-[30px] font-light tracking-tight text-heading leading-tight">75%</span>
+            <span className="text-base font-light text-muted">return</span>
           </div>
           <p className="text-muted font-light text-sm">of gross prize money</p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground/70 block mb-1">Duration</p>
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground block mb-1">Duration</p>
           <div className="flex items-baseline gap-2">
-            <span className="text-5xl font-bold tracking-tighter text-heading">12</span>
-            <span className="text-muted text-lg">months</span>
+            <span className="text-[30px] font-light tracking-tight text-heading leading-tight">12</span>
+            <span className="text-base font-light text-muted">months</span>
           </div>
           <p className="text-muted font-light text-sm">investment term</p>
         </div>
       </div>
 
-      <div className="pt-8 mt-auto space-y-5">
+      <div className="pt-3 mt-auto space-y-3.5">
         {/* Feature rows */}
-        <ul className="space-y-6 pb-6">
+        <ul className="space-y-3 pb-2.5">
           <li className="flex items-start gap-4">
             <Landmark className="text-gold h-[22px] w-[22px] mt-0.5 shrink-0" />
-            <p className="text-muted text-sm leading-relaxed">
+            <p className="text-muted text-sm font-light leading-relaxed">
               <strong className="text-heading font-medium block mb-1">Stable Access</strong>
               Quarterly visits to the training facility and trackside privileges.
             </p>
           </li>
           <li className="flex items-start gap-4">
             <Activity className="text-gold h-[22px] w-[22px] mt-0.5 shrink-0" />
-            <p className="text-muted text-sm leading-relaxed">
+            <p className="text-muted text-sm font-light leading-relaxed">
               <strong className="text-heading font-medium block mb-1">Real-time Updates</strong>
               Weekly audio and video reports from the trainer.
             </p>
           </li>
         </ul>
-        <div className="flex items-center justify-between border-t border-border pt-6">
-          <span className="text-muted text-base">Stake available</span>
-          <span className="text-heading font-bold text-2xl">{maxInvestmentPct.toFixed(0)}%</span>
+        <div className="flex items-center justify-between border-t border-border pt-3">
+          <span className="text-muted font-light text-base">Stake available</span>
+          <span className="text-heading font-light text-xl tracking-tight">{maxInvestmentPct.toFixed(0)}%</span>
         </div>
 
         {/* CTA: opens Step 2 term sheet (learn-more, not buy) */}
         <button
           type="button"
           onClick={() => setFlowOpen(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-pure-white px-8 py-4 text-base font-bold tracking-wide text-black transition-colors hover:bg-white/90"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-pure-white px-8 py-3 text-base font-bold tracking-wide text-black transition-colors hover:bg-white/90"
         >
           Become an Owner <span className="text-lg">→</span>
         </button>
-        <p className="text-center text-xs text-muted-foreground/70">
+        <p className="text-center text-xs font-light text-muted-foreground">
           Subject to{' '}
           <a href="#" className="text-muted underline underline-offset-2 hover:text-heading transition-colors">
             Product Disclosure Statement
@@ -339,7 +339,7 @@ export default function RightRail({
       : 'coming_soon';
 
   return (
-    <aside className="lg:sticky lg:top-28 space-y-6">
+    <aside className="lg:sticky lg:top-24 space-y-6">
       {statusChip(safeStatus)}
 
       {safeStatus === 'listed' && (

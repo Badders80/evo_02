@@ -203,29 +203,28 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
               />
             </div>
 
-            {/* RIGHT COLUMN */}
-            <div className="space-y-8 lg:sticky lg:top-28">
-              {(() => {
-                const legalPack = getCompiledLegalPackForCampaign(campaign);
-                return (
-                  <RightRail
-                    status={campaign.listingStatus}
-                    horseName={campaign.legalName}
-                    horseSlug={campaign.slug}
-                    wholesaleMonthlyNzd={campaign.wholesaleMonthlyNzd}
-                    minInvestmentPct={campaign.minStakePct}
-                    maxInvestmentPct={campaign.capTableFixture.availablePct > 0 ? campaign.capTableFixture.availablePct : 10.0}
-                    stakeStepPct={campaign.stakeStepPct || 0.5}
-                    legalPack={{
-                      pdsMarkdown: legalPack.pdsMarkdown,
-                      saMarkdown: legalPack.saMarkdown,
-                      pdsHash: legalPack.pdsHash,
-                      saHash: legalPack.saHash,
-                    }}
-                  />
-                );
-              })()}
-            </div>
+            {/* RIGHT COLUMN — RightRail's <aside lg:sticky> is the DIRECT grid item so it
+            travels within the full grid row (a wrapping div caps travel at its own height) */}
+            {(() => {
+              const legalPack = getCompiledLegalPackForCampaign(campaign);
+              return (
+                <RightRail
+                  status={campaign.listingStatus}
+                  horseName={campaign.legalName}
+                  horseSlug={campaign.slug}
+                  wholesaleMonthlyNzd={campaign.wholesaleMonthlyNzd}
+                  minInvestmentPct={campaign.minStakePct}
+                  maxInvestmentPct={campaign.capTableFixture.availablePct > 0 ? campaign.capTableFixture.availablePct : 10.0}
+                  stakeStepPct={campaign.stakeStepPct || 0.5}
+                  legalPack={{
+                    pdsMarkdown: legalPack.pdsMarkdown,
+                    saMarkdown: legalPack.saMarkdown,
+                    pdsHash: legalPack.pdsHash,
+                    saHash: legalPack.saHash,
+                  }}
+                />
+              );
+            })()}
           </div>
         </div>
       </main>
