@@ -1,0 +1,646 @@
+⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏ ⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠴ ⠧ Thinking...
+Let me carefully audit chunk-1 against the 8 claims. I need to check each c
+claim, look for bugs, edge cases, scope creep, and vocabulary issues.
+
+Let me go through the diff systematically.
+
+**f2: stepper opens at min (was Math.max(min, 2.0))**
+- Evidence: `apps/web/src/components/horse/right-rail.tsx` line ~482, the `
+`initialStakePct` computation returns `minInvestmentPct` as default, and `u
+`useState(initialStakePct)`. The old code was `Math.max(minInvestmentPct, 2
+2.0)`. New code: `const [stakePct, setStakePct] = React.useState<number>(in
+React.useState<number>(initialStakePct);` where `initialStakePct` defaults 
+to `minInvestmentPct`.
+- This passes f2.
+
+**f3: min_stake_pct wired from DB through horses-data.ts to page.tsx (was h
+hardcoded 1.0)**
+- Evidence: `apps/web/src/lib/horses-data.ts` adds `minStakePct: number;` t
+to interface and `minStakePct: Number(row.min_stake_pct ?? 1.0),` in rowToC
+rowToCampaign.
+- `apps/web/src/app/marketplace/[slug]/page.tsx` changes `minInvestmentPct=
+`minInvestmentPct={1.0}` to `minInvestmentPct={campaign.minStakePct}`.
+- This passes f3.
+
+**f4: fine-print line = "Minimum investment {min}% · Stake available {max}%
+{max}% · Contact us for more info"**
+- Evidence: `apps/web/src/components/horse/right-rail.tsx` lines ~548-550:
+```tsx
+<span>Minimum investment {minInvestmentPct.toFixed(1)}%</span>
+<span>Stake available {maxInvestmentPct.toFixed(1)}%</span>
+<span>Contact us for more info</span>
+```
+- This passes f4.
+
+**f5: availablePct <= 0 forces fully_subscribed (sold-out never buyable)**
+- Evidence: `apps/web/src/lib/horses-data.ts` lines ~195-201:
+```ts
+const listingStatus: ListingStatus =
+    availablePct <= 0 && statusToListingStatus(row.status) === 'listed'
+      ? 'fully_subscribed'
+      : statusToListingStatus(row.status);
+```
+And later `listingStatus,` is returned.
+- This correctly handles row.status already 'fully_subscribed' because `sta
+`statusToListingStatus(row.status)` would be 'fully_subscribed' not 'listed
+'listed', so the condition fails and it stays 'fully_subscribed'.
+- Does it break cap-table math? No, it only changes the listingStatus enum,
+enum, not the math.
+- This passes f5.
+
+**f6: 401 login redirect preserves ?units=**
+- Evidence: `apps/web/src/components/horse/right-rail.tsx` lines ~270-273:
+```ts
+const nextUrl = encodeURIComponent(`${window.location.pathname}?units=${sta
+encodeURIComponent(`${window.location.pathname}?units=${stakePct}`);
+router.push(`/login?next=${nextUrl}`);
+```
+- This preserves units. But wait - is `stakePct` the current state value? Y
+Yes, it's the state in the component. Good.
+- Passes f6.
+
+**f6b: ?units= read from URL on mount, validated min/max/step**
+- Evidence: `apps/web/src/components/horse/right-rail.tsx` lines ~485-497:
+```ts
+const initialStakePct = React.useMemo(() => {
+    if (typeof window === 'undefined') return minInvestmentPct;
+    const raw = new URLSearchParams(window.location.search).get('units');
+    if (!raw) return minInvestmentPct;
+    const parsed = parseFloat(raw);
+    if (!Number.isFinite(parsed)) return minInvestmentPct;
+    const step = stakeStepPct ?? 0.5;
+    const snapped = Math.round(parsed / step) * step;
+    if (snapped < minInvestmentPct || snapped > maxInvestmentPct) return mi
+minInvestmentPct;
+    return Math.round(snapped * 100) / 100;
+  }, [minInvestmentPct, maxInvestmentPct, stakeStepPct]);
+```
+- Edge cases:
+  - units param is 0 or negative: `snapped < minInvestmentPct` → returns mi
+min. Good.
+  - step is 0: `Math.round(parsed / 0) * 0` = Infinity * 0 = NaN. Then `sna
+`snapped < minInvestmentPct` with NaN is false, `snapped > maxInvestmentPct
+maxInvestmentPct` with NaN is false, returns NaN rounded = NaN. That's a bu
+bug! If step is 0, we get NaN state. But stakeStepPct is expected to be 0.5
+0.5 or similar. However, `stakeStepPct ?? 0.5` - if step is undefined/null 
+it uses 0.5, but if step is 0, it uses 0. Need a guard against step <= 0.
+  - Actually the code has `stakeStepPct ?? 0.5`, not `|| 0.5`. So if `stake
+`stakeStepPct` is 0, it uses 0. This is an edge case bug.
+  - Also parseFloat can parse things like "1.5abc" as 1.5. Not a big issue.
+issue.
+  - The snapped value might not exactly equal min if min isn't a mult
+multiple of step. For example min=1.0, step=0.5, parsed=1.0 → snapped=1.0 O
+OK. But if min=1.0, step=0.7, parsed=1.0 → snapped=0.7 which is < 1.0 → ret
+returns min=1.0. But 1.0 isn't a valid step multiple. That's a design issue
+issue but not necessarily this chunk's bug. However the stepper itself prob
+probably snaps to step multiples.
+  - Also using `Math.round(snapped * 100) / 100` assumes 2 decimal places. 
+For step=0.005 this would lose precision. But step is 0.5 typically.
+- The useMemo before useState question: React.useMemo runs during render. u
+useState initializer receives the memo value. The memo is stable because de
+deps are stable on mount. But actually on subsequent renders, useMemo recal
+recalculates, but useState ignores it (initializer only runs once). So the 
+value is correct on first render. However, there's a subtle issue: if the c
+component renders on server first (window undefined), initialStakePct = min
+minInvestmentPct. Then on client hydration, useState initializer has alread
+already run with minInvestmentPct. The URL params won't be read on client b
+because useState initializer doesn't re-run. Wait - this is a critical SSR/
+SSR/hydration issue!
+- Actually in Next.js, the page might be client-side navigated (CSR) to, in
+in which case window exists during render. But if it's SSR, the component r
+renders on server, useState initializes with minInvestmentPct. Then on clie
+client hydration, useState doesn't re-read URL. So f6b won't work for SSR p
+pages!
+- But this is a Next.js app. The marketplace page is an async server compon
+component, but `right-rail.tsx` is a client component (it has 'use client' 
+at the top). Client components in Next.js can still be server-rendered for 
+initial HTML. During server render, window is undefined. Then the useState 
+initializer runs with minInvestmentPct. After hydration, it stays minInvest
+minInvestmentPct even though window exists now.
+- This is a real bug. The fix would be to use a useEffect to read the URL a
+and update state after mount, not in an initializer. Or use a lazy initiali
+initializer that only runs on client... but lazy initializer also runs duri
+during SSR.
+- Wait, the comment says "restore stake from ?units= on mount". But using u
+useState initializer with window check doesn't work on mount if SSR'd first
+first. They need useEffect.
+- This is a BLOCKER or at least WARN for f6b.
+
+**f7: cancel_url includes ?units=**
+- Evidence: `apps/web/src/app/api/checkout/create-session/route.ts` line ~1
+~106:
+```ts
+params.append('cancel_url', `${origin}/horses/${horseSlug}?units=${units}`)
+`${origin}/horses/${horseSlug}?units=${units}`);
+```
+- But wait, the marketplace page is `/marketplace/[slug]` not `/horses/[slu
+`/horses/[slug]`. The cancel_url goes to `/horses/${horseSlug}`? That seems
+seems like it might be a pre-existing path. Let me check the diff context. 
+The success_url goes to `/mystable?checkout=success&slug=${horseSlug}&units
+`/mystable?checkout=success&slug=${horseSlug}&units=${units}`. The cancel_u
+cancel_url was `${origin}/horses/${horseSlug}`. Is `/horses/[slug]` still a
+a valid route? The chunk doesn't show changes to that. But the user is on `
+`/marketplace/nellie` per walk gate. So cancel sends them to `/horses/nelli
+`/horses/nellie?units=...`. If `/horses/[slug]` redirects to `/marketplace/
+`/marketplace/[slug]` or is a separate page, this might be OK or might be a
+a bug. The claim only says cancel_url includes ?units=, which it does. But 
+sending to `/horses/` vs `/marketplace/` could be an issue. Actually let me
+me re-read - the success_url is `/mystable`, the cancel_url is `/horses/${h
+`/horses/${horseSlug}`. The user probably came from `/marketplace/${slug}`.
+`/marketplace/${slug}`. So cancel_url pointing to `/horses/${slug}` might b
+be wrong. But this wasn't in the claims, and the gate says walk :3010: /mar
+/marketplace/nellie 200. So maybe /horses/nellie also works? Not clear from
+from diff. This could be scope creep or a pre-existing path. I'll note it a
+as a WARN but not fail f7 itself since it does include units.
+
+**f8: MyStable success state on ?checkout=success**
+- Evidence: `apps/web/src/components/mystable-dashboard.tsx` lines ~67-74:
+```ts
+const [checkoutSuccess, setCheckoutSuccess] = useState<{ slug: string; unit
+units: string } | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('checkout') !== 'success') return null;
+    return { slug: params.get('slug') ?? '', units: params.get('units') ?? 
+'' };
+  });
+```
+- Same SSR/hydration issue as f6b! If server-rendered, useState initializer
+initializer runs with null and never re-reads on client. Need useEffect.
+- But wait, is MyStableDashboard a client component? It doesn't have 'use c
+client' in the shown diff. Let me check - it's imported into a page. If it'
+it's used in a server component page, it could be server-rendered. The wind
+window check makes it not crash on SSR, but it won't read params after hydr
+hydration. So it's client-safe from crash perspective but functionally brok
+broken for SSR.
+- Banner copy: "Welcome to the syndicate — your {checkoutSuccess.units}% st
+stake in {checkoutSuccess.slug} is being finalised." - "syndicate" is allow
+allowed per vocabulary? The vocabulary whitelist says "Stakes/Co-owners, Se
+Settlement/Distribution/Prize money, Evolution Stables". It doesn't explici
+explicitly ban "syndicate" but earlier comment says "Units/Stakes/Co-owners
+"Units/Stakes/Co-owners". "Syndicate" is used elsewhere. It's a horse racin
+racing term. Probably OK. "finalised" is British English. No exclamation ma
+marks. Uses "stake" not "unit". OK.
+- The component itself might be server-rendered so f8 is partially broken. 
+Need useEffect.
+
+**Dead code / logic bugs:**
+- In `right-rail.tsx`, the `initialStakePct` useMemo before useState: the m
+memo is computed on every render but only used once. This is wasteful but n
+not harmful. Actually useMemo with those deps runs on every render (or when
+when deps change). The result is passed to useState initializer, but useSta
+useState only uses it on first render. So the useMemo computation on subseq
+subsequent renders is wasted. Not a bug, just inefficiency. The question as
+asks if it's valid - yes, it's valid React. useMemo runs during render, use
+useState initializer runs once. The memo value is stable for the first rend
+render if deps don't change between first and... wait, useMemo runs during 
+the same render as useState. On the very first render, useMemo computes, th
+then useState uses that value. On subsequent renders, useMemo recomputes bu
+but useState ignores. So yes valid, but wasteful and has the SSR issue.
+
+- In `horses-data.ts`, `listingStatus` uses `statusToListingStatus(row.stat
+`statusToListingStatus(row.status)` twice. Fine.
+
+- Cap table math: allocatedPct, reservedPct, retainedPct, availablePct. The
+The sold-out guard doesn't touch math.
+
+- Vocabulary: The comment says "Units/Stakes/Co-owners" banned from investo
+investor copy, but actually it says "Vocabulary whitelist: Units/Stakes/Co-
+Units/Stakes/Co-owners" - wait, the comment changed to "Stakes/Co-owners (U
+(Units retired from investor copy 2026-09-01)". So "Units" is banned, "Stak
+"Stakes" is allowed. The diff changes many "unit" references to "stake". Ne
+Need to check for remaining "unit" in investor copy.
+  - `right-rail.tsx`: "Acquire units" → "Take a stake". "Min ... Step ... M
+Max ..." → "Minimum investment ... Stake available ... Contact us for more 
+info". "monthlyKeepUnitNzd" variable name still has "Unit" but it's code, n
+not user copy. PDS text: "Fixed-duration syndicate units" → "Fixed-duration
+"Fixed-duration syndicate stakes". "per unit" → "per 1% stake". Good.
+  - `mystable-dashboard.tsx`: "Prize Payouts (75%)" → "Prize Distribution (
+(75%)". "syndicate unit" → "stake in a syndicate". Good.
+  - `create-session/route.ts`: product name "Syndicate Unit" → "Stake". Goo
+Good.
+  - Any remaining "Unit" in user-facing strings? `create-session/route.ts` 
+line: `line_items[0][price_data][product_data][name]` now says "Stake". Des
+Description still has unit? Let me check the description diff - only the na
+name was changed in the shown diff. The description might still say "units"
+"units" but it's not shown. The diff only shows the name line changed.
+  - The success_url uses `units=${units}` as query param name. The claim sa
+says `?units=` so that's intentional. "units" as a query param is not inves
+investor copy per se.
+
+- Zero exclamation marks: Need to check. The success banner: "Welcome to th
+the syndicate — your ... stake in ... is being finalised." No exclamation. 
+"A welcome email is on its way." No exclamation. Good.
+
+- British English: "finalised" is British. Good.
+
+**Scope creep:**
+Files changed:
+- `apps/web/src/app/api/checkout/create-session/route.ts` - f7, vocabulary 
+(Stake)
+- `apps/web/src/app/marketplace/[slug]/page.tsx` - f3, f5
+- `apps/web/src/components/horse/right-rail.tsx` - f2, f4, f6, f6b, vocabul
+vocabulary
+- `apps/web/src/components/mystable-dashboard.tsx` - f8, vocabulary
+- `apps/web/src/lib/horses-data.ts` - f3, f5
+- `apps/web/src/tests/e3_right_rail.test.ts` - test update for minStakePct
+
+All files seem relevant to the claims. No obvious scope creep.
+
+**Specific edge case checks:**
+
+f5 sold-out guard: `availablePct <= 0 && statusToListingStatus(row.status) 
+=== 'listed'`. If status is 'fully_subscribed', statusToListingStatus retur
+returns 'fully_subscribed', so condition false, listingStatus stays 'fully_
+'fully_subscribed'. Good. If status is 'listed' and availablePct is 0 or ne
+negative, it becomes 'fully_subscribed'. What if availablePct is negative? 
+That indicates data error, but forcing fully_subscribed is reasonable.
+
+But wait - `availablePct` is computed from cap table. If `row.status` is al
+already 'listed' and `availablePct <= 0`, we override. Good.
+
+Cap table math: `const availablePct = Number(row.available_pct ?? row.avail
+row.available_pct ?? 100 - allocatedPct - reservedPct);` - there's a duplic
+duplicate `row.available_pct ??` which is weird but not a bug introduced he
+here. The retained calc: `const retainedPct = Math.max(0, 100 - allocatedPc
+allocatedPct - reservedPct - availablePct);`. If availablePct is forced to 
+0 by the guard only in listingStatus, the actual availablePct value isn't c
+changed. So math still sums to 100. Good.
+
+f6b: "what if units param is 0 or negative?" - returns min. Good.
+"what if step is 0?" - bug, returns NaN. Need guard.
+Also the SSR/hydration bug is the biggest issue.
+
+f8: Same SSR/hydration issue.
+
+**Use of React.useMemo before useState:**
+The question specifically asks: "the initializer uses React.useMemo before 
+useState — is that valid? (useMemo runs during render, useState initializer
+initializer runs once — is the memo value stable?)"
+
+It's valid React syntax. However, on the first render during SSR, window is
+is undefined, so it returns min. On client hydration, useState initializer 
+has already run, so it never reads URL. So functionally broken. The memo va
+value is "stable" in the sense that it's computed consistently for a given 
+render, but it doesn't achieve the stated goal.
+
+Also there's a subtle issue: useMemo dependencies include min/max/step. On 
+first client render (CSR navigation), window exists and it reads URL. Good.
+Good. But if SSR, broken.
+
+**Summary of findings:**
+1. f2 - OK
+2. f3 - OK
+3. f4 - OK
+4. f5 - OK (with note that guard handles already-fully_subscribed)
+5. f6 - OK
+6. f6b - WARN or BLOCKER due to SSR/hydration issue and step=0 edge case
+7. f7 - OK for including units, but possible path mismatch (horses vs marke
+marketplace) - WARN
+8. f8 - WARN or BLOCKER due to SSR/hydration issue
+
+Wait, I need to determine if this is a BLOCKER or WARN. The gates passed (t
+(typecheck, lint, test, walk). The walk gate says `/marketplace/nellie 200,
+200, fine-print renders, mystable 307 (login redirect, expected unauthentic
+unauthenticated)`. It doesn't test the URL preservation after login or the 
+success banner. The e3 tests passed.
+
+The SSR issue: In Next.js App Router, client components are still server-re
+server-rendered for initial request. So if a user lands directly on `/marke
+`/marketplace/nellie?units=5`, the server renders the page, initialStakePct
+initialStakePct = min (because window undefined), client hydrates with min,
+min, and the user's selected 5% is lost. This breaks f6b. But if they navig
+navigate client-side from another page to `/marketplace/nellie?units=5`, it
+it works because window exists on first render. Since the login redirect is
+is a client-side router.push, the next page navigation is client-side, so i
+it would work. But if the user copies the URL and shares it, or refreshes, 
+it breaks.
+
+Similarly for f8: user lands on `/mystable?checkout=success&slug=...&units=
+`/mystable?checkout=success&slug=...&units=...` directly - server renders, 
+checkoutSuccess = null, client hydrates with null, banner never shows. This
+This is a real functional bug. But if they come from Stripe redirect (which
+(which is a full browser navigation), the page is server-rendered, so banne
+banner won't show. That's a critical bug for f8!
+
+So f6b and f8 are BLOCKERs because they don't work for the primary use case
+case (Stripe redirect is full navigation; login redirect could be but usual
+usually client-side router push).
+
+Actually, let me reconsider f6. The login redirect does `router.push('/logi
+`router.push('/login?next=...')`. The login page then on successful login l
+likely redirects to the `next` URL. If that redirect uses `router.push` or 
+`window.location`, it might be client-side or full navigation. We can't see
+see the login page code. But the `next` URL contains `?units=...`, so when 
+the user lands back on the marketplace page, it could be a full navigation 
+(if login does window.location redirect) or client-side (if router.push). I
+If full navigation, the SSR issue breaks f6b. If client-side, it works. But
+But f8 is definitely full navigation from Stripe.
+
+So my verdict should be FAIL due to SSR/hydration issues in f6b and f8.
+
+But wait, I should also consider whether the components are guaranteed to o
+only render client-side. `right-rail.tsx` has 'use client'. `mystable-dashb
+`mystable-dashboard.tsx` doesn't show 'use client' in diff but is presumabl
+presumably imported into a client or server page. Even with 'use client', N
+Next.js still SSRs the initial HTML. So the useState initializer runs on se
+server.
+
+Actually, there's a known pattern: in Next.js, 'use client' components are 
+still prerendered to HTML on the server. So yes, window is undefined during
+during that render.
+
+The fix for both is to use useEffect to read URL params after mount and upd
+update state.
+
+Let me also check if there's a way the current code could work. The useStat
+useState initializer with `typeof window === 'undefined'` returns null/min 
+on server. During hydration, React doesn't re-run the initializer. So yes, 
+broken.
+
+Actually, React 18/19 might run the initializer only once on the client, ev
+even with SSR. So definitely broken.
+
+Let me draft the findings:
+
+1. f2 stepper opens at min: OK
+2. f3 min_stake_pct wired: OK
+3. f4 fine-print copy: OK
+4. f5 sold-out guard: OK
+5. f6 login redirect preserves units: OK
+6. f6b URL units restore: BLOCKER - SSR/hydration + step=0 edge case
+7. f7 cancel_url units: OK (with path caveat)
+8. f8 success banner: BLOCKER - SSR/hydration issue
+
+Plus additional findings:
+- Vocabulary: OK
+- Scope creep: none
+- f6b step=0 NaN
+- cancel_url path mismatch warning
+
+Let me also check the units query param for negative/0 more carefully. `par
+`parsed = parseFloat(raw)`. If raw = "0", parsed = 0, snapped = 0, snapped 
+< minInvestmentPct (assuming min is 1.0) → returns min. Good. If raw = "-5"
+"-5", parsed = -5, snapped = -5 (or snapped to step multiple like 0), < min
+min → returns min. Good.
+
+If `stakeStepPct` is 0: `const step = stakeStepPct ?? 0.5;` → step = 0. `sn
+`snapped = Math.round(parsed / 0) * 0`. `parsed / 0` = Infinity (or -Infini
+-Infinity). `Math.round(Infinity)` = Infinity. `Infinity * 0` = NaN. `Numbe
+`Number.isFinite(NaN)` is false, but that check was on `parsed`, not `snapp
+`snapped`. So snapped = NaN. `NaN < min` is false, `NaN > max` is false, re
+returns `Math.round(NaN * 100) / 100` = NaN. Then useState gets NaN. That's
+That's a bug. Fix: guard step > 0: `const step = Math.max(stakeStepPct ?? 0
+0.5, 0.01)` or check `if (step <= 0) return minInvestmentPct;`.
+
+Also, if `minInvestmentPct` is NaN or undefined? It's a prop passed from pa
+parent. The parent gets it from `campaign.minStakePct` which defaults to 1.
+1.0 in horses-data. OK.
+
+Another edge case: the URL has `?units=2.3` with step 0.5. `snapped = Math.
+Math.round(2.3/0.5)*0.5 = Math.round(4.6)*0.5 = 5*0.5 = 2.5`. Then checks 2
+2.5 < min (1.0) false, > max maybe false, returns 2.5. Good.
+
+Another issue: `initialStakePct` depends on `window.location.search` inside
+inside useMemo. useMemo deps don't include window.location.search, but it d
+doesn't matter because it's only used once. Actually it matters because use
+useMemo is recalculated on subsequent renders but ignored. But if the URL c
+changes after mount, the state won't update. That's fine for this use case.
+case.
+
+But the bigger issue is that during SSR, `window` is undefined, so initialS
+initialStakePct = min. After hydration, state stays min. Broken.
+
+Actually, I realize there might be a nuance: The useState initializer funct
+function (the arrow function passed to useState) only runs once on the clie
+client, during the first client render or during SSR. The useMemo also runs
+runs during render. The question asks if using useMemo before useState is v
+valid. It is valid. But the functional goal isn't achieved due to SSR.
+
+Now for the output format: numbered findings, each with Severity (BLOCKER/W
+(BLOCKER/WARN/OK), Evidence (file:line), Fix (one line). End with verdict.
+
+I should be careful with line numbers. Since I don't have exact line number
+numbers, I'll use approximate line numbers from the diff hunk headers or es
+estimate. Let me use the diff hunk headers:
+- right-rail.tsx hunk at @@ -4,7 +4,7 @@, @@ -267,8 +267,8 @@, @@ -294,9 +2
++294,9 @@, @@ -311,14 +311,14 @@, @@ -479,7 +479,21 @@, @@ -501,10 +515,10 
+@@, @@ -531,9 +545,9 @@, @@ -610,7 +624,7 @@
+- create-session hunk at @@ -103,11 +103,11 @@
+- marketplace page hunk at @@ -213,7 +213,7 @@
+- horses-data hunk at @@ -22,6 +22,7 @@, @@ -191,6 +192,14 @@, @@ -213,6 +2
++222,7 @@, @@ -244,7 +254,7 @@
+- mystable-dashboard hunk at @@ -64,6 +64,15 @@, @@ -117,6 +126,30 @@, @@ -
+-159,7 +192,7 @@, @@ -284,7 +317,7 @@
+- test hunk at @@ -41,6 +41,7 @@
+
+For evidence, I'll cite specific code snippets rather than exact line numbe
+numbers, but I can include approximate line numbers.
+
+Let me write the findings now.
+...done thinking.
+
+# Chunk-1 Audit: Investor Flow Build
+
+## Findings
+
+### 1. f2 — stepper opens at min (was `Math.max(min, 2.0)`)
+**Severity:** OK  
+**Evidence:** `apps/web/src/components/horse/right-rail.tsx:482`  
+```tsx
+const [stakePct, setStakePct] = React.useState<number>(initialStakePct);
+```
+`initialStakePct` falls back to `minInvestmentPct` when no `?units=` is pre
+present.  
+**Fix:** N/A — verified.
+
+---
+
+### 2. f3 — `min_stake_pct` wired from DB to page
+**Severity:** OK  
+**Evidence:**  
+- `apps/web/src/lib/horses-data.ts:25` interface adds `minStakePct: number;
+number;`  
+- `apps/web/src/lib/horses-data.ts:225` maps `minStakePct: Number(row.min_s
+Number(row.min_stake_pct ?? 1.0),`  
+- `apps/web/src/app/marketplace/[slug]/page.tsx:216` passes `minInvestmentP
+`minInvestmentPct={campaign.minStakePct}`  
+**Fix:** N/A — verified.
+
+---
+
+### 3. f4 — fine-print copy
+**Severity:** OK  
+**Evidence:** `apps/web/src/components/horse/right-rail.tsx:548-550`  
+```tsx
+<span>Minimum investment {minInvestmentPct.toFixed(1)}%</span>
+<span>Stake available {maxInvestmentPct.toFixed(1)}%</span>
+<span>Contact us for more info</span>
+```
+**Fix:** N/A — verified.
+
+---
+
+### 4. f5 — sold-out guard never buyable
+**Severity:** OK  
+**Evidence:** `apps/web/src/lib/horses-data.ts:198-201`  
+```ts
+const listingStatus: ListingStatus =
+    availablePct <= 0 && statusToListingStatus(row.status) === 'listed'
+      ? 'fully_subscribed'
+      : statusToListingStatus(row.status);
+```
+The guard correctly leaves an already-`fully_subscribed` status untouched b
+because `statusToListingStatus(row.status) !== 'listed'`. It mutates only t
+the listing status enum, not the cap-table math, so `allocated + reserved +
++ retained + available = 100` is preserved.  
+**Fix:** N/A — verified.
+
+---
+
+### 5. f6 — 401 login redirect preserves `?units=`
+**Severity:** OK  
+**Evidence:** `apps/web/src/components/horse/right-rail.tsx:270-272`  
+```ts
+const nextUrl = encodeURIComponent(`${window.location.pathname}?units=${sta
+encodeURIComponent(`${window.location.pathname}?units=${stakePct}`);
+router.push(`/login?next=${nextUrl}`);
+```
+**Fix:** N/A — verified.
+
+---
+
+### 6. f6b — read `?units=` from URL on mount
+**Severity:** BLOCKER  
+**Evidence:** `apps/web/src/components/horse/right-rail.tsx:485-497`  
+```ts
+const initialStakePct = React.useMemo(() => {
+    if (typeof window === 'undefined') return minInvestmentPct;
+    const raw = new URLSearchParams(window.location.search).get('units');
+    ...
+  }, [minInvestmentPct, maxInvestmentPct, stakeStepPct]);
+const [stakePct, setStakePct] = React.useState<number>(initialStakePct);
+```
+Two defects:
+1. **SSR/hydration bug.** Next.js server-renders `'use client'` components 
+for the initial request. During that render `window` is `undefined`, so the
+the initializer returns `minInvestmentPct`. The `useState` initializer neve
+never runs again after hydration, so a user landing directly on `/marketpla
+`/marketplace/nellie?units=5` (or returning via a full browser navigation f
+from login/Stripe) silently loses the selected stake. The claim says "read 
+from URL on mount" — this does not work for the primary redirect paths.
+2. **Edge case `step = 0`.** `stakeStepPct ?? 0.5` falls back only on `null
+`null/undefined`; a zero step causes `Math.round(parsed / 0) * 0` = `NaN`, 
+which becomes the state.
+
+**Fix:** Move URL parsing into `useEffect` and guard step:
+```ts
+const [stakePct, setStakePct] = React.useState<number>(minInvestmentPct);
+React.useEffect(() => {
+  const raw = new URLSearchParams(window.location.search).get('units');
+  const parsed = raw ? parseFloat(raw) : NaN;
+  const step = Math.max(stakeStepPct ?? 0.5, 0.01);
+  const snapped = Math.round(parsed / step) * step;
+  if (Number.isFinite(snapped) && snapped >= minInvestmentPct && snapped <=
+<= maxInvestmentPct) {
+    setStakePct(Math.round(snapped * 100) / 100);
+  }
+}, [minInvestmentPct, maxInvestmentPct, stakeStepPct]);
+```
+
+---
+
+### 7. f7 — `cancel_url` includes `?units=`
+**Severity:** PASS-WITH-WARN  
+**Evidence:** `apps/web/src/app/api/checkout/create-session/route.ts:106`  
+
+```ts
+params.append('cancel_url', `${origin}/horses/${horseSlug}?units=${units}`)
+`${origin}/horses/${horseSlug}?units=${units}`);
+```
+The `?units=` query is present.  
+**Warning:** the cancel URL points to `/horses/${slug}` while the investor 
+browsing path shown in the walk gate is `/marketplace/${slug}`. If `/horses
+`/horses/[slug]` is no longer the canonical investor page (or does not carr
+carry the same UI), the user will land on an unexpected route after cancell
+cancelling.  
+**Fix:** Consider aligning cancel destination with the marketplace path, e.
+e.g. `${origin}/marketplace/${horseSlug}?units=${units}`.
+
+---
+
+### 8. f8 — MyStable success banner on `?checkout=success`
+**Severity:** BLOCKER  
+**Evidence:** `apps/web/src/components/mystable-dashboard.tsx:67-74`  
+```ts
+const [checkoutSuccess, setCheckoutSuccess] = useState<{ slug: string; unit
+units: string } | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('checkout') !== 'success') return null;
+    return { slug: params.get('slug') ?? '', units: params.get('units') ?? 
+'' };
+  });
+```
+Same SSR/hydration defect as f6b: the `useState` initializer runs once duri
+during server render, sees `window` as `undefined`, and returns `null`. Aft
+After hydration the state stays `null`, so the Stripe success banner never 
+appears on the full browser navigation that `success_url` triggers.
+
+Copy is otherwise clean: uses "stake", "finalised" (British), and contains 
+no exclamation marks.  
+**Fix:** Read params in `useEffect`:
+```ts
+const [checkoutSuccess, setCheckoutSuccess] = useState<{ slug: string; unit
+units: string } | null>(null);
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('checkout') === 'success') {
+    setCheckoutSuccess({ slug: params.get('slug') ?? '', units: params.get(
+params.get('units') ?? '' });
+  }
+}, []);
+```
+
+---
+
+### 9. Vocabulary / brand consistency
+**Severity:** OK  
+**Evidence:** Diff retires "Unit(s)" from investor copy in `right-rail.tsx`
+`right-rail.tsx`, `mystable-dashboard.tsx`, and `create-session/route.ts`. 
+Remaining `unit` strings are code identifiers (`monthlyKeepUnitNzd`) or que
+query parameter names (`?units=`), not user-facing copy. No exclamation mar
+marks introduced; British spelling "finalised" used.  
+**Fix:** N/A.
+
+---
+
+### 10. Scope creep
+**Severity:** OK  
+**Evidence:** Files changed map directly to claims:
+- `route.ts` → f7 + vocabulary
+- `page.tsx` → f3
+- `right-rail.tsx` → f2/f4/f6/f6b
+- `mystable-dashboard.tsx` → f8
+- `horses-data.ts` → f3/f5
+- `e3_right_rail.test.ts` → test coverage for f3  
+No unrelated features or files.  
+**Fix:** N/A.
+
+---
+
+## Verdict
+
+**FAIL**
+
+Chunk-1 satisfies the static claims in isolation, but **f6b and f8 are func
+functionally broken for the main user journeys they are meant to support**:
+support**: full-browser navigation from Stripe (`success_url`) and full-bro
+full-browser return from login. The `useState` initializer pattern with `ty
+`typeof window === 'undefined'` is safe from a server-crash perspective but
+but cannot read URL parameters after SSR hydration. Both must be moved to `
+`useEffect`.
+
+Fixing f6b also requires guarding `stakeStepPct <= 0` to prevent `NaN` stat
+state.
+

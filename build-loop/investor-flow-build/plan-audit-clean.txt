@@ -1,0 +1,1350 @@
+⠋ ⠙ ⠹ ⠸ ⠴ ⠴ ⠦ ⠧ ⠇ ⠋ Thinking...
+The user wants me to audit a build plan against actual codebase. I need to 
+check:
+
+1. Wrong assumptions about codebase
+2. Missing files/dependencies
+3. Broken chunk dependency edges
+4. Scope gaps for f1-f15
+5. Verification steps that don't actually verify claims
+6. Does plan capture locked mockup look
+7. Events table claim
+8. min_stake_pct column and horses-data.ts reading it
+
+I have code sections provided. Let me analyze carefully.
+
+First, let me understand the codebase structure from the provided sections:
+sections:
+
+right-rail.tsx:
+- Line 482: `const [stakePct, setStakePct] = React.useState<number>(Math.ma
+React.useState<number>(Math.max(minInvestmentPct, 2.0));` — this is actuall
+actually f2? Wait, f2 says "stepper opens at Math.max(min,2.0)" and f3 says
+says "min hardcoded 1.0". The prompt says "Line 482: const [stakePct, setSt
+setStakePct] = React.useState<number>(Math.max(minInvestmentPct, 2.0)); Thi
+This is f3 — stepper opens at Math.max(min, 2.0), not Math.max(min, 1.0). T
+The minInvestmentPct defaults to 1.0 but the state starts at 2.0."
+
+Wait, the prompt's own annotation seems confused. Let me re-read the fixes 
+list:
+- f2 stepper opens at Math.max(min,2.0)
+- f3 min hardcoded 1.0
+
+Actually looking at right-rail.tsx line 482: `Math.max(minInvestmentPct, 2.
+2.0)` — this is the stepper opening at max of min and 2.0. If f2 is "steppe
+"stepper opens at Math.max(min,2.0)", then this line already implements f2,
+f2, not f3. But the prompt note says "This is f3". Hmm.
+
+Wait, maybe the current code already has some bug. Let me look: f2 says "st
+"stepper opens at Math.max(min,2.0)" which is the desired fix. f3 says "min
+"min hardcoded 1.0" which is the bug. But line 482 currently is `Math.max(m
+`Math.max(minInvestmentPct, 2.0)` which matches f2's desired behavior. And 
+page.tsx line 216 has `minInvestmentPct={1.0}` which is f3 (min hardcoded t
+to 1.0). 
+
+The prompt's note says "Line 482: ... This is f3" — but I think that's the 
+prompt author's mislabeling. Actually reading more carefully: "This is f3 —
+— stepper opens at Math.max(min, 2.0), not Math.max(min, 1.0). The minInves
+minInvestmentPct defaults to 1.0 but the state starts at 2.0." This seems c
+contradictory. The author of these code notes may have mixed up f2 and f3. 
+But my job is to audit the PLAN, not the code annotations.
+
+Let me focus on the plan's claims:
+- C1: f2 stepper opens at min — wait, the plan says "f2 stepper opens at mi
+min · f3 min_stake_pct wiring"
+- The fixes list in prompt: f2 stepper opens at Math.max(min,2.0), f3 min h
+hardcoded 1.0
+
+Actually the plan says "f2 stepper opens at min" which doesn't match the pr
+prompt's f2 definition "Math.max(min,2.0)". The plan seems to abbreviate. T
+The plan says f3 is "min_stake_pct wiring" but the prompt says f3 is "min h
+hardcoded 1.0". 
+
+This is confusing. The user provides the fix definitions at the top:
+"f1-f15 — is every fix assigned to a chunk? (f1 modal-in-rail, f2 stepper o
+opens at Math.max(min,2.0), f3 min hardcoded 1.0, f4 fine-print line, f5 av
+availablePct<=0 falls to 10.0, f6 401 redirect drops ?units=, f7 cancel_url
+cancel_url lacks ?units=, f8 MyStable success state, f9 5 stepper error sta
+states, f10 7-code Stripe error mapping, f11 75% green row, f12 4-row summa
+summary block, f13 KYC prompt in modal, f14 max-w-lg x h-[720px], f15 Purch
+PurchaseFlowModal absent)"
+
+So f2 = stepper opens at Math.max(min,2.0)
+f3 = min hardcoded 1.0
+
+The plan's chunk table says:
+C1: f2 stepper opens at min · f3 min_stake_pct wiring
+
+This is a mismatch! The plan says f3 is "min_stake_pct wiring" but the actu
+actual f3 is "min hardcoded 1.0". The plan might be using different termino
+terminology. Also f2 in plan says "stepper opens at min" instead of "Math.m
+"Math.max(min,2.0)".
+
+Wait, but maybe the plan is describing what needs to be done in the fix. "s
+"stepper opens at min" might be shorthand for "stepper opens at Math.max(mi
+Math.max(min,2.0)". And "min_stake_pct wiring" might be shorthand for fixin
+fixing the hardcoded 1.0 by wiring to min_stake_pct. But the wording is amb
+ambiguous.
+
+Actually, looking at the architecture approach: "Numbers: mockup figures ($
+($76, $380, 21 months) are PLACEHOLDERS — real build wires pricingForUnits(
+pricingForUnits(campaign.wholesaleMonthlyNzd, units) + campaign data. Never
+Never hand-compute."
+
+And the verification steps: "Walk :3010: /marketplace/nellie → CTA → modal 
+steps → checkout"
+
+Now let me check each of the 8 areas:
+
+1. Wrong assumptions about codebase:
+
+The plan assumes `apps/web/src/components/horse/purchase-flow-modal.tsx` ne
+needs to be created (f15 PurchaseFlowModal absent). The prompt says f15 is 
+"PurchaseFlowModal absent" which means the file doesn't exist, so creating 
+it is correct.
+
+The plan references `apps/web/src/lib/nellie-loop.ts` as read-only. This fi
+file exists with pricingForUnits and stakePctToStepUnits.
+
+The plan references `apps/web/src/lib/horses-data.ts` as read-only with cap
+capTableFixture, min_stake_pct. The provided code shows capTableFixture exi
+exists but I need to check if min_stake_pct is actually read/used. The code
+code section shows availablePct computed from sharesAvailable * stakeStepPc
+stakeStepPct. It doesn't show min_stake_pct being read. This is finding #8.
+#8.
+
+The plan mentions `apps/web/src/app/mystable/page.tsx` to modify for f8 MyS
+MyStable success state.
+
+2. Missing files/dependencies:
+
+Need to check if all referenced files exist. From provided sections:
+- right-rail.tsx exists (with code)
+- page.tsx exists
+- create-session/route.ts exists
+- mystable/page.tsx mentioned but code not provided
+- purchase-flow-modal.tsx doesn't exist yet (to create)
+- nellie-loop.ts exists
+- horses-data.ts exists
+- supabase/migrations/00001_initial_schema.sql exists
+
+No obvious missing files, except maybe the plan doesn't mention some needed
+needed files. But I should look for what the plan assumes that might not ex
+exist.
+
+3. Broken chunk dependency edges:
+
+The plan-graph.json has chunks:
+- chunk-1: no deps
+- chunk-2: depends on chunk-1
+- chunk-3: depends on chunk-2
+- chunk-4: depends on chunk-3
+- chunk-5: depends on chunk-4
+
+This is correct sequential ordering chunk-1 -> chunk-2 -> chunk-3 -> chunk-
+chunk-4 -> chunk-5.
+
+But check the edges within chunks:
+chunk-1: right-rail.tsx, page.tsx, create-session/route.ts, mystable/page.t
+mystable/page.tsx, cmd:just-check, cmd:typecheck
+chunk-2: purchase-flow-modal.tsx, right-rail.tsx, cmd:typecheck
+chunk-3: purchase-flow-modal.tsx, sql:events-table, cmd:typecheck
+chunk-4: purchase-flow-modal.tsx, mystable/page.tsx, cmd:typecheck
+chunk-5: purchase-flow-modal.tsx, create-session/route.ts, cmd:typecheck
+
+There's an edge from file:page.tsx to file:right-rail.tsx in edges, but rig
+right-rail.tsx depends on page.tsx for min/max props. Actually page passes 
+props to right-rail, so right-rail depends on page. The edge direction "fro
+"from page to right-rail" means page is a prerequisite for right-rail, whic
+which is correct (page must define the props before right-rail can consume 
+them).
+
+But wait, in chunk-1 both page.tsx and right-rail.tsx are in the same chunk
+chunk, so the edge doesn't cross chunk boundaries. That's fine.
+
+Edge from right-rail.tsx to purchase-flow-modal.tsx: right-rail imports/use
+imports/uses modal, so modal is prerequisite. This is chunk-2 depends on ch
+chunk-1. Correct.
+
+Edge from create-session/route.ts to purchase-flow-modal.tsx: modal calls A
+API. So route.ts is prerequisite for modal. This means chunk-2 depends on c
+chunk-1 (since create-session is in chunk-1). Correct.
+
+Edge from sql:events-table to purchase-flow-modal.tsx: events table prerequ
+prerequisite for audit tick. This means chunk-3 depends on chunk-2 (modal m
+must exist first, then events wiring). Actually the edge direction is from 
+sql to modal, meaning sql is prereq for modal. But chunk-3 has modal + sql,
+sql, depends on chunk-2. So modal exists from chunk-2, then in chunk-3 we a
+add sql wiring. That makes sense.
+
+Edges to gates:
+- right-rail.tsx -> just-check
+- purchase-flow-modal.tsx -> typecheck
+- typecheck -> walk-3010
+
+But note cmd:just-check is in chunk-1 and cmd:typecheck is in chunks 1-5. T
+The typecheck command is shared across all chunks. There's no direct issue 
+but the graph says chunk-1 has cmd:typecheck, and chunk-2 etc also have cmd
+cmd:typecheck. This means typecheck is run multiple times? That's fine.
+
+However, there might be a broken edge: f8 MyStable success state is in C1 b
+but the success redirect URL is in create-session/route.ts (line 105). The 
+mystable page needs to handle the checkout=success query param. The plan pu
+puts mystable in C1 and C4. In C1 it says "f8 MyStable success state". In C
+C4 it says "Own (MyStable success)". So f8 is in C1. But the edge for mysta
+mystable is only in chunk-4 (to purchase-flow-modal.tsx). Actually f8 might
+might be the redirect target, not necessarily called by modal. The success 
+URL is set in create-session/route.ts, and mystable handles it. There's no 
+need for modal -> mystable edge. But the plan doesn't have an explicit edge
+edge for mystable handling the success state in chunk-1. That's okay becaus
+because it's within chunk-1.
+
+Wait, there's an edge from file:mystable/page.tsx in chunk-4 to file:purcha
+file:purchase-flow-modal.tsx, but not in chunk-1. That seems odd if f8 is i
+in C1. Actually the edge says mystable depends on modal for "Own (MyStable 
+success)" which is C4. But f8 (MyStable success state) is in C1. The plan's
+plan's graph doesn't reflect that f8 is implemented in C1. This is a minor 
+issue.
+
+4. Scope gaps: fixes f1-f15 assigned to chunks:
+
+Let's map:
+- f1 modal-in-rail: C2 (modal extraction + Step 2 term sheet: "f1 modal out
+out of rail")
+- f2 stepper opens at Math.max(min,2.0): C1 ("f2 stepper opens at min") — b
+but plan wording is "stepper opens at min" not "Math.max(min,2.0)". Potenti
+Potential gap: does the plan understand the Math.max(min,2.0) requirement?
+- f3 min hardcoded 1.0: C1 ("f3 min_stake_pct wiring") — this is about repl
+replacing hardcoded 1.0 with min_stake_pct. Assigned to C1.
+- f4 fine-print line: C1
+- f5 availablePct<=0 falls to 10.0: C1 ("f5 sold-out fallback → ClosedCard"
+ClosedCard") — wait, plan says "sold-out fallback → ClosedCard" but f5 is "
+"availablePct<=0 falls to 10.0". The current code at page.tsx line 217: `ma
+`maxInvestmentPct={campaign.capTableFixture.availablePct > 0 ? campaign.cap
+campaign.capTableFixture.availablePct : 10.0}` — this is f5. But the plan d
+describes it as "sold-out fallback → ClosedCard". That's different! If avai
+availablePct <= 0, the fix f5 says it should fall to 10.0, but plan says Cl
+ClosedCard. This is a scope mismatch / wrong fix.
+- f6 401 redirect drops ?units=: C1
+- f7 cancel_url lacks ?units=: C1
+- f8 MyStable success state: C1
+- f9 5 stepper error states: C5
+- f10 7-code Stripe error mapping: C5
+- f11 75% green row: C2
+- f12 4-row summary block: C2
+- f13 KYC prompt in modal: C3
+- f14 max-w-lg x h-[720px]: C2
+- f15 PurchaseFlowModal absent: C2
+
+So all 15 are assigned. But some descriptions mismatch:
+- f5: plan says "sold-out fallback → ClosedCard" but actual f5 is "availabl
+"availablePct<=0 falls to 10.0"
+- f2: plan says "stepper opens at min" but actual f2 is "stepper opens at M
+Math.max(min,2.0)"
+- f3: plan says "min_stake_pct wiring" which might be the fix, but actual f
+f3 is "min hardcoded 1.0"
+
+The f5 mismatch is serious: plan would implement wrong fix (ClosedCard inst
+instead of 10.0 fallback). Actually wait, maybe "sold-out fallback → Closed
+ClosedCard" is the desired behavior? But the prompt says f5 is "availablePc
+"availablePct<=0 falls to 10.0" and the current code has `availablePct > 0 
+? availablePct : 10.0` which is exactly that. So f5 is the bug that needs f
+fixing? Or is f5 the desired state?
+
+Re-reading: "fixes f1-f15 — is every fix assigned to a chunk? (f1 modal-in-
+modal-in-rail, f2 stepper opens at Math.max(min,2.0), f3 min hardcoded 1.0,
+1.0, f4 fine-print line, f5 availablePct<=0 falls to 10.0, f6 401 redirect 
+drops ?units=, f7 cancel_url lacks ?units=, f8 MyStable success state, f9 5
+5 stepper error states, f10 7-code Stripe error mapping, f11 75% green row,
+row, f12 4-row summary block, f13 KYC prompt in modal, f14 max-w-lg x h-[72
+h-[720px], f15 PurchaseFlowModal absent)"
+
+The parenthetical seems to describe the FIXES, i.e., what needs to be fixed
+fixed. So f5 is "availablePct<=0 falls to 10.0" meaning this is the current
+current broken behavior that needs to be fixed. Wait no, "fixes f1-f15" — t
+these are the 15 issues. So f5 = availablePct<=0 falls to 10.0 is an issue.
+issue. But the plan describes C1 f5 as "sold-out fallback → ClosedCard". 
+
+Hmm. Actually, the plan might be saying the FIX for f5 is to show a ClosedC
+ClosedCard when sold out. But the provided code shows the current behavior 
+is falling back to 10.0. So the plan's intended fix (ClosedCard) contradict
+contradicts the current code's behavior and the stated f5 issue. This is a 
+real discrepancy.
+
+Wait, let me reconsider. Maybe the audit found that the current behavior "a
+"availablePct<=0 falls to 10.0" is a bug, and the fix should be "ClosedCard
+"ClosedCard". The plan describes the fix, not the bug. But the user's quest
+question says "fixes f1-f15 — is every fix assigned to a chunk? (f1 modal-i
+modal-in-rail, ... f5 availablePct<=0 falls to 10.0, ...". This lists the b
+bug names. Then it asks if every fix is assigned to a chunk. So we need to 
+verify that each bug (as named) has a corresponding fix in the plan. 
+
+For f5, the bug is "availablePct<=0 falls to 10.0". The plan's C1 says "f5 
+sold-out fallback → ClosedCard". This does address the bug (when sold out, 
+show ClosedCard instead of falling back to 10.0). So maybe it's assigned co
+correctly, just described as the fix rather than the bug.
+
+But the question is about "fixes f1-f15 — is every fix assigned to a chunk?
+chunk?" and the list is bug descriptions. So we need to check if each bug d
+description has a corresponding plan item. For f5, yes — "sold-out fallback
+fallback → ClosedCard" is the fix for "availablePct<=0 falls to 10.0". 
+
+For f2, the bug is "stepper opens at Math.max(min,2.0)". Wait, is that a bu
+bug or the desired fix? The current code line 482 shows `Math.max(minInvest
+`Math.max(minInvestmentPct, 2.0)`. If f2 is the bug, then the plan says "st
+"stepper opens at min" which would be the fix (make it open at min, not max
+max(min,2.0)). But if f2 is the desired fix, then the current code already 
+has it. 
+
+Hmm, the list says "fixes f1-f15" and gives parentheticals. The parenthetic
+parentheticals could be either the bug or the desired state. But "f2 steppe
+stepper opens at Math.max(min,2.0)" — given the current code has exactly th
+that, it's more likely the desired state. But then the current code already
+already implements f2, which contradicts it being a "fix" needed. Unless th
+the current code is from after some previous partial fix.
+
+Actually the code section note says: "Line 482: const [stakePct, setStakePc
+setStakePct] = React.useState<number>(Math.max(minInvestmentPct, 2.0)); Thi
+This is f3 — stepper opens at Math.max(min, 2.0), not Math.max(min, 1.0). T
+The minInvestmentPct defaults to 1.0 but the state starts at 2.0." 
+
+The note labels this as f3, but I think that's the note author's error. The
+The note says "stepper opens at Math.max(min, 2.0), not Math.max(min, 1.0)"
+1.0)". So the bug is that it opens at 2.0 instead of 1.0? Or the current st
+state is the fix? The note is unclear.
+
+Let me re-read f2 and f3 definitions:
+- f2 stepper opens at Math.max(min,2.0)
+- f3 min hardcoded 1.0
+
+If the current code has `Math.max(minInvestmentPct, 2.0)`, and f2 is "stepp
+"stepper opens at Math.max(min,2.0)", then f2 is already implemented in cur
+current code. But if f2 is a bug, then "stepper opens at Math.max(min,2.0)"
+Math.max(min,2.0)" is the bug, and the desired fix is "stepper opens at min
+min" (which matches plan C1). And f3 "min hardcoded 1.0" — the current code
+code has `minInvestmentPct={1.0}` in page.tsx line 216, which is the bug, a
+and the fix is to wire it to min_stake_pct (matches plan C1).
+
+This interpretation makes sense: the 15 items are BUGS, and the plan descri
+describes the FIXES. So:
+- f2 bug: stepper opens at Math.max(min,2.0). Fix: stepper opens at min. Pl
+Plan C1 says "f2 stepper opens at min" — this describes the fix, assigned.
+- f3 bug: min hardcoded 1.0. Fix: wire to min_stake_pct. Plan C1 says "f3 m
+min_stake_pct wiring" — fix, assigned.
+- f5 bug: availablePct<=0 falls to 10.0. Fix: show ClosedCard. Plan C1 says
+says "f5 sold-out fallback → ClosedCard" — fix, assigned.
+
+OK so the parentheticals are bugs, plan describes fixes. That makes more se
+sense.
+
+But there's still the issue: the plan's wording for f2 is ambiguous. It say
+says "f2 stepper opens at min" which could be interpreted as the bug or fix
+fix. But given the bug list says f2 = "stepper opens at Math.max(min,2.0)",
+Math.max(min,2.0)", the plan's "stepper opens at min" is the fix. Good.
+
+However, there is a potential issue: the plan says C1 includes "f2 stepper 
+opens at min · f3 min_stake_pct wiring". But it doesn't explicitly say "rep
+"replace Math.max(min,2.0) with Math.max(min,1.0)" or similar. If a develop
+developer reads "stepper opens at min" they might just set it to minInvestm
+minInvestmentPct, but the bug was specifically about 2.0. Actually the fix 
+for "stepper opens at Math.max(min,2.0)" should be "stepper opens at min" (
+(i.e., remove the 2.0 floor). So that's correct.
+
+Now f5: bug is "availablePct<=0 falls to 10.0". Current code at page.tsx li
+line 217 has exactly this. Plan fix is "sold-out fallback → ClosedCard". Th
+That addresses the bug. Good.
+
+But wait — the plan's architecture approach says: "Step 2 header: mockup 'D
+'Digital-Syndication Terms' (newer, founder-reviewed)." and "Step 3 header:
+header: mockup 'Acceptance — {horse} your documents' (newer)." These aren't
+aren't in the f1-f15 list but are design choices.
+
+5. Verification steps that would not actually verify the claim:
+
+- "just check 10/10 must pass" — just check may run lint/tests, but it does
+doesn't verify UI behavior like stepper opening at correct value or modal d
+dimensions.
+- "pnpm --filter @evo/web typecheck" — type safety, doesn't verify runtime 
+behavior.
+- "Walk :3010: /marketplace/nellie → CTA → modal steps → checkout" — manual
+manual walk, could verify but is vague. It doesn't specify checking each fi
+fix specifically (e.g., checking cancel_url has ?units=, 401 preserves ?uni
+?units=, stepper starts at min, etc.).
+- "kimi-code-audit per chunk" — external, not defined in plan how it verifi
+verifies.
+
+The verification lacks specific assertions for many fixes. For example:
+- No verification that min_stake_pct is actually read from DB (not hardcode
+hardcoded 1.0)
+- No verification that cancel_url preserves ?units=
+- No verification that 401 redirect preserves ?units=
+- No verification that green 75% row exists
+- No verification that 4-row summary exists
+- No verification that stepper error states are implemented
+- No verification of Stripe 7-code mapping
+
+6. Does the plan capture the locked mockup look?
+
+Mockup has:
+- max-w-lg w-full h-[720px] — plan captures f14.
+- Stepper: MIN=1, MAX=5, STEP=0.5 — plan mentions stepper opens at min, but
+but doesn't explicitly mention max=5 and step=0.5. The current code has sta
+stakeStepPct. Need to verify mockup's stepper values match.
+- 4-row summary block — plan captures f12.
+- Green 75% row — plan captures f11.
+- Accordion + Completed badge — plan captures in C3.
+- max-w-lg x h-[720px] — captured.
+
+But the plan doesn't explicitly mention that Steps 2–6 share the same shell
+shell. It does say "Modal shell (f14): max-w-lg × h-[720px], content scroll
+scrolls inside — all Steps 2–6 share it." So yes.
+
+However, there's a discrepancy: mockup says "Step 2 (lines 170-270): max-w-
+max-w-[1600px] mx-auto px-8, inside has max-w-lg w-full h-[720px]". So the 
+outer container is max-w-[1600px]. The plan only says max-w-lg x h-[720px].
+h-[720px]. This might be fine if the modal is the inner container.
+
+7. Events table claim:
+
+Plan says: "events table exists (supabase/migrations/00001_initial_schema.s
+(supabase/migrations/00001_initial_schema.sql:220) — write event_type='acce
+event_type='acceptance' via service client. No migration needed."
+
+The code shows:
+- Line 220-230: events table definition with id, stripe_event_id, event_typ
+event_type, payload, processed, processed_at, error_message, created_at, up
+updated_at
+- Lines 241-250: RLS policy "Service role has full access to events"
+
+So the events table exists at 00001:220 with event_type column. RLS policy 
+allows service role writes. This is OK.
+
+But one concern: the events table is named for Stripe events (stripe_event_
+(stripe_event_id). Using it for acceptance audit ticks might be semanticall
+semantically wrong, but the schema has event_type column and the service ro
+role can write. The plan's claim is technically correct.
+
+8. min_stake_pct:
+
+Schema at 00001:132 has min_stake_pct column. 00002:9 also has it (plan men
+mentions). But horses-data.ts code section shows capTableFixture computed f
+from sharesAvailable * stakeStepPct, not reading min_stake_pct. The plan sa
+says "horses-data.ts Read-only (capTableFixture, min_stake_pct)" but if hor
+horses-data.ts doesn't actually expose min_stake_pct, then C1's "f3 min_sta
+min_stake_pct wiring" needs a data-layer step.
+
+The plan assigns f3 to C1 but doesn't explicitly mention modifying horses-d
+horses-data.ts or the data layer to read min_stake_pct. It says horses-data
+horses-data.ts is read-only. So if min_stake_pct isn't currently read, the 
+plan has a gap.
+
+This is a significant issue.
+
+Now let me think about other potential issues:
+
+- The plan references `?units=` in URL for state (Q2). But the current crea
+create-session route has success_url with `units=${units}`. The cancel_url 
+lacks it (f7). The 401 redirect drops it (f6). The plan addresses these.
+
+- The plan says "State (Q2): ?units= in URL (locked — f6/f7 exist to preser
+preserve it) + step = client state. Deep-linkable, refresh-safe." But does 
+the current page.tsx handle ?units= to initialize the modal/stepper? The pl
+plan doesn't explicitly mention adding URL parsing for ?units= to initializ
+initialize state. f6 and f7 are about preserving it on redirects, but to ma
+make it deep-linkable and refresh-safe, the page needs to read ?units= on l
+load. The plan might be missing this.
+
+- The plan mentions "PURCHASES_ENABLED=true + sk_test_ in .env.local" but d
+doesn't verify these are present or document how to configure.
+
+- The plan's chunk-1 includes cmd:typecheck but chunk-1 modifies files befo
+before purchase-flow-modal.tsx exists. typecheck might fail initially becau
+because right-rail.tsx will import purchase-flow-modal.tsx which doesn't ex
+exist yet. Wait, if C1 modifies right-rail.tsx to extract modal, but purcha
+purchase-flow-modal.tsx is created in C2, then during C1 right-rail.tsx mig
+might still use the old inline modal or have a placeholder. The plan says C
+C1 is "PR-A bug fixes" and C2 is "Modal extraction". So C1 doesn't extract 
+the modal. Then right-rail.tsx in C1 still has AcceptanceGateModal usage. T
+That seems fine. C2 then extracts modal.
+
+Actually the plan's C1 files include right-rail.tsx and C2 also includes ri
+right-rail.tsx. C2 modifies it for modal extraction. So C1 doesn't change m
+modal extraction.
+
+But wait, the chunk-1 graph node for right-rail.tsx says "Rail: stepper ope
+opens at min, fine-print line, 401 keeps ?units=, modal extracted". "modal 
+extracted" is in the description of chunk-1's right-rail node, but the chun
+chunk-1 table says modal extraction is C2. This is inconsistent. The node d
+description says "modal extracted" but chunk-1 doesn't do modal extraction.
+extraction. That's a wrong assumption in plan-graph.json.
+
+- Also, chunk-1's right-rail node says "401 keeps ?units=" but f6 is about 
+the 401 redirect in some other file (probably page.tsx or middleware). The 
+code section shows "Lines 269-273: 401 redirect handling router.push(/login
+router.push(/login?next=${nextUrl}) — does not preserve ?units=, this is f6
+f6." Where is this 401 handling? The code section doesn't specify the file.
+file. It might be in page.tsx or a middleware. The plan assigns f6 to C1 wi
+with files right-rail.tsx, page.tsx, create-session/route.ts, mystable/page
+mystable/page.tsx. But if the 401 handling is in a different file not liste
+listed, the plan misses it.
+
+- The plan's C1 says "f8 MyStable success state" and modifies mystable/page
+mystable/page.tsx. But f8 might also require changes to create-session/rout
+create-session/route.ts (success_url) which is already in C1. Good.
+
+- The plan says "Numbers: mockup figures ($76, $380, 21 months) are PLACEHO
+PLACEHOLDERS — real build wires pricingForUnits(campaign.wholesaleMonthlyNz
+pricingForUnits(campaign.wholesaleMonthlyNzd, units) + campaign data. Never
+Never hand-compute." This is good.
+
+- The plan says "E4 welcome email: OUT OF SCOPE". Good.
+
+- The plan says "KYC port (Firebase → Supabase) — rides existing port; C4 w
+wires the prompt only". But the fixes list has f13 "KYC prompt in modal" in
+in C3. The plan C4 says "Verify (KYC)" — maybe C3 is the prompt and C4 is t
+the actual verification flow. This is OK.
+
+- The plan's C5 says "f9 5 stepper error states · f10 7-code Stripe error→c
+error→copy". The create-session route currently has error handling but prob
+probably not 7-code mapping. Plan C5 modifies create-session/route.ts for e
+error mapping. Good.
+
+Now let me also think about the dependency graph more carefully. The chunks
+chunks claim:
+- chunk-1: right-rail.tsx, page.tsx, create-session/route.ts, mystable/page
+mystable/page.tsx, just-check, typecheck
+- chunk-2: purchase-flow-modal.tsx, right-rail.tsx, typecheck, depends on c
+chunk-1
+- chunk-3: purchase-flow-modal.tsx, sql:events-table, typecheck, depends on
+on chunk-2
+- chunk-4: purchase-flow-modal.tsx, mystable/page.tsx, typecheck, depends o
+on chunk-3
+- chunk-5: purchase-flow-modal.tsx, create-session/route.ts, typecheck, dep
+depends on chunk-4
+
+Dependency edges:
+- page -> right-rail (within chunk-1)
+- right-rail -> purchase-flow-modal (chunk-1 -> chunk-2)
+- create-session/route -> purchase-flow-modal (chunk-1 -> chunk-2)
+- sql:events-table -> purchase-flow-modal (chunk-3, but depends on chunk-2 
+for modal)
+- right-rail -> just-check (gate)
+- purchase-flow-modal -> typecheck (gate)
+- typecheck -> walk-3010 (gate)
+
+Wait, "typecheck -> walk-3010" but walk-3010 isn't listed in chunks or node
+nodes except as cmd:walk-3010. Actually cmd:walk-3010 is a node but not ass
+assigned to any chunk. The output_format mentions "walk :3010". The graph h
+has the node but no chunk assignment. This is a gap: walk-3010 gate is not 
+in any chunk's DOD. It should probably be in chunk-5's DOD.
+
+Also, cmd:just-check is in chunk-1 only, but the plan verification says "ju
+"just check (10/10 must pass) — from repo root". It should probably be in a
+all chunks or at least final chunk. But it's fine to run at chunk-1 and aft
+after each chunk? Actually the table's DOD for C1 is "just check + typechec
+typecheck + walk :3010" but then DOD for C2-C5 is "typecheck + walk" withou
+without just check. The graph puts cmd:just-check only in chunk-1. This mea
+means just-check is only a gate for chunk-1. But if later chunks modify fil
+files, just-check might fail. The verification list at bottom says "just ch
+check" must pass overall. So it should be a final gate too, not just chunk-
+chunk-1.
+
+Also cmd:walk-3010 is not assigned to any chunk. The table says each chunk 
+DOD includes "walk" but the graph node isn't in chunks. Minor inconsistency
+inconsistency.
+
+Now regarding plan-graph.json broken edges:
+- Edge from sql:events-table to purchase-flow-modal.tsx with reason "audit 
+tick writes acceptance event via service client". This implies events table
+table must exist before modal can write to it. In chunk-3 both are present,
+present, depends on chunk-2 (modal created). The edge direction is correct.
+correct.
+- But there's no edge from create-session/route.ts to purchase-flow
+purchase-flow-modal.tsx in chunk-5? The graph has it, but chunk-5 depends o
+on chunk-4, and create-session was in chunk-1. So by chunk-5 create-session
+create-session already exists. The edge is satisfied.
+
+Potential missing edge: f8 MyStable success state requires create-session s
+success_url to include checkout=success, and mystable to handle it. There's
+There's no edge from create-session to mystable. But both are in chunk-1, s
+so no cross-chunk issue.
+
+Potential missing edge: min_stake_pct wiring requires schema (00001:132) an
+and horses-data.ts to expose it. If horses-data.ts needs modification, ther
+there's no edge from sql:min_stake-pct to horses-data.ts or page.tsx. The p
+plan lists horses-data.ts as read-only, which is problematic.
+
+Now, the data-layer wiring for min_stake_pct is critical. Let me focus on i
+it.
+
+The schema has min_stake_pct at inventory table. The campaign object in pag
+page.tsx is presumably returned from horses-data.ts. If horses-data.ts does
+doesn't read min_stake_pct, then page.tsx can't pass it to right-rail. The 
+plan says C1 does "f3 min_stake_pct wiring" with files right-rail.tsx, page
+page.tsx, create-session/route.ts, mystable/page.tsx. It doesn't include ho
+horses-data.ts. So either:
+1. horses-data.ts already reads min_stake_pct and the provided code section
+section omitted it, or
+2. The plan has a gap.
+
+The provided horses-data.ts code section (lines 180-270) shows capTableFixt
+capTableFixture computed from sharesAvailable etc., and line 263-269 return
+returns capTableFixture. It does NOT show min_stake_pct being returned. The
+The code section is limited to lines 180-270. There could be other parts of
+of horses-data.ts that read min_stake_pct. But the prompt's question #8 spe
+specifically asks: "min_stake_pct: does the schema have the column (00001:1
+(00001:132, 00002:9) and does horses-data.ts read it? If not, the f3 fix ne
+needs a data-layer wiring step."
+
+This is a hint that horses-data.ts may not read it. The user is asking me t
+to verify this. Since the provided code section doesn't show min_stake_pct 
+being read, and the plan doesn't include a data-layer wiring step, this is 
+a finding.
+
+I should report: horses-data.ts (as shown in the provided section) does not
+not expose min_stake_pct; the plan lists it as read-only and doesn't add a 
+wiring step. This is a blocker or warning.
+
+Wait, could the plan's "f3 min_stake_pct wiring" implicitly include modifyi
+modifying horses-data.ts even though the file table says "Read-only"? The t
+table says "Action: Read-only (capTableFixture, min_stake_pct)". This expli
+explicitly says read-only. So no, the plan doesn't intend to modify it.
+
+This is a blocker if horses-data.ts doesn't currently read min_stake_pct.
+
+Now, another issue: The plan says "PURCHASES_ENABLED=true + sk_test_ in .en
+.env.local" as constraints but doesn't include them in verification. Also, 
+the dev server port is fixed at :3010. This is fine.
+
+Now let me consider other wrong assumptions:
+
+The plan assumes a component named AcceptanceGateModal exists in right-rail
+right-rail.tsx currently. The code shows it. Fine.
+
+The plan assumes create-session route exists. It does.
+
+The plan assumes MyStable page exists. Not shown but referenced.
+
+The plan assumes `marketplace/[slug]/page.tsx` is the page with the CTA. Th
+The code shows right-rail props wiring there.
+
+The plan assumes `?units=` query param is the state mechanism. Need to chec
+check if current code uses that. The create-session success_url uses units 
+param. But the initial page load may not read it. The plan doesn't explicit
+explicitly mention adding URL parsing. This might be a gap for "deep-linkab
+"deep-linkable, refresh-safe" state.
+
+Actually, the locked state is "step = client state" plus "?units=" in URL. 
+For deep-linking and refresh-safety, the page needs to initialize from URL.
+URL. The plan doesn't assign this to any chunk. It might be assumed to be a
+already implemented or handled by the stepper. But since f6/f7 are about pr
+preserving it, the plan acknowledges ?units= but doesn't say how it's initi
+initially set. The CTA opening modal might append ?units= to URL? Not speci
+specified.
+
+This is a potential gap: no chunk assigned to URL parsing/initialization fo
+for ?units=.
+
+But the fixes list doesn't explicitly include "URL parsing for ?units=" as 
+fX. The f6/f7 are about preserving it on redirects. So maybe it's out of sc
+scope or already implemented.
+
+However, the architecture approach says "?units= in URL (locked — f6/f7 exi
+exist to preserve it) + step = client state. Deep-linkable, refresh-safe." 
+The claim "deep-linkable, refresh-safe" requires URL parsing. If not implem
+implemented, the verification "walk :3010" might not catch refresh-safety. 
+So verification step is insufficient.
+
+Now the events table: event_type='acceptance' — the events table has event_
+event_type but it's probably meant for Stripe event types. Writing arbitrar
+arbitrary 'acceptance' might be acceptable if service role can write. The p
+plan says no migration needed. The schema shows the table exists. RLS polic
+policy allows service role. OK.
+
+But the events table also has `stripe_event_id` which is probably required/
+required/unique or at least semantically meant for Stripe IDs. If acceptanc
+acceptance tick writes with no stripe_event_id, it might violate constraint
+constraints or semantics. The provided schema section doesn't show constrai
+constraints on stripe_event_id. If it's nullable, OK. If not, this would fa
+fail. I don't have enough info to confirm. The plan assumes it works. I sho
+should flag as a warning if stripe_event_id might be non-nullable.
+
+Let me check the provided schema lines 220-230. It says "events table defin
+definition with id, stripe_event_id, event_type, payload, processed, proces
+processed_at, error_message, created_at, updated_at". It doesn't say NOT NU
+NULL. But typically stripe_event_id might be unique. Without the actual SQL
+SQL, I can't confirm. I'll note this as a potential issue.
+
+Now let me think about verification steps more:
+
+- "kimi-code-audit (kimi-k2.7-code:cloud) per chunk, diff-only, PASS/FAIL/W
+PASS/FAIL/WARN + graph" — this is the audit process itself, not a verificat
+verification step the implementer runs. It's fine.
+- The plan lacks unit/E2E tests for specific behaviors. It relies on manual
+manual walk. Manual walk can verify but is not reproducible.
+- For f9 5 stepper error states and f10 7-code mapping, manual walk is espe
+especially weak because you can't easily trigger all error states.
+
+Now let me structure findings. I need to produce numbered findings, each wi
+with FINDING #, Severity, Evidence (file:line), Fix (one line).
+
+Let me draft findings:
+
+1. **f5 scope mismatch / wrong fix assumption in C1**
+   - Plan C1 describes f5 as "sold-out fallback → ClosedCard", but the f5 b
+bug is "availablePct<=0 falls to 10.0". The current code at page.tsx:217 al
+already has the fallback to 10.0. The plan's fix (ClosedCard) is a valid fi
+fix, but the plan's wording doesn't match the bug list. However, if the int
+intent is ClosedCard, that's fine. But if the plan is interpreted as the fi
+fix, it's correct. Hmm.
+   Actually, looking more carefully: the plan says "f5 sold-out fallback → 
+ClosedCard". This describes the desired behavior. The bug list says f5 = "a
+"availablePct<=0 falls to 10.0". So the plan is fixing the bug. This is OK.
+OK. I might not flag this as a finding, or flag as WARN for wording mismatc
+mismatch.
+
+Wait, but is "ClosedCard" a real component? The plan references it without 
+evidence it exists. The code section doesn't show a ClosedCard component. T
+This could be a wrong assumption: the plan assumes a ClosedCard component e
+exists or will be created, but it's not listed in files. That's a valid fin
+finding.
+
+So: Plan C1 assumes a "ClosedCard" component exists for sold-out fallback (
+(f5), but no file or component is listed in the plan. Evidence: plan.md C1 
+f5. Severity: WARN or BLOCKER if ClosedCard doesn't exist.
+
+2. **min_stake_pct data-layer wiring missing**
+   - The schema has min_stake_pct (00001:132) but horses-data.ts (as shown)
+shown) doesn't expose it. The plan lists horses-data.ts as read-only and do
+doesn't include a data-layer wiring step for f3. Evidence: plan.md Files ta
+table "horses-data.ts Read-only"; horses-data.ts:180-270 no min_stake_pct; 
+00001:132 column exists. Severity: BLOCKER because C1's f3 cannot be comple
+completed without modifying the data layer. Fix: Add horses-data.ts to C1 w
+with action "Modify to read and return inventory.min_stake_pct as campaign.
+campaign.minStakePct".
+
+3. **?units= URL initialization not assigned / not verified**
+   - The architecture claims ?units= state is deep-linkable and refresh-saf
+refresh-safe, but no chunk adds URL parsing to initialize stakePct/step fro
+from ?units=. The verification "walk :3010" doesn't specify refresh/deep-li
+refresh/deep-link test. Evidence: plan.md Q2 architecture; C1-C5 files. Sev
+Severity: WARN. Fix: Add a C1 or C2 task to read ?units= from URL on mount 
+and append/restore it on modal open/close; update walk verification to incl
+include refresh and direct URL tests.
+
+4. **plan-graph.json node description wrongly attributes modal extraction t
+to chunk-1**
+   - The node "file:right-rail.tsx" description says "modal extracted" but 
+modal extraction is C2. Evidence: plan-graph.json node file:right-rail.tsx;
+file:right-rail.tsx; plan.md C2. Severity: WARN. Fix: Remove "modal extract
+extracted" from chunk-1 node description and move it to chunk-2.
+
+5. **f6 401 redirect location not identified in plan files**
+   - The f6 fix (401 redirect drops ?units=) is assigned to C1 files, but t
+the actual 401 handling code (lines 269-273 in an unspecified file) may not
+not be in right-rail.tsx, page.tsx, create-session/route.ts, or mystable/pa
+mystable/page.tsx. The plan doesn't identify which file contains the 401 re
+redirect. Evidence: code section "Lines 269-273: 401 redirect handling"; pl
+plan.md C1 files. Severity: WARN (could be BLOCKER if the file isn't in the
+the listed set). Fix: Identify the file containing the 401 redirect and add
+add it to C1.
+
+6. **just-check and walk-3010 gates not consistently assigned across chunks
+chunks**
+   - cmd:just-check is only in chunk-1 node list, but verification requires
+requires it to pass overall; cmd:walk-3010 is a graph node but not assigned
+assigned to any chunk. Evidence: plan-graph.json chunks; plan.md Verificati
+Verification. Severity: WARN. Fix: Move just-check to a final gate in chunk
+chunk-5 and add walk-3010 to each chunk's DOD nodes, or create a final chun
+chunk-6 for global gates.
+
+7. **events table semantic mismatch for acceptance audit tick**
+   - events table is designed for Stripe events (has stripe_event_id), and 
+writing arbitrary event_type='acceptance' may conflict with constraints/sem
+constraints/semantics. Evidence: 00001:220-230 schema; plan.md C3. Severity
+Severity: WARN. Fix: Verify stripe_event_id is nullable/optional and docume
+document the acceptance event shape, or create a dedicated audit_events tab
+table.
+
+8. **Verification steps are too vague to verify many fixes**
+   - just check and typecheck don't verify UI/behavior; walk :3010 doesn't 
+specify assertions for f4, f6, f7, f9, f10, f11, f12, f13, etc. Evidence: p
+plan.md Verification. Severity: WARN. Fix: Add per-fix verification checkli
+checklist to each chunk's DOD (e.g., assert cancel_url includes ?units=, as
+assert 401 preserves ?units=, assert green 75% row present, assert error ma
+mapping for 7 codes, etc.).
+
+9. **Mockup stepper values (MIN=1, MAX=5, STEP=0.5) not explicitly captured
+captured**
+   - The mockup stepper has MIN=1, MAX=5, STEP=0.5. The plan only says "ste
+"stepper opens at min" and references stakeStepPct in code. Evidence: flow-
+flow-mock/index.html stepper; plan.md C1. Severity: WARN. Fix: Confirm curr
+current stakeStepPct equals 0.5 and max investment pct maps to 5.0, or add 
+explicit task to align stepper with mockup MIN/MAX/STEP.
+
+10. **Dependency edge typecheck -> walk-3010 references a gate not in any c
+chunk**
+    - The graph has edge typecheck -> walk-3010, but walk-3010 is not assig
+assigned to a chunk node list. Evidence: plan-graph.json edges and chunks. 
+Severity: WARN. Fix: Add cmd:walk-3010 to chunk-5 nodes or create a final g
+gate chunk.
+
+11. **C4 "Own (MyStable success)" duplicates f8 which is in C1**
+    - f8 MyStable success state is assigned to C1 but also appears as "Own 
+(MyStable success)" in C4. Evidence: plan.md C1 and C4. Severity: WARN (ris
+(risk of double work or inconsistency). Fix: Clarify C1 implements the succ
+success state handling and C4 only consumes it, or move f8 entirely to C4.
+
+12. **No explicit file for 401 redirect fix**
+    - As mentioned in #5, the 401 handling may be in a middleware or auth g
+guard not listed in C1 files. If the file is not in the listed set, f6 won'
+won't be fixed. Severity: BLOCKER if true, but I can't confirm from provide
+provided info. I'll keep it as WARN.
+
+13. **PurchaseFlowModal creation may create circular dependency or missing 
+imports**
+    - Not enough info. Skip.
+
+14. **Step 2 and Step 3 headers differ from mockup?**
+    - Plan says "Step 2 header: Digital-Syndication Terms" and "Step 3 head
+header: Acceptance — {horse} your documents" which are "newer, founder-revi
+founder-reviewed". This is a design decision, not a code correctness issue.
+issue. OK.
+
+15. **E4 welcome email out of scope** - OK.
+
+16. **KYC port out of scope** - OK, but C3/C4 wires prompt only. OK.
+
+Now, the question also asks to check "Does the plan capture the locked mock
+mockup look (stepper, 4-row summary, green 75% row, accordion + Completed b
+badge, max-w-lg x h-[720px])?" I should answer this as a finding.
+
+Let me think about whether the mockup look is captured:
+- stepper: captured as f2
+- 4-row summary: captured as f12
+- green 75% row: captured as f11
+- accordion + Completed badge: captured in C3
+- max-w-lg x h-[720px]: captured as f14
+
+So yes, captured. But the stepper MIN/MAX/STEP values from mockup aren't ex
+explicitly captured. That's a gap. So the answer is partially captured.
+
+I should also check #7 events table claim: table at 00001:220 exists, RLS s
+service role can write. OK. But semantic issue as noted.
+
+#8 min_stake_pct: schema has it, horses-data.ts (shown) doesn't read it. Fi
+Finding as blocker.
+
+Now, let me also consider the "f2 stepper opens at Math.max(min,2.0)" bug. 
+The current code at right-rail.tsx:482 has `Math.max(minInvestmentPct, 2.0)
+2.0)`. The plan C1 says "f2 stepper opens at min". The fix would be to chan
+change it to `minInvestmentPct` or `Math.max(minInvestmentPct, stakeStepPct
+stakeStepPct)` or whatever. The plan captures it. But the plan-graph node f
+for right-rail says "stepper opens at min" — OK.
+
+However, the code section note says "Line 482: ... This is f3 — stepper ope
+opens at Math.max(min, 2.0), not Math.max(min, 1.0). The minInvestmentPct d
+defaults to 1.0 but the state starts at 2.0." This note is confusing and mi
+mislabels f2/f3. But I'm auditing the plan, not the note.
+
+Let me consider whether the plan's f2 description "stepper opens at min" is
+is correct. The bug list says f2 = "stepper opens at Math.max(min,2.0)". Th
+The plan says fix is "stepper opens at min". This is correct (remove 2.0 fl
+floor). The bug list's f3 = "min hardcoded 1.0" and plan fix is "min_stake_
+"min_stake_pct wiring". Correct. So scope is OK except for the data-layer w
+wiring gap.
+
+Now, one more issue: the plan's C1 includes "f3 min_stake_pct wiring" and "
+"f5 sold-out fallback → ClosedCard". If f5 fix is ClosedCard, then when ava
+availablePct <= 0, page.tsx should show ClosedCard instead of passing maxIn
+maxInvestmentPct=10.0 to right-rail. This requires page.tsx changes. The pl
+plan includes page.tsx in C1. Good.
+
+But where is ClosedCard? It might be in apps/web/src/components/horse/ or e
+elsewhere. If it doesn't exist, the plan needs to create it. The plan doesn
+doesn't list ClosedCard creation. That's a gap. However, maybe the codebase
+codebase already has a ClosedCard component. The provided sections don't sh
+show it. I'll flag as WARN.
+
+Actually, maybe the plan's f5 description "sold-out fallback → ClosedCard" 
+is not literal but means "show a closed/sold-out card state". The component
+component might already exist as e.g. `HorseClosedCard` or similar. Without
+Without evidence, I'll flag as assumption risk.
+
+Let me now write the final findings. I need to be careful with severity.
+
+BLOCKER findings:
+1. min_stake_pct data-layer wiring missing (horses-data.ts read-only but do
+doesn't expose it). This prevents f3 from being implemented.
+2. Maybe f5 ClosedCard assumption if not existing — but I can't be sure. I'
+I'll make it WARN.
+
+WARN findings:
+- f5 "ClosedCard" component not listed
+- f6 401 redirect file not identified
+- ?units= URL initialization/refresh-safety not assigned
+- plan-graph node description error (modal extracted in chunk-1)
+- just-check and walk-3010 gates not consistently assigned
+- events table semantic mismatch
+- verification steps too vague
+- mockup stepper MIN/MAX/STEP not explicitly captured
+- C4 duplicates f8
+
+OK findings:
+- f1, f2, f4, f7, f8, f9, f10, f11, f12, f13, f14, f15 assigned
+- events table exists and RLS service role can write
+- chunk dependency ordering is correct
+- mockup shell dimensions captured
+
+Let me refine.
+
+Actually, the user says "Do NOT write code. Do NOT reframe the product." So
+So I should not suggest code changes, just findings. But the format asks fo
+for "Fix (one line)". I can give a one-line recommendation without writing 
+code, e.g., "Add horses-data.ts as a modified file in C1 to expose min_stak
+min_stake_pct." That's not code.
+
+Let me also re-examine the chunk dependency edges. The chunks are sequentia
+sequential chunk-1 -> chunk-2 -> ... -> chunk-5. The edges are:
+- page -> right-rail (within chunk-1)
+- right-rail -> purchase-flow-modal (chunk-1 -> chunk-2)
+- create-session -> purchase-flow-modal (chunk-1 -> chunk-2)
+- sql:events-table -> purchase-flow-modal (chunk-3, but modal from chunk-2)
+chunk-2)
+- right-rail -> just-check
+- purchase-flow-modal -> typecheck
+- typecheck -> walk-3010
+
+The chunk dependencies reflect these. Are there any broken edges? For examp
+example, the edge from sql:events-table to purchase-flow-modal is within ch
+chunk-3. If chunk-3 depends on chunk-2 (modal created), then sql events tab
+table can be wired. That's fine.
+
+But what about the edge from create-session to purchase-flow-modal in chunk
+chunk-5? create-session is in chunk-1, purchase-flow-modal is in chunk-2-5.
+chunk-2-5. So the edge is satisfied long before chunk-5. The chunk-5 depend
+dependency is only on chunk-4. There's no direct edge forcing chunk-5 to wa
+wait until after create-session is modified for error mapping. But because 
+create-session is in chunk-1 and chunk-5 depends on chunk-4 which depends o
+on ... chunk-1, the transitive dependency exists. So it's fine.
+
+One possible broken edge: chunk-3 node "sql:events-table" has an edge to "f
+"file:purchase-flow-modal.tsx". But chunk-3 also depends on chunk-2 where p
+purchase-flow-modal was created. The edge doesn't cross chunk boundaries in
+incorrectly. OK.
+
+Another possible issue: chunk-1 includes cmd:typecheck. But if chunk-1 modi
+modifies right-rail.tsx, page.tsx, etc., typecheck should pass. But chunk-2
+chunk-2 creates purchase-flow-modal.tsx and modifies right-rail.tsx to impo
+import it. The typecheck in chunk-2 will check the new modal. Fine.
+
+I don't see broken chunk dependency edges. The ordering is correct.
+
+Now, let me also check if all fixes are assigned to chunks. Yes, all 15 are
+are assigned. But some assignments have issues.
+
+Let me produce the final answer. I'll include about 8-10 findings, with sev
+severity, evidence, and fix.
+
+I need to be precise with evidence file:line.
+
+Findings:
+
+1. **f3 min_stake_pct wiring lacks data-layer step**
+   Severity: BLOCKER
+   Evidence: 00001_initial_schema.sql:132 (column exists); horses-data.ts:1
+horses-data.ts:180-270 (capTableFixture returns availablePct etc. but no mi
+min_stake_pct); plan.md Files table lists horses-data.ts as Read-only.
+   Fix: Add horses-data.ts as a modified file in C1 to read inventory.min_s
+inventory.min_stake_pct and expose it to page.tsx/right-rail.tsx.
+
+2. **f5 sold-out fallback references unlisted ClosedCard component**
+   Severity: WARN
+   Evidence: plan.md C1 "f5 sold-out fallback → ClosedCard"; no ClosedCard 
+file in Files table.
+   Fix: Confirm ClosedCard exists or add its creation to C1 file list.
+
+3. **f6 401-redirect source file is not identified in C1 files**
+   Severity: WARN
+   Evidence: code section "Lines 269-273: 401 redirect handling router.push
+router.push..." (file unspecified); plan.md C1 files are right-rail.tsx, pa
+page.tsx, create-session/route.ts, mystable/page.tsx.
+   Fix: Identify the file containing the 401 redirect and add it to C1.
+
+4. **?units= deep-link/refresh initialization not assigned to any chunk**
+   Severity: WARN
+   Evidence: plan.md Architecture Q2 claims "?units= ... Deep-linkable, ref
+refresh-safe"; no chunk task reads ?units= from URL on mount.
+   Fix: Add a C1/C2 task to initialize modal state from URLSearchParams('un
+URLSearchParams('units') and to update the URL on stepper changes.
+
+5. **plan-graph.json mislabels chunk-1 right-rail node as "modal extracted"
+extracted"**
+   Severity: WARN
+   Evidence: plan-graph.json node file:right-rail.tsx description includes 
+"modal extracted"; plan.md C2 is "Modal extraction".
+   Fix: Remove "modal extracted" from chunk-1 node description; add it to c
+chunk-2.
+
+6. **Verification steps are too vague to confirm most fixes**
+   Severity: WARN
+   Evidence: plan.md Verification lists only just check, typecheck, walk :3
+:3010; no per-fix assertions.
+   Fix: Add a per-chunk DOD checklist asserting each fix (e.g., cancel_url 
+contains units, 401 preserves units, green 75% row present, 7-code mapping 
+tested).
+
+7. **Global gates (just-check, walk-3010) are not consistently assigned to 
+chunks**
+   Severity: WARN
+   Evidence: plan-graph.json cmd:just-check only in chunk-1; cmd:walk-3010 
+is a node but not in any chunk.
+   Fix: Add just-check and walk-3010 to chunk-5 nodes as final gates.
+
+8. **Mockup stepper MIN/MAX/STEP values (1 / 5 / 0.5) not explicitly captur
+captured**
+   Severity: WARN
+   Evidence: flow-mock/index.html stepper MIN=1, MAX=5, STEP=0.5; plan.md C
+C1 says only "stepper opens at min".
+   Fix: Add task to verify/align stakeStepPct=0.5, minInvestmentPct=1.0, ma
+maxInvestmentPct=5.0 with mockup.
+
+9. **events table used for acceptance audit tick may be semantically wrong*
+wrong**
+   Severity: WARN
+   Evidence: 00001_initial_schema.sql:220-230 (events table has stripe_even
+stripe_event_id); plan.md C3 writes event_type='acceptance'.
+   Fix: Verify stripe_event_id is nullable and document acceptance event pa
+payload shape before writing.
+
+10. **C4 duplicates f8 (MyStable success state) which is assigned to C1**
+    Severity: WARN
+    Evidence: plan.md C1 lists f8 MyStable success state; C4 lists "Own (My
+(MyStable success)".
+    Fix: Clarify C1 owns the success-state implementation and C4 only consu
+consumes it.
+
+11. **Locked mockup look is captured**
+    Severity: OK
+    Evidence: plan.md C2 captures f11 green 75% row, f12 4-row summary, f14
+f14 max-w-lg×h-[720px]; C3 captures accordion+Completed badge; C1 captures 
+stepper.
+    Fix: None.
+
+12. **Events table exists and service-role RLS is usable**
+    Severity: OK
+    Evidence: 00001_initial_schema.sql:220 (table), :241-250 (service_role 
+RLS policy); plan.md C3 no migration needed.
+    Fix: None.
+
+13. **Chunk dependency ordering chunk-1 → … → chunk-5 is coherent**
+    Severity: OK
+    Evidence: plan-graph.json chunks each depends_on previous; edges right-
+right-rail→modal and create-session→modal are respected.
+    Fix: None.
+
+14. **All f1-f15 are assigned to at least one chunk**
+    Severity: OK
+    Evidence: plan.md C1-C5 covers f1-f15.
+    Fix: None.
+
+Then verdict: APPROVE-WITH-FIXES because there are WARNs but no BLOCKER exc
+except #1 which is fixable by updating the plan. Since #1 is a BLOCKER, the
+the verdict should be APPROVE-WITH-FIXES only if the blocker can be address
+addressed. The user asks for APPROVE / APPROVE-WITH-FIXES / REJECT. With on
+one BLOCKER, it's not APPROVE. APPROVE-WITH-FIXES implies conditional appro
+approval subject to fixes. I think that's appropriate.
+
+Wait, the user says "End with verdict: APPROVE / APPROVE-WITH-FIXES / REJEC
+REJECT." If there's a BLOCKER, should it be REJECT or APPROVE-WITH-FIXES? I
+In plan audits, a single fixable blocker usually leads to APPROVE-WITH-FIXE
+APPROVE-WITH-FIXES. REJECT is for unrecoverable. Since #1 is fixable by add
+adding a file to the plan, APPROVE-WITH-FIXES is correct.
+
+But I need to be clear that the BLOCKER must be resolved before execution.
+
+Now let me also consider if any other finding should be BLOCKER.
+
+#2 ClosedCard: if it doesn't exist, it's a blocker. But I can't confirm. So
+So WARN.
+
+#3 401 file: if not in C1 files, f6 won't be fixed. But I can't confirm fil
+file. So WARN.
+
+#4 URL initialization: not a blocker for the stated 15 fixes, but for the a
+architecture claim. WARN.
+
+#5 node description: cosmetic. WARN.
+
+#6 verification: not a correctness issue but quality. WARN.
+
+#7 gates: not a correctness issue. WARN.
+
+#8 stepper values: if current code already has correct values, no issue. Bu
+But not captured in plan. WARN.
+
+#9 events semantics: if stripe_event_id is nullable, OK. WARN.
+
+#10 duplicate f8: coordination risk. WARN.
+
+So only #1 is BLOCKER.
+
+Wait, let me reconsider #1 severity. The plan says "horses-data.ts Read-onl
+Read-only (capTableFixture, min_stake_pct)". Maybe the plan assumes that ho
+horses-data.ts already reads min_stake_pct in a part not shown. The prompt'
+prompt's question #8 asks: "min_stake_pct: does the schema have the column 
+(00001:132, 00002:9) and does horses-data.ts read it? If not, the f3 fix ne
+needs a data-layer wiring step."
+
+This is a direct test. Since the provided code section for horses-data.ts d
+doesn't show min_stake_pct, and the plan doesn't include a wiring step, the
+the answer is that the plan fails this test. It's a blocker for f3.
+
+But could min_stake_pct be read elsewhere? The provided code section is lin
+lines 180-270. There could be a `minStakePct` field in the campaign object 
+defined earlier. But the plan explicitly says "Read-only (capTableFixture, 
+min_stake_pct)" suggesting it believes it's already there. If it's not, tha
+that's an assumption.
+
+I'll keep it as BLOCKER.
+
+Now, one more thing: the plan's C1 says "f2 stepper opens at min". The bug 
+list says f2 = "stepper opens at Math.max(min,2.0)". If the plan interprets
+interprets the bug as needing to open at min, that's correct. But if the pl
+plan means "stepper should open at minInvestmentPct", and minInvestmentPct 
+could be e.g. 0.5, then the stepper should open at min. Good.
+
+But the mockup stepper has MIN=1, and code has minInvestmentPct={1.0}. If m
+min_stake_pct is wired and it's 1.0, then stepper opens at 1.0. Good.
+
+Now let me also think about the "stepper opens at Math.max(min,2.0)" as a b
+bug. The current code line 482: `Math.max(minInvestmentPct, 2.0)`. If minIn
+minInvestmentPct is 1.0, stepper opens at 2.0. The fix is to open at minInv
+minInvestmentPct (1.0). The plan says "stepper opens at min". Good.
+
+But the plan's verification doesn't check this. That's part of #6.
+
+Alright, I'll finalize the findings.
+
+I should format each finding as:
+**FINDING #N** — Severity: X
+- Evidence: file:line
+- Fix: one line
+
+Actually the user says: "Output format — numbered findings, each with: FIND
+FINDING #, Severity (BLOCKER/WARN/OK), Evidence (file:line), Fix (one line)
+line)."
+
+So I should produce a list like:
+1. **FINDING #1** — Severity: BLOCKER
+   - Evidence: ...
+   - Fix: ...
+
+Or maybe:
+**FINDING #1** — BLOCKER
+Evidence: ...
+Fix: ...
+
+I'll use a clear format.
+
+Also I need to end with verdict.
+
+Let me also include the OK findings for completeness, as the user asked to 
+check multiple things and OK findings demonstrate I checked them.
+
+OK findings:
+- #11: Locked mockup look captured (f11, f12, f14, accordion, stepper)
+- #12: Events table exists and RLS usable
+- #13: Chunk dependency ordering correct
+- #14: All f1-f15 assigned to chunks
+
+Wait, #14 might be arguable because of wording mismatches. But all are assi
+assigned. I'll keep it OK with note.
+
+Now, I need to ensure I don't write code. The "Fix" lines should be recomme
+recommendations, not code snippets. For example:
+- "Add horses-data.ts as a modified file in chunk-1 and include a data-laye
+data-layer wiring step to expose inventory.min_stake_pct to page.tsx."
+- "Confirm ClosedCard exists or add its file creation to chunk-1."
+- "Identify and add the file containing the 401 redirect to chunk-1."
+- "Add a chunk-1/2 task to read ?units= from URL on mount and synchronize i
+it with modal state."
+- "Correct plan-graph.json node file:right-rail.tsx description to remove '
+'modal extracted' and add it to chunk-2 node."
+- "Expand each chunk's DOD with per-fix verification assertions."
+- "Add cmd:just-check and cmd:walk-3010 to chunk-5 nodes."
+- "Add an explicit task to align stakeStepPct=0.5 and maxInvestmentPct=5.0 
+with the mockup."
+- "Verify stripe_event_id nullability/document acceptance payload before re
+relying on events table."
+- "Clarify C1 owns f8 and C4 only consumes the success state."
+
+No code.
+
+Now, verdict: APPROVE-WITH-FIXES, with the condition that FINDING #1 (and i
+ideally #2-#10) are addressed.
+
+Actually, the verdict should be just one of the three. APPROVE-WITH-FIXES i
+is appropriate.
+
+Let me also think: is the plan so broken that it should be REJECT? No. The 
+core structure is sound. Only #1 is a real execution blocker. The rest are 
+warnings. APPROVE-WITH-FIXES is right.
+
+One more nuance: the user says "Audit this build plan for correctness again
+against the actual codebase." The "actual codebase" is represented by the c
+code sections provided. I should base findings on those sections and the pl
+plan. I should not assume hidden code that resolves issues unless stated. S
+So if horses-data.ts doesn't show min_stake_pct, I should flag it.
+
+But the prompt's question #8 explicitly asks: "does horses-data.ts read it?
+it? If not, the f3 fix needs a data-layer wiring step." This is the test. I
+I must answer: no, it doesn't (in the provided section), and the plan lacks
+lacks that step. Therefore BLOCKER.
+
+Now, let me write the final answer. I'll be concise but thorough.
+
+I should also note that the plan's C2 Step 2 term sheet and C3 Step 3 accep
+acceptance gate match the mockup. That's good.
+
+Let me structure the response:
+
+```
+1. FINDING #1 — BLOCKER — f3 min_stake_pct wiring lacks data-layer step
+   Evidence: 00001_initial_schema.sql:132 (column exists); horses-data.ts:1
+horses-data.ts:180-270 (no min_stake_pct in capTableFixture/campaign); plan
+plan.md Files table marks horses-data.ts Read-only.
+   Fix: Add horses-data.ts as a modified file in chunk-1 and include a data
+data-layer wiring step to expose inventory.min_stake_pct to page.tsx/right-
+page.tsx/right-rail.tsx.
+
+...
+```
+
+I'll include 14 findings (1 blocker, 9 warns, 4 OKs). Actually I might comb
+combine some or keep separate. The user wants numbered findings. I'll keep 
+them separate for clarity.
+
+Let me finalize the list:
+
+1. BLOCKER: f3 min_stake_pct data-layer wiring missing
+2. WARN: f5 ClosedCard component not listed
+3. WARN: f6 401-redirect source file unidentified
+4. WARN: ?units= URL initialization/refresh-safety not assigned
+5. WARN: plan-graph.json chunk-1 right-rail node mislabels modal extraction
+extraction
+6. WARN: Verification too vague to confirm most fixes
+7. WARN: Global gates not assigned to final chunk
+8. WARN: Mockup stepper MIN/MAX/STEP values not explicitly captured
+9. WARN: events table semantic mismatch for acceptance tick
+10. WARN: C4 duplicates f8 MyStable success state
+11. OK: Locked mockup look captured
+12. OK: Events table exists and service role RLS usable
+13. OK: Chunk dependency ordering correct
+14. OK: All f1-f15 assigned to chunks
+
+Verdict: APPROVE-WITH-FIXES.
+
+I think this is solid. Let me write it.
+...done thinking.
+
+1. **FINDING #1** — Severity: **BLOCKER**
+   - Evidence: `00001_initial_schema.sql:132` defines `min_stake_pct`; `hor
+`horses-data.ts:180-270` returns `capTableFixture` with `availablePct`/`all
+`availablePct`/`allocatedPct`/`reservedPct`/`retainedPct` but no `min_stake
+`min_stake_pct`; `plan.md` Files table lists `horses-data.ts` as **Read-onl
+**Read-only**.
+   - Fix: Add `horses-data.ts` as a modified file in chunk-1 and include a 
+data-layer wiring step to read `inventory.min_stake_pct` and expose it to `
+`page.tsx`/`right-rail.tsx`.
+
+2. **FINDING #2** — Severity: **WARN**
+   - Evidence: `plan.md` C1 lists `f5 sold-out fallback → ClosedCard`, but 
+the Files table does not include any `ClosedCard` component creation or exi
+existing path.
+   - Fix: Confirm `ClosedCard` already exists or add its creation to the ch
+chunk-1 file list.
+
+3. **FINDING #3** — Severity: **WARN**
+   - Evidence: the provided code section notes “Lines 269-273: 401 redirect
+redirect handling `router.push(\`/login?next=${nextUrl}\`)`” but does not n
+name the file; `plan.md` C1 files are `right-rail.tsx`, `page.tsx`, `create
+`create-session/route.ts`, `mystable/page.tsx`.
+   - Fix: Identify the file containing the 401 redirect and add it to chunk
+chunk-1 before fixing f6.
+
+4. **FINDING #4** — Severity: **WARN**
+   - Evidence: `plan.md` Architecture claims `?units=` state is “Deep-linka
+“Deep-linkable, refresh-safe,” but no chunk task reads `URLSearchParams('un
+`URLSearchParams('units')` on mount or updates the URL on stepper changes.
+   - Fix: Add a C1/C2 task to initialize modal state from `?units=` and to 
+keep the URL in sync.
+
+5. **FINDING #5** — Severity: **WARN**
+   - Evidence: `plan-graph.json` node `file:right-rail.tsx` description inc
+includes “modal extracted,” but `plan.md` assigns modal extraction to **C2*
+**C2**, not C1.
+   - Fix: Remove “modal extracted” from the chunk-1 node description and ad
+add it to the chunk-2 node.
+
+6. **FINDING #6** — Severity: **WARN**
+   - Evidence: `plan.md` Verification lists only `just check`, `typecheck`,
+`typecheck`, and “walk :3010,” with no per-fix assertions for f4, f6, f7, f
+f9, f10, f11, f12, or f13.
+   - Fix: Expand each chunk’s DOD with a per-fix verification checklist (e.
+(e.g., `cancel_url` contains `units`, 401 preserves `units`, green 75% row 
+present, 7-code mapping tested).
+
+7. **FINDING #7** — Severity: **WARN**
+   - Evidence: `plan-graph.json` puts `cmd:just-check` only in chunk-1 and 
+leaves `cmd:walk-3010` as a node assigned to no chunk.
+   - Fix: Add `cmd:just-check` and `cmd:walk-3010` to chunk-5 nodes as fina
+final gates.
+
+8. **FINDING #8** — Severity: **WARN**
+   - Evidence: `flow-mock/index.html` stepper shows `MIN=1`, `MAX=5`, `STEP
+`STEP=0.5`; `plan.md` C1 only says “stepper opens at min” and relies on `st
+`stakeStepPct`.
+   - Fix: Add an explicit task to verify/align `stakeStepPct=0.5`, `minInve
+`minInvestmentPct=1.0`, and `maxInvestmentPct=5.0` with the mockup.
+
+9. **FINDING #9** — Severity: **WARN**
+   - Evidence: `00001_initial_schema.sql:220-230` defines `events` with a `
+`stripe_event_id` column; `plan.md` C3 proposes writing `event_type='accept
+`event_type='acceptance'` audit ticks into it.
+   - Fix: Verify `stripe_event_id` is nullable and document the acceptance 
+event payload shape before writing.
+
+10. **FINDING #10** — Severity: **WARN**
+    - Evidence: `plan.md` C1 assigns `f8 MyStable success state`, while C4 
+also lists “Own (MyStable success).”
+    - Fix: Clarify that C1 owns the success-state implementation and C4 onl
+only consumes it.
+
+11. **FINDING #11** — Severity: **OK**
+    - Evidence: `plan.md` C2 captures `f11` green 75% row, `f12` 4-row summ
+summary, `f14` `max-w-lg` × `h-[720px]`; C3 captures accordion + Completed 
+badge; C1 captures stepper.
+    - Fix: None.
+
+12. **FINDING #12** — Severity: **OK**
+    - Evidence: `00001_initial_schema.sql:220` defines the `events` table a
+and `:241-250` grants the service role full access; `plan.md` C3 correctly 
+states no migration is needed.
+    - Fix: None.
+
+13. **FINDING #13** — Severity: **OK**
+    - Evidence: `plan-graph.json` chunks form a valid chain `chunk-1 → chun
+chunk-2 → chunk-3 → chunk-4 → chunk-5`, and the edges `right-rail.tsx → pur
+purchase-flow-modal.tsx` and `create-session/route.ts → purchase-flow-modal
+purchase-flow-modal.tsx` respect that order.
+    - Fix: None.
+
+14. **FINDING #14** — Severity: **OK**
+    - Evidence: all `f1-f15` items appear in `plan.md` C1–C5 (f1/f15/f11/f1
+(f1/f15/f11/f12/f14 in C2, f13 in C3, f9/f10 in C5, remainder in C1).
+    - Fix: None.
+
+**Verdict: APPROVE-WITH-FIXES** — resolve FINDING #1 before execution; addr
+address WARN findings to avoid rework or verification gaps.
+
