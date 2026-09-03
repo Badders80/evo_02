@@ -103,7 +103,7 @@ export async function POST(request: Request) {
     params.append('mode', 'payment');
     params.append('customer_email', userEmail);
     params.append('success_url', `${origin}/mystable?checkout=success&slug=${horseSlug}&units=${units}`);
-    params.append('cancel_url', `${origin}/horses/${horseSlug}?units=${units}`);
+    params.append('cancel_url', `${origin}/marketplace/${horseSlug}?units=${units}`);
     params.append('line_items[0][price_data][currency]', 'nzd');
     params.append(
       'line_items[0][price_data][product_data][name]',

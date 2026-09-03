@@ -480,20 +480,19 @@ function ListedInvestmentCard({
   legalPack?: LegalPackDigest | null;
 }) {
   // f6b (audit 2026-09-03): restore stake from ?units= on mount (login redirect /
-  // cancel return preserve it). Validated against min/max/step; falls back to min.
-  const initialStakePct = React.useMemo(() => {
-    if (typeof window === 'undefined') return minInvestmentPct;
+  // cancel return preserve it). Read in useEffect — a useState initializer runs
+  // during SSR (window undefined) and never re-runs on hydration, which would
+  // drop the stake on exactly the full-browser navigations this exists for.
+  const [stakePct, setStakePct] = React.useState<number>(minInvestmentPct);
+  React.useEffect(() => {
     const raw = new URLSearchParams(window.location.search).get('units');
-    if (!raw) return minInvestmentPct;
-    const parsed = parseFloat(raw);
-    if (!Number.isFinite(parsed)) return minInvestmentPct;
-    const step = stakeStepPct ?? 0.5;
+    const parsed = raw ? parseFloat(raw) : NaN;
+    const step = Math.max(stakeStepPct ?? 0.5, 0.01);
     const snapped = Math.round(parsed / step) * step;
-    if (snapped < minInvestmentPct || snapped > maxInvestmentPct) return minInvestmentPct;
-    return Math.round(snapped * 100) / 100;
+    if (Number.isFinite(snapped) && snapped >= minInvestmentPct && snapped <= maxInvestmentPct) {
+      setStakePct(Math.round(snapped * 100) / 100);
+    }
   }, [minInvestmentPct, maxInvestmentPct, stakeStepPct]);
-
-  const [stakePct, setStakePct] = React.useState<number>(initialStakePct);
   const [openPillarId, setOpenPillarId] = React.useState<string | null>(null);
   const [gateOpen, setGateOpen] = React.useState(false);
 

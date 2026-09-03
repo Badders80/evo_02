@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getSupabaseBrowserClient } from '@/lib/supabase-client';
 import {
@@ -65,14 +65,15 @@ export function MyStableDashboard({
   const kyc = kycLabel(kycStatus);
 
   // f8 (audit 2026-09-03): checkout success state — success_url lands here with
-  // ?checkout=success&slug=&units=. Read once on mount; dismissible.
-  const [checkoutSuccess, setCheckoutSuccess] = useState<{ slug: string; units: string } | null>(() => {
-    if (typeof window === 'undefined') return null;
+  // ?checkout=success&slug=&units=. Read in useEffect (SSR-safe: a useState
+  // initializer would see window undefined on the server and never re-run).
+  const [checkoutSuccess, setCheckoutSuccess] = useState<{ slug: string; units: string } | null>(null);
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('checkout') !== 'success') return null;
-    return { slug: params.get('slug') ?? '', units: params.get('units') ?? '' };
-  });
-
+    if (params.get('checkout') === 'success') {
+      setCheckoutSuccess({ slug: params.get('slug') ?? '', units: params.get('units') ?? '' });
+    }
+  }, []);
   const rows = holdings
     .map((holding) => {
       const campaign = campaigns?.[holding.horse_id];
