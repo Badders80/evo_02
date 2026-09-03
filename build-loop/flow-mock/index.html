@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Purchase Flow Mock — Steps 1–6 (Review Artifact)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        // ── Locked evo_02 design tokens (apps/web/src/app/globals.css @theme) ──
+        colors: {
+          canvas: '#030303',
+          surface: '#0a0a0a',
+          raised: '#111111',
+          heading: '#f8fafc',
+          muted: '#a1a1aa',
+          'muted-foreground': '#737373',
+          border: 'rgba(255,255,255,0.1)',
+          accent: '#d4a964',
+          'accent-hover': '#c49a5a',
+          gold: '#d4a964',
+          'pure-white': '#ffffff',
+          'status-active': '#10b981',
+          error: '#ef4444',
+        },
+        fontFamily: {
+          sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        },
+      }
+    }
+  }
+</script>
+<style>
+  body { background-color: #030303; color: #f8fafc; }
+  .step-band { border: 1px solid rgba(255,255,255,0.08); border-radius: 1.5rem; }
+  .dsl-tag { color: #d4a964; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; }
+  .mock-note { font-size: 11px; color: #737373; font-weight: 300; }
+  /* dull triangle state: at min (▼) or max (▲) — still clickable, shows the gentle limit note */
+  .stake-dull { opacity: 0.3; }
+</style>
+</head>
+<body class="font-sans min-h-screen antialiased">
+
+<!-- Page header -->
+<div class="max-w-[1600px] mx-auto px-8 pt-10 pb-4">
+  <p class="dsl-tag mb-2">Review artifact — not prod code</p>
+  <h1 class="text-3xl font-bold tracking-tight text-heading">The investor journey — horse page to owner</h1>
+  <p class="mock-note mt-2">Locked content from <span class="text-heading">purchase-content-spec.md</span> · look from Stitch rail + production popup pattern · <span class="text-gold">gold = DSL-driven figure, not hand-computed</span>.</p>
+</div>
+
+<!-- ══════════════ STEP 1 — THE HOOK (horse landing page, right rail) ══════════════ -->
+<div class="max-w-[1600px] mx-auto px-8 pb-16">
+  <div class="step-band p-6">
+    <div class="flex items-center justify-between mb-4">
+      <span class="dsl-tag">Step 1 — The Hook · horse landing page · public, no login wall · LOOK LOCKED 2026-09-02</span>
+      <span class="mock-note">CTA opens Step 2 pop-up (learn-more, not buy)</span>
+    </div>
+
+    <div class="rounded-2xl border border-border">
+      <!-- nav strip (muted, indicates page chrome) -->
+      <div class="bg-surface border-b border-border px-8 py-4 flex justify-between items-center rounded-t-2xl">
+        <span class="font-bold tracking-tighter text-heading">Evolution Stables</span>
+        <div class="flex gap-6 text-sm text-muted">
+          <span>Stable</span>
+          <span class="text-heading border-b border-gold pb-1">Ownership</span>
+          <span>Bloodstock</span>
+          <span>Racing</span>
+          <span>Private Bank</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col md:flex-row bg-canvas min-h-[560px]">
+        <!-- story column (fills remaining width) -->
+        <section class="w-full md:flex-1 p-10 lg:p-14 relative min-h-[2000px]">
+          <div class="absolute inset-0 opacity-[0.06] pointer-events-none" style="background-image: radial-gradient(circle at 20% 30%, #ffffff 0%, transparent 40%), radial-gradient(circle at 80% 70%, #d4a964 0%, transparent 45%);"></div>
+          <div class="relative z-10 space-y-4">
+            <span class="text-muted text-xs uppercase tracking-widest">Pedigree Profile</span>
+            <h2 class="text-4xl lg:text-6xl font-bold tracking-tighter text-heading">Nellie</h2>
+            <p class="text-lg text-muted max-w-xl font-light leading-relaxed">
+              Story canvas — hero photography, the horse's story, performance and pedigree surfaces (existing horse page).
+            </p>
+          </div>
+          <div class="relative z-10 mt-10 grid grid-cols-1 gap-6 opacity-50">
+            <div class="h-44 bg-white/5 rounded-2xl border border-white/5 flex items-center justify-center text-muted text-sm">Story content canvas</div>
+            <div class="h-56 bg-white/5 rounded-2xl border border-white/5 flex items-center justify-center text-muted text-sm">Performance / pedigree canvas</div>
+          </div>
+        </section>
+
+        <!-- OWNERSHIP CARD — same framed look as the popups, sticky on the right -->
+        <div class="hidden lg:block w-[420px] shrink-0 p-6 lg:p-8">
+          <aside class="sticky top-24 rounded-3xl border border-border bg-surface backdrop-blur-2xl p-8 space-y-8 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
+            <div class="space-y-3">
+              <span class="text-gold text-[11px] font-bold uppercase tracking-[0.2em]">Ownership</span>
+              <h3 class="text-3xl font-bold leading-tight text-heading tracking-tight">
+                Becoming an owner is easier than you think.
+              </h3>
+            </div>
+            <div class="w-10 h-px bg-gold"></div>
+
+            <!-- Stat rows — big figures; left margin aligned exactly to the feature-row TEXT column below (icon 22px + gap 16px = 38px) -->
+            <div class="pl-[38px] space-y-8">
+              <div>
+                <span class="text-[10px] uppercase tracking-widest text-muted-foreground/70 block mb-1">Price</span>
+                <div class="flex items-baseline gap-2">
+                  <span class="text-5xl font-bold tracking-tighter text-heading">$76</span>
+                  <span class="text-muted text-lg">per month</span>
+                </div>
+                <p class="text-muted font-light text-sm">for a 1% stake</p>
+              </div>
+              <div>
+                <span class="text-[10px] uppercase tracking-widest text-muted-foreground/70 block mb-1">Return</span>
+                <div class="flex items-baseline gap-2">
+                  <span class="text-5xl font-bold tracking-tighter text-heading">75%</span>
+                  <span class="text-muted text-lg">return</span>
+                </div>
+                <p class="text-muted font-light text-sm">of gross prize money</p>
+              </div>
+              <div>
+                <span class="text-[10px] uppercase tracking-widest text-muted-foreground/70 block mb-1">Duration</span>
+                <div class="flex items-baseline gap-2">
+                  <span class="text-5xl font-bold tracking-tighter text-heading">21</span>
+                  <span class="text-muted text-lg">months</span>
+                </div>
+                <p class="text-muted font-light text-sm">investment term</p>
+              </div>
+            </div>
+
+          <!-- availability + CTA -->
+          <div class="pt-8 mt-auto space-y-5">
+            <!-- feature rows -->
+            <ul class="space-y-6 pb-6">
+              <li class="flex items-start gap-4">
+                <span class="material-symbols-outlined text-gold text-[22px] mt-0.5 w-[22px] shrink-0" style="font-variation-settings: 'FILL' 1;">stadium</span>
+                <p class="text-muted text-sm leading-relaxed">
+                  <strong class="text-heading font-medium block mb-1">Stable Access</strong>
+                  Quarterly visits to the training facility and trackside privileges.
+                </p>
+              </li>
+              <li class="flex items-start gap-4">
+                <span class="material-symbols-outlined text-gold text-[22px] mt-0.5 w-[22px] shrink-0" style="font-variation-settings: 'FILL' 1;">update</span>
+                <p class="text-muted text-sm leading-relaxed">
+                  <strong class="text-heading font-medium block mb-1">Real-time Updates</strong>
+                  Weekly audio and video reports from the trainer.
+                </p>
+              </li>
+            </ul>
+            <div class="flex items-center justify-between border-t border-border pt-6">
+              <span class="text-muted text-base">Stake available</span>
+              <span class="text-heading font-bold text-2xl">5%</span>
+            </div>
+            <!-- CTA: opens Step 2 term sheet -->
+            <a href="#step2" class="block w-full bg-pure-white text-black px-8 py-4 rounded-full font-bold text-base tracking-wide hover:bg-white/90 transition-colors flex items-center justify-center gap-2">
+              Become an Owner <span class="text-lg">→</span>
+            </a>
+            <p class="text-center text-xs text-muted-foreground/70">Subject to <a href="#step3" class="text-muted underline underline-offset-2 hover:text-heading transition-colors">Product Disclosure Statement</a> and <a href="#step3" class="text-muted underline underline-offset-2 hover:text-heading transition-colors">Syndicate Agreement</a>.</p>
+          </div>
+        </aside>
+      </div>
+      </div>
+    </div>
+    <p class="mock-note mt-3">DSL-wired figures: <span class="text-gold">list_rate_per_1pct_month</span> · <span class="text-gold">investor_return_pct</span> · <span class="text-gold">lease_period_months</span> · <span class="text-gold">available_pct</span> — never hand-computed.</p>
+  </div>
+</div>
+
+<!-- ══════════════ STEP 2 — TERM SHEET (popup) ══════════════ -->
+<div class="max-w-[1600px] mx-auto px-8 pb-16" id="step2">
+  <div class="step-band p-6">
+    <div class="flex items-center justify-between mb-4">
+      <span class="dsl-tag">Step 2 — The Term Sheet · pop-up over horse page · stepper lives here · LOOK LOCKED 2026-09-03</span>
+      <span class="mock-note">Pattern: production InvestmentTermsModal</span>
+    </div>
+
+    <!-- dimmed page backdrop -->
+    <div class="rounded-2xl bg-canvas/60 backdrop-blur-md border border-border p-6 md:p-12 flex items-start justify-center">
+      <!-- popup -->
+      <div class="relative max-w-lg w-full h-[720px] overflow-y-auto rounded-3xl border border-border bg-surface p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
+        <button class="absolute top-4 right-4 text-muted-foreground hover:text-heading text-xl">✕</button>
+
+        <div>
+          <p class="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Digital-Syndication Terms</p>
+          <h3 class="text-[22px] font-light text-heading tracking-tight">Nellie</h3>
+        </div>
+
+        <!-- stat cards: price + stake selector -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="rounded-2xl border border-border bg-surface p-4 space-y-1">
+            <p class="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Price</p>
+            <p class="text-[28px] font-light text-heading tracking-tight leading-none">
+              <span id="stake-price">$76</span><span class="text-[13px] text-muted-foreground font-light ml-1">NZD</span>
+            </p>
+            <p class="text-[11px] font-light text-white/45 leading-snug pt-1">per month, for a <span id="stake-pct-line">1%</span> stake</p>
+          </div>
+          <div class="rounded-2xl border border-border bg-surface p-4 space-y-1">
+            <p class="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Your stake</p>
+            <div class="pt-1 flex items-center justify-start gap-3">
+              <!-- stacked ▲/▼ left of the value: ▲ green (up), ▼ red (down) -->
+              <div class="flex flex-col items-center gap-1.5">
+                <button id="stake-up" type="button" aria-label="Increase stake"
+                  class="text-[15px] font-bold leading-none text-status-active transition active:scale-90">▲</button>
+                <button id="stake-down" type="button" aria-label="Decrease stake"
+                  class="text-[15px] font-bold leading-none text-error transition active:scale-90">▼</button>
+              </div>
+              <span id="stake-value" class="text-[28px] font-light text-heading tracking-tight">1%</span>
+            </div>
+            <p class="text-[10px] text-muted-foreground/80 text-left pt-1">minimum 1% · 0.5% steps · up to 5% available</p>
+          </div>
+        </div>
+
+        <!-- gentle limit note (fades in/out on dull-triangle clicks) -->
+        <p id="stake-note" class="text-center text-[11px] font-light leading-relaxed text-muted-foreground min-h-[16px]"></p>
+
+        <!-- summary rows -->
+        <div class="space-y-4 text-[13px] font-light border-t border-border pt-5">
+          <!-- PAYMENT — two plain rows, divider between: upfront (what & why) then monthly (when) -->
+          <div class="border-b border-border pb-3.5">
+            <p class="flex justify-between items-baseline">
+              <span class="text-muted-foreground">Initial Payment</span>
+              <strong class="text-heading font-medium"><span id="join-fee">$380</span> NZD</strong>
+            </p>
+            <p class="text-[11px] text-muted-foreground/60 mt-1">for a <span id="stake-pct-line-2">1%</span> stake — includes deposit in initial payment</p>
+          </div>
+          <div class="border-b border-border pb-3.5">
+            <p class="flex justify-between items-baseline">
+              <span class="text-muted-foreground">Monthly thereafter</span>
+              <strong class="text-heading font-medium"><span id="stake-price-2">$76</span> NZD</strong>
+            </p>
+            <p class="text-[11px] text-muted-foreground/60 mt-1">billed on the 1st of each month</p>
+          </div>
+          <div class="border-b border-border pb-3.5">
+            <p class="flex justify-between items-baseline">
+              <span class="text-muted-foreground">Lease period</span>
+              <strong class="text-heading font-medium">21 months</strong>
+            </p>
+            <p class="text-[11px] text-muted-foreground/60 mt-1">From 1 September 2026 to {dsl: service_end_date}</p>
+          </div>
+          <div>
+            <p class="flex justify-between items-baseline">
+              <span class="text-muted-foreground">Investor Return</span>
+              <strong class="text-status-active text-[13px] font-medium">75% of gross prize money</strong>
+            </p>
+            <p class="text-[11px] text-muted-foreground/60 mt-1">distributed quarterly, pro-rated based on your investment &amp; official NZTR results</p>
+          </div>
+        </div>
+
+        <!-- race expectation — REMOVED from term sheet 2026-09-03 (founder); field + PDS §2.4 rendering stays in legal_engine -->
+
+        <!-- prize distribution -->
+        <div class="space-y-2">
+          <p class="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Prize distribution explained</p>
+          <p class="text-[11px] font-light text-white/35 leading-relaxed">
+            Prize money is pro-rata based on your ownership in Evolution's syndicate stake, calculated according to official NZTR results and distributed quarterly after settlement. <a href="#" class="text-muted underline underline-offset-2">Learn more about how prize money is distributed</a>
+          </p>
+        </div>
+
+        <!-- CTA → Step 3 -->
+        <a href="#step3" class="block w-full text-center py-3.5 rounded-full text-[12px] font-medium uppercase tracking-[0.15em] bg-pure-white text-black hover:bg-white/90 transition-all duration-300">
+          Invest in Nellie
+        </a>
+        <p class="text-[11px] font-light text-muted-foreground leading-relaxed text-center">Subject to <a href="#step3" class="text-muted underline underline-offset-2 hover:text-heading transition-colors">Product Disclosure Statement</a> and <a href="#step3" class="text-muted underline underline-offset-2 hover:text-heading transition-colors">Syndicate Agreement</a>.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ STEP 3 — ACCEPT (gate modal) ══════════════ -->
+<div class="max-w-[1600px] mx-auto px-8 pb-16" id="step3">
+  <div class="step-band p-6">
+    <div class="flex items-center justify-between mb-4">
+      <span class="dsl-tag">Step 3 — Accept · gate modal · each tick = recorded acceptance (audit event)</span>
+      <span class="mock-note">CTA label LOCKED: "Proceed to Secure Checkout"</span>
+    </div>
+
+    <div class="rounded-2xl bg-canvas/60 backdrop-blur-md border border-border p-6 md:p-12 flex items-start justify-center">
+      <div class="relative max-w-lg w-full h-[720px] overflow-y-auto rounded-3xl border border-border bg-surface p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
+        <button class="absolute top-4 right-4 text-muted-foreground hover:text-heading text-xl">✕</button>
+
+        <div>
+          <p class="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Acceptance</p>
+          <h3 class="text-[22px] font-light text-heading tracking-tight">Nellie — your documents</h3>
+          <p class="text-[11px] font-light text-white/35 leading-relaxed mt-2">Read each document in full, then tick to accept. Each acceptance is recorded against the exact document version.</p>
+        </div>
+
+        <!-- PDS accordion row -->
+        <div class="rounded-xl border border-border bg-surface overflow-hidden">
+          <button type="button" data-doc-toggle="pds" class="w-full flex items-center justify-between gap-3 px-4 py-3.5 text-left hover:bg-white/[0.03] transition-colors">
+            <span class="flex items-center gap-3 min-w-0">
+              <span class="text-[12px] font-light text-heading">Product Disclosure Statement</span>
+              <span class="font-mono text-[10px] text-muted-foreground shrink-0">sha256: 9f2c…e48d</span>
+            </span>
+            <span class="flex items-center gap-2 shrink-0">
+              <span data-doc-done="pds" class="hidden items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-status-active">
+                <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">check_circle</span> Completed
+              </span>
+              <span data-doc-chevron="pds" class="text-muted-foreground text-lg leading-none transition-transform duration-200">+</span>
+            </span>
+          </button>
+          <div data-doc-body="pds" class="hidden px-4 pb-4 space-y-3">
+            <div class="rounded-xl border border-border bg-canvas/60 h-36 overflow-hidden p-4">
+              <p class="text-[10px] text-muted-foreground/60 font-mono leading-relaxed">scrollable viewport — PDS content from compiled legal pack (getCompiledLegalPackForCampaign) · never authored</p>
+            </div>
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" data-doc-check="pds" class="mt-0.5 accent-[#d4a964]"/>
+              <span class="text-[12px] font-light text-white/70">I have read and accept the Product Disclosure Statement</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- SA accordion row -->
+        <div class="rounded-xl border border-border bg-surface overflow-hidden">
+          <button type="button" data-doc-toggle="sa" class="w-full flex items-center justify-between gap-3 px-4 py-3.5 text-left hover:bg-white/[0.03] transition-colors">
+            <span class="flex items-center gap-3 min-w-0">
+              <span class="text-[12px] font-light text-heading">Syndicate Agreement</span>
+              <span class="font-mono text-[10px] text-muted-foreground shrink-0">sha256: 7b41…ca02</span>
+            </span>
+            <span class="flex items-center gap-2 shrink-0">
+              <span data-doc-done="sa" class="hidden items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-status-active">
+                <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">check_circle</span> Completed
+              </span>
+              <span data-doc-chevron="sa" class="text-muted-foreground text-lg leading-none transition-transform duration-200">+</span>
+            </span>
+          </button>
+          <div data-doc-body="sa" class="hidden px-4 pb-4 space-y-3">
+            <div class="rounded-xl border border-border bg-canvas/60 h-36 overflow-hidden p-4">
+              <p class="text-[10px] text-muted-foreground/60 font-mono leading-relaxed">scrollable viewport — Syndicate Agreement content from compiled legal pack</p>
+            </div>
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" data-doc-check="sa" class="mt-0.5 accent-[#d4a964]"/>
+              <span class="text-[12px] font-light text-white/70">I have read and accept the Syndicate Agreement</span>
+            </label>
+          </div>
+        </div>
+
+        <button id="proceed-btn" class="w-full text-center py-3.5 rounded-full text-[12px] font-medium uppercase tracking-[0.15em] bg-white/10 text-muted-foreground cursor-not-allowed" disabled>
+          Proceed to Secure Checkout
+        </button>
+        <p class="text-[10px] font-light text-muted-foreground/70 text-center">Each document expands to read — a <span class="text-status-active">Completed</span> tick appears once accepted. Button unlocks when both are ticked. <span class="text-gold">Each tick = recorded acceptance</span> — who + document hash + timestamp, logged at the instant of the tick.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ STEP 4 — VERIFY ══════════════ -->
+<div class="max-w-[1600px] mx-auto px-8 pb-16" id="step4">
+  <div class="step-band p-6">
+    <div class="flex items-center justify-between mb-4">
+      <span class="dsl-tag">Step 4 — Verify · one screen · rides the KYC port (Firebase → Supabase)</span>
+      <span class="mock-note">Residency DERIVED from ID, never asked · 18+ derived from DOB</span>
+    </div>
+
+    <div class="rounded-2xl bg-canvas/60 backdrop-blur-md border border-border p-6 md:p-12 flex items-start justify-center">
+      <div class="relative max-w-lg w-full h-[720px] overflow-y-auto rounded-3xl border border-border bg-surface p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
+        <button class="absolute top-4 right-4 text-muted-foreground hover:text-heading text-xl">✕</button>
+
+        <div>
+          <p class="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Identity verification</p>
+          <h3 class="text-[22px] font-light text-heading tracking-tight">One-time check, under New Zealand law</h3>
+          <p class="text-[11px] font-light text-white/35 leading-relaxed mt-2">Identity verification is required before you become a co-owner. It takes a few minutes and is verified once — never re-checked per horse.</p>
+        </div>
+
+        <div class="rounded-2xl border border-border bg-surface p-4 space-y-1">
+          <p class="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Identity check</p>
+          <p class="text-[13px] font-light text-heading leading-relaxed pt-1">Government-issued ID + live selfie, via Stripe Identity</p>
+        </div>
+
+        <!-- NZTR attestation — the ONE tick -->
+        <div class="rounded-2xl border border-border bg-surface p-4">
+          <label class="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" class="mt-0.5 accent-[#d4a964]"/>
+            <span class="text-[12px] font-light text-white/70 leading-relaxed">You are not disqualified under NZTR rules</span>
+          </label>
+        </div>
+
+        <div class="space-y-2">
+          <p class="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">What happens with your details</p>
+          <p class="text-[11px] font-light text-white/35 leading-relaxed">
+            Residency and age are read from your identity document — you are not asked. If anything can't be confirmed automatically, a member of Evolution Stables will contact you to help complete the process.
+          </p>
+        </div>
+
+        <button class="w-full text-center py-3.5 rounded-full text-[12px] font-medium uppercase tracking-[0.15em] bg-pure-white text-black hover:bg-white/90 transition-all duration-300">
+          Continue to Checkout
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ STEP 5 — PAY (Stripe hosted) ══════════════ -->
+<div class="max-w-[1600px] mx-auto px-8 pb-16" id="step5">
+  <div class="step-band p-6">
+    <div class="flex items-center justify-between mb-4">
+      <span class="dsl-tag">Step 5 — Pay · Stripe hosted page · line item locked</span>
+      <span class="mock-note">Cancel → horse page, stake pre-filled (?units=), honest 15-min reservation</span>
+    </div>
+
+    <div class="rounded-2xl bg-canvas/60 backdrop-blur-md border border-border p-6 md:p-12 flex items-start justify-center">
+      <div class="relative max-w-lg w-full h-[720px] overflow-y-auto rounded-3xl border border-border bg-surface p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
+        <div>
+          <p class="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Checkout</p>
+          <h3 class="text-[22px] font-light text-heading tracking-tight">Stripe hosted payment</h3>
+        </div>
+
+        <div class="rounded-2xl border border-border bg-surface p-4 space-y-2">
+          <div class="flex justify-between items-baseline text-[13px] font-light">
+            <span class="text-muted-foreground">Line item</span>
+            <span class="text-heading text-right">Nellie (1% Stake) — Initial 5×M float deposit</span>
+          </div>
+          <div class="flex justify-between items-baseline text-[13px] font-light border-t border-border pt-2">
+            <span class="text-muted-foreground">Amount</span>
+            <strong class="text-heading font-medium">$1,520 NZD <span class="text-muted-foreground font-light text-[11px]">GST-inclusive</span></strong>
+          </div>
+          <div class="flex justify-between items-baseline text-[13px] font-light">
+            <span class="text-muted-foreground">Email</span>
+            <span class="text-heading">pre-filled from your account</span>
+          </div>
+        </div>
+
+        <button class="w-full text-center py-3.5 rounded-full text-[12px] font-medium uppercase tracking-[0.15em] bg-pure-white text-black hover:bg-white/90 transition-all duration-300">
+          Pay
+        </button>
+        <p class="text-[11px] font-light text-muted-foreground leading-relaxed text-center">
+          Your stake is held for 15 minutes. If it expires you are told plainly and offered a fresh reservation — no silent auto-reserve. <span class="text-gold">[ Reserve Again ]</span> on expiry.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ STEP 6 — OWN (MyStable success) ══════════════ -->
+<div class="max-w-[1600px] mx-auto px-8 pb-20" id="step6">
+  <div class="step-band p-6">
+    <div class="flex items-center justify-between mb-4">
+      <span class="dsl-tag">Step 6 — Own · MyStable success state · welcome email (E4) · vault</span>
+      <span class="mock-note">Billing expectation: monthly keep from Month 2</span>
+    </div>
+
+    <div class="rounded-2xl bg-canvas/60 backdrop-blur-md border border-border p-6 md:p-12 flex items-start justify-center">
+      <div class="relative max-w-lg w-full h-[720px] overflow-y-auto rounded-3xl border border-border bg-surface p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
+        <div>
+          <p class="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">MyStable — success</p>
+          <h3 class="text-[22px] font-light text-heading tracking-tight">Welcome to the Nellie syndicate</h3>
+          <p class="text-[12px] font-light text-white/45 mt-2 leading-relaxed">Your 1% stake is confirmed. Your executed documents and their hashes are in your vault.</p>
+        </div>
+
+        <div class="rounded-2xl border border-border bg-surface p-4 space-y-3 text-[13px] font-light">
+          <div class="flex justify-between items-baseline">
+            <span class="text-muted-foreground">Stake</span>
+            <span class="text-heading font-medium">1%</span>
+          </div>
+          <div class="flex justify-between items-baseline border-t border-border pt-2.5">
+            <span class="text-muted-foreground">Monthly keep</span>
+            <span class="text-heading font-medium">$76 NZD <span class="text-muted-foreground font-light text-[11px]">from Month 2</span></span>
+          </div>
+          <div class="flex justify-between items-baseline border-t border-border pt-2.5">
+            <span class="text-muted-foreground">First distribution</span>
+            <span class="text-heading font-medium">next quarterly settlement</span>
+          </div>
+          <div class="flex justify-between items-baseline border-t border-border pt-2.5">
+            <span class="text-muted-foreground">Vault documents</span>
+            <span class="text-gold font-medium">PDS + SA, full hashes, downloadable</span>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <p class="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">What happens next</p>
+          <p class="text-[11px] font-light text-white/35 leading-relaxed">
+            Your welcome email is on its way (it confirms your stake, points to the vault, and sets the same monthly keep expectation). Your first distribution lands at the next quarterly settlement. If the holding is still being finalised by the webhook, we say so honestly — we never claim the holding exists before it does.
+          </p>
+        </div>
+
+        <button class="w-full text-center py-3.5 rounded-full text-[12px] font-medium uppercase tracking-[0.15em] bg-white/5 text-muted border border-border hover:bg-white/10 transition-all duration-300">
+          Open MyStable
+        </button>
+      </div>
+    </div>
+    <p class="mock-note mt-3">E4 welcome email (Yard Journal format) is the companion artifact — not shown here.</p>
+  </div>
+</div>
+
+<!-- Step 2 stake stepper behaviour (mock-only; DSL values are placeholders wired in build) -->
+<script>
+(function () {
+  var MIN = 1, MAX = 5, STEP = 0.5, RATE = 76, JOIN_MONTHS = 5;
+  var stake = MIN;
+  var up = document.getElementById('stake-up');
+  var down = document.getElementById('stake-down');
+  var valueEl = document.getElementById('stake-value');
+  var priceEl = document.getElementById('stake-price');
+  var pctLine = document.getElementById('stake-pct-line');
+  var pctLine2 = document.getElementById('stake-pct-line-2');
+  var price2 = document.getElementById('stake-price-2');
+  var joinEl = document.getElementById('join-fee');
+  var noteEl = document.getElementById('stake-note');
+  var noteTimer = null;
+
+  function money(n) { return '$' + Math.round(n).toLocaleString('en-NZ'); }
+  function pct(n) { return (Math.round(n * 100) / 100) + '%'; }
+
+  function render() {
+    valueEl.textContent = pct(stake);
+    priceEl.textContent = money(RATE * stake);
+    pctLine.textContent = pct(stake);
+    pctLine2.textContent = pct(stake);
+    price2.textContent = money(RATE * stake);
+    joinEl.textContent = money(RATE * stake * JOIN_MONTHS);
+    up.classList.toggle('stake-dull', stake >= MAX);
+    down.classList.toggle('stake-dull', stake <= MIN);
+  }
+
+  function showNote(msg) {
+    noteEl.textContent = msg;
+    noteEl.style.transition = 'opacity 0.3s';
+    noteEl.style.opacity = '1';
+    clearTimeout(noteTimer);
+    noteTimer = setTimeout(function () { noteEl.style.opacity = '0'; }, 2600);
+  }
+
+  up.addEventListener('click', function () {
+    if (stake < MAX - 1e-9) { stake = Math.round((stake + STEP) * 100) / 100; render(); }
+    else showNote('This is the maximum stake available — 5%.');
+  });
+  down.addEventListener('click', function () {
+    if (stake > MIN + 1e-9) { stake = Math.round((stake - STEP) * 100) / 100; render(); }
+    else showNote('This is the minimum investment — a 1% stake.');
+  });
+
+  render();
+})();
+
+/* Step 3 — document accordions (FAQ pattern): expand/collapse, Completed badge, unlock Proceed */
+(function () {
+  var docs = ['pds', 'sa'];
+  var state = { pds: false, sa: false };
+
+  function refresh() {
+    var both = state.pds && state.sa;
+    var btn = document.getElementById('proceed-btn');
+    if (both) {
+      btn.disabled = false;
+      btn.className = 'w-full text-center py-3.5 rounded-full text-[12px] font-medium uppercase tracking-[0.15em] bg-pure-white text-black hover:bg-white/90 transition-all duration-300';
+    } else {
+      btn.disabled = true;
+      btn.className = 'w-full text-center py-3.5 rounded-full text-[12px] font-medium uppercase tracking-[0.15em] bg-white/10 text-muted-foreground cursor-not-allowed';
+    }
+  }
+
+  docs.forEach(function (id) {
+    var toggle = document.querySelector('[data-doc-toggle="' + id + '"]');
+    var body = document.querySelector('[data-doc-body="' + id + '"]');
+    var chevron = document.querySelector('[data-doc-chevron="' + id + '"]');
+    var done = document.querySelector('[data-doc-done="' + id + '"]');
+    var check = document.querySelector('[data-doc-check="' + id + '"]');
+
+    toggle.addEventListener('click', function () {
+      var open = !body.classList.contains('hidden');
+      body.classList.toggle('hidden', open);
+      chevron.textContent = open ? '+' : '−';
+      chevron.style.transform = open ? '' : 'rotate(180deg)';
+    });
+
+    check.addEventListener('change', function () {
+      state[id] = check.checked;
+      done.classList.toggle('hidden', !check.checked);
+      done.classList.toggle('flex', check.checked);
+      refresh();
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
