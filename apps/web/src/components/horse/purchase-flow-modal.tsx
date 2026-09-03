@@ -30,7 +30,7 @@ export interface PurchaseFlowModalProps {
 }
 
 /** Shared modal shell — max-w-lg × h-[720px], scrolls inside (f14, locked 2026-09-03). */
-export function ModalShell({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
+function ModalShell({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -41,7 +41,7 @@ export function ModalShell({ children, onClose }: { children: React.ReactNode; o
 
   return (
     <div
-      className="fixed inset-0 z-[999] flex items-center justify-center bg-black/85 p-4 sm:p-6 backdrop-blur-md overflow-y-auto"
+      className="fixed inset-0 z-[999] flex items-center justify-center bg-black/85 p-4 sm:p-6 backdrop-blur-md"
       role="dialog"
       aria-modal="true"
       onClick={onClose}
@@ -67,7 +67,6 @@ export function ModalShell({ children, onClose }: { children: React.ReactNode; o
 /** Step 2 — The Term Sheet (mockup lines 170–268). */
 function Step2TermSheet({
   horseName,
-  horseSlug,
   wholesaleMonthlyNzd,
   minInvestmentPct = 1.0,
   maxInvestmentPct = 10.0,
@@ -75,7 +74,6 @@ function Step2TermSheet({
   onProceed,
 }: {
   horseName: string;
-  horseSlug: string;
   wholesaleMonthlyNzd?: number;
   minInvestmentPct?: number;
   maxInvestmentPct?: number;
@@ -85,6 +83,13 @@ function Step2TermSheet({
   const [stakePct, setStakePct] = React.useState<number>(minInvestmentPct);
   const [note, setNote] = React.useState<string | null>(null);
   const noteTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clean up the note timer on unmount (audit chunk-2 #11).
+  React.useEffect(() => {
+    return () => {
+      if (noteTimer.current) clearTimeout(noteTimer.current);
+    };
+  }, []);
 
   const wholesale = wholesaleMonthlyNzd ?? 3800;
   const pricing: DslPricing = React.useMemo(
@@ -270,7 +275,6 @@ export default function PurchaseFlowModal({
     <ModalShell onClose={onClose}>
       <Step2TermSheet
         horseName={horseName}
-        horseSlug={horseSlug}
         wholesaleMonthlyNzd={wholesaleMonthlyNzd}
         minInvestmentPct={minInvestmentPct}
         maxInvestmentPct={maxInvestmentPct}
