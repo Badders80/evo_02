@@ -39,6 +39,8 @@ export interface PurchaseFlowModalProps {
   stakeStepPct?: number;
   /** Seed for the modal's internal stake state (from ?units= restore in the rail). */
   initialStakePct?: number;
+  /** Sync the rail's stake state when the user changes it in the modal (audit #13). */
+  onStakeChange?: (stakePct: number) => void;
   legalPack?: LegalPackDigest | null;
   onClose: () => void;
 }
@@ -305,10 +307,12 @@ function Step3AcceptanceGate({
 
   /** Each tick records an acceptance audit event (chunk-3, locked: tick = audit event). */
   const handleTick = async (doc: 'pds' | 'sa', checked: boolean) => {
-    setTicks((prev) => ({ ...prev, [doc]: checked }));
-    if (!checked) return;
+    if (!checked) {
+      setTicks((prev) => ({ ...prev, [doc]: false }));
+      return;
+    }
     try {
-      await fetch('/api/acceptance', {
+      const res = await fetch('/api/acceptance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -318,8 +322,14 @@ function Step3AcceptanceGate({
           docHash: doc === 'pds' ? legalPack?.pdsHash : legalPack?.saHash,
         }),
       });
+      if (!res.ok) {
+        // Audit-tick failure must not silently fake acceptance (audit #3).
+        setTicks((prev) => ({ ...prev, [doc]: false }));
+        return;
+      }
+      setTicks((prev) => ({ ...prev, [doc]: true }));
     } catch {
-      // Audit-tick logging is never allowed to block the flow; surface nothing.
+      setTicks((prev) => ({ ...prev, [doc]: false }));
     }
   };
 
@@ -344,10 +354,14 @@ function Step3AcceptanceGate({
       }
 
       if (res.status === 403) {
-        // KYC required — in-modal prompt (read-then-verify, LOCKED 2026-09-01).
-        setKycState('prompt');
-        setSubmitting(false);
-        return;
+        // Only KYC_REQUIRED maps to the in-modal prompt — other 403s surface as errors.
+        const body = await res.json().catch(() => null);
+        if (body?.code === 'KYC_REQUIRED') {
+          setKycState('prompt');
+          setSubmitting(false);
+          return;
+        }
+        throw new Error(body?.error || 'Forbidden');
       }
 
       const data = await res.json();
@@ -546,12 +560,18 @@ export default function PurchaseFlowModal({
   maxInvestmentPct = 10.0,
   stakeStepPct = 0.5,
   initialStakePct,
+  onStakeChange,
   legalPack = null,
   onClose,
 }: PurchaseFlowModalProps) {
   const [step, setStep] = React.useState<Step>('terms');
   // Stake lifted here so it survives the Step 2 → Step 3 handoff (and later URL sync).
   const [stakePct, setStakePct] = React.useState<number>(initialStakePct ?? minInvestmentPct);
+
+  // Sync rail state as the modal stake changes (audit #13) — modal close keeps the rail honest.
+  React.useEffect(() => {
+    onStakeChange?.(stakePct);
+  }, [stakePct, onStakeChange]);
 
   return (
     <ModalShell onClose={onClose}>

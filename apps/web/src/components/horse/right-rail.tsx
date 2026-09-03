@@ -366,6 +366,7 @@ function ListedInvestmentCard({
           stakeStepPct={stakeStepPct}
           legalPack={legalPack}
           initialStakePct={stakePct}
+          onStakeChange={setStakePct}
           onClose={() => setFlowOpen(false)}
         />
       )}
