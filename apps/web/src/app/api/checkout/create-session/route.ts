@@ -6,7 +6,6 @@ import {
   interpretReserveResult,
   purchasesAreEnabled,
   requireUserId,
-  requireVerifiedKyc,
   resolveLegalHashes,
   pricingForUnits,
   stakePctToStepUnits,
@@ -59,7 +58,19 @@ export async function POST(request: Request) {
       profile && typeof profile === 'object' && 'kyc_status' in profile
         ? String((profile as { kyc_status: string }).kyc_status)
         : null;
-    requireVerifiedKyc(kycStatus);
+    // Chunk-4: KYC_REQUIRED carries the investor's current kyc_status so the modal can
+    // render the honest state (prompt / pending / rejected) instead of guessing. The KYC
+    // port (Firebase → Supabase) is a separate workstream — this route stays the gate.
+    if (kycStatus !== 'verified') {
+      return NextResponse.json(
+        {
+          error: 'KYC verification required before checkout',
+          code: 'KYC_REQUIRED',
+          kycStatus: kycStatus ?? null,
+        },
+        { status: 403 }
+      );
+    }
 
     const { campaign, inventoryId } = await assertCheckoutCampaign(horseSlug);
     if (!campaign) {

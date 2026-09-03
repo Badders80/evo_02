@@ -357,7 +357,12 @@ function Step3AcceptanceGate({
         // Only KYC_REQUIRED maps to the in-modal prompt — other 403s surface as errors.
         const body = await res.json().catch(() => null);
         if (body?.code === 'KYC_REQUIRED') {
-          setKycState('prompt');
+          // Chunk-4: server returns the investor's real kyc_status — render the honest
+          // state (prompt / pending / rejected) instead of guessing.
+          const status = body.kycStatus ?? null;
+          if (status === 'pending') setKycState('pending');
+          else if (status === 'rejected') setKycState('rejected');
+          else setKycState('prompt');
           setSubmitting(false);
           return;
         }
@@ -498,10 +503,13 @@ function Step3AcceptanceGate({
             type="button"
             className="w-full rounded-full bg-foreground py-3 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-background transition-all duration-300 hover:opacity-90"
             onClick={() => {
-              setKycState('pending');
               // KYC port (Firebase → Supabase) is a separate workstream; this is the
-              // in-modal prompt surface. The port wires /auth/verify here when shipped.
-              console.warn('[purchase-flow] KYC port pending — wire Stripe Identity here (chunk-4)');
+              // in-modal prompt surface. `/auth/verify` does NOT exist in evo_02 yet
+              // (verified chunk-4, 404), so the CTA stays inert instead of faking a
+              // pending state. Wire the redirect here when the port ships.
+              console.warn(
+                '[purchase-flow] KYC port pending — /auth/verify absent, CTA intentionally inert (chunk-4)'
+              );
             }}
           >
             Verify Identity
