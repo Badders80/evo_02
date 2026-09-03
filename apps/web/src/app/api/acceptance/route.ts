@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient, getSupabaseServiceClient } from '@/lib/supabase-server';
-import { requireUserId } from '@/lib/nellie-loop';
+import { HttpError, requireUserId } from '@/lib/nellie-loop';
 
 /**
  * Acceptance audit tick (chunk-3, locked 2026-09-01: "each tick = recorded
@@ -12,6 +12,14 @@ import { requireUserId } from '@/lib/nellie-loop';
  */
 
 const DOCS = new Set(['pds', 'sa']);
+
+function jsonError(err: unknown): NextResponse {
+  if (err instanceof HttpError) {
+    return NextResponse.json({ error: err.message, code: err.code }, { status: err.status });
+  }
+  const msg = err instanceof Error ? err.message : 'Acceptance recording failed';
+  return NextResponse.json({ error: msg }, { status: 500 });
+}
 
 export async function POST(request: Request) {
   try {
@@ -51,7 +59,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true });
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : 'Acceptance recording failed';
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return jsonError(err);
   }
 }

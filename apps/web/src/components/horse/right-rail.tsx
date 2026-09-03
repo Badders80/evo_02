@@ -11,10 +11,8 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
-import { ChevronDown, ChevronUp, FileText, Hash, ShieldCheck, Check } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { pricingForUnits } from '@/lib/nellie-loop';
-import type { DslPricing } from '@evo/legal_engine';
 import PurchaseFlowModal from './purchase-flow-modal';
 
 export interface LegalPackDigest {
@@ -222,246 +220,6 @@ function PillarAccordionItem({
   );
 }
 
-/** Acceptance Gate Modal with Scroll-through PDS + SA & Checkboxes */
-function AcceptanceGateModal({
-  horseName,
-  horseSlug,
-  stakePct,
-  pricing,
-  legalPack,
-  onClose,
-}: {
-  horseName: string;
-  horseSlug: string;
-  stakePct: number;
-  pricing: DslPricing;
-  legalPack?: LegalPackDigest | null;
-  onClose: () => void;
-}) {
-  const router = useRouter();
-  const [pdsChecked, setPdsChecked] = React.useState(false);
-  const [saChecked, setSaChecked] = React.useState(false);
-  const [submitting, setSubmitting] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
-  const handleProceed = async () => {
-    if (!pdsChecked || !saChecked || submitting) return;
-    setSubmitting(true);
-    setError(null);
-
-    try {
-      const res = await fetch('/api/checkout/create-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          horseSlug,
-          units: stakePct,
-        }),
-      });
-
-      if (res.status === 401) {
-        // User not logged in -> redirect to login with return path, preserving stake
-        const nextUrl = encodeURIComponent(`${window.location.pathname}?units=${stakePct}`);
-        router.push(`/login?next=${nextUrl}`);
-        return;
-      }
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Checkout initialization failed');
-      }
-
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error('No checkout URL returned from server');
-      }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Checkout encountered an error';
-      setError(message);
-      setSubmitting(false);
-    }
-  };
-
-  const pdsText =
-    legalPack?.pdsMarkdown ||
-    `Product Disclosure Statement (PDS) for ${horseName} Syndicate.\n\n` +
-      `Issued under the NZTR Authorised Syndication Code.\n\n` +
-      `1. The Offer: Fixed-duration syndicate stakes in thoroughbred ${horseName}.\n` +
-      `2. Upfront float deposit covers 5 months advance reserve.\n` +
-      `3. Monthly keep is fixed at $${pricing.monthlyKeepUnitNzd} NZD per 1% stake.\n` +
-      `4. Downside protection: if the horse is injured and unable to train/race, keep contributions stop immediately.\n` +
-      `5. Return mechanics: 75% gross prize money pro-rata quarterly.`;
-
-  const saText =
-    legalPack?.saMarkdown ||
-    `Syndicate Agreement (SA) for ${horseName} Syndicate.\n\n` +
-      `Manager: Evolution Stables.\n\n` +
-      `1. Governance: The Manager administers all racing, veterinary, training, and nomination decisions in accordance with welfare-first standards.\n` +
-      `2. Financials: Monies held in segregated trust account.\n` +
-      `3. Transfers: Secondary transfer facilitated through Evolution Stables upon formal request.\n` +
-      `4. Term: Fixed lease duration with predefined settlement date.`;
-
-  return (
-    <div
-      className="fixed inset-0 z-[999] flex items-center justify-center bg-black/85 p-4 sm:p-6 backdrop-blur-md overflow-y-auto"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="acceptance-gate-title"
-      onClick={onClose}
-    >
-      <div
-        className="my-auto w-full max-w-2xl rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-5"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-start justify-between border-b border-border pb-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-accent">
-                Regulatory Acknowledgment
-              </span>
-              <span className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 text-[9px] font-mono text-accent">
-                <ShieldCheck className="h-3 w-3" /> NZTR Code
-              </span>
-            </div>
-            <h3 id="acceptance-gate-title" className="mt-1 text-lg font-light text-heading">
-              {horseName} · <span className="font-mono text-accent">{stakePct.toFixed(1)}% Stake</span>
-            </h3>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="rounded-full p-1 text-muted-foreground hover:bg-surface-base hover:text-foreground transition-colors"
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* Financial Summary Strip */}
-        <div className="grid grid-cols-2 gap-3 rounded-xl border border-border bg-canvas/60 p-3 font-mono text-[11px]">
-          <div>
-            <span className="text-[9px] uppercase tracking-wider text-muted-foreground block">
-              Monthly Keep
-            </span>
-            <span className="text-[13px] font-medium text-heading">
-              ${pricing.monthlyKeepUnitNzd.toLocaleString()} <span className="text-[10px] font-light text-muted-foreground">/mo</span>
-            </span>
-          </div>
-          <div>
-            <span className="text-[9px] uppercase tracking-wider text-muted-foreground block">
-              Join Float (5×M Deposit)
-            </span>
-            <span className="text-[13px] font-medium text-heading">
-              ${pricing.joinFloatUnitNzd.toLocaleString()}
-            </span>
-          </div>
-        </div>
-
-        {/* Document 1: PDS Scroll Container */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-accent" />
-              <span className="text-[11px] font-medium text-foreground">
-                Product Disclosure Statement (PDS)
-              </span>
-            </div>
-            {legalPack?.pdsHash && (
-              <div className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground">
-                <Hash className="h-3 w-3 text-accent" />
-                <span className="truncate max-w-[120px] sm:max-w-[180px]">
-                  {legalPack.pdsHash}
-                </span>
-              </div>
-            )}
-          </div>
-          <div className="max-h-36 overflow-y-auto rounded-xl border border-border/80 bg-canvas p-3.5 text-[11px] font-light leading-relaxed text-foreground/80 whitespace-pre-line select-text">
-            {pdsText}
-          </div>
-          <label className="flex items-center gap-2.5 cursor-pointer pt-1 group">
-            <input
-              type="checkbox"
-              id="agree-pds"
-              checked={pdsChecked}
-              onChange={(e) => setPdsChecked(e.target.checked)}
-              className="h-4 w-4 rounded border-border bg-background text-accent focus:ring-accent focus:ring-offset-0"
-            />
-            <span className="text-[11px] font-light text-muted-foreground group-hover:text-foreground transition-colors">
-              I have read and agree to the Product Disclosure Statement (PDS)
-            </span>
-          </label>
-        </div>
-
-        {/* Document 2: Syndicate Agreement (SA) Scroll Container */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-accent" />
-              <span className="text-[11px] font-medium text-foreground">
-                Syndicate Agreement (SA)
-              </span>
-            </div>
-            {legalPack?.saHash && (
-              <div className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground">
-                <Hash className="h-3 w-3 text-accent" />
-                <span className="truncate max-w-[120px] sm:max-w-[180px]">
-                  {legalPack.saHash}
-                </span>
-              </div>
-            )}
-          </div>
-          <div className="max-h-36 overflow-y-auto rounded-xl border border-border/80 bg-canvas p-3.5 text-[11px] font-light leading-relaxed text-foreground/80 whitespace-pre-line select-text">
-            {saText}
-          </div>
-          <label className="flex items-center gap-2.5 cursor-pointer pt-1 group">
-            <input
-              type="checkbox"
-              id="agree-sa"
-              checked={saChecked}
-              onChange={(e) => setSaChecked(e.target.checked)}
-              className="h-4 w-4 rounded border-border bg-background text-accent focus:ring-accent focus:ring-offset-0"
-            />
-            <span className="text-[11px] font-light text-muted-foreground group-hover:text-foreground transition-colors">
-              I acknowledge and agree to the Syndicate Agreement terms
-            </span>
-          </label>
-        </div>
-
-        {error && (
-          <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-[11px] text-destructive">
-            {error}
-          </div>
-        )}
-
-        {/* Modal Action Footer */}
-        <div className="pt-2 border-t border-border space-y-3">
-          <p className="text-[10px] font-light leading-relaxed text-muted-foreground text-center">
-            Verification is completed under the NZTR Authorised Syndication Code. Handoff is cryptographically verified.
-          </p>
-          <button
-            type="button"
-            disabled={!pdsChecked || !saChecked || submitting}
-            onClick={handleProceed}
-            className="w-full rounded-full bg-accent py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-accent-foreground transition-all duration-300 hover:brightness-110 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100"
-          >
-            {submitting ? 'Preparing Secure Checkout…' : 'Proceed to Secure Checkout'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /** Listed Investment Card with Stake Slider, Monthly NZD Pricing & 5 Pillars */
 function ListedInvestmentCard({
   horseName,
@@ -495,7 +253,6 @@ function ListedInvestmentCard({
     }
   }, [minInvestmentPct, maxInvestmentPct, stakeStepPct]);
   const [openPillarId, setOpenPillarId] = React.useState<string | null>(null);
-  const [gateOpen, setGateOpen] = React.useState(false);
   const [flowOpen, setFlowOpen] = React.useState(false);
 
   const wholesale = wholesaleMonthlyNzd ?? 3800;
@@ -598,7 +355,7 @@ function ListedInvestmentCard({
         </div>
       </div>
 
-      {/* Step 2 term sheet (PurchaseFlowModal) — hands off to Step 3 gate on proceed */}
+      {/* PurchaseFlowModal — Steps 2–3 (term sheet → acceptance gate) */}
       {flowOpen && (
         <PurchaseFlowModal
           horseName={horseName}
@@ -607,24 +364,9 @@ function ListedInvestmentCard({
           minInvestmentPct={minInvestmentPct}
           maxInvestmentPct={maxInvestmentPct}
           stakeStepPct={stakeStepPct}
-          onProceed={(modalStake) => {
-            setStakePct(modalStake);
-            setFlowOpen(false);
-            setGateOpen(true);
-          }}
-          onClose={() => setFlowOpen(false)}
-        />
-      )}
-
-      {/* Acceptance Gate Modal */}
-      {gateOpen && (
-        <AcceptanceGateModal
-          horseName={horseName}
-          horseSlug={horseSlug}
-          stakePct={stakePct}
-          pricing={pricing}
           legalPack={legalPack}
-          onClose={() => setGateOpen(false)}
+          initialStakePct={stakePct}
+          onClose={() => setFlowOpen(false)}
         />
       )}
     </div>
