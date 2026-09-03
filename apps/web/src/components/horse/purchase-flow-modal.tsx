@@ -351,7 +351,7 @@ function Step2TermSheet({
       <button
         type="button"
         onClick={onProceed}
-        className="block w-full text-center py-3.5 rounded-full text-[12px] font-medium uppercase tracking-[0.15em] bg-foreground text-background hover:opacity-90 transition-all duration-300"
+        className="block w-full text-center py-3.5 rounded-full text-[12px] font-medium uppercase tracking-[0.15em] bg-pure-white text-black hover:opacity-90 transition-all duration-300"
       >
         Invest in {horseName}
       </button>
@@ -605,7 +605,7 @@ function Step3AcceptanceGate({
           </p>
           <button
             type="button"
-            className="w-full rounded-full bg-foreground py-3 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-background transition-all duration-300 hover:opacity-90"
+            className="w-full rounded-full bg-pure-white py-3 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-black transition-all duration-300 hover:opacity-90"
             onClick={() => {
               // KYC port (Firebase → Supabase) is a separate workstream; this is the
               // in-modal prompt surface. `/auth/verify` does NOT exist in evo_02 yet

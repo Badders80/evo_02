@@ -333,7 +333,7 @@ function ListedInvestmentCard({
       <button
         type="button"
         onClick={() => setFlowOpen(true)}
-        className="w-full rounded-full bg-foreground py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-background transition-all duration-300 hover:opacity-90 active:scale-[0.98]"
+        className="w-full rounded-full bg-pure-white py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-black transition-all duration-300 hover:opacity-90 active:scale-[0.98]"
       >
         Become an Owner
       </button>
