@@ -37,10 +37,6 @@ export interface PurchaseFlowModalProps {
   minInvestmentPct?: number;
   maxInvestmentPct?: number;
   stakeStepPct?: number;
-  /** Seed for the modal's internal stake state (from ?units= restore in the rail). */
-  initialStakePct?: number;
-  /** Sync the rail's stake state when the user changes it in the modal (audit #13). */
-  onStakeChange?: (stakePct: number) => void;
   legalPack?: LegalPackDigest | null;
   onClose: () => void;
 }
@@ -671,19 +667,26 @@ export default function PurchaseFlowModal({
   minInvestmentPct = 1.0,
   maxInvestmentPct = 10.0,
   stakeStepPct = 0.5,
-  initialStakePct,
-  onStakeChange,
   legalPack = null,
   onClose,
 }: PurchaseFlowModalProps) {
   const [step, setStep] = React.useState<Step>('terms');
-  // Stake lifted here so it survives the Step 2 → Step 3 handoff (and later URL sync).
-  const [stakePct, setStakePct] = React.useState<number>(initialStakePct ?? minInvestmentPct);
-
-  // Sync rail state as the modal stake changes (audit #13) — modal close keeps the rail honest.
+  // Stake lives in the modal (locked: stepper lives here, not on the rail).
+  // f6/f6b (audit 2026-09-03): restore ?units= from the URL on mount — cancel_url
+  // and the login redirect carry it, so the pre-filled stake survives full-browser
+  // navigations. Read in useEffect (SSR-safe: window undefined on the server).
+  const [stakePct, setStakePct] = React.useState<number>(minInvestmentPct);
   React.useEffect(() => {
-    onStakeChange?.(stakePct);
-  }, [stakePct, onStakeChange]);
+    const raw = new URLSearchParams(window.location.search).get('units');
+    if (!raw) return;
+    const parsed = parseFloat(raw);
+    if (!Number.isFinite(parsed)) return;
+    const step = Math.max(stakeStepPct, 0.01);
+    const snapped = Math.round(parsed / step) * step;
+    if (snapped >= minInvestmentPct - 1e-9 && snapped <= maxInvestmentPct + 1e-9) {
+      setStakePct(Math.round(snapped * 100) / 100);
+    }
+  }, [minInvestmentPct, maxInvestmentPct, stakeStepPct]);
 
   return (
     <ModalShell onClose={onClose}>

@@ -96,64 +96,8 @@ console.log('Running @evo/web E3 Right Rail & Acceptance Gate tests...\n');
   console.log('✅ Legal pack compilation & verified SHA-256 digests validated');
 }
 
-// 3. E3 Five Pillars Content & Vocabulary Whitelist Gate
-{
-  const E3_PILLARS = [
-    {
-      id: 'deal',
-      title: 'The Deal',
-      summary: 'Fixed price · fixed duration · fixed return.',
-      content: 'Can the owner ask for more money? Nope. One price, fixed. What the upfront covers: the last 5 months of the term.',
-    },
-    {
-      id: 'included',
-      title: "What's Included",
-      summary: 'Everything covered, nothing changes.',
-      content: 'Float, keep, insurance, veterinary coverage — all-inclusive management. No surprise capital calls.',
-    },
-    {
-      id: 'what_if',
-      title: 'What If',
-      summary: 'Injured → you stop paying.',
-      content: 'Welfare-first stewardship. If injured and unable to race, your monthly keep contributions stop immediately.',
-    },
-    {
-      id: 'return',
-      title: 'Your Return',
-      summary: '75% gross prize money, pro-rata, quarterly.',
-      content: 'Stakes published on official NZTR record. Distributions paid quarterly directly to your bank account.',
-    },
-    {
-      id: 'exit',
-      title: 'Exit & Transfer',
-      summary: 'Fixed term end · transfer via Evolution on request.',
-      content: 'Secondary market to follow. Initially, ownership transfers are facilitated through Evolution Stables upon request.',
-    },
-  ];
-
-  const BANNED_PATTERNS = [
-    /\bshares\b/i,
-    /\breward\b/i,
-    /\byield\b/i,
-    /\bdividend\b/i,
-    /\broi\b/i,
-    /\bpayout\b/i,
-    /\btop-up\b/i,
-    /\bpieces\b/i,
-    /\bparts\b/i,
-    /\bleadco\b/i,
-    /\bbloodstock\b/i,
-    /!/,
-  ];
-
-  for (const pillar of E3_PILLARS) {
-    const fullText = `${pillar.title} ${pillar.summary} ${pillar.content}`;
-    for (const pattern of BANNED_PATTERNS) {
-      assert.ok(!pattern.test(fullText), `Pillar '${pillar.title}' must not match banned pattern ${pattern}`);
-    }
-  }
-
-  console.log('✅ E3 5-Pillar accordion copy conforms to Private Banker standard & vocabulary whitelist');
-}
+// 3. (Removed 2026-09-04 format-pass/rail rebuild: the E3 5-pillar accordion and stake
+// slider were deleted from the rail — locked Step-1 "Ownership" card replaced them.
+// Whistleblowing pillar copy was locked content, now retired with the surface.)
 
 console.log('\n🎉 All @evo/web E3 Right Rail tests passed successfully!\n');
