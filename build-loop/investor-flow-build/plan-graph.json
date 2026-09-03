@@ -2,31 +2,155 @@
   "cycle": "investor-flow-build",
   "created": "2026-09-03",
   "nodes": [
-    {"id": "file:right-rail.tsx", "type": "file", "description": "Rail: stepper opens at min, fine-print line, 401 keeps ?units=, reads ?units= on mount"},
-    {"id": "file:page.tsx", "type": "file", "description": "marketplace/[slug]: min_stake_pct wiring, sold-out fallback -> ClosedCard"},
-    {"id": "file:create-session/route.ts", "type": "file", "description": "cancel_url ?units=, 7-code Stripe error mapping"},
-    {"id": "file:mystable/page.tsx", "type": "file", "description": "checkout=success state (f8)"},
-    {"id": "file:purchase-flow-modal.tsx", "type": "file", "description": "New PurchaseFlowModal: Steps 2-6, max-w-lg x h-[720px], green 75% row, 4-row summary, KYC prompt, stepper error states, URL sync on stepper change"},
-    {"id": "sql:events-table", "type": "sql", "description": "events table exists (00001:220) - audit tick writes event_type='acceptance'"},
-    {"id": "cmd:just-check", "type": "gate", "description": "just check 10/10 passes"},
-    {"id": "cmd:typecheck", "type": "gate", "description": "pnpm --filter @evo/web typecheck green"},
-    {"id": "cmd:walk-3010", "type": "gate", "description": "walk /marketplace/nellie on :3010, CTA -> modal -> checkout"}
+    {
+      "id": "file:right-rail.tsx",
+      "type": "file",
+      "description": "Rail: stepper opens at min, fine-print line, 401 keeps ?units=, reads ?units= on mount"
+    },
+    {
+      "id": "file:page.tsx",
+      "type": "file",
+      "description": "marketplace/[slug]: min_stake_pct wiring, sold-out fallback -> ClosedCard"
+    },
+    {
+      "id": "file:create-session/route.ts",
+      "type": "file",
+      "description": "cancel_url ?units=, 7-code Stripe error mapping"
+    },
+    {
+      "id": "file:mystable/page.tsx",
+      "type": "file",
+      "description": "checkout=success state (f8)"
+    },
+    {
+      "id": "file:purchase-flow-modal.tsx",
+      "type": "file",
+      "description": "New PurchaseFlowModal: Steps 2-6, max-w-lg x h-[720px], green 75% row, 4-row summary, KYC prompt, stepper error states, URL sync on stepper change"
+    },
+    {
+      "id": "sql:events-table",
+      "type": "sql",
+      "description": "events table exists (00001:220) - audit tick writes event_type='acceptance'"
+    },
+    {
+      "id": "cmd:just-check",
+      "type": "gate",
+      "description": "just check 10/10 passes"
+    },
+    {
+      "id": "cmd:typecheck",
+      "type": "gate",
+      "description": "pnpm --filter @evo/web typecheck green"
+    },
+    {
+      "id": "cmd:walk-3010",
+      "type": "gate",
+      "description": "walk /marketplace/nellie on :3010, CTA -> modal -> checkout"
+    }
   ],
   "edges": [
-    {"from": "file:page.tsx", "to": "file:right-rail.tsx", "reason": "page passes minInvestmentPct/maxInvestmentPct to rail", "source": "page.tsx:216-217"},
-    {"from": "file:right-rail.tsx", "to": "file:purchase-flow-modal.tsx", "reason": "modal extracted out of rail (f1/f15)", "source": "plan C2"},
-    {"from": "file:create-session/route.ts", "to": "file:purchase-flow-modal.tsx", "reason": "modal calls create-session API; error mapping shared", "source": "right-rail.tsx:260"},
-    {"from": "sql:events-table", "to": "file:purchase-flow-modal.tsx", "reason": "audit tick writes acceptance event via service client", "source": "00001_initial_schema.sql:220"},
-    {"from": "file:right-rail.tsx", "to": "cmd:just-check", "reason": "rail changes must pass repo gate", "source": "plan verification"},
-    {"from": "file:purchase-flow-modal.tsx", "to": "cmd:typecheck", "reason": "new component must typecheck", "source": "plan verification"},
-    {"from": "cmd:typecheck", "to": "cmd:walk-3010", "reason": "walk only after typecheck green", "source": "plan verification"}
+    {
+      "from": "file:page.tsx",
+      "to": "file:right-rail.tsx",
+      "reason": "page passes minInvestmentPct/maxInvestmentPct to rail",
+      "source": "page.tsx:216-217"
+    },
+    {
+      "from": "file:right-rail.tsx",
+      "to": "file:purchase-flow-modal.tsx",
+      "reason": "modal extracted out of rail (f1/f15)",
+      "source": "plan C2"
+    },
+    {
+      "from": "file:create-session/route.ts",
+      "to": "file:purchase-flow-modal.tsx",
+      "reason": "modal calls create-session API; error mapping shared",
+      "source": "right-rail.tsx:260"
+    },
+    {
+      "from": "sql:events-table",
+      "to": "file:purchase-flow-modal.tsx",
+      "reason": "audit tick writes acceptance event via service client",
+      "source": "00001_initial_schema.sql:220"
+    },
+    {
+      "from": "file:right-rail.tsx",
+      "to": "cmd:just-check",
+      "reason": "rail changes must pass repo gate",
+      "source": "plan verification"
+    },
+    {
+      "from": "file:purchase-flow-modal.tsx",
+      "to": "cmd:typecheck",
+      "reason": "new component must typecheck",
+      "source": "plan verification"
+    },
+    {
+      "from": "cmd:typecheck",
+      "to": "cmd:walk-3010",
+      "reason": "walk only after typecheck green",
+      "source": "plan verification"
+    }
   ],
   "chunks": {
-    "chunk-1": {"nodes": ["file:right-rail.tsx", "file:page.tsx", "file:create-session/route.ts", "file:mystable/page.tsx", "cmd:just-check", "cmd:typecheck"], "depends_on": [], "state": "done"},
-    "chunk-2": {"nodes": ["file:purchase-flow-modal.tsx", "file:right-rail.tsx", "cmd:typecheck"], "depends_on": ["chunk-1"], "state": "done"},
-    "chunk-3": {"nodes": ["file:purchase-flow-modal.tsx", "sql:events-table", "cmd:typecheck"], "depends_on": ["chunk-2"], "state": "done"},
-    "chunk-4": {"nodes": ["file:purchase-flow-modal.tsx", "file:mystable/page.tsx", "cmd:typecheck"], "depends_on": ["chunk-3"], "state": "done"},
-    "chunk-5": {"nodes": ["file:purchase-flow-modal.tsx", "file:create-session/route.ts", "cmd:typecheck", "cmd:just-check", "cmd:walk-3010"], "depends_on": ["chunk-4"], "state": "pending"}
+    "chunk-1": {
+      "nodes": [
+        "file:right-rail.tsx",
+        "file:page.tsx",
+        "file:create-session/route.ts",
+        "file:mystable/page.tsx",
+        "cmd:just-check",
+        "cmd:typecheck"
+      ],
+      "depends_on": [],
+      "state": "done"
+    },
+    "chunk-2": {
+      "nodes": [
+        "file:purchase-flow-modal.tsx",
+        "file:right-rail.tsx",
+        "cmd:typecheck"
+      ],
+      "depends_on": [
+        "chunk-1"
+      ],
+      "state": "done"
+    },
+    "chunk-3": {
+      "nodes": [
+        "file:purchase-flow-modal.tsx",
+        "sql:events-table",
+        "cmd:typecheck"
+      ],
+      "depends_on": [
+        "chunk-2"
+      ],
+      "state": "done"
+    },
+    "chunk-4": {
+      "nodes": [
+        "file:purchase-flow-modal.tsx",
+        "file:mystable/page.tsx",
+        "cmd:typecheck"
+      ],
+      "depends_on": [
+        "chunk-3"
+      ],
+      "state": "done"
+    },
+    "chunk-5": {
+      "nodes": [
+        "file:purchase-flow-modal.tsx",
+        "file:create-session/route.ts",
+        "cmd:typecheck",
+        "cmd:just-check",
+        "cmd:walk-3010"
+      ],
+      "depends_on": [
+        "chunk-4"
+      ],
+      "state": "done"
+    }
   },
   "output_format": {
     "kind": "files + modal component",
