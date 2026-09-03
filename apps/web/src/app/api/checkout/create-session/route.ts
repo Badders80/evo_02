@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     // Investor-facing `units` are PERCENT of the horse (locked rule 2026-08-26).
     if (!horseSlug || typeof units !== 'number' || !Number.isFinite(units) || units <= 0) {
       return NextResponse.json(
-        { error: 'Invalid horseSlug or units parameter' },
+        { error: 'Invalid horseSlug or units parameter', code: 'INVALID_STAKE' },
         { status: 400 }
       );
     }
@@ -145,7 +145,12 @@ export async function POST(request: Request) {
 
     if (!stripeRes.ok) {
       const errJson = await stripeRes.json();
-      return NextResponse.json({ error: errJson.error?.message || 'Stripe error' }, { status: 500 });
+      // Chunk-5 (f10): Stripe failures map to STRIPE_DECLINE so the modal can render
+      // investor copy — raw Stripe error strings never reach the investor.
+      return NextResponse.json(
+        { error: errJson.error?.message || 'Stripe error', code: 'STRIPE_DECLINE' },
+        { status: 500 }
+      );
     }
 
     const session = await stripeRes.json();

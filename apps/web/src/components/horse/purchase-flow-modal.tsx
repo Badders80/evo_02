@@ -20,7 +20,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { pricingForUnits } from '@/lib/nellie-loop';
+import { pricingForUnits, investorCheckoutError } from '@/lib/nellie-loop';
 import type { DslPricing } from '@evo/legal_engine';
 
 export interface LegalPackDigest {
@@ -103,6 +103,9 @@ function Step2TermSheet({
   onProceed: () => void;
 }) {
   const [note, setNote] = React.useState<string | null>(null);
+  const [stakeError, setStakeError] = React.useState<string | null>(null);
+  const [editing, setEditing] = React.useState(false);
+  const [draft, setDraft] = React.useState<string>(stakePct.toFixed(1));
   const noteTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Clean up the note timer on unmount (audit chunk-2 #11).
@@ -124,7 +127,42 @@ function Step2TermSheet({
     noteTimer.current = setTimeout(() => setNote(null), 2600);
   };
 
+  /** Chunk-5 (f9, spec purchase-content-spec.md:80-89): over / under / non-multiple / empty. */
+  const commitStake = (raw: string) => {
+    const value = raw.replace('%', '').replace(',', '.').trim();
+    if (value === '') {
+      // Cleared / empty → revert to minimum on blur.
+      setStakePct(minInvestmentPct);
+      setStakeError(null);
+      return;
+    }
+    const parsed = parseFloat(value);
+    if (!Number.isFinite(parsed)) {
+      setStakeError('Stake must be a multiple of {step}%'.replace('{step}%', `${stakeStepPct}%`));
+      return;
+    }
+    // Accept in-range values and clamp any drift to the step grid first so a
+    // non-multiple like 1.3% never reaches the server (which throws INVALID_STAKE).
+    const step = Math.max(stakeStepPct, 0.01);
+    const snapped = Math.round(parsed / step) * step;
+    if (Math.abs(snapped - parsed) > 1e-9) {
+      setStakeError(`Stake must be a multiple of ${stakeStepPct}%`);
+      return;
+    }
+    if (snapped > maxInvestmentPct + 1e-9) {
+      setStakeError(`Stake available is ${maxInvestmentPct}% — reduce your stake`);
+      return;
+    }
+    if (snapped < minInvestmentPct - 1e-9) {
+      setStakeError(`Minimum investment is ${minInvestmentPct}% — increase your stake`);
+      return;
+    }
+    setStakePct(Math.round(snapped * 100) / 100);
+    setStakeError(null);
+  };
+
   const stepUp = () => {
+    setStakeError(null);
     const next = Math.round((stakePct + stakeStepPct) * 100) / 100;
     if (next <= maxInvestmentPct + 1e-9) {
       setStakePct(next);
@@ -134,6 +172,7 @@ function Step2TermSheet({
   };
 
   const stepDown = () => {
+    setStakeError(null);
     const next = Math.round((stakePct - stakeStepPct) * 100) / 100;
     if (next >= minInvestmentPct - 1e-9) {
       setStakePct(next);
@@ -171,7 +210,9 @@ function Step2TermSheet({
                 type="button"
                 aria-label="Increase stake"
                 onClick={stepUp}
-                className="text-[15px] font-bold leading-none text-status-active transition active:scale-90"
+                className={`text-[15px] font-bold leading-none text-status-active transition active:scale-90 ${
+                  stakePct >= maxInvestmentPct - 1e-9 ? 'opacity-40 cursor-not-allowed' : ''
+                }`}
               >
                 ▲
               </button>
@@ -179,14 +220,52 @@ function Step2TermSheet({
                 type="button"
                 aria-label="Decrease stake"
                 onClick={stepDown}
-                className="text-[15px] font-bold leading-none text-destructive transition active:scale-90"
+                className={`text-[15px] font-bold leading-none text-destructive transition active:scale-90 ${
+                  stakePct <= minInvestmentPct + 1e-9 ? 'opacity-40 cursor-not-allowed' : ''
+                }`}
               >
                 ▼
               </button>
             </div>
-            <span className="text-[28px] font-light text-heading tracking-tight">
-              {stakePct.toFixed(1)}%
-            </span>
+            {editing ? (
+              <input
+                type="text"
+                inputMode="decimal"
+                aria-label="Enter stake percentage"
+                autoFocus
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                onBlur={() => {
+                  commitStake(draft);
+                  setEditing(false);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    commitStake(draft);
+                    setEditing(false);
+                    e.currentTarget.blur();
+                  }
+                  if (e.key === 'Escape') {
+                    setDraft(stakePct.toFixed(1));
+                    setStakeError(null);
+                    setEditing(false);
+                  }
+                }}
+                className="w-24 rounded-lg border border-border bg-background px-2 py-1 text-[22px] font-light text-heading tracking-tight focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              />
+            ) : (
+              <button
+                type="button"
+                aria-label="Edit stake percentage"
+                onClick={() => {
+                  setDraft(stakePct.toFixed(1));
+                  setEditing(true);
+                }}
+                className="text-[28px] font-light text-heading tracking-tight hover:text-accent transition-colors"
+              >
+                {stakePct.toFixed(1)}%
+              </button>
+            )}
           </div>
           <p className="text-[10px] text-muted-foreground/80 text-left pt-1">
             minimum {minInvestmentPct.toFixed(1)}% · {stakeStepPct.toFixed(1)}% steps · up to{' '}
@@ -199,6 +278,16 @@ function Step2TermSheet({
       <p className="text-center text-[11px] font-light leading-relaxed text-muted-foreground min-h-[16px]">
         {note ?? ''}
       </p>
+
+      {/* Stepper validation error (chunk-5 f9, locked copy) */}
+      {stakeError && (
+        <p
+          role="alert"
+          className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-center text-[11px] font-light text-destructive"
+        >
+          {stakeError}
+        </p>
+      )}
 
       {/* 4-row summary block (LOCKED 2026-09-03) */}
       <div className="space-y-4 text-[13px] font-light border-t border-border pt-5">
@@ -287,11 +376,15 @@ function Step3AcceptanceGate({
   horseSlug,
   stakePct,
   legalPack,
+  stakeStepPct = 0.5,
+  maxInvestmentPct = 10.0,
 }: {
   horseName: string;
   horseSlug: string;
   stakePct: number;
   legalPack?: LegalPackDigest | null;
+  stakeStepPct?: number;
+  maxInvestmentPct?: number;
 }) {
   const router = useRouter();
   const [openDoc, setOpenDoc] = React.useState<'pds' | 'sa' | null>('pds');
@@ -366,12 +459,23 @@ function Step3AcceptanceGate({
           setSubmitting(false);
           return;
         }
-        throw new Error(body?.error || 'Forbidden');
+        throw new Error(
+          investorCheckoutError(body?.code, body?.error || 'Forbidden', {
+            step: stakeStepPct,
+            max: maxInvestmentPct,
+          })
+        );
       }
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'Checkout initialization failed');
+        // Chunk-5 (f10): server returns { error, code }; render the locked investor copy.
+        throw new Error(
+          investorCheckoutError(data?.code, data?.error || 'Checkout initialization failed', {
+            step: stakeStepPct,
+            max: maxInvestmentPct,
+          })
+        );
       }
 
       if (data.url) {
@@ -600,6 +704,8 @@ export default function PurchaseFlowModal({
           horseSlug={horseSlug}
           stakePct={stakePct}
           legalPack={legalPack}
+          stakeStepPct={stakeStepPct}
+          maxInvestmentPct={maxInvestmentPct}
         />
       )}
     </ModalShell>

@@ -76,6 +76,39 @@ export function purchasesAreEnabled(env: NodeJS.Dict<string> = process.env): boo
   return Boolean(env.STRIPE_SECRET_KEY) && env.PURCHASES_ENABLED === 'true';
 }
 
+/**
+ * Chunk-5 (f10, locked spec purchase-content-spec.md:215-228): server error code →
+ * investor-facing copy. The server returns { error, code } and the client renders
+ * exactly this copy — raw server strings (or codes) never reach the investor.
+ */
+export const CHECKOUT_ERROR_COPY: Record<string, string> = {
+  KYC_REQUIRED: 'Identity verification is required before checkout. This is a one-time check under New Zealand law.',
+  INVALID_STAKE: 'Stake must be a multiple of {step}%',
+  CAMPAIGN_NOT_FOUND: 'This campaign is no longer available.',
+  CHECKOUT_CLOSED: 'This campaign is no longer open for subscription.',
+  RESERVE_FAILED: 'That stake was just acquired by another co-owner. Available stake is now {max}%.',
+  PURCHASES_DISABLED: 'Checkout is temporarily unavailable — please try again shortly.',
+  SUPABASE_NOT_CONFIGURED: 'Checkout is temporarily unavailable — please try again shortly.',
+  RESERVE_RPC_ERROR: 'Checkout is temporarily unavailable — please try again shortly.',
+  STRIPE_DECLINE: 'Your payment could not be processed by your card provider. Please try a different card, or contact your bank.',
+};
+// Any code the map does not know must still read as safe investor copy, never a
+// raw server string (audit chunk-5 WARN-b, defense-in-depth).
+export const CHECKOUT_ERROR_UNKNOWN = 'Checkout is temporarily unavailable — please try again shortly.';
+
+export function investorCheckoutError(
+  code: string | undefined | null,
+  _fallback: string,
+  params: { step?: number; max?: number } = {}
+): string {
+  if (!code) return CHECKOUT_ERROR_UNKNOWN;
+  const copy = CHECKOUT_ERROR_COPY[code];
+  if (!copy) return CHECKOUT_ERROR_UNKNOWN;
+  return copy
+    .replace('{step}%', `${params.step ?? 0.5}%`)
+    .replace('{max}%', `${params.max ?? ''}%`);
+}
+
 export function r2ConfigFromEnv(env: NodeJS.Dict<string> = process.env): {
   accountId: string;
   accessKeyId: string;
