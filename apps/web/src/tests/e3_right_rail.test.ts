@@ -41,6 +41,7 @@ console.log('Running @evo/web E3 Right Rail & Acceptance Gate tests...\n');
     barnName: 'Nellie',
     wholesaleMonthlyNzd: 3800,
     totalSyndicateStakePct: 10,
+    minStakePct: 1.0,
     stakeStepPct: 0.5,
     softLegal: {
       aboutHorse: 'Nellie is a talented filly.',

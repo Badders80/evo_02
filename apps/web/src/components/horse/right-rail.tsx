@@ -4,7 +4,7 @@
  * - 5 Pillars: The Deal, What's Included, What If, Your Return, Exit & Transfer.
  * - Share-math: min 1%, step 0.5%, percentages only, pricing via pricingForUnits.
  * - Acceptance gate: scroll-through PDS + SA, dual checkboxes, proceed button disabled until both checked.
- * - Vocabulary whitelist: Units/Stakes/Co-owners, Settlement/Distribution/Prize money, Evolution Stables.
+ * - Vocabulary whitelist: Stakes/Co-owners (Units retired from investor copy 2026-09-01), Settlement/Distribution/Prize money, Evolution Stables.
  * - Zero exclamation marks. British English.
  */
 
@@ -267,8 +267,8 @@ function AcceptanceGateModal({
       });
 
       if (res.status === 401) {
-        // User not logged in -> redirect to login with return path
-        const nextUrl = encodeURIComponent(window.location.pathname);
+        // User not logged in -> redirect to login with return path, preserving stake
+        const nextUrl = encodeURIComponent(`${window.location.pathname}?units=${stakePct}`);
         router.push(`/login?next=${nextUrl}`);
         return;
       }
@@ -294,9 +294,9 @@ function AcceptanceGateModal({
     legalPack?.pdsMarkdown ||
     `Product Disclosure Statement (PDS) for ${horseName} Syndicate.\n\n` +
       `Issued under the NZTR Authorised Syndication Code.\n\n` +
-      `1. The Offer: Fixed-duration syndicate units in thoroughbred ${horseName}.\n` +
+      `1. The Offer: Fixed-duration syndicate stakes in thoroughbred ${horseName}.\n` +
       `2. Upfront float deposit covers 5 months advance reserve.\n` +
-      `3. Monthly keep is fixed at $${pricing.monthlyKeepUnitNzd} NZD per unit.\n` +
+      `3. Monthly keep is fixed at $${pricing.monthlyKeepUnitNzd} NZD per 1% stake.\n` +
       `4. Downside protection: if the horse is injured and unable to train/race, keep contributions stop immediately.\n` +
       `5. Return mechanics: 75% gross prize money pro-rata quarterly.`;
 
@@ -311,14 +311,14 @@ function AcceptanceGateModal({
 
   return (
     <div
-      className="fixed inset-0 z-[999] flex items-center justify-center bg-black/85 p-4 sm:p-6 backdrop-blur-md"
+      className="fixed inset-0 z-[999] flex items-center justify-center bg-black/85 p-4 sm:p-6 backdrop-blur-md overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby="acceptance-gate-title"
       onClick={onClose}
     >
       <div
-        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-5"
+        className="my-auto w-full max-w-2xl rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-5"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -479,7 +479,21 @@ function ListedInvestmentCard({
   stakeStepPct?: number;
   legalPack?: LegalPackDigest | null;
 }) {
-  const [stakePct, setStakePct] = React.useState<number>(Math.max(minInvestmentPct, 2.0));
+  // f6b (audit 2026-09-03): restore stake from ?units= on mount (login redirect /
+  // cancel return preserve it). Validated against min/max/step; falls back to min.
+  const initialStakePct = React.useMemo(() => {
+    if (typeof window === 'undefined') return minInvestmentPct;
+    const raw = new URLSearchParams(window.location.search).get('units');
+    if (!raw) return minInvestmentPct;
+    const parsed = parseFloat(raw);
+    if (!Number.isFinite(parsed)) return minInvestmentPct;
+    const step = stakeStepPct ?? 0.5;
+    const snapped = Math.round(parsed / step) * step;
+    if (snapped < minInvestmentPct || snapped > maxInvestmentPct) return minInvestmentPct;
+    return Math.round(snapped * 100) / 100;
+  }, [minInvestmentPct, maxInvestmentPct, stakeStepPct]);
+
+  const [stakePct, setStakePct] = React.useState<number>(initialStakePct);
   const [openPillarId, setOpenPillarId] = React.useState<string | null>(null);
   const [gateOpen, setGateOpen] = React.useState(false);
 
@@ -501,10 +515,10 @@ function ListedInvestmentCard({
           {horseName}
         </p>
         <h3 className="text-lg font-light tracking-tight text-heading">
-          Ownership Units
+          Become an Owner
         </h3>
         <p className="text-[12px] font-light leading-relaxed text-muted-foreground">
-          Acquire units in clean 0.5% increments with fixed monthly syndicate keep.
+          Take a stake from 1.0%, in clean 0.5% steps, with fixed monthly syndicate keep.
         </p>
       </div>
 
@@ -531,9 +545,9 @@ function ListedInvestmentCard({
         />
 
         <div className="flex justify-between text-[9px] font-mono text-muted-foreground/80 pt-0.5">
-          <span>Min {minInvestmentPct.toFixed(1)}%</span>
-          <span>Step {stakeStepPct.toFixed(1)}%</span>
-          <span>Max {maxInvestmentPct.toFixed(1)}%</span>
+          <span>Minimum investment {minInvestmentPct.toFixed(1)}%</span>
+          <span>Stake available {maxInvestmentPct.toFixed(1)}%</span>
+          <span>Contact us for more info</span>
         </div>
 
         {/* Live Monthly Pricing Display */}
@@ -610,7 +624,7 @@ function ClosedCampaignCard({
 }) {
   const message =
     status === 'fully_subscribed'
-      ? `All units in ${horseName} have been acquired. This horse is in active campaign.`
+      ? `All available stake in ${horseName} has been acquired. This horse is in active campaign.`
       : `The lease period for ${horseName} has concluded. Register your interest for future campaigns.`;
 
   return (

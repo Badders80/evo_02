@@ -22,6 +22,7 @@ export interface HorseCampaign {
   barnName?: string;
   wholesaleMonthlyNzd: number;
   totalSyndicateStakePct: number;
+  minStakePct: number;
   stakeStepPct: number;
   softLegal: HorseSoftLegalContent;
   marketing: HorseMarketingContent;
@@ -191,6 +192,14 @@ function rowToCampaign(row: InventoryHorse): HorseCampaign {
   const reservedPct = reservedShares * stakeStepPct;
   const retainedPct = Math.max(0, 100 - allocatedPct - reservedPct - availablePct);
 
+  // Sold-out guard (f5, audit 2026-09-03): a listed campaign with zero available
+  // stake must render as fully_subscribed — never buyable. Root-cause at the data
+  // layer so no call site can fall back to a buyable max.
+  const listingStatus: ListingStatus =
+    availablePct <= 0 && statusToListingStatus(row.status) === 'listed'
+      ? 'fully_subscribed'
+      : statusToListingStatus(row.status);
+
   const totalInvestors = Math.round(allocatedPct / Math.max(stakeStepPct, 0.01));
 
   const sire = String(pedigreeData.sire ?? row.sire ?? '');
@@ -213,6 +222,7 @@ function rowToCampaign(row: InventoryHorse): HorseCampaign {
     barnName: row.slug === 'i-stole-a-manolo' ? undefined : (row.barn_name || undefined),
     wholesaleMonthlyNzd: Number(row.cost_monthly_nzd),
     totalSyndicateStakePct: listedStakePct,
+    minStakePct: Number(row.min_stake_pct ?? 1.0),
     stakeStepPct,
     softLegal: {
       // Dual-shape read (locked 2026-08-31): canonical camelCase, backward-compatible
@@ -244,7 +254,7 @@ function rowToCampaign(row: InventoryHorse): HorseCampaign {
         ? (marketing.highlights as string[])
         : undefined,
     },
-    listingStatus: statusToListingStatus(row.status),
+    listingStatus,
     owner,
     trainer,
     pedigree: {

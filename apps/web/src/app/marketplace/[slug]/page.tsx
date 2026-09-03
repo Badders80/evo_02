@@ -213,7 +213,7 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
                     horseName={campaign.legalName}
                     horseSlug={campaign.slug}
                     wholesaleMonthlyNzd={campaign.wholesaleMonthlyNzd}
-                    minInvestmentPct={1.0}
+                    minInvestmentPct={campaign.minStakePct}
                     maxInvestmentPct={campaign.capTableFixture.availablePct > 0 ? campaign.capTableFixture.availablePct : 10.0}
                     stakeStepPct={campaign.stakeStepPct || 0.5}
                     legalPack={{

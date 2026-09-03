@@ -64,6 +64,15 @@ export function MyStableDashboard({
   const [activeTab, setActiveTab] = useState<'holdings' | 'feed' | 'vault' | 'billing'>('holdings');
   const kyc = kycLabel(kycStatus);
 
+  // f8 (audit 2026-09-03): checkout success state — success_url lands here with
+  // ?checkout=success&slug=&units=. Read once on mount; dismissible.
+  const [checkoutSuccess, setCheckoutSuccess] = useState<{ slug: string; units: string } | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('checkout') !== 'success') return null;
+    return { slug: params.get('slug') ?? '', units: params.get('units') ?? '' };
+  });
+
   const rows = holdings
     .map((holding) => {
       const campaign = campaigns?.[holding.horse_id];
@@ -117,6 +126,30 @@ export function MyStableDashboard({
         </div>
       </div>
 
+      {checkoutSuccess && (
+        <div className="flex items-start justify-between gap-4 rounded-2xl border border-status-active/40 bg-status-active/10 p-5">
+          <div className="flex items-start gap-3">
+            <ShieldCheck className="h-5 w-5 text-status-active mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-foreground">
+                Welcome to the syndicate — your {checkoutSuccess.units}% stake in {checkoutSuccess.slug} is being finalised.
+              </p>
+              <p className="mt-1 text-xs font-light text-muted-foreground">
+                Your holding will appear here once settlement completes. A welcome email is on its way.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setCheckoutSuccess(null)}
+            aria-label="Dismiss"
+            className="rounded-full p-1 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {lookupError && (
         <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-xs text-destructive-foreground">
           Holdings could not be loaded: {lookupError}
@@ -159,7 +192,7 @@ export function MyStableDashboard({
 
         <div className="rounded-xl border border-border bg-card p-5">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs uppercase font-mono tracking-wider">Prize Payouts (75%)</span>
+            <span className="text-xs uppercase font-mono tracking-wider">Prize Distribution (75%)</span>
             <TrendingUp className="h-4 w-4 text-purple-400" />
           </div>
           <div className="mt-3 flex items-baseline gap-1">
@@ -284,7 +317,7 @@ export function MyStableDashboard({
       {activeTab === 'feed' && (
         <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
           {rows.length === 0
-            ? 'Yard memos appear after you hold a syndicate unit.'
+            ? 'Yard memos appear after you hold a stake in a syndicate.'
             : 'No yard memos posted for your holdings yet.'}
         </div>
       )}
