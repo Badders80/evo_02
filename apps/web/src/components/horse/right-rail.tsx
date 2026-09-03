@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { ChevronDown, ChevronUp, FileText, Hash, ShieldCheck, Check } from 'lucide-react';
 import { pricingForUnits } from '@/lib/nellie-loop';
 import type { DslPricing } from '@evo/legal_engine';
+import PurchaseFlowModal from './purchase-flow-modal';
 
 export interface LegalPackDigest {
   pdsMarkdown?: string;
@@ -495,6 +496,7 @@ function ListedInvestmentCard({
   }, [minInvestmentPct, maxInvestmentPct, stakeStepPct]);
   const [openPillarId, setOpenPillarId] = React.useState<string | null>(null);
   const [gateOpen, setGateOpen] = React.useState(false);
+  const [flowOpen, setFlowOpen] = React.useState(false);
 
   const wholesale = wholesaleMonthlyNzd ?? 3800;
   const pricing = React.useMemo(
@@ -570,10 +572,10 @@ function ListedInvestmentCard({
         </div>
       </div>
 
-      {/* Primary CTA: High contrast button (Crisp White / Gold) */}
+      {/* Primary CTA: opens Step 2 term sheet (learn-more, not buy) */}
       <button
         type="button"
-        onClick={() => setGateOpen(true)}
+        onClick={() => setFlowOpen(true)}
         className="w-full rounded-full bg-foreground py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-background transition-all duration-300 hover:opacity-90 active:scale-[0.98]"
       >
         Become an Owner
@@ -595,6 +597,24 @@ function ListedInvestmentCard({
           ))}
         </div>
       </div>
+
+      {/* Step 2 term sheet (PurchaseFlowModal) — hands off to Step 3 gate on proceed */}
+      {flowOpen && (
+        <PurchaseFlowModal
+          horseName={horseName}
+          horseSlug={horseSlug}
+          wholesaleMonthlyNzd={wholesaleMonthlyNzd}
+          minInvestmentPct={minInvestmentPct}
+          maxInvestmentPct={maxInvestmentPct}
+          stakeStepPct={stakeStepPct}
+          onProceed={(modalStake) => {
+            setStakePct(modalStake);
+            setFlowOpen(false);
+            setGateOpen(true);
+          }}
+          onClose={() => setFlowOpen(false)}
+        />
+      )}
 
       {/* Acceptance Gate Modal */}
       {gateOpen && (
