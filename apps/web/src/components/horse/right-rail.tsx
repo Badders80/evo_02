@@ -338,8 +338,33 @@ export default function RightRail({
       ? s
       : 'coming_soon';
 
+  // lg:fixed pulls the aside out of grid flow — position it over the 1fr (right) track
+  // explicitly, recomputed on resize (grid gap 48px = gap-12; 1fr of 2fr_1fr).
+  const railRef = React.useRef<HTMLElement | null>(null);
+  React.useEffect(() => {
+    const el = railRef.current;
+    if (!el || typeof window === 'undefined') return;
+    const apply = () => {
+      const grid = el.parentElement;
+      if (!grid) return;
+      if (window.innerWidth < 1024) {
+        el.style.left = '';
+        el.style.width = '';
+        return;
+      }
+      const gap = 48;
+      const trackW = (grid.clientWidth - gap) / 3;
+      const left = grid.getBoundingClientRect().left + 2 * trackW + gap;
+      el.style.left = `${Math.round(left)}px`;
+      el.style.width = `${Math.floor(trackW)}px`;
+    };
+    apply();
+    window.addEventListener('resize', apply);
+    return () => window.removeEventListener('resize', apply);
+  }, []);
+
   return (
-    <aside className="lg:sticky lg:top-24 space-y-6">
+    <aside ref={railRef} className="space-y-6 z-20 lg:fixed lg:top-20">
       {statusChip(safeStatus)}
 
       {safeStatus === 'listed' && (

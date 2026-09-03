@@ -116,12 +116,6 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
               <span>/</span>
               <span className="text-foreground">{displayName}</span>
             </div>
-            <Link
-              href="/marketplace"
-              className="normal-case tracking-normal text-[12px] font-medium text-accent transition duration-300 hover:text-frost"
-            >
-              ← Back to Marketplace
-            </Link>
           </div>
 
           <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-[2fr_1fr]">
@@ -146,6 +140,12 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
                     The story
                   </p>
                   <CampaignStatusBadge status={campaign.listingStatus} />
+                  <Link
+                    href="/marketplace"
+                    className="ml-auto normal-case tracking-normal text-[12px] font-medium text-accent transition duration-300 hover:text-frost"
+                  >
+                    ← Back to Marketplace
+                  </Link>
                 </div>
                 <h1 className="text-[24px] font-light leading-tight tracking-tight text-heading">
                   {displayName}
@@ -203,8 +203,8 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
               />
             </div>
 
-            {/* RIGHT COLUMN — RightRail's <aside lg:sticky> is the DIRECT grid item so it
-            travels within the full grid row (a wrapping div caps travel at its own height) */}
+            {/* RIGHT COLUMN — RightRail's <aside lg:fixed> is the direct grid child; fixed (not sticky)
+            so it never releases at the footer — stays pinned under the nav for the whole document. */}
             {(() => {
               const legalPack = getCompiledLegalPackForCampaign(campaign);
               return (
