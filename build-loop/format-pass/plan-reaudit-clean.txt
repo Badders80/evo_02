@@ -1,0 +1,334 @@
+⠙ ⠙ ⠹ ⠸ ⠴ ⠦ ⠦ Thinking...
+The user wants an audit of a revised build plan (rev. 2, post-founder-revie
+post-founder-review). They want me to check ONLY the changes from rev. 1, s
+specifically 7 items, and then provide numbered findings and a verdict.
+
+Let me go through each of the 7 checks:
+
+1. Head re-baselined to `0c96996` (not `7023c8f`)? F1 marked LARGELY LANDED
+LANDED + verify-only?
+- Evidence: Head `0c96996`, branch `design-alignment`. F1 marked LARGELY LA
+LANDED — verify-only delta (rail-scrolled.png alignment).
+- This seems correct based on the diff summary. OK.
+
+2. Font swap removed entirely? (Geist stays, no layout.tsx/globals.css edit
+edits for F2?)
+- Evidence: globals.css has Geist, not Inter. layout.tsx loads Geist. Files
+Files table removed globals.css and layout.tsx from F2. F2 now only purchas
+purchase-flow-modal.tsx and purchase-content-spec.md.
+- This seems correct. OK.
+
+3. `create-session/route.ts` removed from F7? (Modal-only surface polish?)
+- Evidence: Files table removed `apps/web/src/app/api/checkout/create-sessi
+`apps/web/src/app/api/checkout/create-session/route.ts`. F7 = modal-only vi
+visual surface polish. Server returns code, modal renders investor copy.
+- This seems correct. OK.
+
+4. Viewport guard `max-h-[calc(100vh-2rem)] my-auto` added to spec?
+- Evidence: Spec changes added 3rd line for viewport guard. purchase-flow-m
+purchase-flow-modal.tsx:64 currently `max-w-lg × h-[720px]` (locked). Spec 
+says "Modal sizing LOCKED 2026-09-03: all popups share one fixed size — max
+max-w-lg × h-[720px]".
+- Wait. The spec says LOCKED fixed size, but now they added a viewport guar
+guard. The viewport guard is `max-h-[calc(100vh-2rem)] my-auto`. This is a 
+deviation from the "LOCKED" rule. The delta summary says: "Added viewport g
+guard... so 900px modal never clips on viewports <900px. 'Fixed size' rule 
+applies only on viewports that can hold it."
+- Is this a NEW issue? The user is asking if the viewport guard was added t
+to spec. It was. But is it a good change? The evidence shows purchase-flow-
+purchase-flow-modal.tsx:64 currently has `h-[720px]` locked, but the new pl
+plan wants to add a viewport guard. This is a planned edit. The question is
+is whether this introduces issues.
+- The viewport guard `max-h-[calc(100vh-2rem)] my-auto` is a sensible respo
+responsive guard. However, the spec still says "LOCKED 2026-09-03" fixed si
+size. There's a tension between "LOCKED" and the new viewport guard. This c
+could be a WARN: spec contradicts itself or needs update to clarify that lo
+locked sizing has a responsive exception.
+- Actually, the user asks: "Are there any NEW issues introduced by the rev.
+rev. 2 edits that weren't in rev. 1?" The viewport guard addition could be 
+an issue if it conflicts with the existing locked sizing rule. This should 
+be flagged as WARN.
+
+5. `gsap ^3.15.0` correctly noted as installed in package.json L28?
+- Evidence: package.json L28 shows `"gsap": "^3.15.0"` — INSTALLED.
+- This is correct. OK.
+
+6. `dna/colors.ts` removed from critical files (tokens in globals.css)?
+- Evidence: dna/ contains only content/. globals.css:37 has `--color-gold`.
+`--color-gold`. No colors.ts.
+- This is correct. OK.
+
+7. Are there any NEW issues introduced by the rev. 2 edits that weren't in 
+rev. 1?
+- Need to identify new issues from the rev. 2 edits. Potential issues:
+  a. The viewport guard conflicts with the "LOCKED" fixed size rule in the 
+spec. The spec says LOCKED but now allows responsive scaling. This is a spe
+spec consistency issue. WARN.
+  b. F1 marked "LARGELY LANDED — verify-only". Is this accurate? The user n
+needs to verify rail-scrolled.png alignment. If it's largely landed, the ve
+verify-only delta is reasonable. No issue unless there's evidence that more
+more work is needed. Based on provided info, OK.
+  c. Removing `create-session/route.ts` from F7: The modal-only surface pol
+polish means no backend changes. But the modal still needs to "render inves
+investor copy" with server returning code. Is there a route that returns th
+the code? The route.ts is removed from F7, but is it still needed elsewhere
+elsewhere? The delta says "Server returns code, modal renders investor copy
+copy (unchanged)." This implies the route still exists but is not part of F
+F7's changed files. That's fine. No issue.
+  d. The F2 viewport guard uses `my-auto`. In a modal that's absolutely/fix
+absolutely/fixed positioned with flex centering, `my-auto` may not work as 
+expected unless the parent is flex with `items-center`. Need to verify the 
+modal container. This is a potential implementation issue. WARN if not veri
+verified.
+  e. The "fixed size" rule applying "only on viewports that can hold it" me
+means the modal will resize below 900px. This changes the design intent. If
+If the founder explicitly asked for this, it's OK. If not, it's a deviation
+deviation. But it's listed as a planned change, so it's intentional. Howeve
+However, the spec still says LOCKED, which is contradictory. This is the ma
+main issue.
+  f. The head re-baseline to 0c96996: need to verify that this commit is in
+indeed 3 commits past 7023c8f and contains the expected state. Based on evi
+evidence, OK.
+  g. F5 dropped "cancel-back copy" wording: this is a minor change, modal-o
+modal-only visual affordance. No issue.
+
+Let me think about whether there are other issues:
+- The plan says "use gsap per TOOLKIT motion rule" since gsap is installed.
+installed. This is a change in out-of-scope. But is there a concern that th
+the plan doesn't specify where gsap will be used? Not necessarily an issue,
+issue, just a note.
+- The architecture approach changed to "Source of truth = evo_01 prod codeb
+codebase." This is a good clarification. No issue.
+
+The biggest issue is the spec inconsistency: adding a viewport guard while 
+claiming sizing is "LOCKED". This should be a WARN.
+
+Another issue: `purchase-flow-modal.tsx:64` currently has `h-[720px]` locke
+locked. The plan wants to change it to include `max-h-[calc(100vh-2rem)] my
+my-auto`. This is a deviation that needs to be clearly documented. The spec
+spec line still says LOCKED fixed size, which is misleading. The fix is to 
+update the spec wording to say "LOCKED on viewports ≥ 900px; responsive max
+max-h guard on smaller viewports" or similar.
+
+Also, for `my-auto`: In a modal overlay, if the modal is positioned via `fi
+`fixed inset-0 flex items-center justify-center`, the child modal with `my-
+`my-auto` would center vertically. But if the modal uses `h-[720px]` and th
+the viewport is shorter, `my-auto` won't prevent clipping unless `max-h` is
+is set and overflow is handled. The guard `max-h-[calc(100vh-2rem)] my-auto
+my-auto` would make the modal shrink, but if the content inside is also fix
+fixed height, it could still clip or cause scroll issues. The spec needs to
+to mention internal scrolling or content reflow. This could be a WARN.
+
+Let me structure the findings:
+
+1. Head re-baseline: OK
+2. Font swap removal: OK
+3. create-session removal from F7: OK (with a note that the route still exi
+exists, just not in F7 scope)
+4. Viewport guard added: WARN - spec inconsistency (LOCKED vs responsive gu
+guard) and implementation risk with my-auto/content overflow
+5. gsap version: OK
+6. dna/colors.ts removal: OK
+7. New issues: The main new issue is the spec/implementation inconsistency 
+around viewport guard. Also perhaps the F1 "LARGELY LANDED" claim needs ver
+verification evidence (but it's a verify-only delta, so OK if evidence supp
+supports).
+
+Wait, the user wants me to check the 6 specific items and then answer #7 ab
+about new issues. So I should produce findings for each.
+
+Let me draft:
+
+FINDING 1: Head re-baseline and F1 verify-only
+- Severity: OK
+- Evidence: diff summary states Head: 0c96996, F1 LARGELY LANDED verify-onl
+verify-only delta for rail-scrolled.png alignment in right-rail.tsx.
+- Fix: None.
+
+FINDING 2: Font swap removal
+- Severity: OK
+- Evidence: F2 dropped Inter font swap, globals.css and layout.tsx removed 
+from changed files. globals.css:15 uses Geist, layout.tsx loads Geist via n
+next/font/google.
+- Fix: None.
+
+FINDING 3: create-session/route.ts removed from F7
+- Severity: OK
+- Evidence: Files table removed route.ts; F7 = modal-only surface polish. T
+The server-side route still exists (returns code) but is not part of this f
+feature's edit set.
+- Fix: None.
+
+FINDING 4: Viewport guard added to spec
+- Severity: WARN
+- Evidence: purchase-content-spec.md:34 still says "Modal sizing LOCKED 202
+2026-09-03: all popups... share one fixed size — max-w-lg × h-[720px]"; rev
+rev. 2 adds `max-h-[calc(100vh-2rem)] my-auto`. purchase-flow-modal.tsx:64 
+currently has `h-[720px]` locked.
+- Fix: Update spec line to remove "LOCKED" absolute language; state "max-w-
+"max-w-lg × h-[720px] on viewports ≥ 900px; clamp to max-h-[calc(100vh-2rem
+max-h-[calc(100vh-2rem)] with my-auto centering on smaller viewports". Ensu
+Ensure modal body has `overflow-y-auto` so content scrolls when clamped.
+
+FINDING 5: gsap version in package.json
+- Severity: OK
+- Evidence: apps/web/package.json L28: "gsap": "^3.15.0"
+- Fix: None.
+
+FINDING 6: dna/colors.ts removed from critical files
+- Severity: OK
+- Evidence: apps/web/src/dna/ contains only content/; globals.css:37 has --
+--color-gold token; no colors.ts file.
+- Fix: None.
+
+FINDING 7: New issues introduced by rev. 2 edits
+- Severity: WARN
+- Evidence: The viewport guard is a new responsive deviation from the previ
+previously LOCKED fixed-size modal. Spec still says LOCKED. purchase-flow-m
+purchase-flow-modal.tsx:64 currently hardcodes h-[720px]. Adding my-auto + 
+max-h without updating the inner layout may cause content overflow/clipping
+overflow/clipping. Also, F2's viewport guard is a material design change no
+not present in rev. 1; it should be explicitly approved by founder/designer
+founder/designer.
+- Fix: (a) Update spec.md:34 to reflect the responsive exception. (b) Add `
+`overflow-y-auto` to the modal content container. (c) Verify with founder t
+that the 900px modal may shrink on short viewports. (d) Confirm parent over
+overlay uses flex centering so my-auto centers the clamped modal.
+
+Then verdict: APPROVE-WITH-FIXES because there are warnings that need to be
+be addressed.
+
+Actually, should the viewport guard be a BLOCKER? It depends. If the founde
+founder explicitly requested it, it's intentional. The issue is the spec in
+inconsistency, not the change itself. So WARN is appropriate. But if the im
+implementation risks (clipping, my-auto not working) are severe, it could b
+be WARN. I'll keep it as WARN.
+
+Also, I should check: The user says "Check ONLY the changes from rev. 1" an
+and "Do NOT re-audit unchanged rev. 1 items." So I should focus on deltas. 
+My findings do that.
+
+One more thought: The F1 "LARGELY LANDED" claim. Is this a change from rev.
+rev. 1? The diff summary says F1 (NEW): Marked LARGELY LANDED. This is a ch
+change in status. I should verify it. The evidence says right-rail.tsx veri
+verify only. If the rail matches prod density + scrolled state aligns, it's
+it's OK. No issue.
+
+The F5 dropped cancel-back copy: minor, no issue. I don't need to re-audit.
+re-audit.
+
+Out-of-scope gsap installed: This is a change. Need to note it's correctly 
+installed. No issue.
+
+Architecture approach dropped "Inter font already in DNA" claim: good. No i
+issue.
+
+So overall verdict: APPROVE-WITH-FIXES due to the spec/implementation incon
+inconsistency on viewport guard.
+
+Let me write the final output.
+...done thinking.
+
+# Rev. 2 Delta Audit — Founder-Review Changes Only
+
+---
+
+**FINDING 1:** Head re-baseline + F1 verify-only status  
+**Severity:** OK  
+**Evidence:** Diff summary states Head: `0c96996` (3 commits past `7023c8f`
+`7023c8f`), branch `design-alignment`; F1 is now marked **LARGELY LANDED — 
+verify-only delta** for `rail-scrolled.png` alignment in `right-rail.tsx`. 
+ 
+**Fix:** None. Baseline and scope reduction are consistent with repo eviden
+evidence.
+
+---
+
+**FINDING 2:** Font swap removal  
+**Severity:** OK  
+**Evidence:** F2 dropped the Inter font-swap work entirely. `apps/web/src/a
+`apps/web/src/app/globals.css` and `apps/web/src/app/layout.tsx` are remove
+removed from the changed-files table. Verified: `globals.css:15` uses `--fo
+`--font-geist-sans`; `layout.tsx` loads Geist via `next/font/google`.  
+**Fix:** None. Geist remains; no font-swap edits required.
+
+---
+
+**FINDING 3:** `create-session/route.ts` removed from F7  
+**Severity:** OK  
+**Evidence:** Files table removed `apps/web/src/app/api/checkout/create-ses
+`apps/web/src/app/api/checkout/create-session/route.ts`; F7 is now modal-on
+modal-only visual surface polish. Server still returns the code elsewhere; 
+modal renders investor copy unchanged.  
+**Fix:** None. Scope correctly narrowed to UI-only.
+
+---
+
+**FINDING 4:** Viewport guard added to spec  
+**Severity:** WARN  
+**Evidence:** `build-loop/purchase-content-spec.md:34` still reads `"Modal 
+sizing LOCKED 2026-09-03: all popups (Steps 2–6) share one fixed size — max
+max-w-lg × h-[720px]"`, but rev. 2 adds `max-h-[calc(100vh-2rem)] my-auto` 
+and says the "fixed size" rule applies only on viewports that can hold it. 
+`purchase-flow-modal.tsx:64` currently hardcodes `h-[720px]`.  
+**Fix:** Update `purchase-content-spec.md:34` to remove contradictory "LOCK
+"LOCKED" language. Replace with: `max-w-lg × h-[720px] on viewports ≥ 900px
+900px; clamp to max-h-[calc(100vh-2rem)] with my-auto vertical centering on
+on smaller viewports.` Also ensure the modal body has `overflow-y-auto` so 
+content scrolls when clamped.
+
+---
+
+**FINDING 5:** `gsap` version in `package.json`  
+**Severity:** OK  
+**Evidence:** `apps/web/package.json:28`: `"gsap": "^3.15.0"` — installed. 
+Out-of-scope section now correctly reflects this and references the TOOLKIT
+TOOLKIT motion rule.  
+**Fix:** None.
+
+---
+
+**FINDING 6:** `dna/colors.ts` removed from critical files  
+**Severity:** OK  
+**Evidence:** `apps/web/src/dna/` contains only `content/` (`footer.json`, 
+`press.json`, `faq.json`). `globals.css:37` hosts the token (`--color-gold:
+(`--color-gold: #d4a964`). No `dna/colors.ts` file exists.  
+**Fix:** None.
+
+---
+
+**FINDING 7:** New issues introduced by rev. 2 edits  
+**Severity:** WARN  
+**Evidence:**  
+- The viewport guard is a **material responsive deviation** from the previo
+previously locked 900 px modal. The spec still declares sizing "LOCKED," cr
+creating a design/implementation contradiction.  
+- `purchase-flow-modal.tsx:64` currently uses a fixed `h-[720px]`. Adding `
+`max-h-[calc(100vh-2rem)] my-auto` without updating the inner content conta
+container risks clipped buttons/overflow on short viewports.  
+- `my-auto` only centers correctly if the parent overlay uses flex centerin
+centering; otherwise it will have no effect.  
+- This responsive behavior was not in rev. 1 and should be explicitly desig
+design-approved.  
+**Fix:**  
+1. Update `purchase-content-spec.md:34` to document the responsive exceptio
+exception (see Finding 4).  
+2. Add `overflow-y-auto` to the modal's scrollable content pane.  
+3. Verify the modal overlay parent uses `flex items-center justify-center` 
+so `my-auto` behaves as intended, or replace `my-auto` with the parent's ce
+centering strategy.  
+4. Confirm with the founder/designer that the modal may shrink below 900 px
+px on short viewports.
+
+---
+
+## Verdict
+
+**APPROVE-WITH-FIXES**
+
+All six explicit rev. 2 deltas check out. The only new issue introduced by 
+the rev. 2 edits is the **inconsistent treatment of modal sizing** (spec sa
+says LOCKED, but a responsive viewport guard is being added). This is fixab
+fixable with a spec wording update and a quick implementation guard for ove
+overflow/centering. Address Finding 4 and Finding 7 before merge.
+

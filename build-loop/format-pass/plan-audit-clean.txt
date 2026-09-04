@@ -1,0 +1,806 @@
+⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ Thinking...
+We need audit build plan. Need answer with numbered findings severity, evid
+evidence, fix one line, verdict. Must not write code. We need inspect codeb
+codebase? We don't have full files. We have evidence. Need think carefully.
+carefully. The plan references files, functions, columns. Need verify assum
+assumptions. We only have repo state evidence. We need identify potential w
+wrong assumptions.
+
+We need act as auditor against actual codebase. Since we cannot browse file
+filesystem directly? We have provided evidence, but we must infer. We can u
+use reasoning. The prompt says "Audit this build plan for correctness again
+against the actual codebase. Do NOT write code. Do NOT reframe the product.
+product. Do NOT suggest new tools. Check..." They gave repo state evidence.
+evidence. We need produce findings. We need mention evidence file:line but 
+we don't have line numbers except Continue. We can state e.g. CONTINUE.md:3
+CONTINUE.md:31. If no direct evidence, we can state not observed/unknown.
+
+Let's parse plan.
+
+Scope: F1 right rail polish (Step1). F2 popup shell + Step2 term sheet. F3 
+Step3 accept gate. F4 Step4 verify. F5 Step5 pay. F6 Step6 own. F7 error st
+states + Stripe copy.
+
+Files table includes `apps/web/src/components/mystable-dashboard.tsx` Modif
+Modify (F6). But shipped files in CONTINUE.md list `apps/web/src/app/mystab
+`apps/web/src/app/mystable/page.tsx` (modified C1). The plan says `mystable
+`mystable-dashboard.tsx` exists? Is that file actual? Could be component `m
+`mystable-dashboard.tsx` in app? Not in shipped files. Evidence says only p
+page.tsx modified. So assumption wrong. Severity BLOCKER maybe. The file pa
+path likely doesn't exist; success state should be in `page.tsx` or another
+another component. Need verify. If `mystable-dashboard.tsx` doesn't exist, 
+F6 fails.
+
+Plan references `apps/web/src/components/horse/purchase-flow-modal.tsx` (F2
+(F2 etc). That's consistent with shipped files. `right-rail.tsx` consistent
+consistent. `apps/web/src/dna/colors.ts` modify if missing. Need check if `
+`colors.ts` exists. Evidence says DNA token path `apps/web/src/dna/` per to
+toolkit. Not certain `colors.ts` exists. Need mention: assumption unverifie
+unverified; if missing, blocker. Could be `colors.ts` exists maybe. Since t
+they plan to add gold token, but check first. We can warn that plan doesn't
+doesn't specify how to discover if token exists (grep), but OK.
+
+Plan references `create-session/route.ts` modify F7 for visual only? Actual
+Actually table says `purchase-flow-modal.tsx, create-session/route.ts`. Fil
+Files table omitted create-session/route.ts? Yes Files table not list route
+route.ts. It's referenced in F7. Need include in Files table. Broken depend
+dependency? Not necessarily chunk ordering. It's missing from Files table.
+
+Chunk dependency ordering: F1-F7. F6 Step6 own depends on F2? It references
+references return-to-rail affordance, maybe F1. The plan says each chunk de
+depends previous? It doesn't explicitly state dependencies but chunked sequ
+sequentially. The tasks are assigned. Are there missing dependencies? F3 St
+Step3 accept gate refers to "Completed badges", "Proceed to Secure Checkout
+Checkout" CTA. F4 Step4 verify uses KYC prompt in-modal. F5 Stripe handoff.
+handoff. F6 MyStable success. F7 error states. Every step assigned: yes 6 s
+steps plus error states.
+
+Verification steps: `just check` (10/10 must pass) and typecheck + walk. Bu
+But some claims like "rail matches prod density" cannot be verified by just
+just check/typecheck. Need visual audit. Plan has screenshot/chrome-devtool
+screenshot/chrome-devtools/impeccable; OK maybe. However "walk :3010: ... S
+Stripe handoff → MyStable success" uses real Stripe? In dev, Stripe checkou
+checkout handoff may not complete to MyStable success without test credenti
+credentials. Verification claim may not verify. Could be BLOCKER? Need note
+note that end-to-end Stripe handoff in dev requires test mode and webhook o
+or return URL; plan lacks detail. But plan already shipped PASS-WITH-WARNIN
+PASS-WITH-WARNINGS across C1-C5, so maybe there is test flow. Still verific
+verification step "Stripe handoff → MyStable success" is high-level.
+
+Locked look from prod reference: The plan captures? In F2 description it li
+lists max-w-lg wide, ~900px tall, gold accent, Inter, dark, 2 pricing cards
+cards, 4-row summary, GREEN 75% investor return row, BUY NOW-style CTA, NZT
+NZTR fine print. That matches. But plan says "GREEN 75% investor return row
+row". The prod reference has GREEN 75% investor return row. Does actual cod
+codebase data have "75% investor return" as row? Need know. It references `
+`pricingForUnits` etc. The summary may display investor return; but if code
+codebase doesn't have a 4-row summary or green row, this is new visual addi
+addition, not just polish. But the plan is to add to match. The question as
+asks "Does the plan capture the locked look from prod reference" — likely y
+yes OK, but maybe needs verification of whether current modal already has t
+these elements. It might assume Step2 term sheet currently has 2 pricing ca
+cards and 4-row summary. If not, it's a content/behavior addition. But plan
+plan is polish overlay. Hmm.
+
+Modal height bump: spec-deviation logged correctly in Files table? The File
+Files table says `build-loop/purchase-content-spec.md` Modify — log h-[900p
+h-[900px] modal height deviation. The Spec changes section describes single
+single line edit. Is the path `build-loop/purchase-content-spec.md` correct
+correct? The plan is in `build-loop/format-pass/`, and investor flow build 
+is in `build-loop/investor-flow-build/CONTINUE.md`. The spec might be at `b
+`build-loop/purchase-content-spec.md`. Not in evidence. Need verify. If it 
+doesn't exist, missing file dependency. The cycle dir is `/home/evo/porch/n
+`/home/evo/porch/new/evo_02/build-loop/format-pass/`; but working tree mayb
+maybe `build-loop/purchase-content-spec.md`. Evidence doesn't list. We can 
+WARN unverified.
+
+Gold token claim: does apps/web/src/dna/colors.ts already have gold/#d4a964
+gold/#d4a964 token, or does F2 need to add it? We don't have file content. 
+Need state cannot verify from provided evidence; recommend grep. If absent 
+add token. This is likely a key audit question: need find evidence. The pla
+plan says check first. So OK if it checks. But the audit must answer: does 
+the plan correctly handle? It does conditionally. But we cannot verify exis
+existence. Maybe finding: the plan does not provide an explicit pre-audit v
+verification command to check `colors.ts` for gold before editing; risk of 
+adding duplicate. Severity WARN. Evidence: `apps/web/src/dna/colors.ts` not
+not listed in evidence content. Fix: grep before editing.
+
+Cross-cutting invariant: dev server on :3010 (locked); head 7023c8f; branch
+branch design-alignment local-only. Plan carries these in Tech constraints 
+and Context. OK.
+
+Out-of-scope claim: E4 email, KYC port itself, Mobbin, framer-motion. Bound
+Boundary correct? Plan lists "Mobbin off-table" and out of scope: E4, KYC p
+port itself, Mobbin, new tokens beyond single gold, new dependencies, conte
+content edits, behavior edits, migration etc. It does not list framer-motio
+framer-motion explicitly out of scope, but says no new dependencies implies
+implies no framer-motion. The question asks "Mobbin, framer-motion — is the
+the boundary correct?" Plan says tool chain excludes Mobbin, no new depende
+dependencies. Does it mention framer-motion? Not explicitly but can infer. 
+However if the codebase already uses framer-motion, polish could use it wit
+without adding. The plan's tool chain doesn't include it. The out-of-scope 
+list doesn't mention framer-motion specifically. The prompt asks is boundar
+boundary correct? It might be OK because no new dependencies covers it. But
+But if current UI uses framer-motion, plan might inadvertently rely on it. 
+Since we can't see. We can note no explicit mention of framer-motion in out
+out-of-scope but "no new dependencies" covers it. Severity OK? But the ques
+question may expect a finding about framer-motion not listed. Hmm.
+
+Need be thorough. Let's consider all potential issues:
+
+1. File `apps/web/src/components/mystable-dashboard.tsx` does not exist per
+per shipped files list; actual success state likely in `apps/web/src/app/my
+`apps/web/src/app/mystable/page.tsx` (or component imported there). This is
+is a wrong assumption. Severity BLOCKER. Evidence: CONTINUE.md shipped file
+files list includes `apps/web/src/app/mystable/page.tsx` but no `mystable-d
+`mystable-dashboard.tsx`. Fix: change F6 file target to `apps/web/src/app/m
+`apps/web/src/app/mystable/page.tsx` (and any child component actually rend
+rendering success state).
+
+2. Missing file dependency: `apps/web/src/app/api/checkout/create-session/r
+`apps/web/src/app/api/checkout/create-session/route.ts` referenced by F7 bu
+but not listed in Files table. Severity WARN. Evidence: Files table omitted
+omitted it, but CONTINUE.md lists it as shipped file and F7 references it. 
+Fix: add `apps/web/src/app/api/checkout/create-session/route.ts` to Files t
+table with Modify (visual copy only) or Read-only if only reading.
+
+3. Missing file dependency: `build-loop/purchase-content-spec.md` is refere
+referenced but not confirmed to exist. The cycle dir is `format-pass` not `
+`investor-flow-build`. We need verify. Severity WARN. Evidence: no path in 
+repo state evidence. Fix: confirm file exists before F2; if absent, create 
+or move spec to actual path.
+
+4. Gold token: cannot verify if `gold`/#d4a964 exists in `apps/web/src/dna/
+`apps/web/src/dna/colors.ts`. Plan says check first but doesn't include an 
+explicit pre-check/grep. Severity WARN. Evidence: DNA token path exists but
+but colors.ts content not provided. Fix: add pre-F2 audit step `grep -n "d4
+"d4a964\\|gold" apps/web/src/dna/colors.ts` and only modify if absent.
+
+5. Scope gap? F7 references `create-session/route.ts` for "7-code Stripe er
+error copy polish". This is a backend route; copy mapping likely already in
+in route. But plan says "visual only". Modifying backend route for copy is 
+a copy edit, not visual, and is out of scope ("No content/copy edits"). Wai
+Wait: The plan's Out of scope says "Content/copy edits". But F7 says "Strip
+"Stripe copy mapping visual polish" and modifies `create-session/route.ts`.
+`create-session/route.ts`. If it changes error copy strings, that's a conte
+content edit. Also F5 mentions "cancel-back copy · reservation-expired copy
+copy" which are copy edits. The plan claims "No content edits" but includes
+includes copy polish. This is a contradiction. Severity BLOCKER. Evidence: 
+Out-of-scope section says "Content/copy edits" prohibited; F5/F7 explicitly
+explicitly target copy mapping and cancel-back/reservation-expired copy. Fi
+Fix: either remove copy edits from scope or remove "no content/copy edits" 
+from constraints.
+
+6. Verification step "Stripe handoff → MyStable success" may not be verifia
+verifiable in local dev without test Stripe credentials/webhook and success
+successful redirect. This is not a claim? It is a verification step. The pl
+plan shipped C1-C5 PASS, so maybe they have it. But as auditor, we can warn
+warn that it depends on external Stripe test session and may not be automat
+automated. Severity WARN. Evidence: verification section lists full end-to-
+end-to-end handoff; no mention of Stripe test credentials or webhook. Fix: 
+scope verification to "navigates to Stripe checkout URL" and verify success
+success state via direct return URL simulation.
+
+7. Are there wrong assumptions about functions/columns? We don't see data. 
+But Step 2 "4-row summary" and "GREEN 75% investor return row" assumes code
+codebase has investor return data. If current term sheet doesn't compute th
+that row, adding it is a data/behavior change, not visual overlay. Need che
+check. Severity WARN. Evidence: plan F2 describes adding 4-row summary and 
+green investor return row; no evidence that these rows exist in current pur
+purchase-flow-modal. Fix: confirm existing summary rows before treating as 
+polish-only; if missing, add a data-pass task before F2.
+
+8. The plan claims "PDS/SA scroll inside Step 3 remains the one ugly except
+exception". If the modal is fixed h-900px, but PDS/SA scroll inside Step3, 
+this is a spec deviation not logged. The plan says only modal height deviat
+deviation logged. The "ugly exception" means allowed but not documented. Sh
+Should be logged in spec. Severity WARN. Evidence: Context says PDS/SA scro
+scroll inside Step 3 remains the one ugly exception; Spec changes only logs
+logs modal height. Fix: log PDS/SA internal scroll as a retained deviation 
+in `purchase-content-spec.md`.
+
+9. One fixed popup size for Steps 2-6: h-[900px]. But Step 6 MyStable succe
+success might be in a separate page `mystable/page.tsx`, not inside popup. 
+The plan includes F6 modifying `mystable-dashboard.tsx` and `purchase-flow-
+`purchase-flow-modal.tsx`. Step 6 success state may not be in modal. Need v
+verify. If Step 6 is shown after redirect in MyStable page, not in popup. T
+The plan's "Popup stays ONE FIXED SIZE for Steps 2–6" implies Step 6 is in 
+popup, but earlier "MyStable success state (Step 6)" suggests a page. There
+There is a scope confusion. Evidence: Goal says right rail (Step1)+popup(St
+(Step1)+popup(Steps2-6)+MyStable success state (Step6). That is contradicto
+contradictory: Step6 both in popup and MyStable. Context also says all 6 st
+steps end-to-end — right rail (Step 1) + popup (Steps 2–6) + MyStable succe
+success state (Step 6). So Step 6 is MyStable page, not in popup. Then "Pop
+"Popup stays ONE FIXED SIZE for Steps 2–6" is technically Steps 2-5? Or Ste
+Step6 in popup before redirect? Need clarify. Severity WARN. Evidence: Goal
+Goal/Context list Step6 as MyStable success state, while Architecture says 
+one fixed size for Steps 2-6. Fix: clarify that Step 6 success is rendered 
+on `/mystable` page, not inside the fixed popup; popup covers Steps 2-5 onl
+only.
+
+10. F1 "right rail" — file `right-rail.tsx`. Does the component exist at th
+that exact path? Shipped files list `right-rail.tsx` (created/modified). OK
+OK.
+
+11. Does plan correctly capture locked look? F2 description captures. The q
+question asks "Does the plan capture the locked look from prod reference ..
+...?" We can answer OK with note that it relies on token/Inter/DNA, which i
+is unverified.
+
+12. Modal height bump spec deviation logged correctly in Files table? It lo
+logs in spec but Files table entry says "Modify — log h-[900px] modal heigh
+height deviation (single line)". The question asks "is the spec-deviation l
+logged correctly in the Files table?" It is described. But actual file path
+path maybe wrong. Could be OK if path exists. However the spec change is a 
+deviation from locked h-[720px]; logging is correct. But we might note it d
+doesn't reference previous spec line. OK.
+
+13. Cross-cutting invariant carried correctly: yes. OK.
+
+14. Branch local-only, head etc. OK.
+
+15. Out-of-scope: E4, KYC port itself, Mobbin, new tokens beyond single gol
+gold, new deps, content edits, behavior edits. Boundary mostly correct. How
+However framer-motion is not explicitly listed but "no new dependencies" co
+covers. But if codebase already has framer-motion, using it is not a new de
+dependency. The plan says "No new dependencies" not "no motion libraries". 
+Is framer-motion in dependencies? Not provided. We can say OK with caveat. 
+However prompt specifically asks "Mobbin, framer-motion — is the boundary c
+correct?" Maybe plan boundary incorrectly omits framer-motion. If they want
+want no new tools and no new deps, framer-motion is a dependency not a tool
+tool. Could be in scope if already installed. But plan doesn't list out-of-
+out-of-scope. Need decide. Since plan says no new dependencies, if framer-m
+framer-motion is already installed, it could be used. But the question like
+likely expects a finding: "framer-motion is not explicitly out-of-scope, an
+and if not already in package.json, adding it would violate constraints." S
+Since we don't have package.json evidence, we can note. Severity WARN. Evid
+Evidence: out-of-scope list does not mention framer-motion; no package.json
+package.json evidence. Fix: explicitly state framer-motion is out-of-scope 
+unless already in `apps/web/package.json` dependencies and no new install.
+
+16. The "Working tree carries a pre-existing unrelated terminology sweep." 
+Could cause merge conflicts? Not a plan issue.
+
+17. F3 "Accordion + Completed badges" — if codebase doesn't have accordion 
+component, adding one might require new dependency or component. But plan s
+says tokens locked and no new deps; could use existing DNA components. Need
+Need verify. Not enough evidence. We can maybe not flag.
+
+18. F4 "KYC prompt in-modal polish" but out of scope says "KYC port itself"
+itself". Polish of KYC prompt is in scope if it exists. OK.
+
+19. F7 error states: "5 stepper error states · 7-code Stripe error copy pol
+polish · already shipped in C5 — visual only". It references create-session
+create-session route. If the route only returns error codes (not UI copy), 
+"visual only" doesn't make sense. Copy polish on backend route is not visua
+visual. This duplicates finding 5.
+
+20. Verification: "Founder eyeballs on F2 before F3 starts" — good, but not
+not an audit gate? OK.
+
+21. Typecheck command `pnpm --filter @evo/web typecheck` — need confirm wor
+workspace name `@evo/web`. Could be correct. Not evidence.
+
+22. `just check` 10/10 — need confirm justfile has check recipe. Not eviden
+evidence.
+
+23. The plan says "Chunk-by-chunk, each audited by kimi-code-audit before t
+the next starts." But also "Stage 1 — awaiting plan audit (kimi-code-audit)
+(kimi-code-audit) + GATE 1". The audit itself is by kimi-code-audit. OK.
+
+24. F2 modifies colors.ts if needed but colors.ts is part of DNA tokens whi
+which are locked? Plan says one token addition permitted if absent. OK.
+
+25. The "locked look" includes Inter font; plan says Inter already in DNA. 
+Need verify; if not, this is an assumption. Severity WARN. Evidence: plan a
+asserts Inter already in DNA but no font file evidence. Fix: verify `apps/w
+`apps/web/src/dna/typography.ts` or tailwind config for Inter before assumi
+assuming.
+
+26. The "2 pricing cards" — if current Step 2 doesn't have two cards, this 
+is layout addition, not overlay. But they are making visual polish. OK mayb
+maybe.
+
+27. The "BUY NOW-style CTA" — copy/behavior? It might change button text/st
+text/styling. The plan says no content edits but allows visual copy? Contra
+Contradiction.
+
+Need now formulate answer. Since instructions ask "Output format — numbered
+numbered findings, each with: FINDING #, Severity (BLOCKER/WARN/OK), Eviden
+Evidence (file:line), Fix (one line). End with verdict". We need include al
+all checked items maybe as findings. Could have OK findings too. Numbered. 
+Need concise.
+
+We must not write code. One-line fix each.
+
+Verdict: likely APPROVE-WITH-FIXES because there are blockers? The instruct
+instructions: APPROVE / APPROVE-WITH-FIXES / REJECT. If blockers, maybe REJ
+REJECT? APPROVE-WITH-FIXES means plan can be approved after fixes. The pres
+presence of wrong file path is blocker but fixable. I'd choose APPROVE-WITH
+APPROVE-WITH-FIXES, with requirement to address BLOCKER/WARN before executi
+execution. If blockers unresolved, REJECT. The standard for plan audit: APP
+APPROVE-WITH-FIXES if issues are fixable.
+
+Need ensure findings are based on provided evidence, not hallucinated. We c
+can say "Evidence: CONTINUE.md shipped files list" etc. For line numbers un
+unknown, use file reference. The format says file:line; if line unknown, we
+we can use file or CONTINUE.md:31. It's acceptable.
+
+Let's gather evidence lines:
+- CONTINUE.md line 31: modal h-[720px].
+- CONTINUE.md shipped files list includes page.tsx not mystable-dashboard.t
+mystable-dashboard.tsx.
+- F7 references create-session/route.ts.
+- Out-of-scope section line no unknown.
+- F5/F7 copy edits.
+- Goal/Context line: Step6 MyStable success state vs popup Steps2-6.
+- Files table path for spec.
+- DNA path.
+
+Let's produce maybe 10 findings. Need not overdo. The prompt expects specif
+specific checks. We can structure findings around the enumerated checks.
+
+Potential findings list:
+
+1. Wrong file target for Step 6 success state. BLOCKER. Evidence: CONTINUE.
+CONTINUE.md shipped files list (no mystable-dashboard.tsx, only `apps/web/s
+`apps/web/src/app/mystable/page.tsx`). Fix: Replace `apps/web/src/component
+`apps/web/src/components/mystable-dashboard.tsx` with the actual MyStable s
+success component/path.
+
+2. Missing file entry for `create-session/route.ts`. WARN. Evidence: F7 ref
+references `apps/web/src/app/api/checkout/create-session/route.ts` but File
+Files table omits it. Fix: Add the route file to Files table with Modify/Re
+Modify/Read-only status.
+
+3. Spec file path unverified / missing. WARN. Evidence: Files table referen
+references `build-loop/purchase-content-spec.md` but repo evidence only lis
+lists `build-loop/investor-flow-build/CONTINUE.md`; path not verified. Fix:
+Fix: Confirm `build-loop/purchase-content-spec.md` exists before F2, or upd
+update path to actual spec.
+
+4. Copy edits contradict "No content/copy edits" constraint. BLOCKER. Evide
+Evidence: Out-of-scope prohibits content/copy edits; F5 targets cancel-back
+cancel-back/reservation-expired copy and F7 targets 7-code Stripe error cop
+copy mapping. Fix: Remove copy edits from scope or remove the no-content/co
+no-content/copy constraint.
+
+5. Step 6 location ambiguity: MyStable page vs popup Steps 2–6. WARN. Evide
+Evidence: Goal/Context describe Step 6 as MyStable success state, while Arc
+Architecture asserts popup covers Steps 2–6. Fix: Clarify that fixed `h-[90
+`h-[900px]` popup covers Steps 2–5 and Step 6 is on `/mystable` page.
+
+6. Gold token existence not pre-verified. WARN. Evidence: `apps/web/src/dna
+`apps/web/src/dna/colors.ts` content not provided; plan only says "check fi
+first". Fix: Add pre-F2 grep: `grep -n "d4a964\|gold" apps/web/src/dna/colo
+apps/web/src/dna/colors.ts` and only add token if absent.
+
+7. Inter font assumption unverified. WARN. Evidence: Plan asserts Inter alr
+already in DNA but no `apps/web/src/dna/typography.ts` or tailwind font con
+config evidence. Fix: Verify Inter is configured before relying on it for t
+the locked look.
+
+8. PDS/SA internal scroll exception not logged as deviation. WARN. Evidence
+Evidence: Context says PDS/SA scroll inside Step 3 remains the one ugly exc
+exception, but Spec changes only logs modal height. Fix: Add a line to `pur
+`purchase-content-spec.md` documenting the retained PDS/SA internal scroll 
+exception.
+
+9. End-to-end Stripe handoff verification not reliably automatable. WARN. E
+Evidence: Verification lists Stripe handoff → MyStable success with no Stri
+Stripe test credentials/webhook/local return path. Fix: Split verification 
+into "navigates to Stripe checkout URL" and "MyStable success via direct su
+success simulation/return URL."
+
+10. Out-of-scope boundary for framer-motion not explicit. WARN. Evidence: O
+Out-of-scope does not mention framer-motion; package.json not provided. Fix
+Fix: Add "framer-motion (unless already in apps/web dependencies)" to out-o
+out-of-scope or confirm it is present.
+
+11. Locked look captured. OK. Evidence: F2 description explicitly lists max
+max-w-lg, ~900px, gold, Inter, dark, 2 pricing cards, 4-row summary, green 
+return row, BUY NOW CTA, NZTR fine print. Fix: none.
+
+12. Modal height deviation logged. OK. Evidence: Files table and Spec chang
+changes log `h-[900px]` bump from `h-[720px]` (CONTINUE.md:31). Fix: none.
+
+13. Cross-cutting invariants carried. OK. Evidence: Tech constraints list `
+`:3010`, head `7023c8f`, branch `design-alignment` local-only. Fix: none.
+
+14. Every step assigned. OK. Evidence: F1–F6 map Steps 1–6 and F7 covers er
+error states. Fix: none.
+
+15. Chunk dependency edges appear sequential. OK. Evidence: F1→F2→...→F7 or
+ordering in Chunks table. Fix: none.
+
+That's a lot. Maybe combine some. We need numbered findings. OK findings ca
+can be included. But over 15 is fine. We can make 12 findings. Need ensure 
+one line fix.
+
+Let's think about severity of copy-edit contradiction. Could be BLOCKER. Ye
+Yes.
+
+Is there a finding about "F7 modifies create-session/route.ts for visual on
+only"? That is covered in missing file and copy edit. We can add: modifying
+modifying a backend route cannot be "visual only"; it's copy/logic. But we 
+already have copy contradiction. Could mention F7 target wrong if only visu
+visual. However if it only adjusts comments or code mapping? Still copy. Ke
+Keep.
+
+Also F2 says "NZTR fine print" — this might be content (legal text). If no 
+content edits, adding fine print copy is content. But the prod reference in
+includes it, and existing code probably has it. If absent, adding copy is c
+content edit. The plan's "no content edits" would be violated. But maybe th
+the copy already exists. We can warn. But maybe too pedantic.
+
+Need answer final verdict. APPROVE-WITH-FIXES because issues fixable. State
+State blockers must be fixed before execution.
+
+Let's ensure format: "FINDING 1: [title] | Severity: BLOCKER | Evidence: ..
+... | Fix: ..." Maybe use markdown table? The prompt says "numbered finding
+findings, each with: FINDING #, Severity (BLOCKER/WARN/OK), Evidence (file:
+(file:line), Fix (one line)". Could be a list. I'll use headings or a struc
+structured line per finding.
+
+Example:
+
+**FINDING 1** — `mystable-dashboard.tsx` target does not match shipped file
+files
+- Severity: BLOCKER
+- Evidence: `investor-flow-build/CONTINUE.md` shipped files list includes `
+`apps/web/src/app/mystable/page.tsx`; no `mystable-dashboard.tsx` is listed
+listed.
+- Fix: Replace F6 file target with the actual component rendering the MySta
+MyStable success state (likely `apps/web/src/app/mystable/page.tsx`).
+
+Evidence file:line we don't have line for shipped files list. Could use `in
+`investor-flow-build/CONTINUE.md` (file). The prompt wants file:line but if
+if line unknown, approximate. We can use line references from evidence: lin
+line 31 for modal height. For others, just file. Good.
+
+Let's maybe include only the most material findings. We can include OK item
+items as findings too.
+
+Let's consider if there are other wrong assumptions about functions/columns
+functions/columns. The plan references `apps/web/src/lib/nellie-loop.ts` (r
+(read-only). It is listed as read-only in evidence but not in Files table. 
+The plan doesn't need to modify, but F2-F5 may use it. Not a missing depend
+dependency. OK.
+
+Check "Missing files or dependencies the plan references": `build-loop/flow
+`build-loop/flow-mock/index.html` and *.png read-only. They are in evidence
+evidence. OK. `new/evo_01/02_website/` read-only. OK. `purchase-content-spe
+`purchase-content-spec.md` not in evidence. That is missing. Also `create-s
+`create-session/route.ts` not in Files table. Good.
+
+Check "Broken chunk dependency edges (F1 → F2 → ... → F7 ordering)". The ch
+chunks table is sequential. F6 depends on F5. F7 error states could be inde
+independent but placed last. No explicit edges, but order implies. OK.
+
+Check "Scope gaps: F1 right rail polish · F2 popup shell + Step 2 term shee
+sheet · F3 Step 3 accept gate · F4 Step 4 verify · F5 Step 5 pay · F6 Step 
+6 own · F7 error states + Stripe copy. Is every step assigned?" Yes. OK.
+
+Check "Verification steps that would not actually verify the claim". `just 
+check` 10/10 and typecheck verify build. Walk verifies 200 and UI. Screensh
+Screenshot verifies look. Playwright a11y/regression. Founder eyeballs F2. 
+But Stripe handoff to MyStable success as verification may not be possible.
+possible. Also "rail matches prod density" verified by screenshot/impeccabl
+screenshot/impeccable/audit; OK. We'll flag Stripe handoff.
+
+Check "Does the plan capture the locked look from prod reference". F2 descr
+description covers. OK. But note unverified token and font.
+
+Check "Modal height bump logged correctly in Files table". Yes, Files table
+table and spec. OK.
+
+Check "Gold token claim". The plan conditionally adds token if absent. But 
+does colors.ts already have gold/#d4a964? We can't verify. We'll flag as un
+unverified. This is a question: "does ... already have a gold / #d4a964 tok
+token, or does F2 need to add it?" The plan says "Check first. If absent, a
+add ONE token in F2." So the audit cannot confirm from evidence. We must an
+answer that the plan's conditional check is correct in principle but not pr
+pre-verified. Maybe we should not issue a warning for that; the question is
+is asking us to verify. Since we don't have file content, the finding is "c
+"cannot verify from provided evidence; plan relies on runtime check." Sever
+Severity WARN. Fix: add pre-execution grep verification.
+
+Check cross-cutting invariants: carried. OK.
+
+Out-of-scope boundary: Mostly correct. Need flag framer-motion. Also copy e
+edits in scope contradict. New tokens beyond single gold out-of-scope. Mobb
+Mobbin off-table. E4 and KYC port out. OK.
+
+Now final answer. Need be concise but complete.
+
+Potential verdict: APPROVE-WITH-FIXES. Because there is a BLOCKER file path
+path and BLOCKER scope contradiction but both fixable; if not fixed, REJECT
+REJECT.
+
+Let's draft final.
+
+We need be careful not to write code. "Fix" lines are prose instructions, n
+not code.
+
+Let's produce final findings:
+
+1. BLOCKER: `mystable-dashboard.tsx` file target does not exist. Evidence: 
+`investor-flow-build/CONTINUE.md` shipped files list names `apps/web/src/ap
+`apps/web/src/app/mystable/page.tsx`, not `mystable-dashboard.tsx`. Fix: Up
+Update F6 to target the actual component/path that renders Step 6 MyStable 
+success.
+
+2. BLOCKER: Scope contradiction — copy edits in F5/F7 violate "no content/c
+content/copy edits". Evidence: Out-of-scope section: "Content/copy edits"; 
+F5 lists "cancel-back copy · reservation-expired copy" and F7 lists "7-code
+"7-code Stripe error copy polish" plus `create-session/route.ts` (a server 
+route, not visual). Fix: Either remove "no content/copy edits" or remove ba
+backend/error copy changes from F5/F7 and keep them truly visual-only.
+
+3. WARN: `create-session/route.ts` referenced by F7 is missing from Files t
+table. Evidence: F7 Files column includes `create-session/route.ts`; Files 
+table omits it. Fix: Add `apps/web/src/app/api/checkout/create-session/rout
+`apps/web/src/app/api/checkout/create-session/route.ts` to Files table with
+with Modify or Read-only status.
+
+4. WARN: `build-loop/purchase-content-spec.md` path not verified in repo ev
+evidence. Evidence: Repo evidence only shows `build-loop/investor-flow-buil
+`build-loop/investor-flow-build/CONTINUE.md`; no evidence of the spec file.
+file. Fix: Confirm the spec file exists at that path before F2, or correct 
+the Files table to the actual spec location.
+
+5. WARN: Step 6 location ambiguity between popup and MyStable page. Evidenc
+Evidence: Goal/Context say "popup (Steps 2–6) + MyStable success state (Ste
+(Step 6)" and Architecture says "one fixed size for Steps 2–6". Fix: Clarif
+Clarify that the fixed `h-[900px]` popup covers Steps 2–5 and Step 6 is ren
+rendered on `/mystable`.
+
+6. WARN: Gold token `#d4a964` existence in `apps/web/src/dna/colors.ts` not
+not pre-verified. Evidence: DNA path is known but token content not provide
+provided. Fix: Run `grep -n "d4a964\|gold" apps/web/src/dna/colors.ts` befo
+before F2 and add the token only if absent.
+
+7. WARN: Inter font claim in DNA is unverified. Evidence: Plan asserts "Int
+"Inter already in DNA" but no `typography.ts` or tailwind font config evide
+evidence is shown. Fix: Verify Inter is configured in `apps/web/src/dna/` o
+or tailwind config before relying on it.
+
+8. WARN: PDS/SA internal scroll exception is not logged as a spec deviation
+deviation. Evidence: Context calls it "the one ugly exception" but Spec cha
+changes only logs modal height. Fix: Add a line to `purchase-content-spec.m
+`purchase-content-spec.md` documenting that Step 3 retains internal PDS/SA 
+scrolling.
+
+9. WARN: End-to-end Stripe handoff verification may not be automatable in l
+local dev. Evidence: Verification section lists "Stripe handoff → MyStable 
+success" without Stripe test credentials, webhooks, or return URL setup. Fi
+Fix: Split verification into "reaches Stripe checkout URL" and "MyStable su
+success via direct success simulation".
+
+10. WARN: `framer-motion` boundary not explicitly stated. Evidence: Out-of-
+Out-of-scope lists Mobbin and no new dependencies but not `framer-motion`; 
+package.json not provided. Fix: Add "framer-motion (unless already in apps/
+apps/web dependencies)" to out-of-scope or confirm it is present.
+
+11. OK: Locked look from prod reference is captured in F2 description. Evid
+Evidence: F2 explicitly lists max-w-lg, ~900px, dark, Inter, gold `#d4a964`
+`#d4a964`, two pricing cards, four-row summary, green investor-return row, 
+BUY NOW-style CTA, NZTR fine print. Fix: none.
+
+12. OK: Modal height `h-[900px]` deviation is logged. Evidence: Files table
+table targets `build-loop/purchase-content-spec.md`; Spec changes section r
+records the bump from `h-[720px]` (CONTINUE.md:31). Fix: none.
+
+13. OK: Cross-cutting invariants are carried. Evidence: Tech constraints li
+list `:3010`, head `7023c8f`, branch `design-alignment` local-only. Fix: no
+none.
+
+14. OK: Every step is assigned and chunk order is sequential. Evidence: F1–
+F1–F6 map Steps 1–6, F7 covers error states, and the Chunks table orders F1
+F1→F2→…→F7. Fix: none.
+
+15. OK: Out-of-scope boundary for E4 email, KYC port, Mobbin, new deps, beh
+behavior edits is correctly excluded. Evidence: Out-of-scope section lists 
+E4, KYC port itself, Mobbin, etc. Fix: none.
+
+Verdict: APPROVE-WITH-FIXES. The two BLOCKERs must be resolved before execu
+execution (correct Step 6 file and resolve copy-edit contradiction); if lef
+left unresolved, verdict becomes REJECT.
+
+Need ensure each finding has Severity, Evidence, Fix. Good.
+
+Let's check if the `create-session/route.ts` missing from Files table is a 
+dependency edge issue? It's a missing file. Good.
+
+Should we combine 6 and 7? They are both unverified DNA assumptions. Could 
+be one finding. But separate is okay.
+
+Potential issue: The question 10 "Out-of-scope claim: E4 email, KYC port it
+itself, Mobbin, framer-motion — is the boundary correct?" We have OK for E4
+E4/KYC/Mobbin/new deps, WARN for framer-motion. Good.
+
+Question 6 "Does the plan capture the locked look from prod reference" -> O
+OK finding 11. But also question 7 maybe. Good.
+
+Question 8 "The gold token claim: does apps/web/src/dna/colors.ts already h
+have a gold / #d4a964 token, or does F2 need to add it?" -> finding 6. We a
+answer cannot verify. Good.
+
+Question 5 "Verification steps that would not actually verify the claim" ->
+-> finding 9. Good.
+
+Question 4 "Is every step assigned?" -> finding 14. Good.
+
+Question 3 "Broken chunk dependency edges" -> finding 14. Good.
+
+Question 2 "Missing files or dependencies" -> findings 1,3,4. Good.
+
+Question 1 "Wrong assumptions about codebase" -> findings 1,5,6,7 maybe. Go
+Good.
+
+Question 9 cross-cutting invariants -> finding 13. Good.
+
+Now final. Need maybe mention that the plan's date 2026-09-04 is future? No
+Not relevant.
+
+Let's ensure no code. Fine.
+
+One more thought: The "right-rail.tsx" file path might also be wrong? CONTI
+CONTINUE.md says `apps/web/src/components/horse/right-rail.tsx` modified. S
+So OK.
+
+The `purchase-flow-modal.tsx` created in C2. OK.
+
+`lib/nellie-loop.ts` read-only. Not in plan files but OK.
+
+The plan says "Chunk-by-chunk, each audited by kimi-code-audit before the n
+next starts." The audit itself is by us. OK.
+
+The plan references `build-loop/flow-mock/index.html` read-only. The file e
+exists per evidence. OK.
+
+The "Modal height bumped from h-[720px] to h-[900px] to match prod's natura
+natural content fit" but then "Popup stays ONE FIXED SIZE for Steps 2–6" — 
+a fixed size might not be natural content fit; it's contradictory but OK.
+
+Should we flag "Single fixed popup size of h-[900px]" may conflict with "na
+"natural content fit" claim? The prod reference is ~900px tall. The plan ch
+chooses fixed h-900. It's acceptable. Not a finding.
+
+Should we flag `max-w-lg` width: in Tailwind max-w-lg is 512px, not ~900px 
+tall. The prod screenshot says max-w-lg wide, ~900px tall. OK.
+
+Potential issue: `max-w-lg` is 512px, but prod reference "wide"? Might be `
+`max-w-2xl`? But prompt states "max-w-lg wide, ~900px tall". They interpret
+interpret max-w-lg as wide? In plan it's max-w-lg. OK.
+
+Now final. Use markdown.
+...done thinking.
+
+**FINDING 1** — `mystable-dashboard.tsx` is not a shipped file  
+- Severity: **BLOCKER**  
+- Evidence: `investor-flow-build/CONTINUE.md` shipped-files list names `app
+`apps/web/src/app/mystable/page.tsx`; no `apps/web/src/components/mystable-
+`apps/web/src/components/mystable-dashboard.tsx` is listed.  
+- Fix: Update F6 to target the actual component that renders the Step 6 MyS
+MyStable success state (likely `apps/web/src/app/mystable/page.tsx` or its 
+imported child).
+
+**FINDING 2** — Copy-edits in F5/F7 contradict the “no content/copy edits” 
+constraint  
+- Severity: **BLOCKER**  
+- Evidence: Out-of-scope section prohibits “Content/copy edits”, but F5 tar
+targets “cancel-back copy · reservation-expired copy” and F7 targets “7-cod
+“7-code Stripe error copy polish” and includes `apps/web/src/app/api/checko
+`apps/web/src/app/api/checkout/create-session/route.ts` (a server route, no
+not a visual surface).  
+- Fix: Either remove “no content/copy edits” from scope or remove backend/e
+backend/error-copy changes from F5/F7 and keep them strictly visual.
+
+**FINDING 3** — `create-session/route.ts` referenced by F7 is missing from 
+the Files table  
+- Severity: **WARN**  
+- Evidence: F7 Files column lists `create-session/route.ts`; the Files tabl
+table does not.  
+- Fix: Add `apps/web/src/app/api/checkout/create-session/route.ts` to the F
+Files table with its intended Modify/Read-only status.
+
+**FINDING 4** — `build-loop/purchase-content-spec.md` path is not verified 
+in the provided repo evidence  
+- Severity: **WARN**  
+- Evidence: Repo evidence only shows `build-loop/investor-flow-build/CONTIN
+`build-loop/investor-flow-build/CONTINUE.md`; the spec file path is not con
+confirmed to exist.  
+- Fix: Confirm the spec file exists at that path before F2, or update the F
+Files table to the actual spec location.
+
+**FINDING 5** — Step 6 location is ambiguous (popup vs. MyStable page)  
+- Severity: **WARN**  
+- Evidence: Goal/Context describe “popup (Steps 2–6) + MyStable success sta
+state (Step 6)”, while Architecture says the popup is one fixed size for St
+Steps 2–6.  
+- Fix: Clarify that the fixed `h-[900px]` popup covers Steps 2–5 and Step 6
+6 is rendered on `/mystable`.
+
+**FINDING 6** — Gold token `#d4a964` existence in `colors.ts` is not pre-ve
+pre-verified  
+- Severity: **WARN**  
+- Evidence: `apps/web/src/dna/` is known, but the contents of `apps/web/src
+`apps/web/src/dna/colors.ts` are not provided.  
+- Fix: Run `grep -n "d4a964\|gold" apps/web/src/dna/colors.ts` before F2 an
+and add the token only if it is absent.
+
+**FINDING 7** — Inter font claim is unverified  
+- Severity: **WARN**  
+- Evidence: Plan asserts “Inter already in DNA”, but no `apps/web/src/dna/t
+`apps/web/src/dna/typography.ts` or Tailwind font config evidence is shown.
+shown.  
+- Fix: Verify Inter is configured in DNA/Tailwind before relying on it for 
+the locked look.
+
+**FINDING 8** — PDS/SA internal-scroll exception is not logged as a spec de
+deviation  
+- Severity: **WARN**  
+- Evidence: Context calls Step 3 PDS/SA scrolling “the one ugly exception”,
+exception”, but the Spec changes section only logs the modal height deviati
+deviation.  
+- Fix: Add a line to `purchase-content-spec.md` documenting that Step 3 ret
+retains internal PDS/SA scrolling.
+
+**FINDING 9** — End-to-end Stripe-handoff verification may not actually ver
+verify the claim  
+- Severity: **WARN**  
+- Evidence: Verification lists “Stripe handoff → MyStable success” with no 
+mention of Stripe test credentials, webhooks, or a local return-path.  
+- Fix: Split verification into “navigates to Stripe checkout URL” and “MySt
+“MyStable success via direct success/return-URL simulation”.
+
+**FINDING 10** — `framer-motion` boundary is not explicit  
+- Severity: **WARN**  
+- Evidence: Out-of-scope lists Mobbin and “no new dependencies”, but does n
+not name `framer-motion`; `apps/web/package.json` is not provided.  
+- Fix: Add “framer-motion (unless already in `apps/web` dependencies)” to o
+out-of-scope, or confirm it is already installed.
+
+**FINDING 11** — Locked prod look is captured in the F2 description  
+- Severity: **OK**  
+- Evidence: F2 explicitly lists `max-w-lg`, ~900px, dark theme, Inter, gold
+gold `#d4a964`, two pricing cards, four-row summary, green investor-return 
+row, BUY NOW-style CTA, and NZTR fine print.  
+- Fix: None.
+
+**FINDING 12** — Modal `h-[900px]` deviation is logged correctly  
+- Severity: **OK**  
+- Evidence: Files table targets `build-loop/purchase-content-spec.md` and t
+the Spec changes section records the bump from `h-[720px]` (`investor-flow-
+(`investor-flow-build/CONTINUE.md:31`).  
+- Fix: None.
+
+**FINDING 13** — Cross-cutting invariants are correctly carried  
+- Severity: **OK**  
+- Evidence: Tech constraints list `:3010`, head `7023c8f`, branch `design-a
+`design-alignment` local-only.  
+- Fix: None.
+
+**FINDING 14** — Every step assigned and chunk order is sequential  
+- Severity: **OK**  
+- Evidence: F1–F6 map Steps 1–6, F7 covers error states, and the Chunks tab
+table orders F1 → F2 → … → F7.  
+- Fix: None.
+
+**FINDING 15** — Out-of-scope boundary is mostly correct  
+- Severity: **OK**  
+- Evidence: Out-of-scope section correctly excludes E4 email, KYC port itse
+itself, Mobbin, new dependencies, behavior edits, migration, push, and depl
+deploy.  
+- Fix: None (see FINDING 10 for framer-motion caveat).
+
+---
+
+**VERDICT: APPROVE-WITH-FIXES**
+
+The two BLOCKERs (wrong Step 6 file target and the copy-edit scope contradi
+contradiction) must be resolved before execution. If they are not fixed, ve
+verdict becomes **REJECT**. All WARN findings should be verified/addressed 
+before or during the first chunk.
+
