@@ -38,7 +38,7 @@ Branch: `style-guide-lock-in`. Each chunk leaves the repo green. Commit AFTER ga
 - **Files:** + `scripts/check-style-guard.sh`, M `Justfile` (recipe `check:style`)
 - **Guard rule:** `grep -rn 'text-\[11px\] font-medium uppercase tracking-\[0.2em\]' apps/ packages/` → non-zero exit + print matches. Also flag `text-\[10px\] font-mono uppercase tracking-\[0.2em\]` (stat-row label) — those must use primitives.
 - **Just recipe:** `check:style: sh scripts/check-style-guard.sh` (check Justfile syntax — verify existing recipe style first).
-- **DOD:** script exits 1 on an inline eyebrow match (test with a temp fixture), 0 on clean; `just check:style` registered.
+- **DOD:** script exits 1 on an inline eyebrow match (test with a temp fixture), 0 on clean; `just check-style` registered.
 - **Gate:** run the guard — it should PASS on the clean tree BUT right-rail must not trigger it (it's converted in sg-3, so sg-4 runs after sg-3's commit to avoid false-positive churn).
 - **Commit:** `chore(lint): SG-4 add inline-pattern style guard (sandbox)`
 - **Nodes:** `file:check-style-guard`, `cmd:check-style`

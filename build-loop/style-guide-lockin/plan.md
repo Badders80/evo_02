@@ -20,7 +20,7 @@ Lock the canonical style guide (doc) + the five shared primitives (code package)
 
 - **Phase A:** Draft `STYLE_GUIDE-draft.md` — 7 locked pattern rules + token references + prod-diff notes.
 - **Phase B:** Extract 5 primitives → `packages/ui`: `Eyebrow`, `BackLink`, `StatusPill` (status="listed"|"fully_subscribed"|"coming_soon"|"completed"), `StatRow`, `WhitePillCTA`.
-- **Phase D-lite:** `scripts/check-style-guard.sh` + `just check:style` recipe (flags inline eyebrow re-pattern). Storybook deferred.
+- **Phase D-lite:** `scripts/check-style-guard.sh` + `just check-style` recipe (flags inline eyebrow re-pattern). Storybook deferred.
 
 ## Out of scope (deferred — next cycle)
 

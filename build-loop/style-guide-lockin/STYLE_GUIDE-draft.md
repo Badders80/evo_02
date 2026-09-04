@@ -116,7 +116,7 @@ className="rounded-3xl border border-border bg-surface backdrop-blur-2xl px-6 py
 ## Part 4 — Enforcement contract
 
 1. All 5 primitives (`Eyebrow`, `BackLink`, `StatusPill`, `StatRow`, `WhitePillCTA`) live in `@evo/ui` and are the ONLY sanctioned spellings.
-2. `scripts/check-style-guard.sh` (wired as `just check:style`) greps `apps/ packages/` and fails on inline `text-[11px] font-medium uppercase tracking-[0.2em]` and inline `text-[10px] font-mono uppercase tracking-[0.2em]`.
+2. `scripts/check-style-guard.sh` (wired as `just check-style`) greps `apps/ packages/` and fails on inline `text-[11px] font-medium uppercase tracking-[0.2em]` and inline `text-[10px] font-mono uppercase tracking-[0.2em]`.
 3. As of 2026-09-04, these files still carry inline `tracking-[0.2em]` and are Phase C refactor targets: `header.tsx`, `landing-cta-popup.tsx`, `HowItWorksSection.tsx`, `FAQSection.tsx`, `mystable-dashboard.tsx`, `DigitalSyndicationSection.tsx`, `privacy/page.tsx`, `purchase-flow-modal.tsx`.
 4. Badge duplication (known debt): `components/ui/badge.tsx:18` bright-success variant + `marketplace/campaign-status-badge.tsx` — superseded by `<StatusPill>`; deprecate in Phase C.
 

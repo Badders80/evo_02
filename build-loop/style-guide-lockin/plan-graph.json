@@ -1,50 +1,264 @@
 {
   "nodes": [
-    {"id": "doc:style-guide-draft", "type": "file", "description": "STYLE_GUIDE-draft.md — 7 pattern rules with file:line evidence"},
-    {"id": "pkg:ui-package", "type": "file", "description": "packages/ui/{package.json,tsconfig.json,src/index.ts}"},
-    {"id": "file:eyebrow", "type": "file", "description": "packages/ui/src/eyebrow.tsx + test"},
-    {"id": "file:back-link", "type": "file", "description": "packages/ui/src/back-link.tsx + test"},
-    {"id": "file:status-pill", "type": "file", "description": "packages/ui/src/status-pill.tsx + test"},
-    {"id": "file:stat-row", "type": "file", "description": "packages/ui/src/stat-row.tsx + test"},
-    {"id": "file:white-pill-cta", "type": "file", "description": "packages/ui/src/white-pill-cta.tsx + test"},
-    {"id": "file:right-rail-first-consumer", "type": "file", "description": "right-rail.tsx converted to import primitives; inline patterns deleted (Rule 13 one-client-first)"},
-    {"id": "cmd:visual-before-after", "type": "gate", "description": "screenshot right rail :3010 before/after conversion; class-for-class compare"},
-    {"id": "cmd:smoke-import", "type": "gate", "description": "one @evo/ui import in apps/web + typecheck resolves"},
-    {"id": "file:check-style-guard", "type": "file", "description": "scripts/check-style-guard.sh — greps inline eyebrow pattern"},
-    {"id": "cmd:check-style", "type": "gate", "description": "just check:style recipe registered and fails on inline pattern"},
-    {"id": "cmd:typecheck", "type": "gate", "description": "just typecheck passes (all apps+packages)"},
-    {"id": "cmd:test", "type": "gate", "description": "pnpm --filter @evo/ui test passes (5 primitives)"},
-    {"id": "cmd:lint", "type": "gate", "description": "just lint passes"},
-    {"id": "cmd:kimi-audit", "type": "gate", "description": "kimi-code-audit on branch diff → audit-report.md"},
-    {"id": "cmd:founder-approval", "type": "gate", "description": "FOUNDER manual go-live gate — nothing merges/lands until approved"}
+    {
+      "id": "doc:style-guide-draft",
+      "type": "file",
+      "description": "STYLE_GUIDE-draft.md — 7 pattern rules with file:line evidence"
+    },
+    {
+      "id": "pkg:ui-package",
+      "type": "file",
+      "description": "packages/ui/{package.json,tsconfig.json,src/index.ts}"
+    },
+    {
+      "id": "file:eyebrow",
+      "type": "file",
+      "description": "packages/ui/src/eyebrow.tsx + test"
+    },
+    {
+      "id": "file:back-link",
+      "type": "file",
+      "description": "packages/ui/src/back-link.tsx + test"
+    },
+    {
+      "id": "file:status-pill",
+      "type": "file",
+      "description": "packages/ui/src/status-pill.tsx + test"
+    },
+    {
+      "id": "file:stat-row",
+      "type": "file",
+      "description": "packages/ui/src/stat-row.tsx + test"
+    },
+    {
+      "id": "file:white-pill-cta",
+      "type": "file",
+      "description": "packages/ui/src/white-pill-cta.tsx + test"
+    },
+    {
+      "id": "file:right-rail-first-consumer",
+      "type": "file",
+      "description": "right-rail.tsx converted to import primitives; inline patterns deleted (Rule 13 one-client-first)"
+    },
+    {
+      "id": "cmd:visual-before-after",
+      "type": "gate",
+      "description": "screenshot right rail :3010 before/after conversion; class-for-class compare"
+    },
+    {
+      "id": "cmd:smoke-import",
+      "type": "gate",
+      "description": "one @evo/ui import in apps/web + typecheck resolves"
+    },
+    {
+      "id": "file:check-style-guard",
+      "type": "file",
+      "description": "scripts/check-style-guard.sh — greps inline eyebrow pattern"
+    },
+    {
+      "id": "cmd:check-style",
+      "type": "gate",
+      "description": "just check:style recipe registered and fails on inline pattern"
+    },
+    {
+      "id": "cmd:typecheck",
+      "type": "gate",
+      "description": "just typecheck passes (all apps+packages)"
+    },
+    {
+      "id": "cmd:test",
+      "type": "gate",
+      "description": "pnpm --filter @evo/ui test passes (5 primitives)"
+    },
+    {
+      "id": "cmd:lint",
+      "type": "gate",
+      "description": "just lint passes"
+    },
+    {
+      "id": "cmd:kimi-audit",
+      "type": "gate",
+      "description": "kimi-code-audit on branch diff → audit-report.md"
+    },
+    {
+      "id": "cmd:founder-approval",
+      "type": "gate",
+      "description": "FOUNDER manual go-live gate — nothing merges/lands until approved"
+    }
   ],
   "edges": [
-    {"from": "doc:style-guide-draft", "to": "file:eyebrow", "reason": "doc defines the Eyebrow rule the primitive implements", "source": "plan dependency"},
-    {"from": "doc:style-guide-draft", "to": "file:status-pill", "reason": "doc defines pill variants the primitive encodes", "source": "plan dependency"},
-    {"from": "pkg:ui-package", "to": "file:eyebrow", "reason": "primitives live in the package", "source": "package layout"},
-    {"from": "pkg:ui-package", "to": "file:back-link", "reason": "primitives live in the package", "source": "package layout"},
-    {"from": "pkg:ui-package", "to": "file:status-pill", "reason": "primitives live in the package", "source": "package layout"},
-    {"from": "pkg:ui-package", "to": "file:stat-row", "reason": "primitives live in the package", "source": "package layout"},
-    {"from": "pkg:ui-package", "to": "file:white-pill-cta", "reason": "primitives live in the package", "source": "package layout"},
-    {"from": "file:eyebrow", "to": "file:right-rail-first-consumer", "reason": "right rail consumes the primitive, deleting inline class string", "source": "review amendment"},
-    {"from": "file:white-pill-cta", "to": "file:right-rail-first-consumer", "reason": "right rail CTA consumes the primitive", "source": "review amendment"},
-    {"from": "file:right-rail-first-consumer", "to": "cmd:visual-before-after", "reason": "conversion must prove pixel parity on the canonical surface", "source": "review amendment"},
-    {"from": "file:eyebrow", "to": "cmd:test", "reason": "tests validate each primitive; package runs isolated via --filter @evo/ui", "source": "gate"},
-    {"from": "file:status-pill", "to": "cmd:test", "reason": "variant matrix test", "source": "gate"},
-    {"from": "pkg:ui-package", "to": "cmd:smoke-import", "reason": "import must resolve before wiring is proven", "source": "gate"},
-    {"from": "cmd:smoke-import", "to": "cmd:typecheck", "reason": "typecheck proves resolution end-to-end", "source": "gate"},
-    {"from": "file:check-style-guard", "to": "cmd:check-style", "reason": "recipe runs the script", "source": "gate"},
-    {"from": "cmd:typecheck", "to": "cmd:kimi-audit", "reason": "only green gates go to audit", "source": "plan dependency"},
-    {"from": "cmd:test", "to": "cmd:kimi-audit", "reason": "only green gates go to audit", "source": "plan dependency"},
-    {"from": "cmd:lint", "to": "cmd:kimi-audit", "reason": "only green gates go to audit", "source": "plan dependency"},
-    {"from": "cmd:kimi-audit", "to": "cmd:founder-approval", "reason": "audit verdict precedes go-live decision", "source": "sandbox contract"}
+    {
+      "from": "doc:style-guide-draft",
+      "to": "file:eyebrow",
+      "reason": "doc defines the Eyebrow rule the primitive implements",
+      "source": "plan dependency"
+    },
+    {
+      "from": "doc:style-guide-draft",
+      "to": "file:status-pill",
+      "reason": "doc defines pill variants the primitive encodes",
+      "source": "plan dependency"
+    },
+    {
+      "from": "pkg:ui-package",
+      "to": "file:eyebrow",
+      "reason": "primitives live in the package",
+      "source": "package layout"
+    },
+    {
+      "from": "pkg:ui-package",
+      "to": "file:back-link",
+      "reason": "primitives live in the package",
+      "source": "package layout"
+    },
+    {
+      "from": "pkg:ui-package",
+      "to": "file:status-pill",
+      "reason": "primitives live in the package",
+      "source": "package layout"
+    },
+    {
+      "from": "pkg:ui-package",
+      "to": "file:stat-row",
+      "reason": "primitives live in the package",
+      "source": "package layout"
+    },
+    {
+      "from": "pkg:ui-package",
+      "to": "file:white-pill-cta",
+      "reason": "primitives live in the package",
+      "source": "package layout"
+    },
+    {
+      "from": "file:eyebrow",
+      "to": "file:right-rail-first-consumer",
+      "reason": "right rail consumes the primitive, deleting inline class string",
+      "source": "review amendment"
+    },
+    {
+      "from": "file:white-pill-cta",
+      "to": "file:right-rail-first-consumer",
+      "reason": "right rail CTA consumes the primitive",
+      "source": "review amendment"
+    },
+    {
+      "from": "file:right-rail-first-consumer",
+      "to": "cmd:visual-before-after",
+      "reason": "conversion must prove pixel parity on the canonical surface",
+      "source": "review amendment"
+    },
+    {
+      "from": "file:eyebrow",
+      "to": "cmd:test",
+      "reason": "tests validate each primitive; package runs isolated via --filter @evo/ui",
+      "source": "gate"
+    },
+    {
+      "from": "file:status-pill",
+      "to": "cmd:test",
+      "reason": "variant matrix test",
+      "source": "gate"
+    },
+    {
+      "from": "pkg:ui-package",
+      "to": "cmd:smoke-import",
+      "reason": "import must resolve before wiring is proven",
+      "source": "gate"
+    },
+    {
+      "from": "cmd:smoke-import",
+      "to": "cmd:typecheck",
+      "reason": "typecheck proves resolution end-to-end",
+      "source": "gate"
+    },
+    {
+      "from": "file:check-style-guard",
+      "to": "cmd:check-style",
+      "reason": "recipe runs the script",
+      "source": "gate"
+    },
+    {
+      "from": "cmd:typecheck",
+      "to": "cmd:kimi-audit",
+      "reason": "only green gates go to audit",
+      "source": "plan dependency"
+    },
+    {
+      "from": "cmd:test",
+      "to": "cmd:kimi-audit",
+      "reason": "only green gates go to audit",
+      "source": "plan dependency"
+    },
+    {
+      "from": "cmd:lint",
+      "to": "cmd:kimi-audit",
+      "reason": "only green gates go to audit",
+      "source": "plan dependency"
+    },
+    {
+      "from": "cmd:kimi-audit",
+      "to": "cmd:founder-approval",
+      "reason": "audit verdict precedes go-live decision",
+      "source": "sandbox contract"
+    }
   ],
   "chunks": {
-    "sg-1": {"nodes": ["doc:style-guide-draft"], "depends_on": [], "state": "pending"},
-    "sg-2": {"nodes": ["pkg:ui-package", "file:eyebrow", "file:back-link", "file:status-pill", "file:stat-row", "file:white-pill-cta", "cmd:test"], "depends_on": ["sg-1"], "state": "pending"},
-    "sg-3": {"nodes": ["cmd:smoke-import", "file:right-rail-first-consumer", "cmd:visual-before-after", "cmd:typecheck"], "depends_on": ["sg-2"], "state": "pending"},
-    "sg-4": {"nodes": ["file:check-style-guard", "cmd:check-style"], "depends_on": [], "state": "pending"},
-    "sg-5": {"nodes": ["cmd:lint", "cmd:typecheck", "cmd:kimi-audit", "cmd:founder-approval"], "depends_on": ["sg-2", "sg-3", "sg-4"], "state": "pending"}
+    "sg-1": {
+      "nodes": [
+        "doc:style-guide-draft"
+      ],
+      "depends_on": [],
+      "state": "done"
+    },
+    "sg-2": {
+      "nodes": [
+        "pkg:ui-package",
+        "file:eyebrow",
+        "file:back-link",
+        "file:status-pill",
+        "file:stat-row",
+        "file:white-pill-cta",
+        "cmd:test"
+      ],
+      "depends_on": [
+        "sg-1"
+      ],
+      "state": "done"
+    },
+    "sg-3": {
+      "nodes": [
+        "cmd:smoke-import",
+        "file:right-rail-first-consumer",
+        "cmd:visual-before-after",
+        "cmd:typecheck"
+      ],
+      "depends_on": [
+        "sg-2"
+      ],
+      "state": "done"
+    },
+    "sg-4": {
+      "nodes": [
+        "file:check-style-guard",
+        "cmd:check-style"
+      ],
+      "depends_on": [],
+      "state": "done"
+    },
+    "sg-5": {
+      "nodes": [
+        "cmd:lint",
+        "cmd:typecheck",
+        "cmd:kimi-audit",
+        "cmd:founder-approval"
+      ],
+      "depends_on": [
+        "sg-2",
+        "sg-3",
+        "sg-4"
+      ],
+      "state": "done"
+    }
   },
   "output_format": {
     "kind": "style guide doc (draft) + @evo/ui package with right-rail first consumer + guard script + audit report",
