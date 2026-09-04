@@ -27,6 +27,10 @@ typecheck:
 lint:
     pnpm run lint
 
+# Style-guide enforcement: no inline eyebrow/stat-row class strings outside @evo/ui
+check-style:
+	bash scripts/check-style-guard.sh
+
 # Run all tests
 test:
     pnpm run test

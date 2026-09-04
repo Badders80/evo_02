@@ -1,0 +1,5 @@
+=== BEFORE: rail pattern strings present in rendered HTML ===
+eyebrow (P1) occurrences: 1
+stat-label (P5) occurrences: 3
+white CTA (P6a) occurrences: 1
+capture bytes: 76825
