@@ -1,9 +1,5 @@
 === BEFORE: rail pattern strings present in rendered HTML ===
-1
-eyebrow occurrences ^
-1
-stat-label occurrences ^
-bg-pure-white px-8 py-3 text-base font-bold
-white CTA class ^
-total html bytes:
-76825
+eyebrow (P1) occurrences: 1
+stat-label (P5) occurrences: 3
+white CTA (P6a) occurrences: 1
+capture bytes: 76825
