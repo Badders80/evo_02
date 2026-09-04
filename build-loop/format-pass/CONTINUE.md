@@ -1,6 +1,113 @@
 # format-pass — session wrap 2026-09-04 (ALL 7 CHUNKS DONE)
 
-**Status:** FORMAT PASS COMPLETE — 4 commits landed, 3 verify-only chunks, all gates green. Visual polish pass against prod reference + flow-mock surfaces.
+**Status:** FORMAT PASS COMPLETE — 18 chunks shipped, working tree clean of format-pass changes (dirty tree is pre-existing terminology sweep). **Session wrap 2026-09-04.**
+
+## What's done (chunks F1–F18)
+
+| Chunk | Scope | Commit | Audit |
+|---|---|---|---|
+| F1 | Right rail polish (verify-only) | LARGELY LANDED at `0c96996` | PASS (code-level) |
+| F2 | Modal shell + Step 2 term sheet | `145a8ba` | PASS-WITH-FIXES → sm: padding fixed |
+| F3 | Step 3 accept gate polish | (verify-only) | APPROVE |
+| F4 | Step 4 verify polish | (verify-only) | APPROVE-WITH-FIXES → spec copy drift OOS |
+| F5 | Step 5 pay polish (error affordance) | `7b8ca48` | APPROVE-WITH-FIXES → WARN applied |
+| F6 | Step 6 own (MyStable success) polish | `9bc1eed` | visual-only, byte-identical |
+| F7 | Error states visual polish | `9bc1eed` (combined) | visual-only, byte-identical |
+| **F8** | **Lift PurchaseFlowModal to page-level (global CTA mount)** | **`1ed18e2`** | **APPROVE (10/10 OK)** |
+| F9 | Step 1 right rail prod-evo_01 polish | `98e481a` | visual-only |
+| F10 | In-modal back Step 3 → Step 2 | `aa2ea00` | APPROVE-WITH-FIXES → copy trimmed, type=button |
+| F11 | Remove dot-grid background (marketplace + login) | `e4cacc0` | APPROVE (7/7 OK) |
+| F12 | Reduce gold on login page | `98e481a` | visual-only |
+| F13 | Right-rail text-column alignment | `d368285` | APPROVE (10/10 OK) |
+| F14 | Remove duplicate green status chip (right rail) | `5fa046e` | visual-only (text reverted per founder) |
+| F15 | mix-blend-mode: lighten on horse images | `d368285` | visual-only |
+| F17 | L-section back-link alignment | `5fa046e` | visual-only |
+| **F18** | **Align mystable + status badge to canonical style** | **`6574e90`** | visual-only (sweep) |
+
+## What is missing — **STYLE GUIDE IS NOT LOCKED IN** ⚠️
+
+**Critical risk:** This entire format-pass arc has been **reactive** — founder spots a visual mismatch, I fix that surface, repeat. We never locked the canonical style guide into a single source of truth, so:
+
+1. **No documented style guide.** The "canonical" patterns I used (eyebrow `font-medium uppercase tracking-[0.2em]`, back-link `text-muted-foreground + ArrowLeft + hover:text-accent`, `font-mono` reserved for tabular data, no `font-serif italic` decoration) are **implicit** in the right rail + my sweep edits. They live in my head + in scattered `className` strings, not in `evo_00/doc/STYLE_GUIDE.md`.
+
+2. **No shared component primitives.** Every surface rolls its own eyebrow / back-link / status-pill / stat-row. When a new surface ships, the next mismatch appears. Right rail uses inline `<div className="...">`, mystable uses inline `<span className="...">`, login uses `<button>`, CampaignStatusBadge uses `<Badge>` — four different implementations of the same pattern.
+
+3. **No diff against prod (`evo_01/02_website`).** I never formally diff'd the new build against prod to confirm we ARE matching the reference. The canonical patterns I used came from the right rail + the few prod screenshots you shared, not from a documented source.
+
+4. **Many surfaces not yet audited.** F18 covered marketplace horse page L section + mystable + (partially) login. Not yet audited:
+   - Marketplace listing grid (`marketplace-listing-grid.tsx`)
+   - Marketplace card hover/expanded states
+   - Mystable sub-tabs (feed / vault / billing)
+   - Login (after F12 + F11) — only one `font-mono` left, likely OK
+   - Mission control (`apps/mission_control/`)
+   - Landing page / marketing surfaces
+   - FAQ / learn / returns pages
+   - Documents gate, detail tabs
+
+5. **Tokens exist but aren't enforced.** `--color-gold` / `--color-accent` / `--color-status-active` exist in `globals.css` but some code still uses the brighter `--color-success` (#22c55e vs status-active #10b981). F18 fixed CampaignStatusBadge, but `Badge` component itself still has `success` variant.
+
+**Risk if we don't lock this in:** we'll keep doing reactive fix-pass loops. Each new surface ships with its own stylistic interpretation. The build stays functional but visually drifts surface-by-surface. By cutover, the whole thing is a patchwork.
+
+## Next cycle — **STYLE GUIDE LOCK-IN** (proposed scope)
+
+This is the conversation starter for the next planning round. Proposed scope:
+
+**Phase A — Document the canonical style guide (1 chunk, ~half day)**
+- Write `evo_00/doc/STYLE_GUIDE.md` derived from the right rail + prod screenshots + the patterns we landed on
+- Diff against `evo_01/02_website` prod to confirm we're not inventing vs matching
+- Lock the eyebrow / back-link / status-pill / stat-row / CTA / image-bg / dot-grid rules
+
+**Phase B — Extract shared primitives (3-4 chunks, ~1 day)**
+- `<Eyebrow>` — replaces inline `text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground`
+- `<BackLink href icon>` — replaces `inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-accent transition-colors` + ArrowLeft
+- `<StatusPill status="listed"|"fully_subscribed"|"coming_soon"|"completed">` — replaces both right-rail `statusChip` + CampaignStatusBadge (single component, single token set)
+- `<StatRow label value>` — replaces right-rail PRICE/RETURN/DURATION pattern
+- `<WhitePillCTA onClick>` — the right-rail CTA style (white pill, gold-on-hover)
+
+**Phase C — Refactor every surface (many chunks)**
+- Marketplace horse page L+R + MediaDeck + DetailTabs + DocumentsGate
+- Mystable + tabs + success state
+- Login + signup
+- Marketplace listing grid
+- Mission control
+- FAQ / learn / returns
+- All new surfaces auto-use the primitives
+
+**Phase D — Lock enforcement**
+- Add a lint rule (eslint plugin or simple grep check) that flags any inline `font-medium uppercase tracking-[0.2em]` etc. — must use `<Eyebrow>`.
+- Add a Storybook (or similar) for the primitives.
+- Update `AGENTS.md` + `GEMINI.md` to point at `STYLE_GUIDE.md` as the single source.
+
+**Estimated effort:** Phase A + B = ~1.5 days. Phase C = ~2-3 days depending on surface count. Phase D = ~half day. Total ~4-5 days.
+
+**Alternative:** keep the reactive format-pass loop going and accept the visual drift. **Not recommended** — we'll hit this same wall at cutover.
+
+## Head
+
+`6574e90` on `design-alignment` local-only. All gates green. Working tree dirty tree = pre-existing terminology sweep (out of format-pass scope).
+
+## Pre-existing gaps NOT addressed (out of format-pass scope, for follow-up)
+
+1. **F4 spec copy drift** — Step 4 KYC prompt copy differs from spec L182.
+2. **Step 6 success-state copy drift** — slug interpolation vs legalName.
+3. **Many surfaces not yet audited** (see "What is missing" section above).
+4. **PDS/SA internal scroll in Step 3** — known ugliness, founder 2026-09-04.
+5. **Modal height spec deviation** — logged in `purchase-content-spec.md:34`.
+6. **E4 welcome email** — separate workstream.
+7. **KYC port itself** — separate workstream.
+
+## Locked decisions honored
+
+- Modal popup = Dialog over marketplace page, URL-driven (`?open=1&units=X`)
+- Modal `max-w-lg × h-[900px]` + responsive guard `max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)]`
+- Steps 2–6 share one fixed-size modal
+- Geist font stays (source = evo_01 codebase, NOT mockup screenshot)
+- Gold tokens pre-existing (`--color-gold: #d4a964` etc.)
+- Stepper opens at min, 0.5% steps, max = availablePct
+- Numbers from `pricingForUnits` only
+- Audit tick `{horse_slug, stake_pct, doc, doc_hash, user_id}`
+- KYC states only from server `kycStatus`
+- Vocabulary whitelist (Stakes/Co-owners, zero !, British English)
 
 ## Done (committed, audited)
 
