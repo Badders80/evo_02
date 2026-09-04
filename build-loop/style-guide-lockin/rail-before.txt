@@ -1,0 +1,9 @@
+=== BEFORE: rail pattern strings present in rendered HTML ===
+1
+eyebrow occurrences ^
+1
+stat-label occurrences ^
+bg-pure-white px-8 py-3 text-base font-bold
+white CTA class ^
+total html bytes:
+76825

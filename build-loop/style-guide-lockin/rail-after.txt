@@ -1,0 +1,5 @@
+=== AFTER (final): rail class strings in SSR, occurrence counts ===
+eyebrow (P1) occurrences: 1
+stat-label (P5) occurrences: 3
+white CTA (P6a) occurrences: 1
+price renders $76: 0

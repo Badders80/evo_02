@@ -12,6 +12,7 @@
 
 import * as React from 'react';
 import { Landmark, Activity } from 'lucide-react';
+import { Eyebrow, StatRow, WhitePillCTA } from '@evo/ui';
 import { pricingForUnits } from '@/lib/nellie-loop';
 
 export interface LegalPackDigest {
@@ -35,42 +36,6 @@ export interface RightRailProps {
 }
 
 type ListingStatus = 'listed' | 'fully_subscribed' | 'coming_soon' | 'completed';
-
-function statusChip(status: ListingStatus) {
-  if (status === 'listed') {
-    return (
-      <div className="inline-flex items-center gap-1.5 rounded-full border border-status-active/40 bg-status-active/10 px-3 py-1.5 text-[8px] font-medium uppercase tracking-widest text-status-active">
-        <span className="h-2 w-2 rounded-full bg-status-active" />
-        <span>Become An Owner</span>
-      </div>
-    );
-  }
-
-  if (status === 'fully_subscribed') {
-    return (
-      <div className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-[8px] font-medium uppercase tracking-widest text-accent">
-        <span className="h-2 w-2 rounded-full bg-accent" />
-        <span>Fully Subscribed</span>
-      </div>
-    );
-  }
-
-  if (status === 'coming_soon') {
-    return (
-      <div className="inline-flex items-center gap-1.5 rounded-full border border-status-active/40 bg-status-active/10 px-3 py-1.5 text-[8px] font-medium uppercase tracking-widest text-status-active">
-        <span className="h-2 w-2 rounded-full bg-status-active" />
-        <span>Coming Soon</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-[8px] font-medium uppercase tracking-widest text-muted-foreground">
-      <span className="h-2 w-2 rounded-full bg-muted-foreground" />
-      <span>Campaign Concluded</span>
-    </div>
-  );
-}
 
 /** Shared lead-capture form (subscribe endpoint; errors surfaced, a11y labels). */
 function LeadForm({
@@ -171,7 +136,7 @@ function ListedInvestmentCard({
   return (
     <div className="rounded-3xl border border-border bg-surface backdrop-blur-2xl px-6 py-4 space-y-3.5 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
       <div className="space-y-2">
-        <p className="text-gold text-[11px] font-medium uppercase tracking-[0.2em]">Ownership</p>
+        <Eyebrow>Ownership</Eyebrow>
         <h3 className="text-[22px] font-light leading-tight tracking-tight text-heading">
           Becoming an owner is easier than you think.
         </h3>
@@ -180,32 +145,14 @@ function ListedInvestmentCard({
 
       {/* Stat rows — straight left edge per prod reference (no icon-column indent on stat rows) */}
       <div className="space-y-3.5">
-        <div>
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground block mb-1">Price</p>
-          <div className="flex items-baseline gap-2">
-            <span className="text-[30px] font-light tracking-tight text-heading leading-tight">
-              ${pricing.monthlyKeepUnitNzd.toLocaleString()}
-            </span>
-            <span className="text-base font-light text-muted">per month</span>
-          </div>
-          <p className="text-muted-foreground font-light text-sm">for a {minInvestmentPct.toFixed(1)}% stake</p>
-        </div>
-        <div>
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground block mb-1">Return</p>
-          <div className="flex items-baseline gap-2">
-            <span className="text-[30px] font-light tracking-tight text-heading leading-tight">75%</span>
-            <span className="text-base font-light text-muted">return</span>
-          </div>
-          <p className="text-muted-foreground font-light text-sm">of gross prize money</p>
-        </div>
-        <div>
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground block mb-1">Duration</p>
-          <div className="flex items-baseline gap-2">
-            <span className="text-[30px] font-light tracking-tight text-heading leading-tight">12</span>
-            <span className="text-base font-light text-muted">months</span>
-          </div>
-          <p className="text-muted-foreground font-light text-sm">investment term</p>
-        </div>
+        <StatRow
+          label="Price"
+          value={<>${pricing.monthlyKeepUnitNzd.toLocaleString()}</>}
+          unit="per month"
+          sub={`for a ${minInvestmentPct.toFixed(1)}% stake`}
+        />
+        <StatRow label="Return" value="75%" unit="return" sub="of gross prize money" />
+        <StatRow label="Duration" value="12" unit="months" sub="investment term" />
       </div>
 
       <div className="pt-3 mt-auto space-y-3.5">
@@ -234,13 +181,9 @@ function ListedInvestmentCard({
           </div>
 
           {/* CTA: opens Step 2 term sheet (learn-more, not buy) */}
-          <button
-            type="button"
-            onClick={() => onOpenModal()}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-pure-white px-8 py-3 text-base font-bold tracking-wide text-black transition-colors hover:bg-white/90"
-          >
+          <WhitePillCTA onClick={() => onOpenModal()}>
             Become an Owner <span className="text-lg">→</span>
-          </button>
+          </WhitePillCTA>
           <p className="text-center text-xs font-light text-muted-foreground">
             Subject to{' '}
             <a href="#" className="text-muted-foreground underline underline-offset-2 hover:text-heading transition-colors">
