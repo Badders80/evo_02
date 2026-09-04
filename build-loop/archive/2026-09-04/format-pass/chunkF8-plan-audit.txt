@@ -1,0 +1,36 @@
+Audit this F8 plan (lift PurchaseFlowModal from right-rail scope to page-level scope — making it a global popup reachable from any CTA).
+
+The change:
+1. Modify `apps/web/src/app/marketplace/[slug]/page.tsx` to use a client wrapper component that renders `<PurchaseFlowModal>` at page-level (above the grid), driven by URL `?open=1` + `?units=X`.
+2. Modify `apps/web/src/components/horse/right-rail.tsx` to remove the local `flowOpen` state + the inline modal mount (L161, L253-264). Right rail's "Become an Owner" button (L234) calls a callback prop instead of `setFlowOpen(true)`.
+3. Add a new `onOpenModal` prop to RightRail that page.tsx wires to `router.push('?open=1&units={value}')`.
+
+Check ONLY:
+
+1. Does page.tsx currently use `useSearchParams` / `useRouter`? (It's an async server component — convert to a client wrapper, or split into a wrapper component.)
+2. Where is `?units=` currently read on mount? (verify the URL-state plumbing already exists in modal.)
+3. Does removing `flowOpen` from right-rail break any other state path (e.g. URL hydration mismatch, server-rendered modal flash)?
+4. Will the modal still work on deep-link (`/horses/{slug}?units=X` without `?open=1`)? (Per spec it should NOT auto-open; only opens when `?open=1` is present. Plan should make this explicit.)
+5. Are there any other callers of the modal besides right-rail.tsx? (check imports)
+6. Does Next.js App Router have any SSR concerns with the URL-driven modal state (Suspense boundary needed for useSearchParams)?
+7. Will `router.push('?open=1&units=X')` cause a server round-trip or stay client-side? (Next 13+ uses shallow routing for query-only changes.)
+8. Is there a need for `router.back()` on modal close, or is `router.replace()` (stripping `?open=1`) cleaner?
+9. Any visual regression risk from the mount change?
+
+Output: numbered findings, each: FINDING #, Severity (BLOCKER/WARN/OK), Evidence (file:line), Fix. End with verdict: APPROVE / APPROVE-WITH-FIXES / REJECT.
+
+--- F8 PLAN SUMMARY ---
+
+- New client wrapper at `apps/web/src/components/marketplace/purchase-flow-host.tsx` (or similar) that reads `useSearchParams` + renders `<PurchaseFlowModal>` at page-level when `?open=1`.
+- page.tsx wraps the existing JSX in the new host component (the host owns the modal state).
+- right-rail.tsx loses `flowOpen` state + inline modal mount. Receives `onOpenModal` callback prop. "Become an Owner" button calls it.
+- Modal close: host strips `?open=1` from URL via `router.replace()`.
+
+--- EVIDENCE ---
+
+- purchase-flow-modal.tsx already has props-only interface (no internal state for open/close). Easy to lift.
+- right-rail.tsx L161 `const [flowOpen, setFlowOpen] = React.useState(false);`
+- right-rail.tsx L234 `onClick={() => setFlowOpen(true)}`
+- right-rail.tsx L253-264 inline `<PurchaseFlowModal>` mount
+- page.tsx is async server component L63. Convert to client wrapper.
+- `?units=` URL hydration already handled in modal's mount logic (per plan rev. 2).

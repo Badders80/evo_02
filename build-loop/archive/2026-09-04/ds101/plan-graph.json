@@ -1,0 +1,42 @@
+{
+  "nodes": [
+    {"id": "doc:plan", "type": "doc", "description": "ds101 cycle plan (plan.md)"},
+    {"id": "doc:source-truth", "type": "doc", "description": "source-truth.md — reading-task output, every chain claim §-verified"},
+    {"id": "doc:spec", "type": "doc", "description": "spec.md — DS101 architecture spec (groups, chains, format, trigger, leg-out, chat note)"},
+    {"id": "doc:chunks", "type": "doc", "description": "chunks.md — chunk breakdown"},
+    {"id": "ref:pack-lib", "type": "ref", "description": "pack_lib.py — DSL → PDS/SA template (evo_01, read-only)"},
+    {"id": "ref:hlts-json", "type": "ref", "description": "hlts.json — campaign data (evo_01, read-only)"},
+    {"id": "ref:learn-returns", "type": "ref", "description": "/learn/returns page.tsx — Your Return content, pre-restructure (evo_01, read-only)"},
+    {"id": "ref:content-spec", "type": "ref", "description": "purchase-content-spec.md — THE AGREED FLOW + BACKLOG NOTE cross-ref"},
+    {"id": "ref:right-rail-deepdive", "type": "ref", "description": "e3-right-rail-deepdive.md — 5 pillars (voice-checked)"},
+    {"id": "ref:voice-manual", "type": "ref", "description": "evo_00 VOICE_AND_TONE_MANUAL.md — Private Banker Standard, Silent Gavel"},
+    {"id": "ref:compiled-pack", "type": "ref", "description": "getCompiledLegalPackForCampaign (nellie-loop.ts + [slug]/page.tsx) — chat grounding source"},
+    {"id": "gate:source-truth", "type": "gate", "description": "every chain link §-sourced or flagged UNSUPPORTED; no invented causality"},
+    {"id": "gate:spec-checks", "type": "gate", "description": "spec contradicts no locked decision; leg-out verbatim; whitelist clean"},
+    {"id": "out:spec-lock", "type": "outcome", "description": "founder locks spec (fluid until lock, GATE 1)"},
+    {"id": "out:content-draft", "type": "outcome", "description": "post-lock content draft — NOT in this dispatch (needs founder lock)"}
+  ],
+  "edges": [
+    {"from": "ref:pack-lib", "to": "doc:source-truth", "reason": "pack_lib template is the source of PDS/SA structure and § anchors", "source": "plan.md"},
+    {"from": "ref:hlts-json", "to": "doc:source-truth", "reason": "campaign-level facts (lease period, start date, return %, stake) come from here", "source": "plan.md"},
+    {"from": "ref:learn-returns", "to": "doc:source-truth", "reason": "Your Return content is pre-restructure input and becomes the redirect target", "source": "plan.md"},
+    {"from": "ref:right-rail-deepdive", "to": "doc:source-truth", "reason": "5 pillars are already voice-checked summaries of the same material", "source": "plan.md"},
+    {"from": "ref:voice-manual", "to": "doc:spec", "reason": "all spec entries drafted under Private Banker Standard / Silent Gavel", "source": "plan.md"},
+    {"from": "ref:content-spec", "to": "doc:spec", "reason": "BACKLOG NOTE is the cross-reference; trigger point lands with main-flow wireframing", "source": "plan.md"},
+    {"from": "doc:source-truth", "to": "doc:spec", "reason": "spec chains must only use §-verified links", "source": "plan.md"},
+    {"from": "doc:source-truth", "to": "gate:source-truth", "reason": "gate runs on source-truth.md", "source": "plan.md"},
+    {"from": "doc:spec", "to": "gate:spec-checks", "reason": "gate runs on spec.md", "source": "plan.md"},
+    {"from": "gate:spec-checks", "to": "out:spec-lock", "reason": "founder review gate", "source": "plan.md"},
+    {"from": "out:spec-lock", "to": "out:content-draft", "reason": "content draft starts only after spec is locked", "source": "plan.md"}
+  ],
+  "chunks": {
+    "chunk-1": {"nodes": ["doc:source-truth", "gate:source-truth"], "depends_on": [], "state": "pending"},
+    "chunk-2": {"nodes": ["doc:spec", "gate:spec-checks"], "depends_on": ["chunk-1"], "state": "pending"},
+    "chunk-3": {"nodes": ["out:spec-lock"], "depends_on": ["chunk-2"], "state": "pending", "note": "founder GATE 1 — fluid until lock, no execution past this without approval"},
+    "chunk-4": {"nodes": ["out:content-draft"], "depends_on": ["chunk-3"], "state": "pending", "note": "post-lock; not dispatched in this cycle's initial wave"}
+  },
+  "output_format": {
+    "kind": "two markdown docs (source-truth.md, spec.md) + git-clean tree",
+    "verification": "chunk-1: every chain claim §-sourced or flagged; chunk-2: spec contradicts no lock, leg-out verbatim, whitelist clean"
+  }
+}
