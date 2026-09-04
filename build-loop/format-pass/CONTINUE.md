@@ -13,6 +13,20 @@
 | F5 | Step 5 pay polish (error affordance) | `7b8ca48` | APPROVE-WITH-FIXES → WARN #6 affordance polish applied |
 | F6 | Step 6 own (MyStable success) polish | `9bc1eed` | (visual-only, byte-identical copy) |
 | F7 | Error states visual polish | `9bc1eed` (combined with F6) | (visual-only, byte-identical copy) |
+| **F8** | **Lift PurchaseFlowModal to page-level (global CTA mount)** | **`1ed18e2`** | **APPROVE (10/10 OK, no findings)** |
+
+## F8 shipped (founder-suggested, post-format-pass)
+
+Founder 2026-09-04: "Step 1 CTA in the right block, when triggered, it's a global popup, not just the right block." Lifted modal from right-rail scope to page-level.
+
+Architecture:
+- `purchase-flow-host.tsx` (NEW): URL-driven modal mount, gates on `?open=1` only. Exports `usePurchaseFlowOpener()` hook for any CTA.
+- `horse-page-shell.tsx` (NEW): thin client wrapper that wires opener to RightRail + renders host beside.
+- `right-rail.tsx`: lost `flowOpen` state + inline mount. Added required `onOpenModal` prop.
+- `purchase-flow-modal.tsx`: added optional `initialUnits` prop (cleaner than window.location re-read).
+- `marketplace/[slug]/page.tsx`: stays async server component (no useSearchParams in RSC). Replaced `<RightRail>` with `<HorsePageShell>`.
+
+Future CTAs (hero, email links, mobile bar) can now call `usePurchaseFlowOpener()` or push `?open=1&units=X` to open the same modal — no re-mounting needed.
 
 ## F2 shipped (the headline)
 
