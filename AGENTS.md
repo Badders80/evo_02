@@ -5,9 +5,10 @@
 
 ## Product locks (evo_02-specific; nothing here restates evo_00)
 
-- Hard gates: no merge/push/deploy (branch `design-alignment` LOCAL-ONLY); no migrations 00001–00008; no `apps/mission_control/` or `evo_01` edits; no prod surfaces (live site still served by evo_01/02_website via Vercel).
+- Hard gates: no push/deploy (branch `design-alignment` LOCAL-ONLY). Founder approved 2026-09-04 the local merge of `style-guide-lock-in` into `design-alignment`. Still no push, no deploy. No migrations 00001–00008; no `apps/mission_control/` or `evo_01` edits; no prod surfaces (live site still served by evo_01/02_website via Vercel).
+- Style patterns: [`../evo_00/doc/STYLE_GUIDE.md`](../evo_00/doc/STYLE_GUIDE.md) (LOCKED 2026-09-04). Do not paste the guide into `GEMINI.md` / `CLAUDE.md` / `HERMES.md` — those harnesses read this file (`GEMINI.md` already chains here).
 - Money: prod `PURCHASES_ENABLED` stays **OFF** until founder go-live with live keys. Dev :3010 is **ON** with `sk_test_` (`CONTINUE.md` locked 2026-09-01) — test mode cannot move real money; that is the DoD walk path.
-- Locked: vocabulary whitelist (Stakes/Co-owners, Settlement/Distribution/Prize money, Lease contribution/Deposit, Stake/Co-owners; zero exclamation marks; British English) · $$$$ rule (never lead with dollars) · status pills (Fully Subscribed + Completed = amber outline, Coming Soon = green; age reads "5yr") · `/marketplace/[slug]` = locked 2fr/1fr LEFT/RIGHT · values PERCENT everywhere (`stakePctToStepUnits` at checkout boundary only) · design tokens from `apps/web/src/dna/` + @theme v4 — never invent colors.
+- Locked: vocabulary whitelist (Stakes/Co-owners, Settlement/Distribution/Prize money, Lease contribution/Deposit, Stake/Co-owners; zero exclamation marks; British English) · $$$$ rule (never lead with dollars) · status pills (Fully Subscribed + Completed = amber outline, Coming Soon = green; age reads "5yr") · `/marketplace/[slug]` = locked 2fr/1fr LEFT/RIGHT · values PERCENT everywhere (`stakePctToStepUnits` at checkout boundary only) · design tokens from `apps/web/src/dna/` + @theme v4 — never invent colors · visual patterns from `../evo_00/doc/STYLE_GUIDE.md` via `@evo/ui`
 - Build loop: [`build-loop/README.md`](build-loop/README.md) — cycle dirs & one-client-first per evo_00 build-loop skill Rules 12–13.
 - UI toolkit (desk, cross-build): [`../../workspace_01/ui-toolkit/TOOLKIT.md`](../../workspace_01/ui-toolkit/TOOLKIT.md) — which skill/MCP for which job; enforcement laws stay in this file + evo_00.
 

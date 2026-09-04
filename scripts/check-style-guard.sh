@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # check-style-guard.sh — inline class-string enforcement for the canonical style guide.
-# Contract: STYLE_GUIDE-draft.md Part 4. These two class strings must ONLY exist inside
+# Contract: evo_00/doc/STYLE_GUIDE.md Part 4. These two class strings must ONLY exist inside
 # @evo/ui primitives (<Eyebrow>, <StatRow>). A surface that spells them inline is drifting.
 #
 # Scan scope (env-overridable for tests): apps/ + packages/ except packages/ui.
 # Known debt 2026-09-04: 8 apps/web files still carry inline tracking-[0.2em]
-# (Phase C refactor targets — see STYLE_GUIDE-draft.md Part 4 list). Until Phase C lands,
+# (Phase C refactor targets — see STYLE_GUIDE.md Part 4 list). Until Phase C lands,
 # this guard intentionally exits 1 and names them. That is the point: drift stays visible.
 set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -44,7 +44,7 @@ fi
 if [ "$violations" -gt 0 ]; then
   echo ""
   echo "STYLE-GUARD: $violations violation group(s). Resolve via @evo/ui primitives."
-  echo "Reference: build-loop/style-guide-lockin/STYLE_GUIDE-draft.md Part 4 (enforcement contract)."
+  echo "Reference: evo_00/doc/STYLE_GUIDE.md Part 4 (enforcement contract)."
   exit 1
 fi
 
