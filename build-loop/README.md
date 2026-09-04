@@ -9,7 +9,8 @@ open of the next one (build-loop skill Rule 12). Canonical names (`plan.md`,
 
 | Cycle | Dir | State |
 |---|---|---|
-| E3 purchase flow (rung 4) | `e3-rung4/` | Content spec locked + 4/4 chunks done · **Next: Stitch wireframes from `../purchase-content-spec.md` THE AGREED FLOW, then build (stepper rework, KYC port, E4)** |
+| DS101 — Digital-Syndication 101 drawer | `ds101/` | Plan written 2026-09-02 — awaiting Stage-2 review + GATE 1 (architecture spec phase, no code) |
+| E3 purchase flow (rung 4) | `e3-rung4/` | Content spec locked + 4/4 chunks done · **Next: Stitch wireframes from `../purchase-content-spec.md` THE AGREED FLOW, then build (stepper rework, KYC port, E4)** · flow mock in review (`flow-mock/`) |
 
 ## Archive
 

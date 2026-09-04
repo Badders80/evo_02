@@ -9,7 +9,7 @@ flowchart TD
     subgraph INV["INVESTOR"]
         A([Land on horse page]) --> B[Select stake via stepper+input<br/>opens at min · step 0.5% · max = available %]
         B --> C[Read pillars<br/>The Deal / Included / What If / Return / Exit]
-        C --> D[Click Become an Owner / Acquire Units]
+        C --> D[Click Become an Owner]
         D --> E[Scroll PDS → tick box 1]
         E --> F[Scroll SA → tick box 2]
         F --> G[Click Proceed to Secure Checkout]

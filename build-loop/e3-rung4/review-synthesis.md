@@ -15,7 +15,7 @@
 | **Share & Slider Math** | ✅ ALIGNED | Verified against `SHARE_MATH` in `@evo/legal_engine` & `pricingForUnits` in `nellie-loop.ts`: min 1.0%, step 0.5%, percentage only. |
 | **Acceptance Gate Source** | ✅ ALIGNED | Verified against `getCompiledLegalPackForCampaign` (`pack.pdsMarkdown`, `pack.saMarkdown`, `pack.pdsHash`, `pack.saHash`). No new legal_engine compiler changes. |
 | **Dual Checkbox Gate** | ✅ ALIGNED | Button remains disabled until both PDS and SA are scrolled and checked. |
-| **Vocabulary & Voice** | ✅ ALIGNED | Whitelist enforced: `Units`/`Stakes`/`Co-owners`, `Settlement`/`Distribution`/`Prize money`, `Evolution Stables`, 0 exclamation marks, British English. |
+| **Vocabulary & Voice** | ✅ ALIGNED | Whitelist enforced: `Stakes`/`Co-owners` (Units retired from investor copy), `Settlement`/`Distribution`/`Prize money`, `Evolution Stables`, 0 exclamation marks, British English. |
 | **Blacklist Compliance** | ✅ ALIGNED | No DB migrations, no touching mission_control, no E4 post-purchase email/BCC, no PDF download CTA. |
 
 ---

@@ -16,7 +16,7 @@ The 4-rung journey is locked: Public → Logged in → KYC'ed → Owner. Rungs 1
 - Cancel-stake: Option A — carry units in `cancel_url` (`create-session/route.ts:106`), horse page pre-fills from param. Fix queued.
 - Read-then-verify: gate modal opens pre-KYC, checkout blocked until verified. KYC = port from production (Firebase → Supabase), UX already designed + walked.
 - Transfer facilitation: "standard fees apply" (fee % TBD). Not in code.
-- Vocabulary whitelist (AGENTS.md): Units/Stakes/Co-owners, Settlement/Distribution/Prize money, Lease contribution/Deposit, Evolution Stables. Zero exclamation marks. British English. Never lead with dollars.
+- Vocabulary whitelist (AGENTS.md): Stakes/Co-owners (Units retired from investor copy 2026-09-01), Settlement/Distribution/Prize money, Lease contribution/Deposit, Evolution Stables. Zero exclamation marks. British English. Never lead with dollars.
 - Pricing: list = cost ×1.05 ×1.03 GST-inclusive; 5×M float join; $M monthly keep. From `pricingForUnits` — never invent pricing math.
 
 **Deliverable:** a content spec for each of the 5 purchase steps, in the style of `build-loop/e3-content-tree.md` (node-type blocks: [header] [body] [figure] [CTA] [note] etc.), covering:

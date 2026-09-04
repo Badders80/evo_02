@@ -46,7 +46,7 @@
 4. **Stewardship** — investor updates, welfare-first decisions, "ready when she is ready."
 5. **Access + transfer** — secondary market later; initially ownership transfers via Evolution on request.
 
-**Voice constraint (from VOICE_AND_TONE_MANUAL):** vocabulary whitelist — `Settlement`/`Distribution`/`Prize money` (NOT Payout/Reward/Yield/Dividend/ROI); `Lease contribution`/`Deposit` (NOT Top-up); `Units`/`Stakes`/`Co-owners` (NOT Pieces/Parts). Zero exclamation marks. British English. 4MAT narrative (WHY→WHAT→HOW→WHAT IF). CTA matrix: `[ Become an Owner ]`, `[ Acquire Units ]`.
+**Voice constraint (from VOICE_AND_TONE_MANUAL):** vocabulary whitelist — `Settlement`/`Distribution`/`Prize money` (NOT Payout/Reward/Yield/Dividend/ROI); `Lease contribution`/`Deposit` (NOT Top-up); `Stakes`/`Co-owners` (NOT Units — retired from investor copy 2026-09-01; NOT Pieces/Parts). Zero exclamation marks. British English. 4MAT narrative (WHY→WHAT→HOW→WHAT IF). CTA: single locked `[ Become an Owner ]` (the acquire/stake-allocation variant is retired).
 
 **Off-limits (from ABOUT_AND_AUDIENCE):** no over-promising returns, no ROI multipliers, no implied guaranteed profit, no invented trainer quotes (drafts must carry `[DRAFT — verify with trainer]` until confirmed), no bookmaker slang.
 

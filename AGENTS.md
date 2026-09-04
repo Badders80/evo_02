@@ -1,47 +1,25 @@
-# evo_02 — agent laws
+# evo_02 — product agent laws
 
-You are pointed at this repo. **Before any other file, any other plan, any code:**
+**Governing laws:** [`../evo_00/AGENTS.md`](../evo_00/AGENTS.md) — single source of laws. Read it first.
+**Next action:** [`CONTINUE.md`](CONTINUE.md). **Scope fence:** [`.agents/rules/e3-sprint.md`](.agents/rules/e3-sprint.md).
 
-1. [`CONTINUE.md`](CONTINUE.md) — next action + locked facts (SSOT)
-2. [`build-loop/e3-right-rail-deepdive.md`](build-loop/e3-right-rail-deepdive.md) — E3 locked decisions
-3. [`.agents/rules/e3-sprint.md`](.agents/rules/e3-sprint.md) — E3 sprint scope fence (what you may touch, what you may NOT)
+## Product locks (evo_02-specific; nothing here restates evo_00)
 
-Chat memory is not SSOT. Do not invent a fourth continue file.
+- Hard gates: no merge/push/deploy (branch `design-alignment` LOCAL-ONLY); no migrations 00001–00008; no `apps/mission_control/` or `evo_01` edits; no prod surfaces (live site still served by evo_01/02_website via Vercel).
+- Money: prod `PURCHASES_ENABLED` stays **OFF** until founder go-live with live keys. Dev :3010 is **ON** with `sk_test_` (`CONTINUE.md` locked 2026-09-01) — test mode cannot move real money; that is the DoD walk path.
+- Locked: vocabulary whitelist (Stakes/Co-owners, Settlement/Distribution/Prize money, Lease contribution/Deposit, Stake/Co-owners; zero exclamation marks; British English) · $$$$ rule (never lead with dollars) · status pills (Fully Subscribed + Completed = amber outline, Coming Soon = green; age reads "5yr") · `/marketplace/[slug]` = locked 2fr/1fr LEFT/RIGHT · values PERCENT everywhere (`stakePctToStepUnits` at checkout boundary only) · design tokens from `apps/web/src/dna/` + @theme v4 — never invent colors.
+- Build loop: [`build-loop/README.md`](build-loop/README.md) — cycle dirs & one-client-first per evo_00 build-loop skill Rules 12–13.
+- UI toolkit (desk, cross-build): [`../../workspace_01/ui-toolkit/TOOLKIT.md`](../../workspace_01/ui-toolkit/TOOLKIT.md) — which skill/MCP for which job; enforcement laws stay in this file + evo_00.
 
-## Hard gates
-
-- **No execution before founder `APPROVED:`** on the plan (build-loop Stage 2 gate).
-- **No merge, no push, no deploy.** Branch `design-alignment` is LOCAL-ONLY. Cutover is founder-only.
-- **No `PURCHASES_ENABLED`.** No live money. Stripe stays on test keys.
-- **No migrations 00001–00008.** No touching `supabase/migrations/` or `packages/db_models/src/schema/`.
-- **No edits to `apps/mission_control/`.** No edits to the `evo_01` tree (hands-off rule).
-- **No prod surfaces.** Live site is still served by evo_01/02_website via Vercel.
-
-## Done means walked
-
-Unit tests are not enough. Before "done":
+## Verify (island walk commands — done-means-walked is evo_00 law 4)
 
 1. `just check` (10/10 must pass) — from repo root.
 2. `pnpm --filter @evo/web typecheck` green.
 3. Walk the surface yourself: dev server on :3010, click the new control, walk adjacent screens that share state.
 4. Founder must not be the first person to click Next.
 
-## Locked rules (do not reopen)
-
-- Owner/lessor = **"Evolution Stables"** — never "Ltd", "Bloodstock", "Leadco".
-- Vocabulary whitelist: `Settlement`/`Distribution`/`Prize money` (NOT Payout/Reward/Yield/Dividend/ROI); `Lease contribution`/`Deposit` (NOT Top-up); `Units`/`Stakes`/`Co-owners` (NOT Pieces/Parts/Shares). Zero exclamation marks. British English.
-- $$$$ rule: never lead with dollars. "Attractive offer from Australia" NOT "$300k".
-- Status pills: Fully Subscribed + Completed = amber outline (warning variant); Coming Soon = green. Age reads "5yr" (lowercase yr).
-- Marketplace page model: `/marketplace/[slug]` = locked 2fr/1fr LEFT/RIGHT. Right rail is the E3 surface.
-- Values are PERCENT everywhere (stakePctToStepUnits at checkout boundary only).
-- Design tokens: use the @theme v4 token layer + `apps/web/src/dna/` — never invent colors. Clone prod look, re-wire data.
-
-## Git discipline
+## Git + wrap
 
 - `git -C <path>` or verify cwd after cd — never chain onto a fallback directory.
-- Dirty working tree after a chunk = chunk not done.
-- Commit messages: `feat(web): ...` / `fix(web): ...` / `docs: ...` — one bounded change per commit.
-
-## Session wrap
-
-Overwrite [`CONTINUE.md`](CONTINUE.md). Do not edit `.agents/rules/` on wrap — those are frozen pointers.
+- Dirty working tree after a chunk = chunk not done. Commit messages: `feat(web): ...` / `fix(web): ...` / `docs: ...` — one bounded change per commit.
+- Session wrap: overwrite [`CONTINUE.md`](CONTINUE.md). Do not edit `.agents/rules/` on wrap — those are frozen pointers.

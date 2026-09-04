@@ -38,8 +38,8 @@ The term-sheet modal shows:
 
 - The horse name and the deal framing (Digital-Syndication Terms)
 - Monthly keep and the upfront deposit (the 5×M float) — live figures for the stake
-- The key terms as a clean table: lease period, lease start date, stake available, investor return (75% of gross stakes)
-- A short "returns explained" line: pro-rata on your stake, calculated from official NZTR results, distributed quarterly after settlement
+- The key terms as a clean table: lease period, lease start date, stake available, prize share (75% of gross stakes)
+- A short "prize distribution" line: pro-rata on your stake, calculated from official NZTR results, distributed quarterly after settlement
 - A learn-more link for anyone who wants the detail
 
 Extra information is available on demand — dropdowns, mini-popups, FAQ links — but the surface stays light. We do not get heavy here. The heavy content (PDS/SA) has its own moment later.
@@ -82,11 +82,11 @@ Extra information is available on demand — dropdowns, mini-popups, FAQ links �
 
 ## Phase 5 — The Payment (Stripe)
 
-**What we want:** a clean, honest handoff. The investor is sent to Stripe's hosted page with everything already known: the line item named clearly ("{Horse} ({units}% Syndicate Unit)" — "Initial 5×M float deposit"), the amount GST-inclusive, their email pre-filled. No surprises, no re-entry.
+**What we want:** a clean, honest handoff. The investor is sent to Stripe's hosted page with everything already known: the line item named clearly ("{Horse} ({units}% Stake)" — "Initial 5×M float deposit"), the amount GST-inclusive, their email pre-filled. No surprises, no re-entry.
 
 If they complete payment, they land on MyStable with a success state. If they cancel, they return to the horse page with their stake pre-filled and an honest reservation countdown — their stake is held for 15 minutes, and if it expires, they are told plainly and offered a fresh reservation. No fake urgency, no countdown theatrics.
 
-**How it gets in:** the checkout route is wired. The cancel return needs the `?units=` fix (queued). Every server error maps to plain investor copy — never raw codes: "those units were just acquired by another co-owner", "checkout is temporarily unavailable", each in the right tone. The reservation copy is specified and locked.
+**How it gets in:** the checkout route is wired. The cancel return needs the `?units=` fix (queued). Every server error maps to plain investor copy — never raw codes: "that stake was just acquired by another co-owner", "checkout is temporarily unavailable", each in the right tone. The reservation copy is specified and locked.
 
 **Voice check:** the payment moment is the most transactional, so it is the most restrained. The line item is factual. The countdown is honest. Nothing here sells — it completes.
 

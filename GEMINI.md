@@ -1,9 +1,5 @@
-# evo_02 — Antigravity desk
+# evo_02 — pointer
 
-Read, in order, before any code:
-
-1. [`AGENTS.md`](AGENTS.md) — agent laws, hard gates, locked rules
-2. [`CONTINUE.md`](CONTINUE.md) — next action + locked facts (SSOT)
-3. [`.agents/rules/e3-sprint.md`](.agents/rules/e3-sprint.md) — E3 sprint scope fence (whitelist / blacklist)
-
-This file is a frozen pointer. Do not edit it. Do not edit `.agents/rules/` on session wrap.
+Governing laws: [`../evo_00/AGENTS.md`](../evo_00/AGENTS.md) — single source; read it first.
+Next action: [`CONTINUE.md`](CONTINUE.md). Scope fence: [`.agents/rules/e3-sprint.md`](.agents/rules/e3-sprint.md).
+Antigravity is visual/wide — not an executor. This file is a frozen pointer. Do not edit it.
