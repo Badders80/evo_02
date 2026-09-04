@@ -41,7 +41,7 @@ function statusChip(status: ListingStatus) {
     return (
       <div className="inline-flex items-center gap-1.5 rounded-full border border-status-active/40 bg-status-active/10 px-3 py-1.5 text-[8px] font-medium uppercase tracking-widest text-status-active">
         <span className="h-2 w-2 rounded-full bg-status-active" />
-        <span>Available Now</span>
+        <span>Become An Owner</span>
       </div>
     );
   }
@@ -358,8 +358,6 @@ export default function RightRail({
 
   return (
     <aside ref={railRef} className="space-y-6 z-20 lg:fixed lg:top-20">
-      {statusChip(safeStatus)}
-
       {safeStatus === 'listed' && (
         <ListedInvestmentCard
           horseName={horseName}

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import {
   formatHorseDisplayName,
   getCampaignBySlug,
@@ -142,9 +143,10 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
                   <CampaignStatusBadge status={campaign.listingStatus} />
                   <Link
                     href="/marketplace"
-                    className="ml-auto normal-case tracking-normal text-[12px] font-medium text-accent transition duration-300 hover:text-frost"
+                    className="ml-auto inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-accent transition-colors"
                   >
-                    ← Back to Marketplace
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    <span>Back to Marketplace</span>
                   </Link>
                 </div>
                 <h1 className="text-[24px] font-light leading-tight tracking-tight text-heading">
