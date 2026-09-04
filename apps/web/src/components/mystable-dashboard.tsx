@@ -94,14 +94,14 @@ export function MyStableDashboard({
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 space-y-10 pb-24">
       <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-border pb-6 gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs font-mono tracking-[0.2em] uppercase text-accent">
+          <div className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs font-medium tracking-[0.2em] uppercase text-accent">
             <Sparkles className="h-3 w-3" />
             <span>Evolution Investor Portal</span>
           </div>
           <h1 className="mt-3 text-3xl sm:text-4xl font-light tracking-tight text-foreground">
-            My<span className="font-serif italic text-accent">Stables</span> Dashboard
+            MyStable Dashboard
           </h1>
-          <p className="mt-1 text-xs font-mono text-muted-foreground">
+          <p className="mt-1 text-xs font-medium text-muted-foreground">
             Authenticated Account: <span className="text-foreground">{userEmail}</span>
           </p>
         </div>
@@ -110,7 +110,7 @@ export function MyStableDashboard({
           <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-xs">
             <ShieldCheck className={`h-4 w-4 ${kyc.className}`} />
             <div>
-              <span className="text-muted-foreground block text-[10px] uppercase font-mono">KYC Status</span>
+              <span className="text-muted-foreground block text-[10px] uppercase font-medium tracking-[0.2em]">KYC Status</span>
               <span className={`font-medium ${kyc.className}`}>{kyc.text}</span>
             </div>
           </div>
@@ -160,7 +160,7 @@ export function MyStableDashboard({
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-border bg-card p-5">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs uppercase font-mono tracking-wider">Active Syndicates</span>
+            <span className="text-xs uppercase font-medium tracking-[0.2em]">Active Syndicates</span>
             <Layers className="h-4 w-4 text-accent" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
@@ -171,7 +171,7 @@ export function MyStableDashboard({
 
         <div className="rounded-xl border border-border bg-card p-5">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs uppercase font-mono tracking-wider">Float Deposit Held</span>
+            <span className="text-xs uppercase font-medium tracking-[0.2em]">Float Deposit Held</span>
             <ShieldCheck className="h-4 w-4 text-status-active" />
           </div>
           <div className="mt-3 flex items-baseline gap-1">
@@ -182,7 +182,7 @@ export function MyStableDashboard({
 
         <div className="rounded-xl border border-border bg-card p-5">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs uppercase font-mono tracking-wider">Monthly Keep</span>
+            <span className="text-xs uppercase font-medium tracking-[0.2em]">Monthly Keep</span>
             <CreditCard className="h-4 w-4 text-accent" />
           </div>
           <div className="mt-3 flex items-baseline gap-1">
@@ -193,7 +193,7 @@ export function MyStableDashboard({
 
         <div className="rounded-xl border border-border bg-card p-5">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs uppercase font-mono tracking-wider">Prize Distribution (75%)</span>
+            <span className="text-xs uppercase font-medium tracking-[0.2em]">Prize Distribution (75%)</span>
             <TrendingUp className="h-4 w-4 text-purple-400" />
           </div>
           <div className="mt-3 flex items-baseline gap-1">
@@ -209,7 +209,7 @@ export function MyStableDashboard({
             key={tab}
             type="button"
             onClick={() => setActiveTab(tab)}
-            className={`pb-3 px-4 text-xs uppercase font-mono tracking-wider transition-all border-b-2 ${
+            className={`pb-3 px-4 text-xs uppercase font-medium tracking-[0.2em] transition-all border-b-2 ${
               activeTab === tab
                 ? 'border-accent text-accent font-medium'
                 : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -253,7 +253,7 @@ export function MyStableDashboard({
                         style={{ backgroundImage: `url(${media.horse.heroConformation})` }}
                       />
                       <div className="absolute top-4 left-4">
-                        <span className="rounded-md border border-status-active/40 bg-status-active/10 px-2.5 py-1 text-[11px] font-mono text-status-active">
+                        <span className="rounded-md border border-status-active/40 bg-status-active/10 px-2.5 py-1 text-[11px] font-medium text-status-active">
                           {holding.status}
                         </span>
                       </div>
@@ -261,10 +261,10 @@ export function MyStableDashboard({
                     <div className="lg:col-span-8 p-6 sm:p-8 flex flex-col justify-between space-y-6">
                       <div>
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-mono uppercase tracking-[0.2em] text-accent">
+                          <span className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
                             {campaign.pedigree.gender} · {campaign.pedigree.sire} × {campaign.pedigree.dam}
                           </span>
-                          <span className="text-xs font-mono text-muted-foreground">
+                          <span className="text-xs font-medium text-muted-foreground">
                             Life #{campaign.pedigree.lifeNumber}
                           </span>
                         </div>
@@ -275,13 +275,13 @@ export function MyStableDashboard({
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 rounded-xl border border-border bg-background p-4">
                         <div>
-                          <span className="text-[10px] uppercase font-mono text-muted-foreground block">Your Stake</span>
+                          <span className="text-[10px] uppercase font-medium tracking-[0.2em] text-muted-foreground block">Your Stake</span>
                           <span className="text-lg font-mono font-semibold text-accent">
                             {Number(holding.stake_percentage).toFixed(1)}%
                           </span>
                         </div>
                         <div>
-                          <span className="text-[10px] uppercase font-mono text-muted-foreground block">Monthly Keep</span>
+                          <span className="text-[10px] uppercase font-medium tracking-[0.2em] text-muted-foreground block">Monthly Keep</span>
                           <span className="text-lg font-mono font-semibold text-foreground">
                             ${Number(holding.monthly_keep_rate_nzd).toLocaleString()}/mo
                           </span>
