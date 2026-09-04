@@ -378,6 +378,7 @@ function Step3AcceptanceGate({
   legalPack,
   stakeStepPct = 0.5,
   maxInvestmentPct = 10.0,
+  onBack,
 }: {
   horseName: string;
   horseSlug: string;
@@ -385,6 +386,8 @@ function Step3AcceptanceGate({
   legalPack?: LegalPackDigest | null;
   stakeStepPct?: number;
   maxInvestmentPct?: number;
+  /** F10: in-modal back to Step 2 (term sheet) without closing the modal. */
+  onBack: () => void;
 }) {
   const router = useRouter();
   const [openDoc, setOpenDoc] = React.useState<'pds' | 'sa' | null>('pds');
@@ -537,6 +540,15 @@ function Step3AcceptanceGate({
   return (
     <div className="space-y-6">
       <div>
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label="Back"
+          className="inline-flex items-center gap-1.5 text-[12px] font-light text-muted-foreground hover:text-heading transition-colors mb-3"
+        >
+          <span aria-hidden>←</span>
+          <span>Back</span>
+        </button>
         <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Acceptance</p>
         <h3 className="text-[22px] font-light text-heading tracking-tight">
           {horseName} — your documents
@@ -719,6 +731,7 @@ export default function PurchaseFlowModal({
           legalPack={legalPack}
           stakeStepPct={stakeStepPct}
           maxInvestmentPct={maxInvestmentPct}
+          onBack={() => setStep('terms')}
         />
       )}
     </ModalShell>
