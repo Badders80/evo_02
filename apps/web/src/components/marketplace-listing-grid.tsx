@@ -130,6 +130,7 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
                     src={card.image}
                     alt={card.name}
                     className="h-full w-full object-contain opacity-90 transition-transform duration-1000 group-hover:scale-[1.03] group-hover:opacity-100"
+                    style={{ mixBlendMode: 'lighten' }}
                   />
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-canvas/40 via-transparent to-transparent" />
                   <StatusBadge status={card.status} />

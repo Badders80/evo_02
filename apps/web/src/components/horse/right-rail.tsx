@@ -41,7 +41,7 @@ function statusChip(status: ListingStatus) {
     return (
       <div className="inline-flex items-center gap-1.5 rounded-full border border-status-active/40 bg-status-active/10 px-3 py-1.5 text-[8px] font-medium uppercase tracking-widest text-status-active">
         <span className="h-2 w-2 rounded-full bg-status-active" />
-        <span>Become an Owner</span>
+        <span>Available Now</span>
       </div>
     );
   }
@@ -209,7 +209,7 @@ function ListedInvestmentCard({
       </div>
 
       <div className="pt-3 mt-auto space-y-3.5">
-        {/* Feature rows — icon left of text column (38px = icon 22 + gap 16), text column not pushed */}
+        {/* Feature rows — icon left of text column (38px = icon 22 + gap 16) */}
         <ul className="space-y-3 pb-2.5">
           <li className="flex items-start gap-4">
             <Landmark className="text-gold h-[22px] w-[22px] mt-0.5 shrink-0" />
@@ -226,30 +226,33 @@ function ListedInvestmentCard({
             </p>
           </li>
         </ul>
-        <div className="flex items-center justify-between border-t border-border pt-3">
-          <span className="text-muted-foreground font-light text-base">Stake available</span>
-          <span className="text-heading font-light text-xl tracking-tight">{maxInvestmentPct.toFixed(0)}%</span>
-        </div>
+        {/* Stake available + CTA + fine print — all aligned to the feature-row text column (pl-[38px]) */}
+        <div className="pl-[38px] space-y-3">
+          <div className="flex items-center justify-between border-t border-border pt-3">
+            <span className="text-muted-foreground font-light text-base">Stake available</span>
+            <span className="text-heading font-light text-xl tracking-tight">{maxInvestmentPct.toFixed(0)}%</span>
+          </div>
 
-        {/* CTA: opens Step 2 term sheet (learn-more, not buy) */}
-        <button
-          type="button"
-          onClick={() => onOpenModal()}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-pure-white px-8 py-3 text-base font-bold tracking-wide text-black transition-colors hover:bg-white/90"
-        >
-          Become an Owner <span className="text-lg">→</span>
-        </button>
-        <p className="text-center text-xs font-light text-muted-foreground">
-          Subject to{' '}
-          <a href="#" className="text-muted-foreground underline underline-offset-2 hover:text-heading transition-colors">
-            Product Disclosure Statement
-          </a>{' '}
-          and{' '}
-          <a href="#" className="text-muted-foreground underline underline-offset-2 hover:text-heading transition-colors">
-            Syndicate Agreement
-          </a>
-          .
-        </p>
+          {/* CTA: opens Step 2 term sheet (learn-more, not buy) */}
+          <button
+            type="button"
+            onClick={() => onOpenModal()}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-pure-white px-8 py-3 text-base font-bold tracking-wide text-black transition-colors hover:bg-white/90"
+          >
+            Become an Owner <span className="text-lg">→</span>
+          </button>
+          <p className="text-center text-xs font-light text-muted-foreground">
+            Subject to{' '}
+            <a href="#" className="text-muted-foreground underline underline-offset-2 hover:text-heading transition-colors">
+              Product Disclosure Statement
+            </a>{' '}
+            and{' '}
+            <a href="#" className="text-muted-foreground underline underline-offset-2 hover:text-heading transition-colors">
+              Syndicate Agreement
+            </a>
+            .
+          </p>
+        </div>
       </div>
     </div>
   );
