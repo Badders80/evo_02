@@ -245,7 +245,7 @@ const INITIAL_HORSES: Record<string, { context: SyndicateLegalContext; status: s
  effectiveDate: '2026-08-17',
  softLegal: {
  aboutHorse:
- 'Turn Me Loose x Yearn 2023 (barn name Mulan) is an exceptionally bred 2YO filly representing a pure synthesis of elite New Zealand racing speed and stamina.',
+ 'Turn Me Loose x Yearn 2023 (barn name Mulan) is an exceptionally bred 2YO filly representing a pure synthesis of New Zealand racing speed and stamina.',
  trainerBio:
  'Stephen Gray Racing trains from Copper Belt Lodge in Palmerston North.',
  racingOutlookAndPedigree:
