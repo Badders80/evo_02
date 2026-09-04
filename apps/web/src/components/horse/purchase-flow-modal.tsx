@@ -637,8 +637,10 @@ function Step3AcceptanceGate({
       )}
 
       {error && (
-        <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-[11px] text-destructive">
-          {error}
+        <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-4">
+          <p className="text-[12px] font-light leading-relaxed text-foreground/90">
+            {error}
+          </p>
         </div>
       )}
 
