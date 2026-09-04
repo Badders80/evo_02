@@ -246,7 +246,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
               Syndicate Governance & Terms
             </h2>
             <p className="mt-2 text-xs text-muted-foreground">
-              Strict mathematical invariants, 1% integer units, and immutable SHA-256 legal contracts.
+              Strict mathematical invariants, 0.5% step increments, and immutable SHA-256 legal contracts.
             </p>
           </div>
 

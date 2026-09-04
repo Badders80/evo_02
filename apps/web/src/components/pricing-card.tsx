@@ -113,20 +113,20 @@ export function PricingCard({
           </span>
         </div>
         <div className={`grid gap-2 ${STAKE_OPTIONS.length <= 2 ? 'grid-cols-2' : 'grid-cols-4'}`}>
-          {STAKE_OPTIONS.map((units) => {
-            const isSelected = selectedStake === units;
+          {STAKE_OPTIONS.map((stakeOption) => {
+            const isSelected = selectedStake === stakeOption;
             return (
               <button
-                key={units}
+                key={stakeOption}
                 type="button"
-                onClick={() => setSelectedStake(units)}
+                onClick={() => setSelectedStake(stakeOption)}
                 className={`py-2 px-3 text-center rounded-lg border font-mono text-sm transition-all cursor-pointer ${
                   isSelected
                     ? 'border-accent bg-accent/20 text-accent font-semibold ring-1 ring-accent/50'
                     : 'border-border bg-card/60 text-muted-foreground hover:border-muted-foreground/60 hover:text-foreground'
                 }`}
               >
-                {units.toFixed(1)}%
+                {stakeOption.toFixed(1)}%
               </button>
             );
           })}

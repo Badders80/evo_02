@@ -4,7 +4,7 @@ import { getCampaignMedia, type HorseCampaign } from './horses-data';
 export const SITE_URL = 'https://evolutionstables.nz';
 export const SITE_NAME = 'Evolution Stables';
 export const SITE_DESCRIPTION =
-  'Experience regulated fractional ownership of elite New Zealand thoroughbred racehorses. Fixed-term digital syndication leases with transparent billing, 75/25 gross stakes distribution, and direct trainer updates.';
+  'Experience regulated fractional ownership of New Zealand thoroughbred racehorses. Fixed-term digital syndication leases with transparent billing, 75/25 gross stakes distribution, and direct trainer updates.';
 
 export const DEFAULT_OG_IMAGE = {
   url: '/og/default.png',

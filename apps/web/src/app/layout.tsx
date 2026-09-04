@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { NavBar as Header } from '../components/NavBar';
 import { Footer } from '../components/footer';
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Evolution Stables | Ownership, evolved.',
     description:
-      'Direct, regulated fractional ownership of elite thoroughbred racehorses in New Zealand. Grounded in tradition, evolved through innovation.',
+      'Direct, regulated fractional ownership of thoroughbred racehorses in New Zealand. Grounded in tradition, evolved through innovation.',
     url: SITE_URL,
     siteName: SITE_NAME,
     locale: 'en_NZ',
@@ -43,13 +44,20 @@ export const metadata: Metadata = {
   },
 };
 
+const geistSans = Geist({ subsets: ['latin'], variable: '--font-sans' });
+const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono' });
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`dark ${geistSans.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <link rel="icon" href="/brand/logos/favicon/favicon-gold.svg" type="image/svg+xml" />
         <link rel="icon" href="/brand/logos/favicon/favicon-white.svg" type="image/svg+xml" />

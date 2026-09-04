@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { TrendingUp, ArrowLeft, Trophy, DollarSign, Calculator } from 'lucide-react';
 
 export const metadata = {
-  title: 'Returns & Prize Distribution | Evolution Stables',
+  title: 'Prize Money & Distribution | Evolution Stables',
   description: 'Understanding the 75/25 gross stakes distribution model and prize accounting.',
 };
 
@@ -23,7 +23,7 @@ export default function ReturnsGuidePage() {
       </div>
 
       <h1 className="text-4xl font-light tracking-tight text-foreground sm:text-5xl">
-        Returns & <span className="font-serif italic text-accent">Prize Distributions</span>
+        Prize Money & <span className="font-serif italic text-accent">Distribution</span>
       </h1>
       <p className="mt-2 text-xs font-mono text-muted-foreground">
         The canonical 75/25 gross stakes distribution model explained.
@@ -77,7 +77,7 @@ export default function ReturnsGuidePage() {
               <span className="text-accent font-semibold">$112,500 NZD</span>
             </div>
             <div className="flex justify-between py-2 border-b border-border text-muted-foreground">
-              <span>Payout per 1% Unit Stake:</span>
+              <span>Prize money per 1% Stake:</span>
               <span className="text-status-active font-semibold">$1,125.00 NZD</span>
             </div>
           </div>

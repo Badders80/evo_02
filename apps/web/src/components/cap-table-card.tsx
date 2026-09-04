@@ -94,7 +94,7 @@ export function CapTableCard({
             <div className="h-3 w-3 rounded-sm bg-accent" />
             <div>
               <span className="font-sans text-sm text-foreground font-medium block">
-                Allocated Syndicate Units
+                Allocated Stake
               </span>
               <span className="text-[11px] font-sans text-muted-foreground flex items-center gap-1">
                 <Users className="h-3 w-3 text-muted-foreground" />
