@@ -178,8 +178,8 @@ function ListedInvestmentCard({
       </div>
       <div className="w-10 h-px bg-gold" />
 
-      {/* Stat rows — figures aligned to the feature-row text column (icon 22px + gap 16px = 38px) */}
-      <div className="pl-[38px] space-y-3.5">
+      {/* Stat rows — straight left edge per prod reference (no icon-column indent on stat rows) */}
+      <div className="space-y-3.5">
         <div>
           <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground block mb-1">Price</p>
           <div className="flex items-baseline gap-2">
@@ -188,7 +188,7 @@ function ListedInvestmentCard({
             </span>
             <span className="text-base font-light text-muted">per month</span>
           </div>
-          <p className="text-muted font-light text-sm">for a {minInvestmentPct.toFixed(1)}% stake</p>
+          <p className="text-muted-foreground font-light text-sm">for a {minInvestmentPct.toFixed(1)}% stake</p>
         </div>
         <div>
           <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground block mb-1">Return</p>
@@ -196,7 +196,7 @@ function ListedInvestmentCard({
             <span className="text-[30px] font-light tracking-tight text-heading leading-tight">75%</span>
             <span className="text-base font-light text-muted">return</span>
           </div>
-          <p className="text-muted font-light text-sm">of gross prize money</p>
+          <p className="text-muted-foreground font-light text-sm">of gross prize money</p>
         </div>
         <div>
           <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground block mb-1">Duration</p>
@@ -204,30 +204,30 @@ function ListedInvestmentCard({
             <span className="text-[30px] font-light tracking-tight text-heading leading-tight">12</span>
             <span className="text-base font-light text-muted">months</span>
           </div>
-          <p className="text-muted font-light text-sm">investment term</p>
+          <p className="text-muted-foreground font-light text-sm">investment term</p>
         </div>
       </div>
 
       <div className="pt-3 mt-auto space-y-3.5">
-        {/* Feature rows */}
+        {/* Feature rows — icon left of text column (38px = icon 22 + gap 16), text column not pushed */}
         <ul className="space-y-3 pb-2.5">
           <li className="flex items-start gap-4">
             <Landmark className="text-gold h-[22px] w-[22px] mt-0.5 shrink-0" />
-            <p className="text-muted text-sm font-light leading-relaxed">
+            <p className="text-muted-foreground text-sm font-light leading-relaxed">
               <strong className="text-heading font-medium block mb-1">Stable Access</strong>
               Quarterly visits to the training facility and trackside privileges.
             </p>
           </li>
           <li className="flex items-start gap-4">
             <Activity className="text-gold h-[22px] w-[22px] mt-0.5 shrink-0" />
-            <p className="text-muted text-sm font-light leading-relaxed">
+            <p className="text-muted-foreground text-sm font-light leading-relaxed">
               <strong className="text-heading font-medium block mb-1">Real-time Updates</strong>
               Weekly audio and video reports from the trainer.
             </p>
           </li>
         </ul>
         <div className="flex items-center justify-between border-t border-border pt-3">
-          <span className="text-muted font-light text-base">Stake available</span>
+          <span className="text-muted-foreground font-light text-base">Stake available</span>
           <span className="text-heading font-light text-xl tracking-tight">{maxInvestmentPct.toFixed(0)}%</span>
         </div>
 
@@ -241,11 +241,11 @@ function ListedInvestmentCard({
         </button>
         <p className="text-center text-xs font-light text-muted-foreground">
           Subject to{' '}
-          <a href="#" className="text-muted underline underline-offset-2 hover:text-heading transition-colors">
+          <a href="#" className="text-muted-foreground underline underline-offset-2 hover:text-heading transition-colors">
             Product Disclosure Statement
           </a>{' '}
           and{' '}
-          <a href="#" className="text-muted underline underline-offset-2 hover:text-heading transition-colors">
+          <a href="#" className="text-muted-foreground underline underline-offset-2 hover:text-heading transition-colors">
             Syndicate Agreement
           </a>
           .

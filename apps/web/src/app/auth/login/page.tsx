@@ -193,7 +193,7 @@ function AuthLoginForm() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3.5 text-[12px] font-semibold uppercase tracking-[0.15em] text-canvas transition-all hover:bg-accent-hover disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-full border border-foreground/30 bg-foreground/[0.02] py-3.5 text-[12px] font-semibold uppercase tracking-[0.15em] text-foreground transition-all hover:border-accent hover:bg-accent hover:text-canvas disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -210,7 +210,7 @@ function AuthLoginForm() {
           <div className="mt-7 text-center">
             <Link
               href="/marketplace"
-              className="text-[10px] uppercase tracking-[0.2em] text-accent transition-colors duration-200 hover:text-pure-white"
+              className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground transition-colors duration-200 hover:text-foreground"
             >
               Need an account? Sign up
             </Link>
