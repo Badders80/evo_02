@@ -128,14 +128,14 @@ export function MyStableDashboard({
       </div>
 
       {checkoutSuccess && (
-        <div className="flex items-start justify-between gap-4 rounded-2xl border border-status-active/40 bg-status-active/10 p-5">
+        <div className="flex items-start justify-between gap-4 rounded-2xl border border-status-active/40 bg-status-active/10 p-6 shadow-[0_0_40px_rgba(16,185,129,0.08)]">
           <div className="flex items-start gap-3">
             <ShieldCheck className="h-5 w-5 text-status-active mt-0.5 shrink-0" />
-            <div>
-              <p className="text-sm font-medium text-foreground">
+            <div className="space-y-1.5">
+              <p className="text-sm font-medium text-foreground leading-relaxed">
                 Welcome to the syndicate — your {checkoutSuccess.units}% stake in {checkoutSuccess.slug} is being finalised.
               </p>
-              <p className="mt-1 text-xs font-light text-muted-foreground">
+              <p className="text-xs font-light text-muted-foreground leading-relaxed">
                 Your holding will appear here once settlement completes. A welcome email is on its way.
               </p>
             </div>
@@ -144,7 +144,7 @@ export function MyStableDashboard({
             type="button"
             onClick={() => setCheckoutSuccess(null)}
             aria-label="Dismiss"
-            className="rounded-full p-1 text-muted-foreground hover:text-foreground transition-colors"
+            className="rounded-full p-1.5 text-muted-foreground hover:text-foreground transition-colors"
           >
             ✕
           </button>

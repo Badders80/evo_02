@@ -281,7 +281,7 @@ function Step2TermSheet({
       {stakeError && (
         <p
           role="alert"
-          className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-center text-[11px] font-light text-destructive"
+          className="rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-center text-[12px] font-light leading-relaxed text-foreground/90"
         >
           {stakeError}
         </p>
