@@ -43,7 +43,9 @@ export interface PurchaseFlowModalProps {
 
 type Step = 'terms' | 'accept';
 
-/** Shared modal shell — max-w-lg × h-[720px], scrolls inside (f14, locked 2026-09-03). */
+/** Shared modal shell — max-w-lg × h-[900px] (bumped from locked 720px 2026-09-04 to match prod's natural content fit for Step 2).
+ *  Viewport guard: clamps to max-h-[calc(100vh-2rem)] my-auto on shorter viewports (re-audit guard 2026-09-04).
+ *  Content scrolls inside via overflow-y-auto. All Steps 2–6 share this shell (f14). */
 function ModalShell({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -61,7 +63,7 @@ function ModalShell({ children, onClose }: { children: React.ReactNode; onClose:
       onClick={onClose}
     >
       <div
-        className="relative my-auto w-full max-w-lg h-[720px] overflow-y-auto rounded-3xl border border-border bg-surface p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]"
+        className="relative w-full max-w-lg h-[900px] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-y-auto rounded-3xl border border-border bg-surface p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]"
         onClick={(e) => e.stopPropagation()}
       >
         <button

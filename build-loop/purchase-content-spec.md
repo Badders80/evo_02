@@ -13,12 +13,12 @@
 - **Private Banker Standard** (VOICE_AND_TONE_MANUAL §1): professional, not stuffy; confident, not arrogant.
 - **Silent Gavel** (§1.2): lead with the thoroughbred, never the platform; zero justification; no negation openers; *if a sentence tries to convince the reader we are legitimate — delete it.*
 - **Fight Club rule** (e3-right-rail-deepdive §1, founder): selling ownership without selling it — quiet, implied, never shouted. The acceptance surface IS the moment of trust.
-- **Vocabulary whitelist** (AGENTS.md + §2.3): `Units`/`Stakes`/`Co-owners` · `Settlement`/`Distribution`/`Prize money` · `Lease contribution`/`Deposit` · `Evolution Stables`. Banned: Payout/Reward/Yield/Dividend/ROI, Top-up, Pieces/Parts/Shares, Token/Blockchain/Crypto.
+- **Vocabulary whitelist** (AGENTS.md + §2.3): `Stakes`/`Co-owners` (NOT `Units` — retired from investor copy 2026-09-01; units survive only in code internals/operator ledgers); `Stake` (NOT Pieces/Parts/Shares) · `Settlement`/`Distribution`/`Prize money` · `Lease contribution`/`Deposit` · `Evolution Stables`. Banned: Payout/Reward/Yield/Dividend/ROI, Top-up, Pieces/Parts/Shares, Token/Blockchain/Crypto.
 - **Zero exclamation marks. British English** (`-ise`, `-our`, `metres`). Em dashes with spaces, not ellipses.
 - **$$$$ rule:** never lead with dollars. Lead with the horse, the yard, the journey. Figures are tabular, monospace, secondary.
 - **Pricing:** `pricingForUnits(wholesaleMonthlyNzd, units)` → `computeDslPricing` (legal_engine SSOT). List = cost ×1.05 ×1.03, GST-inclusive. 5×M float join, $M monthly keep. **Never invent pricing math.**
 - **Values are PERCENT everywhere** (stakePctToStepUnits at checkout boundary only).
-- **CTA matrix** (§6): `[ Become an Owner ]` (campaign action) · `[ Acquire Units ]` (unit allocation, per-campaign decision).
+- **CTA matrix** (§6): `[ Become an Owner ]` — single locked CTA. (The former alternative CTA is retired; the acquire/stake-allocation variant is gone.)
 
 ---
 
@@ -31,14 +31,21 @@ One continuous journey, horse page → locked-in owner. Steps 1–6 fluid-but-ag
 - From $76 per month for a 1% stake · Fixed return — 75% of gross prize money* · Stake available 5% (*pro-rated to your stake, settled quarterly)
 - CTA: **[ Ownership Terms and Conditions ]** — learn-more, not a buy button. Opens Step 2 pop-up.
 
-**STEP 2 — THE TERM SHEET (pop-up).** The deal made real; stepper lives here.
+**STEP 2 — THE TERM SHEET (pop-up).** The deal made real; stepper lives here. **Modal dimensions: `max-w-lg × h-[900px]` (bumped from locked `h-[720px]` on 2026-09-04 to match prod's natural content fit for Step 2 term sheet). On viewports ≥ 900px tall, popup stays ONE FIXED SIZE for Steps 2–6, does not resize between steps. On shorter viewports, modal clamps via `max-h-[calc(100vh-2rem)] my-auto` (responsive exception, founder 2026-09-04) so it never clips top/bottom. Logged deviation from the 2026-09-03 lock.** Modal body carries `overflow-y-auto` (re-audit guard 2026-09-04) so content scrolls inside when viewport clamps.
 - Stake selector = the stake pill (right) + price (left); opens at 1%, ▲/▼ in 0.5%, manual entry with small warnings; monthly price moves with it. Tiny line beneath: minimum 1.0% · increments 0.5% · total available 5%.
-- Upfront payment (5 months up front — 3 months deposit + 2 months keep in advance, link to PDS §4). Duration: start date — end date. Investor return: 75% of gross prize money, pro-rated.
-- Race expectation one-liner per horse ("Nellie is in pre-training, expected to race this summer") — sourced from PDS §2.4 Racing Expectation (NEW field `raceExpectation`, same string both surfaces — zero drift).
-- Returns explained paragraph + pointer to where the depth lives (PDS/SA reviewed at next step).
+- Upfront payment (5 months up front — 3 months deposit + 2 months keep in advance, link to PDS §4). Duration: start date — end date. Prize share: 75% of gross prize money, pro-rated.
+- **Summary block (LOCKED 2026-09-03 — founder restructure):** four plain rows, label left · value right · sub-note below, divider line between each:
+  - **Initial Payment** — {joinFloat} NZD — "for a {stake}% stake — includes deposit in initial payment"
+  - **Monthly thereafter** — {monthlyKeep} NZD — "billed on the 1st of each month"
+  - **Lease period** — {months} months — "From {start date} to {dsl: service_end_date}"
+  - **Investor Return** — 75% of gross prize money (**green `status-active` accent — prod look, LOCKED 2026-09-03**) — "distributed quarterly, pro-rated based on your investment & official NZTR results"
+  - ~~Syndicate stake available row DROPPED~~ (min/step/max lives in the stepper card only — no duplication)
+- ~~Race expectation one-liner per horse~~ **REMOVED from term sheet 2026-09-03 (founder)** — the `raceExpectation` field + PDS §2.4 rendering stays in legal_engine (shipped + audited PASS); it just no longer surfaces in the Step 2 popup. Do not re-add to the popup.
+- Prize distribution explained paragraph + pointer to where the depth lives (PDS/SA reviewed at next step).
 - CTA: **[ Invest in {Horse} ]** — buying into the journey, not a supermarket purchase.
+- Fine print (both Step 1 rail + Step 2 popup): "Subject to [Product Disclosure Statement] and [Syndicate Agreement]." — **PDS and SA are LIVE LINKS to the docs (LOCKED 2026-09-03)** — in the mock they anchor to Step 3 (the accept modal where the docs live); in build they open the compiled legal pack (getCompiledLegalPackForCampaign).
 
-**STEP 3 — ACCEPT (gate modal).** PDS scroll + tick · SA scroll + tick · hashes shown. **Each tick = recorded acceptance** (audit-tracker rule): logged at the instant of the tick — user_id + document hash + timestamp — whether the sale ever completes or not. This is the verifiable signature (identifies the person + the exact document version + intent). CTA: **"Proceed to Secure Checkout" (LOCKED 2026-09-01 — kept despite leading to Verify; it is the established label and Verify is a quiet intermediate).**
+**STEP 3 — ACCEPT (gate modal).** PDS + SA as **FAQ-style accordion rows (LOCKED 2026-09-03 — founder: same flow/order, page presentation only)** — each doc is a collapsed row (title + truncated hash + "+"), click to expand the scroll viewport + tick; once ticked the row shows a green **Completed** badge (check_circle + "Completed"); Proceed unlocks when both show Completed. **Each tick = recorded acceptance** (audit-tracker rule): logged at the instant of the tick — user_id + document hash + timestamp — whether the sale ever completes or not. This is the verifiable signature (identifies the person + the exact document version + intent). CTA: **"Proceed to Secure Checkout" (LOCKED 2026-09-01 — kept despite leading to Verify; it is the established label and Verify is a quiet intermediate).**
 
 **STEP 4 — VERIFY (one screen, NEW — rides the KYC port).** ONE tick only — the NZTR disqualification attestation ("You are not disqualified under NZTR rules"). **Residency is DERIVED, never asked (LOCKED 2026-09-01):** read from the Stripe Identity verification result (ID issuing country + address off the ID); NZ-resident and international-investor are internally-derived labels, same identity check for everyone, no separate question. Age 18+ also derived from the ID's date of birth. Identity check: government-issued ID + live selfie via Stripe Identity. "Required under New Zealand law before you become a co-owner." A few minutes; verified once, never re-checked per horse. Ambiguous residency edge cases (e.g. foreign passport + NZ address) resolve via the existing manual-assistance path, never via blocking. Failed check = manual-assistance path (member of Evolution Stables contacts them; resolution = founder/ops: approve/deny/re-verify).
 
@@ -48,7 +55,7 @@ One continuous journey, horse page → locked-in owner. Steps 1–6 fluid-but-ag
 
 **THE SPINE — AUDIT TRACKER (LOCKED 2026-09-01).** 100% audit tracker, NOT browsing clicks. Commitment events only, logged at source the instant they happen: PDS accepted · SA accepted · NZTR declaration accepted · identity check completed · checkout started · payment completed/cancelled/expired. Each row: who + exact document hash + when. Trail stands complete regardless of sale outcome — supports both the investor ("I paid, where is my horse") and the regulator (NZTR/FMA/counsel) without reconstruction.
 
-**BACKLOG NOTE — THE SYNDICATION 101 GUIDE — "DIGITAL-SYNDICATION 101" (idea, 2026-09-01 — SHAPE LOCKED, not built).** A lightweight, plain-language companion to the PDS/SA — a "dummy's guide to ownership" adapted for general investor knowledge. Reading it should produce "ah, I see — it's 75% of my pro-rata share", "ah, ok — if the horse is retired and can no longer race, the bills stop", "when do I get paid". **Form (LOCKED 2026-09-01): a SIDEBAR DRAWER that pops from the LEFT** (like the left-side panel reference), **grouped into titled sections with drop-downs** (accordion pattern — modelled on the homepage FAQ at evolutionstables.nz/#faq), **content = the logic and concepts detailed in the PDS/SA, re-voiced in layman's terms** — never legal boilerplate. Covers: how the 75% + pro-rata works, the float / deposit / monthly keep, what happens on injury/retirement, when distributions land (quarterly), what "spelling" means, how to exit, verified-international basics. Trigger point TBD (term sheet "learn more" links most likely); surface decision lands with wireframing. Content source = re-voiced pillars/term-sheet/PDS in Private Banker Standard.
+**BACKLOG NOTE — THE SYNDICATION 101 GUIDE — "DIGITAL-SYNDICATION 101" (idea, 2026-09-01 — SHAPE LOCKED, not built. NOW ITS OWN BUILD CYCLE: `build-loop/ds101/` (2026-09-02, founder decision — linked to but independent of this flow). Architecture spec phase in progress; this note is the cross-ref only. Content = the logic and concepts detailed in the PDS/SA, re-voiced in layman's terms** — never legal boilerplate. Covers: how the 75% + pro-rata works, the float / deposit / monthly keep, what happens on injury/retirement, when distributions land (quarterly), what "spelling" means, how to exit, verified-international basics. Trigger point TBD (term sheet "learn more" links most likely); surface decision lands with wireframing. Content source = re-voiced pillars/term-sheet/PDS in Private Banker Standard.
 
 **TERMINOLOGY RULE (LOCKED 2026-09-01).** Investor-facing: always **stake**, always as a percentage ("2.0% stake", "your stake", "stake available"). "Units" retires from investor-facing copy — survives only in code internals (function names, RPC params, metadata). "Tokens" banned everywhere.
 
@@ -62,8 +69,8 @@ One continuous journey, horse page → locked-in owner. Steps 1–6 fluid-but-ag
 
 ```
 [header]    {legalName} (NZ)
-[subheader] Ownership Units
-[body]      Acquire units in clean {step}% increments with fixed monthly syndicate keep.
+[subheader] Become an Owner
+[body]      Take a stake from {min}%, in clean {step}% steps, with fixed monthly syndicate keep.
 
 [stepper]   Stake — opens at {min}%
             ▲ / ▼ move in {step}% increments · manual entry allowed
@@ -90,7 +97,6 @@ One continuous journey, horse page → locked-in owner. Steps 1–6 fluid-but-ag
              "Contact us" = [contact link] — mailto TBD by founder, GWS email)
 
 [CTA]       Become an Owner ──────────────► STEP 2 (gate modal)
-            (alt per CTA matrix: [ Acquire Units ] — per-campaign decision, Fork A)
 
 [dropdown]  Ownership Pillars (5) — CONTENT LOCKED in e3-content-tree.md, reference only:
   ├─ The Deal · What's Included · What If · Your Return · Exit & Transfer
@@ -99,7 +105,7 @@ One continuous journey, horse page → locked-in owner. Steps 1–6 fluid-but-ag
 
 **FORK A — campaign status (before rail renders):**
 ```
-open ──────────────► rail with CTA [ Become an Owner ] / [ Acquire Units ]
+open ──────────────► rail with CTA [ Become an Owner ]
 Fully Subscribed / Completed ► amber pill, ClosedCampaignCard (lead form, no CTA)
 Coming Soon                  ► green pill, ComingSoonCard (lead form, no CTA)
 ```
@@ -215,7 +221,7 @@ On Proceed → create-session returns 403 KYC_REQUIRED →
 | 400 INVALID_STAKE | "Stake must be a multiple of {step}%" |
 | 404 CAMPAIGN_NOT_FOUND | "This campaign is no longer available." |
 | 409 CHECKOUT_CLOSED | "This campaign is no longer open for subscription." |
-| 409 RESERVE_FAILED | "Those units were just acquired by another co-owner. Available stake is now {max}%." (honest, no fake scarcity) |
+| 409 RESERVE_FAILED | "That stake was just acquired by another co-owner. Available stake is now {max}%." (honest, no fake scarcity) |
 | 503 PURCHASES_DISABLED (kill switch) | "Checkout is temporarily unavailable — please try again shortly." (investor NEVER sees PURCHASES_DISABLED) |
 | 503 SUPABASE_NOT_CONFIGURED / RESERVE_RPC_ERROR | "Checkout is temporarily unavailable — please try again shortly." |
 | 500 Stripe error | "Payment could not be started — please try again." |
@@ -233,7 +239,7 @@ On Proceed → create-session returns 403 KYC_REQUIRED →
 
 ```
 [state] Stripe hosted checkout (external, evolutionstables.nz-branded)
-[figure] Line item name:  "{legalName} ({units}% Syndicate Unit)"
+[figure] Line item name:  "{legalName} ({units}% Stake)"
 [figure] Line item desc:  "Initial 5×M float deposit for {legalName}"
          (whitelist OK: Deposit ✓. Voice check: quiet, factual, no selling.)
 [figure] Amount:          ${pricing.joinFloatUnitNzd} NZD (GST-inclusive), qty 1
@@ -284,7 +290,7 @@ On Proceed → create-session returns 403 KYC_REQUIRED →
 **Format:** Yard Journal (VOICE_AND_TONE_MANUAL §7.2) — headline with single italicised emphasis word, 120–280 words in 50–90 word paragraphs, sign-off `Alex Baddeley · Evolution Stables` with gold hairline rule. No bullets, no exclamation marks, British English, never lead with dollars.
 
 ```
-Subject:  {legalName} — your syndicate unit is confirmed
+Subject:  {legalName} — your syndicate stake is confirmed
 
 [email]
   Headline:  *Welcome* to the {legalName} syndicate.
