@@ -16,8 +16,8 @@ console.log('Running brand_dna voice tests...');
   const crypto = validateCopy('Invest in this crypto token for guaranteed returns.');
   assert.equal(crypto.isValid, false, 'Should reject crypto/token/guaranteed return');
 
-  const clean = validateCopy('Elite thoroughbred ownership, evolved for the modern stable.');
-  assert.equal(clean.isValid, true, 'Clean copy should pass');
+  const elite = validateCopy('Elite thoroughbred ownership, evolved for the modern stable.');
+  assert.equal(elite.isValid, false, 'Elite is banned from investor-facing copy');
 
   console.log('✅ Banned term enforcement works (including "opaque")');
 }

@@ -43,7 +43,7 @@ Drawdown is applied to prepaid keep and security deposit reserves only, in that 
 
 ## Clause 11: Syndicate Management Fee
 
-A **5.0% syndicate management margin** is embedded in the monthly keep rate of **$${p.monthlyKeepUnitNzd.toFixed(2)} per 1% unit**. No separate management invoices or off-platform accounting fees are charged.
+A **5.0% syndicate management margin** is embedded in the monthly keep rate of **$${p.monthlyKeepUnitNzd.toFixed(2)} per 1% stake**. No separate management invoices or off-platform accounting fees are charged.
 
 The listed rate is calculated as:
 > M = CEIL(cost × 1.05 × 1.03)

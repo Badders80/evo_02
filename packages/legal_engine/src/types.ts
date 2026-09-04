@@ -9,6 +9,7 @@ import type { CloseStyle } from '@evo/db_models/types';
  * Canonical DSL share math (locked 2026-08-26, founder).
  * A lot/share = one increment (0.5%). Available units = listed stake % / step %.
  * Min investment is a purchase floor — never a divisor for counting units.
+ * (Operator-internal only. Investor-facing copy says stake/% — never "units".)
  * Investor-facing language is percentage-based; "lots" never appears.
  */
 export const SHARE_MATH = {

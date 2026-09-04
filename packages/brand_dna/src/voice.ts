@@ -49,7 +49,7 @@ export const APPROVED_CTAS = {
   telemetry: 'Explore Telemetry',
   onboarding: 'Enter Stable',
   action: 'Become an Owner',
-  acquire: 'Acquire Units',
+  acquire: 'Become an Owner',
 } as const;
 
 export const VOCABULARY_WHITELIST = [
@@ -57,7 +57,6 @@ export const VOCABULARY_WHITELIST = [
   'Racehorses',
   'Digital-Syndication',
   'Digitally-syndicated fractional ownership',
-  'Units',
   'Stakes',
   'Co-owners',
   'The Stable',
@@ -81,6 +80,9 @@ export const VOCABULARY_WHITELIST = [
   'Prep',
   'Rating',
 ] as const;
+/* 'Units' is retired from investor-facing copy (LOCKED 2026-09-01) — it survives
+   only in code internals: function names, RPC params, metadata, operator ledgers.
+   Investors see stake / % / co-owner. Do not re-add to this whitelist. */
 
 export const BANNED_TERMS = [
   // Crypto & Web3 Hype
@@ -123,6 +125,8 @@ export const BANNED_TERMS = [
   'democratises',
   'democratise',
   'revolutionary',
+  // Velvet-rope exclusivity (banned 2026-09-02 — ownership is accessible)
+  'elite',
   // Anti-transparent / unhelpful descriptors
   'opaque',
 ] as const;

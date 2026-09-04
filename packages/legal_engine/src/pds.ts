@@ -77,7 +77,7 @@ ${aboutSection}### §2.2 Key Details
 
 ## §3. Commercial Model
 
-| Component | Rate | Monthly Amount (per 1% unit) |
+| Component | Rate | Monthly Amount (per 1% stake) |
 | :--- | :--- | ---: |
 | Base lease & keep cost | 100% | $${(p.costMonthlyNzd * 0.01).toFixed(2)} |
 | Evolution operating margin | 5.0% | Included above |
@@ -115,7 +115,7 @@ All prize money distributions are calculated strictly from **officially publishe
 
 | Pool | Share | Purpose |
 | :--- | ---: | :--- |
-| Investor Syndicate Pool | 75% | Distributed pro-rata to unit holders |
+| Investor Syndicate Pool | 75% | Distributed pro-rata to co-owners |
 | Owner Expense Buffer | 25% | Retained by owner to absorb trainer/jockey fees, nominations, acceptances, and race-day incidentals |
 
 **Fixed-Cost Shield:** Investors receive their clean 75% share of official gross stakes without being asked for additional capital contributions. New Zealand Thoroughbred Racing deducts trainer and jockey percentages at source; the 25% owner retention absorbs these deductions plus nomination and race-day incidentals.
@@ -134,7 +134,7 @@ This syndicate operates under the **${context.closeStyle === 'fourteen_day' ? 'S
 
 ${context.closeStyle === 'fourteen_day'
     ? 'An investor may exit by giving 14 calendar days written notice when the underlying head lease concludes or the horse is retired. No penalty buyout applies.'
-    : 'Where the head lease provides liquidation proceeds, the syndicate may be wound up by payment of 3× the remaining lease value to syndicate holders.'}
+    : 'Where the head lease provides liquidation proceeds, the syndicate may be wound up by payment of 3× the remaining lease value to co-owners.'}
 
 Upon exit, any unused float is refunded pro-rata within 14 business days.
 

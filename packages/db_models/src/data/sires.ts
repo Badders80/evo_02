@@ -87,7 +87,6 @@ export const SIRES: SireProfile[] = [
     sireline: 'Choisir (Danehill Dancer)',
     typeSignatures: [
       "New Zealand's leading sire",
-      'elite strike rate',
       'Group 1 sire',
       'proven commercial sire',
     ],
@@ -95,7 +94,7 @@ export const SIRES: SireProfile[] = [
     staminaScope: 'versatile',
     notableProgeny: ['Prowess', 'Legarto', 'Levante'],
     serviceFeeNzd: 70000,
-    colourNote: 'Elite southern-hem sire; quality progeny',
+    colourNote: 'Southern-hem sire; quality progeny',
   },
 ] as const;
 
