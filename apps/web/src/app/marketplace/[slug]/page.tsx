@@ -14,7 +14,7 @@ import { getStableLinks } from '@/lib/stable-links';
 import { getSupabaseServiceClient } from '@/lib/supabase-service';
 import { CampaignStatusBadge } from '@/components/marketplace/campaign-status-badge';
 import { DetailTabs } from '@/components/marketplace/detail-tabs';
-import RightRail from '@/components/horse/right-rail';
+import { HorsePageShell } from '@/components/marketplace/horse-page-shell';
 import { DocumentsGate } from '@/components/horse/documents-gate';
 import { CampaignStatusBlock } from '@/components/horse/campaign-status-block';
 import { MediaDeck } from '@/components/horse/media-deck';
@@ -204,12 +204,20 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
             </div>
 
             {/* RIGHT COLUMN — RightRail's <aside lg:fixed> is the direct grid child; fixed (not sticky)
-            so it never releases at the footer — stays pinned under the nav for the whole document. */}
+            so it never releases at the footer — stays pinned under the nav for the whole document.
+            F8: modal is page-level via HorsePageShell, reachable from any CTA via ?open=1&units=X. */}
             {(() => {
               const legalPack = getCompiledLegalPackForCampaign(campaign);
               return (
-                <RightRail
-                  status={campaign.listingStatus}
+                <HorsePageShell
+                  listingStatus={
+                    (campaign.listingStatus === 'listed' ||
+                      campaign.listingStatus === 'fully_subscribed' ||
+                      campaign.listingStatus === 'coming_soon' ||
+                      campaign.listingStatus === 'completed')
+                      ? campaign.listingStatus
+                      : 'coming_soon'
+                  }
                   horseName={campaign.legalName}
                   horseSlug={campaign.slug}
                   wholesaleMonthlyNzd={campaign.wholesaleMonthlyNzd}

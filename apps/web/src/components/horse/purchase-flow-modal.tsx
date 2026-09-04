@@ -38,6 +38,8 @@ export interface PurchaseFlowModalProps {
   maxInvestmentPct?: number;
   stakeStepPct?: number;
   legalPack?: LegalPackDigest | null;
+  /** Optional initial stake % from the host (preferred over window.location read). */
+  initialUnits?: number;
   onClose: () => void;
 }
 
@@ -672,16 +674,20 @@ export default function PurchaseFlowModal({
   maxInvestmentPct = 10.0,
   stakeStepPct = 0.5,
   legalPack = null,
+  initialUnits,
   onClose,
 }: PurchaseFlowModalProps) {
   const [step, setStep] = React.useState<Step>('terms');
   // Stake lives in the modal (locked: stepper lives here, not on the rail).
-  // f6/f6b (audit 2026-09-03): restore ?units= from the URL on mount — cancel_url
-  // and the login redirect carry it, so the pre-filled stake survives full-browser
-  // navigations. Read in useEffect (SSR-safe: window undefined on the server).
+  // F8: prefer `initialUnits` prop from host (cleaner, page-level state). Fall
+  // back to window.location read for any future CTA that mounts modal without
+  // prop — preserves the f6/f6b cancel_url / login redirect pre-fill behavior.
   const [stakePct, setStakePct] = React.useState<number>(minInvestmentPct);
   React.useEffect(() => {
-    const raw = new URLSearchParams(window.location.search).get('units');
+    const raw =
+      typeof initialUnits === 'number' && Number.isFinite(initialUnits)
+        ? String(initialUnits)
+        : new URLSearchParams(window.location.search).get('units');
     if (!raw) return;
     const parsed = parseFloat(raw);
     if (!Number.isFinite(parsed)) return;
@@ -690,7 +696,7 @@ export default function PurchaseFlowModal({
     if (snapped >= minInvestmentPct - 1e-9 && snapped <= maxInvestmentPct + 1e-9) {
       setStakePct(Math.round(snapped * 100) / 100);
     }
-  }, [minInvestmentPct, maxInvestmentPct, stakeStepPct]);
+  }, [initialUnits, minInvestmentPct, maxInvestmentPct, stakeStepPct]);
 
   return (
     <ModalShell onClose={onClose}>

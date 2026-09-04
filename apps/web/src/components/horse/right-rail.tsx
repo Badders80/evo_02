@@ -13,7 +13,6 @@
 import * as React from 'react';
 import { Landmark, Activity } from 'lucide-react';
 import { pricingForUnits } from '@/lib/nellie-loop';
-import PurchaseFlowModal from './purchase-flow-modal';
 
 export interface LegalPackDigest {
   pdsMarkdown?: string;
@@ -31,6 +30,8 @@ export interface RightRailProps {
   maxInvestmentPct?: number;
   stakeStepPct?: number;
   legalPack?: LegalPackDigest | null;
+  /** F8: opens the page-level PurchaseFlowModal via URL push. Required. */
+  onOpenModal: (units?: number) => void;
 }
 
 type ListingStatus = 'listed' | 'fully_subscribed' | 'coming_soon' | 'completed';
@@ -149,6 +150,7 @@ function ListedInvestmentCard({
   maxInvestmentPct = 10.0,
   stakeStepPct = 0.5,
   legalPack,
+  onOpenModal,
 }: {
   horseName: string;
   horseSlug: string;
@@ -157,8 +159,9 @@ function ListedInvestmentCard({
   maxInvestmentPct?: number;
   stakeStepPct?: number;
   legalPack?: LegalPackDigest | null;
+  /** F8: opens the page-level PurchaseFlowModal via URL push (parent owns state). */
+  onOpenModal: (units?: number) => void;
 }) {
-  const [flowOpen, setFlowOpen] = React.useState(false);
   const wholesale = wholesaleMonthlyNzd ?? 3800;
   // Locked Step-1 figures are DSL values, never mockup placeholders: monthly keep per 1%,
   // 75% of gross prize money, and the campaign's available stake. Duration row uses the
@@ -231,7 +234,7 @@ function ListedInvestmentCard({
         {/* CTA: opens Step 2 term sheet (learn-more, not buy) */}
         <button
           type="button"
-          onClick={() => setFlowOpen(true)}
+          onClick={() => onOpenModal()}
           className="flex w-full items-center justify-center gap-2 rounded-full bg-pure-white px-8 py-3 text-base font-bold tracking-wide text-black transition-colors hover:bg-white/90"
         >
           Become an Owner <span className="text-lg">→</span>
@@ -248,20 +251,6 @@ function ListedInvestmentCard({
           .
         </p>
       </div>
-
-      {/* PurchaseFlowModal — Steps 2–3 (term sheet → acceptance gate) */}
-      {flowOpen && (
-        <PurchaseFlowModal
-          horseName={horseName}
-          horseSlug={horseSlug}
-          wholesaleMonthlyNzd={wholesaleMonthlyNzd}
-          minInvestmentPct={minInvestmentPct}
-          maxInvestmentPct={maxInvestmentPct}
-          stakeStepPct={stakeStepPct}
-          legalPack={legalPack}
-          onClose={() => setFlowOpen(false)}
-        />
-      )}
     </div>
   );
 }
@@ -331,6 +320,7 @@ export default function RightRail({
   maxInvestmentPct = 10.0,
   stakeStepPct = 0.5,
   legalPack = null,
+  onOpenModal,
 }: RightRailProps) {
   const s = status as ListingStatus;
   const safeStatus: ListingStatus =
@@ -376,6 +366,7 @@ export default function RightRail({
           maxInvestmentPct={maxInvestmentPct}
           stakeStepPct={stakeStepPct}
           legalPack={legalPack}
+          onOpenModal={onOpenModal}
         />
       )}
 
