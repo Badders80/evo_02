@@ -125,7 +125,7 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
                 href={`/marketplace/${card.slug}`}
                 className="relative block w-full flex-shrink-0 overflow-hidden rounded-2xl md:order-last md:w-[40%]"
               >
-                <div className="relative aspect-[16/9] w-full bg-canvas dot-grid-surface">
+                <div className="relative aspect-[16/9] w-full bg-canvas">
                   <img
                     src={card.image}
                     alt={card.name}

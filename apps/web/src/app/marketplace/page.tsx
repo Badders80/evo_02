@@ -34,7 +34,7 @@ export default async function MarketplacePage() {
 
   return (
     <div className="min-h-screen bg-canvas font-sans selection:bg-accent selection:text-black">
-      <main className="dot-grid-surface min-h-screen pb-24">
+      <main className="min-h-screen pb-24">
         <div className="mx-auto max-w-6xl px-12 pt-32 md:px-16 lg:px-20">
           <p className="text-[11px] font-light uppercase tracking-[0.2em] text-muted-foreground">
             Evolution Stables

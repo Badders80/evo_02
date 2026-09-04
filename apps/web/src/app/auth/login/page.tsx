@@ -87,7 +87,7 @@ function AuthLoginForm() {
   };
 
   return (
-    <div className="dot-grid-surface flex min-h-screen items-center justify-center bg-canvas px-4 py-16 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center bg-canvas px-4 py-16 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
         {/* Card */}
         <div className="rounded-3xl border border-border bg-surface-base/80 p-8 shadow-[0_30px_80px_rgba(0,0,0,0.6)] backdrop-blur-md sm:p-10">

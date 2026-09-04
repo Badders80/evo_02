@@ -102,7 +102,7 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
 
   return (
     <div className="min-h-screen bg-canvas font-sans selection:bg-accent selection:text-black">
-      <main className="dot-grid-surface min-h-screen pb-24 pt-32">
+      <main className="min-h-screen pb-24 pt-32">
         <div className="mx-auto max-w-6xl px-6 sm:px-10 lg:px-12">
           {/* Breadcrumb */}
           <div className="mb-10 flex items-center justify-between text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
