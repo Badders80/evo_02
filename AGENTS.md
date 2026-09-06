@@ -10,7 +10,7 @@
 - Money: prod `PURCHASES_ENABLED` stays **OFF** until founder go-live with live keys. Dev :3010 is **ON** with `sk_test_` (`CONTINUE.md` locked 2026-09-01) — test mode cannot move real money; that is the DoD walk path.
 - Locked: vocabulary whitelist (Stakes/Co-owners, Settlement/Distribution/Prize money, Lease contribution/Deposit, Stake/Co-owners; zero exclamation marks; British English) · $$$$ rule (never lead with dollars) · status pills (Fully Subscribed + Completed = amber outline, Coming Soon = green; age reads "5yr") · `/marketplace/[slug]` = locked 2fr/1fr LEFT/RIGHT · values PERCENT everywhere (`stakePctToStepUnits` at checkout boundary only) · design tokens from `apps/web/src/dna/` + @theme v4 — never invent colors · visual patterns from `../evo_00/doc/STYLE_GUIDE.md` via `@evo/ui`
 - Build loop: [`build-loop/README.md`](build-loop/README.md) — cycle dirs & one-client-first per evo_00 build-loop skill Rules 12–13.
-- UI toolkit (desk, cross-build): [`../../workspace_01/ui-toolkit/TOOLKIT.md`](../../workspace_01/ui-toolkit/TOOLKIT.md) — which skill/MCP for which job; enforcement laws stay in this file + evo_00.
+- UI toolkit (cross-build playbook): [`../../infra/ui/TOOLKIT.md`](../../infra/ui/TOOLKIT.md) — which skill/MCP for which job; enforcement laws stay in this file + `../SSOT/`.
 
 ## Verify (island walk commands — done-means-walked is evo_00 law 4)
 

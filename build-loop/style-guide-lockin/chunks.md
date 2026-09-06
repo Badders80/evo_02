@@ -5,7 +5,7 @@ Branch: `style-guide-lock-in`. Each chunk leaves the repo green. Commit AFTER ga
 ## sg-1 — Style guide draft (Phase A)
 
 - **Files:** + `build-loop/style-guide-lockin/STYLE_GUIDE-draft.md`
-- **Read first:** `apps/web/src/components/horse/right-rail.tsx` (full), `apps/web/src/app/globals.css`, `/home/evo/porch/new/evo_01/02_website/DESIGN.md`
+- **Read first:** `apps/web/src/components/horse/right-rail.tsx` (full), `apps/web/src/app/globals.css`, `/home/evo/porch/evo_01/02_website/DESIGN.md`
 - **Deliverable:** doc with `## Patterns` section — one subsection per locked rule: Eyebrow, BackLink, StatusPill (variants: listed/fully_subscribed/coming_soon/completed/neutral), StatRow, WhitePillCTA, ImageBackground (mix-blend-mode: lighten), DotGrid (**removed** from marketplace + login, deferred). Each rule: canonical classes + file:line evidence + do/don't. Token section citing globals.css values. Font open item recorded (Geist vs Inter).
 - **DOD:** every rule has `file:line` evidence; token values match globals.css/DESIGN.md; status `**DRAFT**` header, not LOCKED.
 - **Gate:** none (doc); reviewed in sg-5 audit.

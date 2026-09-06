@@ -6,7 +6,7 @@ Copy this block into a fresh chat to resume. Self-contained — no prior context
 
 You are resuming the **investor-flow-build** cycle in the evolution stables workspace (branch `design-alignment`, LOCAL-ONLY — no merge/push/deploy).
 
-**Repo:** `/home/evo/porch/new/evo_02` — cycle artifacts in `build-loop/investor-flow-build/` (read `CONTINUE.md` there first; it is the authoritative session state).
+**Repo:** `/home/evo/porch/engine/website` — cycle artifacts in `build-loop/investor-flow-build/` (read `CONTINUE.md` there first; it is the authoritative session state).
 
 **GOAL:** finish the 6-step investor purchase flow (horse page → ownership) to match the locked mockup `build-loop/flow-mock/index.html` (LOOK LOCKED 2026-09-02/03). Work chunk-by-chunk: implement → run gates → kimi-code-audit → commit → next chunk.
 

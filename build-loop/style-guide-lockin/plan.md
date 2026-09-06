@@ -14,7 +14,7 @@ Lock the canonical style guide (doc) + the five shared primitives (code package)
 |---|---|---|
 | Doctrine | `evo_00/doc/STYLE_GUIDE.md` | DRAFT written in cycle dir; promoted to SSOT **only on go-live approval** |
 | Implementation | `evo_02/packages/ui` → `@evo/ui` | Created + gated + audited this cycle |
-| Workshop | `workspace_01/ui-toolkit` | Referenced (inspiration/prod refs), untouched |
+| Workshop | `engine/infra/ui` | Referenced (inspiration/prod refs), untouched |
 
 ## Scope (this session = Phase A + B + D-lite)
 
@@ -36,7 +36,7 @@ Lock the canonical style guide (doc) + the five shared primitives (code package)
 - Status-chip pattern real: `right-rail.tsx:42` — `rounded-full border border-status-active/40 bg-status-active/10 px-3 py-1.5 text-[8px] font-medium uppercase tracking-widest`
 - CTA pattern real: `right-rail.tsx:132` — `rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-[10px] font-medium uppercase tracking-widest`
 - Tokens real: `apps/web/src/app/globals.css:35-38` — `--color-accent: #d4a964` == `--color-gold: #d4a964`; `:76` — `--color-muted-foreground: #737373`
-- Prod reference real: `/home/evo/porch/new/evo_01/02_website/DESIGN.md` — accent `#d4a964`, Geist Sans, dark #030303 base
+- Prod reference real: `/home/evo/porch/evo_01/02_website/DESIGN.md` — accent `#d4a964`, Geist Sans, dark #030303 base
 - Workspace covers packages: `pnpm-workspace.yaml` — `packages/*`, `apps/*`
 - `components/ui/` exists in apps/web (13 components) — bespoke, not shared; mission_control has its own tree. The shared package is the upgrade path.
 - `Justfile` tracked + clean (not in dirty list) → safe to add `check:style` recipe

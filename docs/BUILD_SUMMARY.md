@@ -1,4 +1,4 @@
-# BUILD_SUMMARY — Evolution Stables (evo_02)
+# BUILD_SUMMARY — Evolution Stables (website)
 
 **Updated:** 2026-09-04
 
@@ -11,12 +11,12 @@
 | packages/brand_dna | ✅ | Tokens, theme.css, tailwind-preset, voice |
 | **packages/ui (@evo/ui)** | ✅ **NEW** | Eyebrow, BackLink, StatusPill, StatRow, WhitePillCTA + cn |
 | packages/legal_engine, db_models, storage | ✅ | Terminology sweep landed |
-| Style guide | 🟡 DRAFT | `build-loop/style-guide-lockin/STYLE_GUIDE-draft.md` → evo_00/doc on go-live |
+| Style guide | 🟡 DRAFT | `build-loop/style-guide-lockin/STYLE_GUIDE-draft.md` → SSOT/doc on go-live |
 | Enforcement | ✅ | `just check-style` guard (red on 2 known Phase C files) |
 
 ## Architecture Rules
 
-- **Three-home doctrine:** doctrine = `evo_00/doc/STYLE_GUIDE.md` (SSOT), implementation = `evo_02/packages/ui`, workshop = `workspace_01/ui-toolkit`.
+- **Three-home doctrine:** doctrine = `SSOT/doc/STYLE_GUIDE.md` (SSOT), implementation = `website/packages/ui`, workshop = `engine/infra/ui`.
 - **Token vocabulary only:** primitives emit only existing theme classes (accent/gold #d4a964, muted-foreground #737373, border tokens). No new hex, no arbitrary values.
 - **One client first:** right rail is the first primitive consumer; Phase C extends to all surfaces.
 - **Enforcement:** inline eyebrow/stat-row class strings are a lint violation (`just check-style`).
