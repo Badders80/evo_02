@@ -21,7 +21,7 @@ export interface HorsePageShellProps {
   horseName: string;
   horseSlug: string;
   wholesaleMonthlyNzd?: number;
-  minInvestmentPct?: number;
+  minInvestmentPct: number;
   maxInvestmentPct?: number;
   stakeStepPct?: number;
   legalPack?: LegalPackDigest | null;

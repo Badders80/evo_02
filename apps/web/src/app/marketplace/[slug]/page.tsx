@@ -13,8 +13,7 @@ import { campaignShareMetadata, SITE_DESCRIPTION } from '@/lib/seo';
 import { getTrainer } from '@evo/db_models';
 import { getStableLinks } from '@/lib/stable-links';
 import { getSupabaseServiceClient } from '@/lib/supabase-service';
-import { Eyebrow } from '@evo/ui';
-import { CampaignStatusBadge } from '@/components/marketplace/campaign-status-badge';
+import { Eyebrow, StatusPill } from '@evo/ui';
 import { DetailTabs } from '@/components/marketplace/detail-tabs';
 import { HorsePageShell } from '@/components/marketplace/horse-page-shell';
 import { DocumentsGate } from '@/components/horse/documents-gate';
@@ -139,7 +138,7 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
               <section className="space-y-4">
                 <div className="flex flex-wrap items-center gap-3">
                   <Eyebrow className="text-muted-foreground">The story</Eyebrow>
-                  <CampaignStatusBadge status={campaign.listingStatus} />
+                  <StatusPill status={campaign.listingStatus} />
                   <Link
                     href="/marketplace"
                     className="ml-auto inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-accent transition-colors"

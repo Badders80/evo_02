@@ -27,7 +27,7 @@ export interface RightRailProps {
   horseName?: string;
   horseSlug?: string;
   wholesaleMonthlyNzd?: number;
-  minInvestmentPct?: number;
+  minInvestmentPct: number;
   maxInvestmentPct?: number;
   stakeStepPct?: number;
   legalPack?: LegalPackDigest | null;
@@ -111,7 +111,7 @@ function ListedInvestmentCard({
   horseName,
   horseSlug,
   wholesaleMonthlyNzd,
-  minInvestmentPct = 1.0,
+  minInvestmentPct,
   maxInvestmentPct = 10.0,
   stakeStepPct = 0.5,
   legalPack,
@@ -120,7 +120,7 @@ function ListedInvestmentCard({
   horseName: string;
   horseSlug: string;
   wholesaleMonthlyNzd?: number;
-  minInvestmentPct?: number;
+  minInvestmentPct: number;
   maxInvestmentPct?: number;
   stakeStepPct?: number;
   legalPack?: LegalPackDigest | null;
@@ -262,7 +262,7 @@ export default function RightRail({
   horseName = 'this horse',
   horseSlug = '',
   wholesaleMonthlyNzd,
-  minInvestmentPct = 1.0,
+  minInvestmentPct,
   maxInvestmentPct = 10.0,
   stakeStepPct = 0.5,
   legalPack = null,

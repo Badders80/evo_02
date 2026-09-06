@@ -22,6 +22,7 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { pricingForUnits, investorCheckoutError } from '@/lib/nellie-loop';
 import type { DslPricing } from '@evo/legal_engine';
+import { WhitePillCTA } from '@evo/ui';
 
 export interface LegalPackDigest {
   pdsMarkdown?: string;
@@ -193,7 +194,7 @@ function Step2TermSheet({
       {/* Stat cards: price + stake selector */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="rounded-2xl border border-border bg-surface p-4 space-y-1">
-          <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Price</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Price</p>
           <p className="text-[28px] font-light text-heading tracking-tight leading-none">
             ${pricing.monthlyKeepUnitNzd.toLocaleString()}
             <span className="text-[13px] text-muted-foreground font-light ml-1">NZD</span>
@@ -203,7 +204,7 @@ function Step2TermSheet({
           </p>
         </div>
         <div className="rounded-2xl border border-border bg-surface p-4 space-y-1">
-          <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Your stake</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Your stake</p>
           <div className="pt-1 flex items-center justify-start gap-3">
             <div className="flex flex-col items-center gap-1.5">
               <button
@@ -335,7 +336,7 @@ function Step2TermSheet({
 
       {/* Prize distribution explained */}
       <div className="space-y-2">
-        <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
           Prize distribution explained
         </p>
         <p className="text-[11px] font-light text-muted-foreground/60 leading-relaxed">
@@ -348,13 +349,7 @@ function Step2TermSheet({
       </div>
 
       {/* CTA → Step 3 */}
-      <button
-        type="button"
-        onClick={onProceed}
-        className="block w-full text-center py-3.5 rounded-full text-[12px] font-medium uppercase tracking-[0.15em] bg-pure-white text-black hover:opacity-90 transition-all duration-300"
-      >
-        Invest in {horseName}
-      </button>
+      <WhitePillCTA onClick={onProceed}>Invest in {horseName}</WhitePillCTA>
       <p className="text-[11px] font-light text-muted-foreground leading-relaxed text-center">
         Subject to{' '}
         <a href="#" className="text-muted underline underline-offset-2 hover:text-heading transition-colors">
@@ -396,6 +391,8 @@ function Step3AcceptanceGate({
   const [error, setError] = React.useState<string | null>(null);
   // KYC flow state: null = not prompted, 'prompt' = 403 received, 'pending', 'rejected'
   const [kycState, setKycState] = React.useState<'prompt' | 'pending' | 'rejected' | null>(null);
+  // F13 seam: Verify Identity is inert until mission 003 (kyc-port). Do not fake pending.
+  const [kycStubNotice, setKycStubNotice] = React.useState(false);
 
   const toggleDoc = (doc: 'pds' | 'sa') => {
     setOpenDoc((prev) => (prev === doc ? null : doc));
@@ -619,20 +616,25 @@ function Step3AcceptanceGate({
             type="button"
             className="w-full rounded-full bg-pure-white py-3 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-black transition-all duration-300 hover:opacity-90"
             onClick={() => {
-              // KYC port (Firebase → Supabase) is a separate workstream; this is the
-              // in-modal prompt surface. `/auth/verify` does NOT exist in evo_02 yet
-              // (verified chunk-4, 404), so the CTA stays inert instead of faking a
-              // pending state. Wire the redirect here when the port ships.
+              // F13 / 002 soft-launch: KYC port (Firebase → Supabase) is kyc-port / 003.
+              // `/auth/verify` does not exist. CTA stays inert — never fake pending.
               console.warn(
-                '[purchase-flow] KYC port pending — /auth/verify absent, CTA intentionally inert (chunk-4)'
+                '[purchase-flow] KYC port pending — /auth/verify absent, CTA intentionally inert (F13 stub)'
               );
+              setKycStubNotice(true);
             }}
           >
             Verify Identity
           </button>
-          <p className="text-[10px] font-light text-muted-foreground/80">
-            After verification, return here — your stake and documents are preserved.
-          </p>
+          {kycStubNotice ? (
+            <p className="text-[10px] font-light text-muted-foreground/80">
+              Identity verification is not live on this build. Your stake and documents stay saved. A member of Evolution Stables will complete this check with you.
+            </p>
+          ) : (
+            <p className="text-[10px] font-light text-muted-foreground/80">
+              After verification, return here — your stake and documents are preserved.
+            </p>
+          )}
         </div>
       )}
       {kycState === 'pending' && (
