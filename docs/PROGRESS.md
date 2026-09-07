@@ -23,7 +23,7 @@
 2. **Phase C refactor:** MarketplaceSection.tsx:232, marketplace/[slug]/page.tsx:140 → then 8-file tracking-[0.2em] sweep → badge deprecation.
 3. Resolve open founder decisions: font, P7 image-bg blend.
 4. **Storybook** for primitives.
-5. **Go-live checklist** (standing): website replaces `evo_01/02_website` on Vercel — see porch CONTINUE.md.
+5. **Go-live checklist** (standing): website replaces `old evo_01 build (02_website)` on Vercel — see porch CONTINUE.md.
 
 ## Architecture Status
 

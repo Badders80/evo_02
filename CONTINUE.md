@@ -1,9 +1,9 @@
 # CONTINUE — evo_02
 
 **Date:** 2026-09-01 — **SESSION 5 WRAP: Rung 4 content DONE + AGREED FLOW SIGNED OFF (founder 2026-09-01) — reference: `build-loop/purchase-content-spec.md` THE AGREED FLOW section. Locks: 7 decisions + audit-tracker + stake-only terminology + KYC-at-checkout + residency-derived. raceExpectation → PDS §2.4 shipped + audited PASS. Rung-4 audit 23 PASS/4 WARN (build-loop/e3-rung4/audit-graph-rung4.json) + hermes verify ok:true at HEAD. Next: wireframes (Stitch) from the signed flow → build (stepper rework + min_stake_pct wiring, KYC port, E4).**
-**Dual-surface rule (LOCKED):** "current state" = check BOTH `evo_01/02_website` (LIVE prod — Firebase, full KYC stack) AND evo_02 (:3010, Supabase). Gap in evo_02 + exists in prod = PORT, not rebuild. KYC is a port (Firebase → Supabase), UX already designed + walked.
+**Dual-surface rule (LOCKED):** "current state" = check BOTH `old evo_01 build (02_website)` (LIVE prod — Firebase, full KYC stack) AND evo_02 (:3010, Supabase). Gap in evo_02 + exists in prod = PORT, not rebuild. KYC is a port (Firebase → Supabase), UX already designed + walked.
 **Branch:** `design-alignment` (LOCAL-ONLY, never push). Cutover founder-only.
-**Live site:** still served by evo_01/02_website via Vercel. evo_01 working tree is DIRTY — hands off (read-only reference for ports).
+**Live site:** still served by old evo_01 build (02_website) via Vercel. evo_01 working tree is DIRTY — hands off (read-only reference for ports).
 
 ---
 
@@ -53,7 +53,7 @@
 - **Min/step/max are DSL-driven per horse** (`min_stake_pct`, `stake_step_pct`, `availablePct`). **Min currently hardcoded 1.0** (`marketplace/[slug]/page.tsx:216`) — must read `campaign.min_stake_pct`. Max = available % (Nellie 5.0%).
 - **Cancel-stake: RESOLVED — Option A** (carry units in `cancel_url`): `create-session/route.ts:106` appends `?units=`, horse page pre-fills from param. Currently NOT preserved (stake-loss bug, fix queued).
 - **Transfer facilitation: "standard fees apply"** (fee % TBD by founder — likely 5%+3% but undecided). Incoming buyer re-verified (Ops SOP §9.1). NOT in code (no SA clause, no transfer flow).
-- **KYC = PORT from production** (evo_01/02_website: `/api/kyc/create-session|callback|status` + `/auth/verify` + `/marketplace/[id]/kyc-processing`, Firebase claims, resume + sync + manual-assistance UX). Reconcile `rejected` enum (evo_02) vs `requires_input` (prod) at port.
+- **KYC = PORT from production** (old evo_01 build (02_website): `/api/kyc/create-session|callback|status` + `/auth/verify` + `/marketplace/[id]/kyc-processing`, Firebase claims, resume + sync + manual-assistance UX). Reconcile `rejected` enum (evo_02) vs `requires_input` (prod) at port.
 - **Auth fixes queued:** 7 OAuth codes mapped (not 9); password path shows raw Supabase messages — map before E4. OAuth error path drops `next` (`api/auth/google/callback/route.ts:37`) — fix before E4.
 - **KYC badge:** collapses pending/rejected into "Unverified" (`mystable-dashboard.tsx:39-48`) — add pending ("Being reviewed") / rejected ("Re-verify required") labels.
 
@@ -103,7 +103,7 @@
 
 **Gates (all green at HEAD `a80c739`):** forced `turbo run lint typecheck test` 22/22 (0 cached) · `hermes verify --json --skip-start` ok:true (build + 8 test phases) · live walk 200 × 5 (/marketplace + prudentia + first-gear + hottathanafantasy + i-stole-a-manolo + tml-x-yearn).
 
-**Dev server:** does NOT auto-start on reboot — `cd /home/evo/new/evo_02/apps/web && pnpm dev --port 3010` (background). Stale-boot server 500s on [slug] with missing vendor-chunk error → restart, not code. `hermes verify`'s prod build clobbers dev `.next/` every run — always restart dev after verify.
+**Dev server:** does NOT auto-start on reboot — `cd /home/evo/new/website/apps/web && pnpm dev --port 3010` (background). Stale-boot server 500s on [slug] with missing vendor-chunk error → restart, not code. `hermes verify`'s prod build clobbers dev `.next/` every run — always restart dev after verify.
 
 **Founder TODOs before live (unchanged):** verify the 2 trainer quotes carrying `[DRAFT — verify with trainer]` (Prudentia + First Gear). Fix first-gear `latestUpdateUrl` prose (C15, hidden by updateCount=null gate).
 
@@ -166,7 +166,7 @@
 
 **Key-shape fix (root cause):** MC writer wrote snake_case jsonb (`about_horse`), reader+seed used camelCase → MC-created campaigns rendered empty. Writer now camelCase; reader reads both shapes (pattern already existed for pedigree_data).
 
-**Dev server:** does NOT auto-start on reboot — `cd /home/evo/new/evo_02/apps/web && pnpm dev --port 3010` (background). Stale-boot server 500s on [slug] with missing vendor-chunk error → restart, not code.
+**Dev server:** does NOT auto-start on reboot — `cd /home/evo/new/website/apps/web && pnpm dev --port 3010` (background). Stale-boot server 500s on [slug] with missing vendor-chunk error → restart, not code.
 
 **Parked (founder-visible, not blockers):**
 1. tml barn-name inline cleanup — aboutHorse embeds "(barn name Mulan)"; dupes the future `Meet {Legal} aka {Nick}` header. One-time seed-content edit for tml row.

@@ -10,7 +10,7 @@
 - Money: prod `PURCHASES_ENABLED` stays **OFF** until founder go-live with live keys. Dev :3010 is **ON** with `sk_test_` (`CONTINUE.md` locked 2026-09-01) — test mode cannot move real money; that is the DoD walk path.
 - Locked: vocabulary whitelist (Stakes/Co-owners, Settlement/Distribution/Prize money, Lease contribution/Deposit, Stake/Co-owners; zero exclamation marks; British English) · $$$$ rule (never lead with dollars) · status pills (Fully Subscribed + Completed = amber outline, Coming Soon = green; age reads "5yr") · `/marketplace/[slug]` = locked 2fr/1fr LEFT/RIGHT · values PERCENT everywhere (`stakePctToStepUnits` at checkout boundary only) · design tokens from `apps/web/src/dna/` + @theme v4 — never invent colors · visual patterns from `../SSOT/doc/STYLE_GUIDE.md` via `@evo/ui`
 - Build loop: [`build-loop/README.md`](build-loop/README.md) — cycle dirs & one-client-first per SSOT build-loop skill Rules 12–13.
-- UI tool catalog (which skill/MCP for which job): `../../workspace/war-room/reference/ui-tool-catalog.md` — reference only; enforcement laws stay in this file + `../SSOT/`.
+- UI tool catalog (which skill/MCP for which job): `/home/evo/toolbox/reference/ui-tool-catalog.md` — reference only; enforcement laws stay in this file + `../SSOT/`. Shelf-first: before inventing a UI workflow, check `/home/evo/toolbox/INDEX.md` — pick one proven path, never load the shelf.
 
 ## Verify (island walk commands — done-means-walked is SSOT law 4)
 
