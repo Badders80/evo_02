@@ -85,7 +85,7 @@ export const CHECKOUT_ERROR_COPY: Record<string, string> = {
   KYC_REQUIRED: 'Identity verification is required before checkout. This is a one-time check under New Zealand law.',
   INVALID_STAKE: 'Stake must be a multiple of {step}%',
   CAMPAIGN_NOT_FOUND: 'This campaign is no longer available.',
-  CHECKOUT_CLOSED: 'This campaign is no longer open for subscription.',
+  CHECKOUT_CLOSED: 'This offering is closed.',
   RESERVE_FAILED: 'That stake was just acquired by another co-owner. Available stake is now {max}%.',
   PURCHASES_DISABLED: 'Checkout is temporarily unavailable — please try again shortly.',
   SUPABASE_NOT_CONFIGURED: 'Checkout is temporarily unavailable — please try again shortly.',
@@ -166,7 +166,7 @@ export async function assertCheckoutCampaign(slug: string) {
   assertNellieOnly(slug);
   const resolved = await resolveCampaignInventory(slug);
   if (!isCheckoutOpen(resolved.campaign)) {
-    throw new HttpError(409, 'CHECKOUT_CLOSED', 'This campaign is visible but not open for subscription');
+    throw new HttpError(409, 'CHECKOUT_CLOSED', 'This campaign is not open for stakes');
   }
   return resolved;
 }

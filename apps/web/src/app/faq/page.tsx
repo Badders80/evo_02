@@ -11,7 +11,7 @@ export const metadata = {
 const faqs = [
     {
       q: 'What is a Digitally Syndicated Lease (DSL)?',
-      a: 'A DSL is a regulated fractional leasehold of a thoroughbred racehorse. Instead of purchasing full thoroughbred bloodstock equity with unlimited capital liabilities, you subscribe to an authorized fractional stake (minimum investments and the exact stake percentages offered vary by campaign — exact percentages are shown on each horse\'s subscription page) with fixed monthly keep and direct rights to 75% of net prize money.',
+      a: 'A DSL is a regulated fractional leasehold of a thoroughbred racehorse. You hold a stake as a percentage of the syndicate (minimums and exact percentages vary by campaign — they are shown on each horse\'s page), with fixed monthly keep and direct rights to 75% of official NZTR gross prize money.',
     },
     {
       q: 'How does the 5×M Join Float Model work?',
@@ -19,7 +19,7 @@ const faqs = [
     },
     {
       q: 'How is prize money calculated and distributed?',
-      a: 'Prize money is calculated directly from officially published NZTR gross stakes (e.g. on Loveracing NZ). Syndicate members receive 75% pro-rata to their shareholding. The remaining 25% is retained by the lessor to absorb all jockey, trainer, nom/acceptance fees, and operational overheads.',
+      a: 'Prize money is calculated directly from officially published NZTR gross stakes (e.g. on Loveracing NZ). Syndicate members receive 75% pro-rata to their stake. The remaining 25% is retained by the lessor to absorb all jockey, trainer, nom/acceptance fees, and operational overheads.',
     },
     {
       q: 'Who decides where and when the horse races?',
@@ -78,7 +78,7 @@ export default function FaqPage() {
           href="/marketplace"
           className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-xs font-semibold text-canvas hover:bg-accent-hover transition-all"
         >
-          <span>Explore Available Horses</span>
+          <span>View Current Offerings</span>
         </Link>
       </div>
     </div>

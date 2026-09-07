@@ -1,7 +1,6 @@
 import { FixedBg } from '@/components/ui/FixedBg';
 import { GrassBg } from '@/components/ui/GrassBg';
 import { NavBar } from '@/components/NavBar';
-import { Footer } from '@/components/footer';
 import { CtaLeadModal } from '@/components/CtaLeadModal';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { AboutSection } from '@/components/sections/AboutSection';
@@ -95,7 +94,6 @@ export default async function HomePage({
 
         <FAQSection />
 
-        <Footer />
       </main>
     </>
   );

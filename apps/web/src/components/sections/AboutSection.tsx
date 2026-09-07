@@ -68,9 +68,9 @@ export const AboutSection = () => {
 
         <div ref={bodyRef} className="mt-6 space-y-8">
           <p className="text-[16px] font-light leading-[1.7] text-foreground">
-            Racehorse ownership has changed. Evolution Stables removes the barriers that once made it
-            complex and inaccessible — opening the door for first-timers and seasoned fans alike to not
-            just watch, but own the experience.
+            Racehorse ownership has changed. Evolution Stables lists Thoroughbreds as
+            Digital Syndication Leases — the horse, the trainer, and the commercial terms
+            in one agreement. You hold the share. You stand in the photo.
           </p>
         </div>
       </div>

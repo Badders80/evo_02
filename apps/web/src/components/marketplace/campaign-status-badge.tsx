@@ -8,7 +8,7 @@ const statusConfig: Record<
   draft: { variant: "outline", label: "Draft" },
   coming_soon: { variant: "success", label: "Coming Soon" },
   coming_soon_details: { variant: "success", label: "Coming Soon" },
-  listed: { variant: "success", label: "Become An Owner" },
+  listed: { variant: "success", label: "Become an Owner" },
   fully_subscribed: { variant: "warning", label: "Fully Subscribed" },
   completed: { variant: "warning", label: "Completed" },
 };

@@ -73,11 +73,11 @@ export function Footer({ minimal = false }: FooterProps) {
             <div className="max-w-4xl space-y-8">
               <div ref={containerRef} className="flex flex-col items-center gap-4">
                 <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-light text-heading tracking-tight flex flex-col items-center gap-3">
-                  {/* Row 1: The Future of Ownership */}
+                  {/* Row 1: The Future of Ownership (founder-locked 2026-09-07: tagline restored) */}
                   <span style={line1Style} className="inline-block">
                     The Future of <span className="text-gold">Ownership</span>
                   </span>
-                  {/* Row 2: Has Arrived | */}
+                  {/* Row 2: Has Arrived | (typewriter) */}
                   <span style={line2Style} className="inline-block flex items-center justify-center">
                     Has Arrived
                     <span

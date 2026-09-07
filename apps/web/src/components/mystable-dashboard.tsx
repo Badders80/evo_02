@@ -96,7 +96,7 @@ export function MyStableDashboard({
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs font-medium tracking-[0.2em] uppercase text-accent">
             <Sparkles className="h-3 w-3" />
-            <span>Evolution Investor Portal</span>
+            <span>Private Dashboard</span>
           </div>
           <h1 className="mt-3 text-3xl sm:text-4xl font-light tracking-tight text-foreground">
             MyStable Dashboard

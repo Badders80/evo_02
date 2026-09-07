@@ -43,7 +43,7 @@ export default function ReturnsGuidePage() {
 
           <div className="mt-6 grid sm:grid-cols-2 gap-4">
             <div className="rounded-xl border border-accent/40 bg-accent/10 p-5">
-              <span className="text-xs uppercase font-mono text-accent block font-medium">75% Net Investor Pool</span>
+              <span className="text-xs uppercase font-mono text-accent block font-medium">75% Gross Prize Pool</span>
               <span className="text-2xl font-mono font-semibold text-foreground mt-2 block">75.0%</span>
               <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
                 Distributed pro-rata directly to verified syndicate members based on their percentage stake.
@@ -51,7 +51,7 @@ export default function ReturnsGuidePage() {
             </div>
 
             <div className="rounded-xl border border-border bg-background p-5">
-              <span className="text-xs uppercase font-mono text-muted-foreground block font-medium">25% Lessor Operational Cut</span>
+              <span className="text-xs uppercase font-mono text-muted-foreground block font-medium">25% Lessor Retention</span>
               <span className="text-2xl font-mono font-semibold text-foreground mt-2 block">25.0%</span>
               <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
                 Retained by the lessor to absorb all jockey riding fees, trainer percentages, nomination fees, and acceptance charges.

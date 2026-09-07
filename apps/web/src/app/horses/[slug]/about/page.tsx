@@ -122,7 +122,7 @@ export default async function HorseAboutPage({ params }: PageProps) {
             <div className="mt-8 rounded-lg border border-border bg-background p-4 flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
                 <ShieldCheck className="h-4 w-4 text-accent" />
-                <span>NZTR Authorized Syndication Disclosure</span>
+                <span>NZTR Authorised Syndication Disclosure</span>
               </div>
               <a
                 href={campaign.pedigree.studBookUrl}

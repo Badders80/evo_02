@@ -15,7 +15,7 @@ function test_error_copy_mapping() {
     ['KYC_REQUIRED', 'Identity verification is required before checkout. This is a one-time check under New Zealand law.'],
     ['INVALID_STAKE', 'Stake must be a multiple of 0.5%'],
     ['CAMPAIGN_NOT_FOUND', 'This campaign is no longer available.'],
-    ['CHECKOUT_CLOSED', 'This campaign is no longer open for subscription.'],
+    ['CHECKOUT_CLOSED', 'This offering is closed.'],
     ['RESERVE_FAILED', 'That stake was just acquired by another co-owner. Available stake is now 5%.'],
     ['PURCHASES_DISABLED', 'Checkout is temporarily unavailable — please try again shortly.'],
     ['SUPABASE_NOT_CONFIGURED', 'Checkout is temporarily unavailable — please try again shortly.'],

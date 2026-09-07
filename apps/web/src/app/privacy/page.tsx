@@ -60,7 +60,7 @@ export default function PrivacyPage() {
         <section className="rounded-xl border border-border bg-card p-6">
           <h2 className="text-lg font-medium text-foreground mb-3">4. Third-Party Sharing</h2>
           <p>
-            We do not sell, rent, or monetize your personal data. Personal information is disclosed solely to authorized
+            We do not sell, rent, or monetise your personal data. Personal information is disclosed solely to authorised
             regulatory bodies (NZTR, FMA, DIA) where required by New Zealand law for official ownership registration.
           </p>
         </section>

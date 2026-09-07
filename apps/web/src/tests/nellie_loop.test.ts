@@ -144,13 +144,15 @@ console.log('Running @evo/web Nellie loop tests...\n');
 }
 
 {
+  // Founder-locked 2026-09-07: all live campaigns flipped to coming_soon (brochure
+  // mode) — no campaign is buyable until the purchase workflows land.
   const open = (await getAllCampaigns()).filter(isCheckoutOpen).map((c: { slug: string }) => c.slug);
-  assert.deepEqual(open, ['nellie']);
+  assert.deepEqual(open, []);
   assert.throws(() => assertNellieOnly('tml-x-yearn'), (err: unknown) => err instanceof HttpError && err.status === 409);
   assert.rejects(async () => assertCheckoutCampaign('tml-x-yearn'), (err: unknown) => err instanceof HttpError && (err as HttpError).status === 409);
+  assert.rejects(async () => assertCheckoutCampaign('nellie'), (err: unknown) => err instanceof HttpError && (err as HttpError).status === 409);
   assert.equal(getInventoryId('nellie'), NELLIE_INVENTORY_ID);
-  await assertCheckoutCampaign('nellie');
-  console.log('✅ only Nellie is buyable');
+  console.log('✅ no campaign is buyable (brochure mode)');
 }
 
 {

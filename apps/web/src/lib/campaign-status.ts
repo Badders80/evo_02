@@ -158,7 +158,7 @@ export const STATUS_INFO: Record<CampaignStatus, StatusInfo> = {
     showPrice: true,
   },
   listed: {
-    label: "Become An Owner",
+    label: "Become an Owner",
     badgeClass: "bg-emerald-500/15 border-emerald-400/30 text-emerald-200",
     dotClass: "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]",
     canPurchase: true,

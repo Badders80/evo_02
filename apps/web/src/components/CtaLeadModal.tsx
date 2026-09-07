@@ -4,7 +4,7 @@ import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from
 import { createPortal } from 'react-dom';
 
 const CTA_COPY =
-  'Unlock the thrill of ownership with early access and behind-the-scenes coverage - it is easier than you think.';
+  'Early access to new campaigns and behind-the-scenes coverage from the yard.';
 
 /** Organic visits only — campaign links open instantly. */
 const CTA_OPEN_DELAY_MS = 4500;
@@ -157,8 +157,8 @@ export function CtaLeadModal({ forceInstant = false }: CtaLeadModalProps) {
       });
 
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({ error: 'Failed to subscribe' }));
-        throw new Error(errData.error || 'Failed to subscribe');
+        const errData = await res.json().catch(() => ({ error: 'Registration failed' }));
+        throw new Error(errData.error || 'Registration failed');
       }
     } catch (err) {
       console.error('Subscribe error:', err);
@@ -233,7 +233,7 @@ export function CtaLeadModal({ forceInstant = false }: CtaLeadModalProps) {
                       <div className="absolute -inset-x-1/2 -inset-y-4 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-30 blur-xl animate-border-shimmer" />
                     </div>
                     <span className="relative z-10">
-                      {isSubmitting ? 'Joining...' : 'Join the Evolution'}
+                      {isSubmitting ? 'Registering...' : 'Register'}
                     </span>
                   </button>
                 </div>

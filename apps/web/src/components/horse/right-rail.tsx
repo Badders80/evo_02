@@ -104,7 +104,7 @@ function LeadForm({
 }
 
 /** Listed Investment Card — locked Step-1 "Ownership" rail (mockup index.html:94-161, LOOK LOCKED 2026-09-02).
- * Ownership eyebrow → "Becoming an owner is easier than you think." → gold divider → 3 stat rows →
+ * Ownership eyebrow → "You hold the share. You stand in the photo." → gold divider → 3 stat rows →
  * 2 feature rows → Stake available → white CTA → fine print. NO slider, NO pillars, NO stake selector —
  * the stepper lives in the Step-2 term sheet only. */
 function ListedInvestmentCard({
@@ -138,7 +138,7 @@ function ListedInvestmentCard({
       <div className="space-y-2">
         <Eyebrow>Ownership</Eyebrow>
         <h3 className="text-[22px] font-light leading-tight tracking-tight text-heading">
-          Becoming an owner is easier than you think.
+          You hold the share. You stand in the photo.
         </h3>
       </div>
       <div className="w-10 h-px bg-gold" />

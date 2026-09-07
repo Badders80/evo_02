@@ -6,8 +6,8 @@
  * - Step 3 header: "Acceptance — {horse} your documents"; accordion + Completed badge,
  *   CTA label LOCKED: "Proceed to Secure Checkout".
  * - Stepper: ▲/▼ buttons, opens at min, 0.5% steps, max = availablePct.
- * - 4-row summary: Initial Payment / Monthly thereafter / Lease period / Investor Return.
- * - Investor Return value GREEN (text-status-active) — LOCKED 2026-09-03.
+ * - 4-row summary: Initial Payment / Monthly thereafter / Lease period / Distribution.
+ * - Distribution value GREEN (text-status-active) — LOCKED 2026-09-03 (label "Distribution" per VOICE.md §4, 2026-09-07).
  * - Numbers from pricingForUnits — NEVER mockup placeholders ($76/$380/21mo).
  * - Each acceptance tick = recorded audit event (POST /api/acceptance, chunk-3).
  * - KYC read-then-verify (LOCKED 2026-09-01): docs readable pre-KYC; on 403 KYC_REQUIRED
@@ -323,7 +323,7 @@ function Step2TermSheet({
         </div>
         <div>
           <p className="flex justify-between items-baseline">
-            <span className="text-muted-foreground">Investor Return</span>
+            <span className="text-muted-foreground">Distribution</span>
             <strong className="text-status-active text-[13px] font-medium">
               75% of gross prize money
             </strong>

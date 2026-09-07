@@ -79,7 +79,7 @@ export function HeroSection({
         <div className="relative w-full max-w-[720px] animate-hero-logo">
           <Image
             src="/images/brand/lockups/gold/lockup-horizontal-gold.png"
-            alt="Evolution Stables - The Future of Racehorse Ownership"
+            alt="Evolution Stables — Thoroughbreds in training"
             width={1200}
             height={400}
             priority

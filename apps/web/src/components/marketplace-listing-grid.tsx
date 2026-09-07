@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { ListingStatus } from '@evo/db_models';
+import { HorseCtaModal } from '@/components/horse-cta-modal';
 
 export type MarketplaceCard = {
   slug: string;
@@ -15,7 +16,7 @@ export type MarketplaceCard = {
 };
 
 const FILTERS = [
-  { key: 'all', label: 'All Horses' },
+  { key: 'all', label: 'All Thoroughbreds' },
   { key: 'available', label: 'Available' },
   { key: 'coming_soon', label: 'Coming Soon' },
 ] as const;
@@ -33,11 +34,11 @@ export const STATUS_META: Record<
   },
   coming_soon: {
     label: 'Coming Soon',
-    badge: 'border-accent/40 bg-accent/10 text-accent',
-    dot: 'bg-accent',
+    badge: 'border-status-active/40 bg-status-active/10 text-status-active',
+    dot: 'bg-status-active',
   },
   fully_subscribed: {
-    label: 'Fully Subscribed',
+    label: 'Fully Allocated',
     badge: 'border-border bg-card text-muted-foreground',
     dot: 'bg-muted-foreground',
   },
@@ -62,7 +63,7 @@ function StatusBadge({ status }: { status: ListingStatus }) {
       className={`absolute top-4 right-4 z-10 flex items-center gap-1.5 rounded-full border px-3 py-1 backdrop-blur-md ${meta.badge}`}
     >
       <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
-      <span className="text-[8px] font-medium uppercase tracking-widest">{meta.label}</span>
+      <span className="text-[8px] font-light uppercase tracking-widest">{meta.label}</span>
     </div>
   );
 }
@@ -70,6 +71,14 @@ function StatusBadge({ status }: { status: ListingStatus }) {
 export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) {
   const [filter, setFilter] = useState<FilterKey>('all');
   const router = useRouter();
+  // Founder-locked 2026-09-07: coming-soon cards open the placeholder CTA modal
+  // (future purchase-workflow host) instead of navigating. Other statuses navigate.
+  const [ctaHorse, setCtaHorse] = useState<{ name: string; slug: string } | null>(null);
+
+  const openCard = (card: MarketplaceCard) => {
+    if (card.status === 'coming_soon') setCtaHorse({ name: card.name, slug: card.slug });
+    else router.push(`/marketplace/${card.slug}`);
+  };
 
   const filtered = useMemo(() => {
     const next = cards.filter((card) => {
@@ -91,7 +100,7 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
             key={tab.key}
             type="button"
             onClick={() => setFilter(tab.key)}
-            className={`relative cursor-pointer py-1 text-[10px] font-medium uppercase tracking-[0.2em] transition-all duration-300 ${
+            className={`relative cursor-pointer py-1 text-[10px] font-light uppercase tracking-[0.2em] transition-all duration-300 ${
               filter === tab.key ? 'text-heading' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -106,7 +115,7 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
       <section className="mx-auto max-w-6xl space-y-6 px-12 pb-32 md:px-16 lg:px-20">
         {filtered.length === 0 && (
           <div className="py-20 text-center text-sm font-light text-muted-foreground">
-            No horses in this category.
+            No thoroughbreds in this category.
           </div>
         )}
         {filtered.map((card) => {
@@ -117,12 +126,19 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
               className={`group flex cursor-pointer flex-col items-stretch gap-6 rounded-3xl border border-border bg-card/60 p-5 backdrop-blur-md transition-all duration-700 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.45)] md:flex-row md:gap-8 md:p-6 ${
                 isFeatured ? 'md:gap-12 md:p-8' : ''
               }`}
-              onClick={() => router.push(`/marketplace/${card.slug}`)}
+              onClick={() => openCard(card)}
               role="link"
               aria-label={card.name}
             >
               <Link
                 href={`/marketplace/${card.slug}`}
+                onClick={(e) => {
+                  if (card.status === 'coming_soon') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setCtaHorse({ name: card.name, slug: card.slug });
+                  }
+                }}
                 className="relative block w-full flex-shrink-0 overflow-hidden rounded-2xl md:order-last md:w-[40%]"
               >
                 <div className="relative aspect-[16/9] w-full bg-canvas">
@@ -155,7 +171,7 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
                     {card.highlightTags.map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-full border border-border bg-surface-base px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground"
+                        className="rounded-full border border-border bg-surface-base px-3 py-1 text-[10px] font-light uppercase tracking-wider text-muted-foreground"
                       >
                         {tag}
                       </span>
@@ -165,9 +181,16 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
                 <div className="pt-6">
                   <Link
                     href={`/marketplace/${card.slug}`}
-                    className="inline-flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.2em] text-foreground transition-colors group-hover:text-accent"
+                    onClick={(e) => {
+                      if (card.status === 'coming_soon') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setCtaHorse({ name: card.name, slug: card.slug });
+                      }
+                    }}
+                    className="inline-flex items-center gap-2 text-[10px] font-light uppercase tracking-[0.2em] text-foreground transition-colors group-hover:text-accent"
                   >
-                    <span>Explore Offering</span>
+                    <span>{card.status === 'coming_soon' ? 'Register Interest' : 'View Offering'}</span>
                     <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
                   </Link>
                 </div>
@@ -176,6 +199,14 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
           );
         })}
       </section>
+
+      {ctaHorse && (
+        <HorseCtaModal
+          horseName={ctaHorse.name}
+          horseSlug={ctaHorse.slug}
+          onClose={() => setCtaHorse(null)}
+        />
+      )}
     </div>
   );
 }

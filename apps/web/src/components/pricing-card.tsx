@@ -93,7 +93,7 @@ export function PricingCard({
             Commercial Pricing Engine
           </span>
           <h3 className="text-xl font-medium tracking-tight text-foreground mt-0.5">
-            Syndicate Subscription
+            Syndicate Membership
           </h3>
         </div>
         <div className="flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 text-[11px] font-mono text-accent">
@@ -217,7 +217,7 @@ export function PricingCard({
       <div className="mt-6">
         {!checkoutOpen ? (
           <div className="w-full rounded-lg border border-border bg-muted/40 py-3.5 px-4 text-center text-sm font-medium text-muted-foreground">
-            {listingStatusLabel ?? 'Subscription closed'}
+            {listingStatusLabel ?? 'Offering closed'}
           </div>
         ) : (
         <button

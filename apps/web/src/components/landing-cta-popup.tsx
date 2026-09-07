@@ -88,15 +88,15 @@ export function LandingCtaPopup() {
 
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3.5 py-1 text-xs font-mono tracking-[0.2em] uppercase text-accent">
           <Sparkles className="h-3 w-3" />
-          <span>Join the Evolution</span>
+          <span>Register</span>
         </div>
 
         <h2 className="text-2xl font-light tracking-tight text-foreground sm:text-3xl">
-          Own a share of New Zealand thoroughbred racing.
+          A share of New Zealand thoroughbred racing.
         </h2>
 
         <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-          Get first access to new campaigns, race updates, and the verified contracts behind every Evolution Stables syndicate.
+          First access to new campaigns, race updates, and the verified contracts behind every Evolution Stables syndicate.
         </p>
 
         {sent ? (

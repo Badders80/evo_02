@@ -103,7 +103,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
                   : campaign.listingStatus === 'coming_soon'
                     ? 'Coming Soon'
                     : campaign.listingStatus === 'fully_subscribed'
-                      ? 'Fully Subscribed'
+                      ? 'Fully Allocated'
                       : 'In Active Training'}
               </span>
             </div>
@@ -260,11 +260,11 @@ export default async function HorseDetailPage({ params }: PageProps) {
               checkoutOpen={isCheckoutOpen(campaign)}
               listingStatusLabel={
                 campaign.listingStatus === 'completed'
-                  ? 'Completed campaign — subscription closed'
+                  ? 'Completed campaign — offering closed'
                   : campaign.listingStatus === 'coming_soon'
-                    ? 'Coming soon — subscription not open'
+                    ? 'Coming soon — offering not open'
                     : campaign.listingStatus === 'fully_subscribed'
-                      ? 'Fully subscribed — subscription closed'
+                      ? 'Fully allocated — offering closed'
                       : undefined
               }
             />

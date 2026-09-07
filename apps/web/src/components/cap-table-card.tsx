@@ -65,7 +65,7 @@ export function CapTableCard({
           <div
             style={{ width: `${availablePct}%` }}
             className="bg-status-active transition-all"
-            title={`Available for Subscription: ${availablePct}%`}
+            title={`Available stake: ${availablePct}%`}
           />
         </div>
       </div>
@@ -128,11 +128,11 @@ export function CapTableCard({
             <div className="h-3 w-3 rounded-sm bg-status-active" />
             <div>
               <span className="font-sans text-sm text-foreground font-medium block">
-                Available for Subscription
+                Available Stake
               </span>
               <span className="text-[11px] font-sans text-status-active/80 flex items-center gap-1">
                 <CheckCircle2 className="h-3 w-3 text-status-active" />
-                Open for Immediate Subscription
+                Open now
               </span>
             </div>
           </div>

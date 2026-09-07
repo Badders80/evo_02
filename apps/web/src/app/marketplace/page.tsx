@@ -10,6 +10,7 @@ import {
   MarketplaceListingGrid,
   type MarketplaceCard,
 } from '@/components/marketplace-listing-grid';
+import { OwnershipFAQSection } from '@/components/sections/OwnershipFAQSection';
 
 export const metadata: Metadata = {
   title: 'Marketplace | Evolution Stables',
@@ -39,16 +40,25 @@ export default async function MarketplacePage() {
           <p className="text-[11px] font-light uppercase tracking-[0.2em] text-muted-foreground">
             Evolution Stables
           </p>
-          <h1 className="mt-4 text-[36px] font-light tracking-tight text-heading md:text-[56px] leading-[1.05]">
+          <h1 className="mt-4 text-[36px] font-light tracking-tight text-heading md:text-[48px] leading-[1.05]">
             Ownership, evolved.
           </h1>
           <p className="mt-4 max-w-2xl text-[15px] font-light leading-[1.7] text-muted-foreground">
-            Browse active offerings, coming-soon books, and completed track record.
+            Browse active offerings, coming-soon offerings, and completed track record. For a deeper
+            dive into our ownership model, read the{' '}
+            <a
+              href="#ownership-faq"
+              className="text-accent underline decoration-accent/40 underline-offset-4 transition-colors hover:text-heading"
+            >
+              Ownership FAQ
+            </a>{' '}
+            below.
           </p>
         </div>
         <div className="mt-16">
           <MarketplaceListingGrid cards={cards} />
         </div>
+        <OwnershipFAQSection />
       </main>
     </div>
   );

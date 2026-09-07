@@ -41,9 +41,9 @@ const STATUS_CLASSES: Record<Status, string> = {
 };
 
 const STATUS_LABELS: Record<Status, string> = {
-  listed: 'Become An Owner',
+  listed: 'Become an Owner',
   coming_soon: 'Coming Soon',
-  fully_subscribed: 'Fully Subscribed',
+  fully_subscribed: 'Fully Allocated',
   completed: 'Completed',
 };
 
