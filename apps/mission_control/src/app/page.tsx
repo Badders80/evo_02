@@ -18,7 +18,7 @@ import { SearchModal } from '../components/search-modal';
 
 const INITIAL_HORSES: Record<string, { context: SyndicateLegalContext; status: string }> = {
  nellie: {
- status: 'listed',
+ status: 'coming_soon',
  context: {
  syndicateName: 'Lady Ketchikan Racing Syndicate',
  campaignSlug: 'nellie',

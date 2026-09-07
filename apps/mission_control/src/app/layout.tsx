@@ -4,6 +4,12 @@ import './globals.css';
 export const metadata: Metadata = {
  title: 'Mission Control — Evolution Stables',
  description: 'Internal operations portal for thoroughbred syndication management.',
+ icons: {
+  icon: [
+   { url: '/brand/logos/favicon/favicon-gold.svg', type: 'image/svg+xml' },
+   { url: '/brand/logos/favicon/favicon-black.svg', type: 'image/svg+xml' },
+  ],
+ },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

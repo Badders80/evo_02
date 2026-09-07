@@ -46,9 +46,11 @@ export function SidebarNav({
  return (
  <aside className="flex h-full w-64 xl:w-72 flex-col border-r border-zinc-200/80 bg-white select-none text-zinc-900">
  <div className="flex h-14 items-center gap-3 border-b border-zinc-200/80 px-4">
- <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-300 bg-zinc-100 text-zinc-900 font-mono text-xs font-bold">
- EV
- </div>
+ <img
+ src="/brand/logos/favicon/favicon-gold.svg"
+ alt="Evolution Stables"
+ className="h-7 w-7 rounded-lg"
+/>
  <div className="flex flex-col">
  <span className="text-xs font-semibold tracking-tight text-zinc-900">
  Evolution Stables

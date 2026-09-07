@@ -14,9 +14,11 @@ export function TopNav({ mode, onModeChange, onOpenSearch }: TopNavProps) {
  <header className="sticky top-0 z-40 flex h-14 w-full items-center justify-between border-b border-zinc-200/80 bg-white/80 px-4 backdrop-blur-md transition-colors">
  {/* Left: Breadcrumbs & Brand Badge */}
  <div className="flex items-center gap-3">
- <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-300 bg-zinc-100 text-zinc-900 font-mono text-xs font-bold shadow-sm">
- EV
- </div>
+ <img
+ src="/brand/logos/favicon/favicon-gold.svg"
+ alt="Evolution Stables"
+ className="h-7 w-7 rounded-lg shadow-sm"
+/>
  <div className="flex items-center gap-1.5 text-xs text-zinc-500">
  <span className="font-semibold text-zinc-900">Evolution Stables</span>
  <span className="text-zinc-500">/</span>
