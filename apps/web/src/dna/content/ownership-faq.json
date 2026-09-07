@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "question": "What is a Digitally Syndicated Lease (DSL)?",
+      "answer": "A DSL is a regulated fractional leasehold of a thoroughbred racehorse. You hold a stake as a percentage of the syndicate (minimums and exact percentages vary by campaign — they are shown on each horse's page), with fixed monthly keep and direct rights to 75% of official NZTR gross prize money."
+    },
+    {
+      "question": "How does the 5×M Join Float Model work?",
+      "answer": "When joining a syndicate, you pay an initial float equal to 5 months of keep (3 months security deposit reserve + 2 months prepaid keep). Monthly billing of $M starts in Month 2. This structure completely prevents surprise cash calls. When the lease concludes, all unused deposit and prepaid funds are refunded pro-rata within 14 days."
+    },
+    {
+      "question": "How is prize money calculated and distributed?",
+      "answer": "Prize money is calculated directly from officially published NZTR gross stakes (e.g. on Loveracing NZ). Syndicate members receive 75% pro-rata to their stake. The remaining 25% is retained by the lessor to absorb all jockey, trainer, nom/acceptance fees, and operational overheads."
+    },
+    {
+      "question": "Who decides where and when the horse races?",
+      "answer": "Under Clause 6 of the Syndicate Agreement, the licensed trainer holds sole and absolute authority over all race placement, training regimen, spelling periods, and horse welfare decisions. This ensures the horse is conditioned to the highest professional and veterinary standard without amateur interference."
+    },
+    {
+      "question": "Is Evolution Stables regulated in New Zealand?",
+      "answer": "Yes. Evolution Stables operates as an Authorised Syndicator under New Zealand Thoroughbred Racing (NZTR) in accordance with the Financial Markets Conduct (Equine Syndicating Schemes) Exemption Notice."
+    }
+  ]
+}
