@@ -1,0 +1,66 @@
+INSERT INTO public.inventory (
+    id, slug, legal_name, barn_name, sire, dam, trainer_name, trainer_location,
+    cost_monthly_nzd, list_price_nzd, monthly_keep_unit_nzd, join_float_unit_nzd,
+    listed_stake_pct, min_stake_pct, stake_step_pct, total_shares, shares_available, reserved_shares,
+    status, close_style, payment_style, listing_platform, hero_image_url, pds_hash, sa_hash, pds_url, sa_url
+) VALUES
+(
+    '11111111-0000-0000-0000-000000000001', 'nellie', 'Lady Ketchikan (NZ)', 'Nellie', 'Almanzor (FR)', 'Night Danza (AUS)', 'Barbara Kennedy', 'Byerley Park, Karaka, NZ',
+    7000.00, 7571.00, 76.00, 380.00, 5.00, 1.00, 0.50, 10, 10, 0,
+    'listed', 'fourteen_day', 'subscription_float', 'evolution', 'https://cdn.evolutionstables.nz/horses/nellie/hero.jpg',
+    'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'a1b2c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef0',
+    'https://cdn.evolutionstables.nz/docs/nellie-pds.pdf', 'https://cdn.evolutionstables.nz/docs/nellie-sa.pdf'
+),
+(
+    '11111111-0000-0000-0000-000000000002', 'tml-x-yearn', 'Turn Me Loose x Yearn 2023', 'Mulan', 'Turn Me Loose (NZ)', 'Yearn (NZ)', 'Stephen Gray Racing', 'Palmerston North, NZ',
+    6000.00, 6489.00, 65.00, 325.00, 5.00, 1.00, 0.50, 10, 10, 0,
+    'listed', 'fourteen_day', 'subscription_float', 'evolution', 'https://cdn.evolutionstables.nz/horses/tml-x-yearn/hero.jpg',
+    'c704e0cb74e647a1539b617c421fdf31fa1600bc0d4a8c5a660411306f94bd0d', '4235dc4e5644a08603b1c6c4e02c83b8f43e86c4ec68a5bed1b7ef1998a58cfc',
+    'https://cdn.evolutionstables.nz/docs/mulan-pds.pdf', 'https://cdn.evolutionstables.nz/docs/mulan-sa.pdf'
+),
+(
+    '11111111-0000-0000-0000-000000000003', 'prudentia', 'Prudentia (NZ)', '', 'Proisir (AUS)', 'Little Bit Irish (NZ)', 'Lance O''Sullivan & Andrew Scott', 'Wexford Stables, Matamata, NZ',
+    7500.00, 8112.00, 82.00, 410.00, 5.00, 1.00, 0.25, 20, 0, 0,
+    'fully_subscribed', 'fourteen_day', 'upfront', 'tokinvest', 'https://cdn.evolutionstables.nz/horses/prudentia/hero.jpg',
+    'f4ec1f5450ca27115f9fa88cbf44e274c09eb25c85d0bd3590b93b9cdcbf21ab', '7237ef86408c8d126a800f158c717434abcc9277b655d1c74dd216bf451eafc7',
+    'https://cdn.evolutionstables.nz/docs/prudentia-pds.pdf', 'https://cdn.evolutionstables.nz/docs/prudentia-sa.pdf'
+),
+(
+    '11111111-0000-0000-0000-000000000004', 'hottathanafantasy', 'Hottathanafantasy (NZ)', 'Coco', 'Contributer (IRE)', 'Whiffle (USA)', 'Lance O''Sullivan & Andrew Scott', 'Wexford Stables, Matamata, NZ',
+    7000.00, 7571.00, 76.00, 380.00, 5.00, 1.00, 0.25, 20, 0, 0,
+    'fully_subscribed', 'fourteen_day', 'upfront', 'tokinvest', 'https://cdn.evolutionstables.nz/horses/hottathanafantasy/hero.jpg',
+    '95b363cd2a554e4c3ca308f07fd548fc070d839eae1d8c55b0b51179376f38e4', '92d990db9b776a32cbd69187fbb60a8488d093edd2f9d7b65fa16c8d75a83b8a',
+    'https://cdn.evolutionstables.nz/docs/hotta-pds.pdf', 'https://cdn.evolutionstables.nz/docs/hotta-sa.pdf'
+),
+(
+    '11111111-0000-0000-0000-000000000005', 'i-stole-a-manolo', 'I Stole A Manolo (NZ)', 'Manolo', 'Satono Aladdin (JPN)', 'Canuhandleajandal (NZ)', 'Lance O''Sullivan & Andrew Scott', 'Wexford Stables, Matamata, NZ',
+    6500.00, 7030.00, 70.00, 350.00, 5.00, 1.00, 0.50, 10, 10, 0,
+    'coming_soon', 'fourteen_day', 'upfront', 'evolution', 'https://cdn.evolutionstables.nz/horses/i-stole-a-manolo/hero.jpg',
+    'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'a1b2c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef0',
+    'https://cdn.evolutionstables.nz/docs/manolo-pds.pdf', 'https://cdn.evolutionstables.nz/docs/manolo-sa.pdf'
+),
+(
+    '11111111-0000-0000-0000-000000000006', 'first-gear', 'First Gear (NZ)', 'First Gear', 'Derryn (AUS)', 'A''Guin Ace (NZ)', 'Stephen Gray Racing', 'Palmerston North, NZ',
+    7000.00, 7571.00, 76.00, 380.00, 10.00, 1.00, 1.00, 10, 0, 0,
+    'completed', 'fourteen_day', 'upfront', 'tokinvest', 'https://cdn.evolutionstables.nz/horses/first-gear/hero.jpg',
+    'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'a1b2c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef0',
+    'https://cdn.evolutionstables.nz/docs/first-gear-pds.pdf', 'https://cdn.evolutionstables.nz/docs/first-gear-sa.pdf'
+)
+ON CONFLICT (slug) DO UPDATE SET
+    legal_name = EXCLUDED.legal_name,
+    barn_name = EXCLUDED.barn_name,
+    cost_monthly_nzd = EXCLUDED.cost_monthly_nzd,
+    list_price_nzd = EXCLUDED.list_price_nzd,
+    monthly_keep_unit_nzd = EXCLUDED.monthly_keep_unit_nzd,
+    join_float_unit_nzd = EXCLUDED.join_float_unit_nzd,
+    listed_stake_pct = EXCLUDED.listed_stake_pct,
+    min_stake_pct = EXCLUDED.min_stake_pct,
+    stake_step_pct = EXCLUDED.stake_step_pct,
+    total_shares = EXCLUDED.total_shares,
+    shares_available = EXCLUDED.shares_available,
+    reserved_shares = EXCLUDED.reserved_shares,
+    status = EXCLUDED.status,
+    payment_style = EXCLUDED.payment_style,
+    listing_platform = EXCLUDED.listing_platform,
+    hero_image_url = EXCLUDED.hero_image_url,
+    updated_at = now();;
