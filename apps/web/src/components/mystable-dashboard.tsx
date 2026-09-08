@@ -10,7 +10,6 @@ import {
 } from '@/lib/horses-data';
 import type { KycStatus } from '@evo/db_models/types';
 import {
-  Sparkles,
   ShieldCheck,
   FileText,
   Download,
@@ -83,29 +82,29 @@ export function MyStableDashboard({
   const totalKeep = rows.reduce((sum, row) => sum + Number(row.holding.monthly_keep_rate_nzd), 0);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 space-y-10 pb-24">
-      {/* C1: local KYC pill + Sign Out removed — Header (root layout) already
-          renders the top nav with the user chip + Sign Out. Duplicate removed. */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-border pb-6 gap-4">
+    <div className="mx-auto max-w-7xl px-12 pt-32 pb-24 md:px-16 lg:px-20 space-y-10">
+      {/* C7+C8: typography + rhythm aligned with marketplace hero (pt-32,
+          eyebrow + display H1 in tracking-tight, paragraph at 15/light).
+          Local Sign Out removed (C1) — Header covers it. KYC pill kept
+          as status chip on the right. */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-border pb-8 gap-6">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs font-medium tracking-[0.2em] uppercase text-accent">
-            <Sparkles className="h-3 w-3" />
-            <span>Private Dashboard</span>
-          </div>
-          <h1 className="mt-3 text-3xl sm:text-4xl font-light tracking-tight text-foreground">
-            MyStable Dashboard
+          <p className="text-[11px] font-light uppercase tracking-[0.2em] text-muted-foreground">
+            Private Dashboard
+          </p>
+          <h1 className="mt-4 text-[36px] font-light tracking-tight text-heading md:text-[48px] leading-[1.05]">
+            MyStable
           </h1>
-          <p className="mt-1 text-xs font-medium text-muted-foreground">
-            Authenticated Account: <span className="text-foreground">{userEmail}</span>
+          <p className="mt-4 max-w-2xl text-[15px] font-light leading-[1.7] text-muted-foreground">
+            Authenticated as <span className="text-foreground">{userEmail}</span>. Active
+            holdings, distributions, and legal pack for your stake.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-xs">
-            <ShieldCheck className={`h-4 w-4 ${kyc.className}`} />
-            <div>
-              <span className="text-muted-foreground block text-[10px] uppercase font-medium tracking-[0.2em]">KYC Status</span>
-              <span className={`font-medium ${kyc.className}`}>{kyc.text}</span>
-            </div>
+        <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-xs shrink-0">
+          <ShieldCheck className={`h-4 w-4 ${kyc.className}`} />
+          <div>
+            <span className="text-muted-foreground block text-[10px] uppercase font-medium tracking-[0.2em]">KYC Status</span>
+            <span className={`font-medium ${kyc.className}`}>{kyc.text}</span>
           </div>
         </div>
       </div>
