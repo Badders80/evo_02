@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
 
   if (request.nextUrl.pathname.startsWith('/mystable') && !user) {
     const redirectUrl = request.nextUrl.clone();
