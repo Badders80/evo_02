@@ -18,6 +18,7 @@ import {
   stakePctToStepUnits,
 } from '@/lib/nellie-loop';
 import { handleIdentityEvent, isIdentityEvent } from '@/lib/identity-webhook';
+import { handleSubscriptionEvent, isSubscriptionEvent } from '@/lib/subscription-webhook';
 import { sendWelcomeEmail } from '@/lib/welcome-email';
 
 type StripeEvent = {
@@ -184,6 +185,9 @@ export async function POST(request: Request) {
     }
     if (isIdentityEvent(event.type)) {
       await handleIdentityEvent(event.type, event.data.object);
+    }
+    if (isSubscriptionEvent(event.type)) {
+      await handleSubscriptionEvent(event.data.object);
     }
 
     const { error: markError } = await admin
