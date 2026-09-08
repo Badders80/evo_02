@@ -133,27 +133,32 @@ function resolveTrainerSlug(trainerName: string): string {
   return normalized || 'unknown';
 }
 
-function resolveOwner(slug: string): { entity: string; contact: string } {
-  switch (slug) {
-    case 'first-gear':
-    case 'tml-x-yearn':
-      return { entity: 'Stephen Gray Racing', contact: 'Stephen Gray' };
-    case 'nellie':
-    case 'prudentia':
-    case 'hottathanafantasy':
-    case 'i-stole-a-manolo':
-      return { entity: 'B.A.X Bloodstock', contact: 'Kylie Bax' };
-    default:
-      return { entity: 'Evolution Stables', contact: 'Evolution Stables' };
-  }
-}
-
 function resolveTrainer(trainerName: string, trainerLocation: string): HorseCampaign['trainer'] {
   const slug = resolveTrainerSlug(trainerName);
   const profile = getTrainer(slug);
   const stable = profile?.stableName ?? trainerName;
   const location = profile?.location ?? trainerLocation;
   return { name: trainerName, stable, location, slug };
+}
+
+/**
+ * Owner resolution (007 T6): owner entities live in the `owners` table and are
+ * linked to inventory via owner_id (migration 00009). Fetched once per query
+ * as a slug→owner map (no N+1); a missing linkage falls back to the canonical
+ * lessor of last resort (Evolution Stables) rather than failing the row.
+ */
+const EVOLUTION_OWNER = { entity: 'Evolution Stables', contact: 'Evolution Stables' } as const;
+
+async function fetchOwnerMap(): Promise<Map<string, { entity: string; contact: string }>> {
+  const admin = getSupabaseServiceClient();
+  const { data } = await admin.from('inventory').select('slug, owners(entity, contact)');
+  const map = new Map<string, { entity: string; contact: string }>();
+  for (const row of (data ?? []) as Array<{ slug: string; owners?: { entity: string; contact: string } }>) {
+    if (row.owners) {
+      map.set(row.slug, row.owners);
+    }
+  }
+  return map;
 }
 
 function statusToListingStatus(status: string): ListingStatus {
@@ -172,7 +177,10 @@ function statusToListingStatus(status: string): ListingStatus {
   }
 }
 
-function rowToCampaign(row: InventoryHorse): HorseCampaign {
+function rowToCampaign(
+  row: InventoryHorse,
+  ownerMap: Map<string, { entity: string; contact: string }>
+): HorseCampaign {
   const pedigreeData = parseJsonb<Record<string, unknown>>(row.pedigree_data) ?? {};
   // Raw jsonb maps — typed as plain records so both camelCase (canonical) and legacy
   // snake_case keys are readable at runtime (dual-shape read, locked 2026-08-31).
@@ -180,7 +188,7 @@ function rowToCampaign(row: InventoryHorse): HorseCampaign {
   const marketing = parseJsonb<Record<string, unknown>>(row.marketing) ?? {};
 
   const trainer = resolveTrainer(row.trainer_name, row.trainer_location);
-  const owner = resolveOwner(row.slug);
+  const owner = ownerMap.get(row.slug) ?? EVOLUTION_OWNER;
 
   const listedStakePct = Number(row.listed_stake_pct);
   const sharesAvailable = Number(row.shares_available);
@@ -298,7 +306,8 @@ export async function getAllCampaigns(): Promise<HorseCampaign[]> {
   if (error) {
     throw new Error(`Failed to load campaigns: ${error.message}`);
   }
-  return (rows ?? []).map(rowToCampaign);
+  const ownerMap = await fetchOwnerMap();
+  return (rows ?? []).map((row) => rowToCampaign(row, ownerMap));
 }
 
 export async function getCampaignBySlug(slug: string): Promise<HorseCampaign | null> {
@@ -308,7 +317,8 @@ export async function getCampaignBySlug(slug: string): Promise<HorseCampaign | n
     if (error?.code === 'PGRST116') return null;
     throw new Error(`Failed to load campaign ${slug}: ${error?.message ?? 'not found'}`);
   }
-  return rowToCampaign(row);
+  const ownerMap = await fetchOwnerMap();
+  return rowToCampaign(row, ownerMap);
 }
 
 /**
