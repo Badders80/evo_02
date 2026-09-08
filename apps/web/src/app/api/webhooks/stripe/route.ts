@@ -18,6 +18,7 @@ import {
   resolvePaidAmountNzd,
   stakePctToStepUnits,
 } from '@/lib/nellie-loop';
+import { handleIdentityEvent, isIdentityEvent } from '@/lib/identity-webhook';
 
 type StripeEvent = {
   id: string;
@@ -165,6 +166,9 @@ export async function POST(request: Request) {
 
     if (event.type === 'checkout.session.completed') {
       await persistCompletedCheckout(event);
+    }
+    if (isIdentityEvent(event.type)) {
+      await handleIdentityEvent(event.type, event.data.object);
     }
 
     const { error: markError } = await admin

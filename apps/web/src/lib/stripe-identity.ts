@@ -61,12 +61,13 @@ export async function createVerificationSession(userId: string, returnUrl: strin
 }
 
 /**
- * Retrieves a session WITH its verification report expanded — required for
- * the audit digest and the residency/age gates.
+ * Retrieves a session WITH its last verification report expanded — required for
+ * the audit digest and the residency/age gates. (Stripe's expandable field is
+ * `last_verification_report`; `verification_report` is not expandable.)
  */
 export async function retrieveVerificationSession(sessionId: string): Promise<Record<string, unknown>> {
   const res = await fetch(
-    `${STRIPE_API}/identity/verification_sessions/${encodeURIComponent(sessionId)}?expand[]=verification_report`,
+    `${STRIPE_API}/identity/verification_sessions/${encodeURIComponent(sessionId)}?expand[]=last_verification_report`,
     { headers: { Authorization: `Bearer ${stripeSecretKey()}` } }
   );
   const json = (await res.json()) as Record<string, unknown>;
