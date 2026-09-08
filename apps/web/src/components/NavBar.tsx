@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { LOGOS } from '@/lib/assets';
 import { GlowPillButton } from '@/components/ui/GlowPillButton';
@@ -29,6 +30,8 @@ const navLinks = [
  * - Responsive mobile menu
  */
 export function NavBar() {
+  const pathname = usePathname();
+  const loginHref = `/auth/login?next=${encodeURIComponent(pathname || '/')}`;
   const { user, signOut, loading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -197,7 +200,7 @@ export function NavBar() {
             </div>
           ) : (
             <Link
-              href="/auth/login"
+              href={loginHref}
               className={isCompact ? 'hidden' : 'lg:block'}
             >
               <GlowPillButton>
@@ -264,7 +267,7 @@ export function NavBar() {
                 </div>
               ) : (
                 <Link
-                  href="/auth/login"
+                  href={loginHref}
                   className="block"
                   onClick={() => setIsMenuOpen(false)}
                 >
