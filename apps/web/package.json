@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
-    "test": "tsx src/tests/nellie_loop.test.ts && tsx src/tests/media_fallback.test.ts && tsx src/tests/google_oauth.test.ts && tsx src/tests/race_summary.test.ts && tsx src/tests/e3_right_rail.test.ts && tsx src/tests/checkout_error_copy.test.ts"
+    "test": "tsx src/tests/nellie_loop.test.ts && tsx src/tests/media_fallback.test.ts && tsx src/tests/google_oauth.test.ts && tsx src/tests/race_summary.test.ts && tsx src/tests/e3_right_rail.test.ts && tsx src/tests/checkout_error_copy.test.ts && tsx src/tests/stripe_identity.test.ts"
   },
   "dependencies": {
     "@evo/brand_dna": "workspace:*",
