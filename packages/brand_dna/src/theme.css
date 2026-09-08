@@ -54,6 +54,10 @@
 
     /* Radii */
     --radius: 0.375rem;             /* 6px default */
+
+    /* Glow shadows (delta indicators / success badges) */
+    --shadow-success-glow: 0 0 20px hsl(160 84% 39% / 0.35);    /* status-active emerald */
+    --shadow-success-glow-strong: 0 0 32px hsl(160 84% 39% / 0.55);
   }
 }
 

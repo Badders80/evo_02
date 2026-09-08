@@ -58,11 +58,16 @@ function statusOrder(status: ListingStatus): number {
 
 function StatusBadge({ status }: { status: ListingStatus }) {
   const meta = STATUS_META[status];
+  // T14 — delta indicator: actively-engaged statuses (listed + coming_soon) get
+  // the --shadow-success-glow ring on the dot to signal "in motion" — distinct
+  // from fully_subscribed (settled) and completed (historical).
+  const isActive = status === 'listed' || status === 'coming_soon';
+  const dotGlow = isActive ? 'shadow-[0_0_8px_var(--shadow-success-glow)]' : '';
   return (
     <div
       className={`absolute top-4 right-4 z-10 flex items-center gap-1.5 rounded-full border px-3 py-1 backdrop-blur-md ${meta.badge}`}
     >
-      <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
+      <span className={`h-1.5 w-1.5 rounded-full ${meta.dot} ${dotGlow}`} />
       <span className="text-[8px] font-light uppercase tracking-widest">{meta.label}</span>
     </div>
   );
@@ -100,7 +105,7 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
             key={tab.key}
             type="button"
             onClick={() => setFilter(tab.key)}
-            className={`relative cursor-pointer py-1 text-[10px] font-light uppercase tracking-[0.2em] transition-all duration-300 ${
+            className={`relative cursor-pointer py-1 text-[10px] font-light uppercase tracking-[0.2em] transition-colors duration-300 ${
               filter === tab.key ? 'text-heading' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -145,7 +150,7 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
                   <img
                     src={card.image}
                     alt={card.name}
-                    className="h-full w-full object-contain opacity-90 transition-transform duration-1000 group-hover:scale-[1.03] group-hover:opacity-100"
+                    className="h-full w-full object-contain opacity-90 transition-transform duration-300 group-hover:scale-[1.03] group-hover:opacity-100"
                     style={{ mixBlendMode: 'lighten' }}
                   />
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-canvas/40 via-transparent to-transparent" />
