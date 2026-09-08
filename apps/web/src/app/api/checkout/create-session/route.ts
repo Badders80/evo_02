@@ -10,6 +10,7 @@ import {
   pricingForUnits,
   stakePctToStepUnits,
 } from '@/lib/nellie-loop';
+import { buildSubscriptionCheckoutParams } from '@/lib/stripe-subscription';
 
 function jsonError(err: unknown): NextResponse {
   if (err instanceof HttpError) {
@@ -110,29 +111,23 @@ export async function POST(request: Request) {
 
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY as string;
     const origin = request.headers.get('origin') || new URL(request.url).origin;
-    const params = new URLSearchParams();
-    params.append('mode', 'payment');
-    params.append('customer_email', userEmail);
-    params.append('success_url', `${origin}/mystable?checkout=success&slug=${horseSlug}&units=${units}`);
-    params.append('cancel_url', `${origin}/marketplace/${horseSlug}?units=${units}`);
-    params.append('line_items[0][price_data][currency]', 'nzd');
-    params.append(
-      'line_items[0][price_data][product_data][name]',
-      `${campaign.legalName} (${units}% Stake)`
-    );
-    params.append(
-      'line_items[0][price_data][product_data][description]',
-      `Initial 5×M float deposit for ${campaign.legalName}`
-    );
-    params.append('line_items[0][price_data][unit_amount]', String(pricing.joinFloatUnitNzd * 100));
-    params.append('line_items[0][quantity]', '1');
-    params.append('metadata[horse_slug]', horseSlug);
-    params.append('metadata[units]', String(units));
-    params.append('metadata[user_id]', userId);
-    params.append('metadata[reservation_id]', reservation.reservationId);
-    params.append('metadata[pds_hash]', legalPack.pdsHash);
-    params.append('metadata[sa_hash]', legalPack.saHash);
-    params.append('metadata[owner_name]', campaign.owner.entity);
+    const params = buildSubscriptionCheckoutParams({
+      userEmail,
+      legalName: campaign.legalName,
+      units,
+      monthlyKeepUnitNzd: pricing.monthlyKeepUnitNzd,
+      joinFloatUnitNzd: pricing.joinFloatUnitNzd,
+      origin,
+      metadata: {
+        horse_slug: horseSlug,
+        units: String(units),
+        user_id: userId,
+        reservation_id: reservation.reservationId,
+        pds_hash: legalPack.pdsHash,
+        sa_hash: legalPack.saHash,
+        owner_name: campaign.owner.entity,
+      },
+    });
 
     const stripeRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
