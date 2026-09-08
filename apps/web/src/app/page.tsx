@@ -1,6 +1,5 @@
 import { FixedBg } from '@/components/ui/FixedBg';
 import { GrassBg } from '@/components/ui/GrassBg';
-import { NavBar } from '@/components/NavBar';
 import { CtaLeadModal } from '@/components/CtaLeadModal';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { AboutSection } from '@/components/sections/AboutSection';
@@ -42,10 +41,8 @@ export default async function HomePage({
 
   return (
     <>
-      <NavBar />
       <CtaLeadModal forceInstant={forceInstant} />
       <main className="text-foreground">
-        <h1 className="sr-only">Evolution Stables — Digital Racehorse Ownership</h1>
 
         <div className="w-full bg-canvas px-0 shadow-[0_0_80px_RGBA(0,0,0,0.35)] m-0 p-0 border-none max-w-none">
           <HeroSection />

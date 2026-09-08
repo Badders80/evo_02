@@ -75,17 +75,17 @@ export function HeroSection({
       </div>
 
       <div ref={contentRef} className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-start gap-4 px-8 pb-16 md:px-12">
-        {/* Logo */}
-        <div className="relative w-full max-w-[720px] animate-hero-logo">
+        {/* Logo — visible h1 (north-star rule: one display h1 per page) */}
+        <h1 className="relative w-full max-w-[720px] animate-hero-logo">
           <Image
             src="/images/brand/lockups/gold/lockup-horizontal-gold.png"
-            alt="Evolution Stables — Thoroughbreds in training"
+            alt="Evolution Stables — Digital Racehorse Ownership"
             width={1200}
             height={400}
             priority
             className="relative z-20 h-auto w-full"
           />
-        </div>
+        </h1>
 
         {/* Tagline */}
         <p
