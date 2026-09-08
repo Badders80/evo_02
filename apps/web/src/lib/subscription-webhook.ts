@@ -1,6 +1,7 @@
 // apps/web/src/lib/subscription-webhook.ts
 import { getSupabaseServiceClient } from '@/lib/supabase-server';
 import { HttpError } from '@/lib/nellie-loop';
+import { resetFloat } from '@/lib/float-reset';
 
 const SUBSCRIPTION_EVENTS = new Set([
   'customer.subscription.updated',
@@ -38,9 +39,13 @@ export async function handleSubscriptionEvent(subscription: Record<string, unkno
   const holdingStatus = holdingStatusForSubscription(status);
 
   const admin = getSupabaseServiceClient();
+  const patch: Record<string, unknown> = { status: holdingStatus };
+  if (holdingStatus === 'active') {
+    patch.float_months_held = resetFloat(0);
+  }
   const { error } = await admin
     .from('holdings')
-    .update({ status: holdingStatus })
+    .update(patch)
     .eq('stripe_subscription_id', subscriptionId);
 
   if (error) {
