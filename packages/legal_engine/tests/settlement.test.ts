@@ -123,7 +123,7 @@ console.log('Running @evo/legal_engine Settlement & Cap Table Invariant tests...
   assert.equal(caseE.stakeForfeited, true);
   assert.equal(caseE.burnedOverMonths, 4, 'Full 4-month float coverage is burned in Case E (must be 4, not 3)');
 
-  console.log('✅ SOP Settlement Cases (Case B, Case D 4->3, Case E) verified');
+  console.log('✅ SOP Settlement Cases (Case B, Case D 5->4->3, Case E) verified');
 }
 
 // 4. NZ GST Breakdown Tests (Strict 20/23 and 3/23 Identity)
