@@ -182,6 +182,8 @@ export interface Database {
           sa_hash: string;
           pds_url: string;
           sa_url: string;
+          term_start_date: string | null;
+          term_end_date: string | null;
           pedigree_data: PedigreeData | null;
           soft_legal?: Json | null;
           marketing?: Json | null;
@@ -218,6 +220,8 @@ export interface Database {
           sa_hash: string;
           pds_url: string;
           sa_url: string;
+          term_start_date?: string | null;
+          term_end_date?: string | null;
           pedigree_data?: PedigreeData | null;
           soft_legal?: Json | null;
           marketing?: Json | null;
@@ -254,6 +258,8 @@ export interface Database {
           sa_hash?: string;
           pds_url?: string;
           sa_url?: string;
+          term_start_date?: string | null;
+          term_end_date?: string | null;
           pedigree_data?: PedigreeData | null;
           soft_legal?: Json | null;
           marketing?: Json | null;

@@ -59,6 +59,9 @@ export interface HorseCampaign {
   };
   closeStyle: 'fourteen_day' | 'three_x_remaining';
   listingPlatform?: string;
+  paymentModel?: 'subscription_float' | 'upfront';
+  termStartDate?: string;
+  termEndDate?: string;
 }
 
 /**
@@ -287,6 +290,9 @@ function rowToCampaign(
     },
     closeStyle: row.close_style as 'fourteen_day' | 'three_x_remaining',
     listingPlatform: row.listing_platform,
+    paymentModel: row.payment_style as 'subscription_float' | 'upfront',
+    termStartDate: row.term_start_date ?? undefined,
+    termEndDate: row.term_end_date ?? undefined,
   };
 
   // Sire sanity: enrich empty pedigree fields from registry when possible.
@@ -367,16 +373,21 @@ export function getCompiledLegalPackForCampaign(campaign: HorseCampaign): Compil
       trainer: {
         name: campaign.trainer.name,
         location: campaign.trainer.location,
-        managerEntity: campaign.trainer.stable,
+        // Manager is Evolution Stables (locked: Evolution is the syndicate manager,
+        // never an owner row). The trainer's stable is NOT the manager.
+        managerEntity: 'Evolution Stables',
       },
       pricing,
       closeStyle: campaign.closeStyle,
       totalHorsePercentage: campaign.totalSyndicateStakePct,
       totalShares: Math.round(campaign.totalSyndicateStakePct),
       sharesAvailable: Math.round(campaign.capTableFixture.availablePct),
+      paymentModel: campaign.paymentModel,
+      termStartDate: campaign.termStartDate,
+      termEndDate: campaign.termEndDate,
       pdsVersion: '1.0.0',
       saVersion: '1.0.0',
-      effectiveDate: '2026-08-17',
+      effectiveDate: campaign.termStartDate ?? '2026-08-17',
       softLegal: campaign.softLegal,
       marketing: campaign.marketing,
       listingPlatform: campaign.listingPlatform,

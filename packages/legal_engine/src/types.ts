@@ -76,6 +76,8 @@ export interface SyndicateLegalContext {
   sharesAvailable: number;
   paymentModel?: 'subscription_float' | 'upfront';
   termMonths?: number;
+  termStartDate?: string;
+  termEndDate?: string;
   listingPlatform?: string;
   minInvestmentPct?: number;
   stakeStepPct?: number;

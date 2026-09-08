@@ -134,7 +134,7 @@ export function runTests(): void {
   assertIncludes(nelliePack.pack.termSheetMarkdown, '5.0% available', 'Nellie total syndicated %');
   assertIncludes(nelliePack.pack.termSheetMarkdown, 'Minimum Investment:** 1.0% — increments of 0.5% thereafter', 'Nellie min investment / step wording');
   assertIncludes(nelliePack.pack.termSheetMarkdown, '$76.00 / month per 1% stake', 'Nellie keep rate');
-  assertIncludes(nelliePack.pack.termSheetMarkdown, '$380.00 per 1% stake', 'Nellie join float');
+  assertIncludes(nelliePack.pack.termSheetMarkdown, '3 mo reserve deposit + 2 mo advance keep', 'Nellie join float');
   assertIncludes(nelliePack.pack.termSheetMarkdown, '75% Investor Pool / 25% Owner Retention', 'Prize split');
   assertIncludes(nelliePack.pack.termSheetMarkdown, '**Bax Bloodstock** (Owner)', 'Owner signature block');
   console.log('✅ Term Sheet generation & anchors verified');
