@@ -100,17 +100,22 @@ console.log('Running @evo/legal_engine Settlement & Cap Table Invariant tests...
   assert.equal(caseBPartial.depositRefundNzd, 152.0, 'Only remaining 2 months held deposit refunded (2 * 76 = 152)');
   assert.equal(caseBPartial.totalRefundNzd, 152.0);
 
-  // Case D Phase 1: Delinquency Drawdown (The 4 -> 3 Rule)
-  const caseD1 = computeDelinquencyBurn(keepNzd);
+  // Case D Phase 1: Delinquency Drawdown (5 -> 4 -> 3)
+  const caseD1 = computeDelinquencyBurn(keepNzd, 5);
   assert.equal(caseD1.burnedAdvanceKeepNzd, 76.0, '1 month advance keep burned');
-  assert.equal(caseD1.remainingDepositMonths, 3, '3 months deposit coverage remaining');
+  assert.equal(caseD1.remainingFloatMonths, 4, '5 -> 4 after first miss');
+  assert.equal(caseD1.remainingDepositMonths, 3, '3 months deposit still held');
+
+  const caseD1b = computeDelinquencyBurn(keepNzd, 4);
+  assert.equal(caseD1b.remainingFloatMonths, 3, '4 -> 3 after second miss');
+  assert.equal(caseD1b.remainingDepositMonths, 3, 'deposit floor reached');
 
   // Case D Phase 2: Uncured Default Settlement
   const caseD2 = computeDelinquentDefaultSettlement(keepNzd);
-  assert.equal(caseD2.burnedAdvanceKeepNzd, 76.0);
-  assert.equal(caseD2.forfeitedDepositNzd, 228.0, '3 months deposit forfeited to Evolution (3 * 76 = 228)');
-  assert.equal(caseD2.totalEvolutionLiquidatedDamagesNzd, 228.0);
+  assert.equal(caseD2.forfeitedDepositNzd, 228.0, '3 months deposit forfeited (3 * 76 = 228)');
   assert.equal(caseD2.stakeRepossessed, true);
+  assert.equal(caseD2.depositHeldBy, 'evolution');
+  assert.equal(caseD2.depositDisposition, 'manual_review_to_owner');
 
   // Case E: Investor Walk-Away (Notice before the 1st, 4-month burn, zero refund)
   const caseE = computeInvestorExitSettlement();

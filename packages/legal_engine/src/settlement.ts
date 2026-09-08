@@ -190,19 +190,28 @@ export function computeOwnerCloseSettlement(
 
 export interface DelinquencyBurnResult {
   burnedAdvanceKeepCents: number;
+  remainingFloatMonths: number;
   remainingDepositMonths: number;
   burnedAdvanceKeepNzd: number;
 }
 
 /**
- * Case D — Phase 1: Delinquency Drawdown (The 4 -> 3 Rule).
- * Rule: Missed payment on 1st burns 1 month advance keep, coverage drops from 4 to 3 months.
+ * Case D — Phase 1: Delinquency Drawdown (5 -> 4 -> 3).
+ * Rule: Missed payment on the 1st burns 1 month advance keep. Float drops
+ * 5 -> 4 (3 deposit + 1 advance) on the first miss, 4 -> 3 (all deposit) on
+ * the second. At 3 the deposit floor is reached and default matures.
  */
-export function computeDelinquencyBurn(monthlyKeepNzd: number): DelinquencyBurnResult {
+export function computeDelinquencyBurn(
+  monthlyKeepNzd: number,
+  floatMonthsHeld: number = 5
+): DelinquencyBurnResult {
   const keepCents = Math.round(Math.max(0, monthlyKeepNzd) * 100);
+  const remainingFloatMonths = Math.max(3, floatMonthsHeld - 1);
+  const remainingDepositMonths = Math.min(3, remainingFloatMonths);
   return {
     burnedAdvanceKeepCents: keepCents,
-    remainingDepositMonths: 3,
+    remainingFloatMonths,
+    remainingDepositMonths,
     burnedAdvanceKeepNzd: keepCents / 100,
   };
 }
@@ -210,29 +219,28 @@ export function computeDelinquencyBurn(monthlyKeepNzd: number): DelinquencyBurnR
 export interface DelinquentDefaultSettlementResult {
   burnedAdvanceKeepCents: number;
   forfeitedDepositCents: number;
-  totalEvolutionLiquidatedDamagesCents: number;
-  burnedAdvanceKeepNzd: number;
   forfeitedDepositNzd: number;
-  totalEvolutionLiquidatedDamagesNzd: number;
   stakeRepossessed: boolean;
+  depositHeldBy: 'evolution';
+  depositDisposition: 'manual_review_to_owner';
 }
 
 /**
  * Case D — Phase 2: Uncured Default Settlement.
- * Rule: After 4->3 keep drawdown, when default matures under SA Clause 8, the 3-month deposit ($3xM) is forfeited to Evolution as liquidated damages, stake repossessed.
+ * Rule: At 3 months the investor forfeits the 3-month deposit and ownership
+ * rights. The deposit is HELD BY EVOLUTION and manually reviewed to calculate
+ * the owner return — it is not automatically Evolution's liquidated damages.
  */
 export function computeDelinquentDefaultSettlement(monthlyKeepNzd: number): DelinquentDefaultSettlementResult {
   const keepCents = Math.round(Math.max(0, monthlyKeepNzd) * 100);
   const forfeitedDepositCents = 3 * keepCents;
-
   return {
     burnedAdvanceKeepCents: keepCents,
     forfeitedDepositCents,
-    totalEvolutionLiquidatedDamagesCents: forfeitedDepositCents,
-    burnedAdvanceKeepNzd: keepCents / 100,
     forfeitedDepositNzd: forfeitedDepositCents / 100,
-    totalEvolutionLiquidatedDamagesNzd: forfeitedDepositCents / 100,
     stakeRepossessed: true,
+    depositHeldBy: 'evolution',
+    depositDisposition: 'manual_review_to_owner',
   };
 }
 
