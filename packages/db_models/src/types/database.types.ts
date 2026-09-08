@@ -104,6 +104,12 @@ export type ReservationStatus =
   | 'released'
   | 'expired';
 
+export type DslDocStatus =
+  | 'draft'
+  | 'pending'
+  | 'approved'
+  | 'rejected';
+
 export interface Database {
   public: {
     Tables: {
@@ -186,6 +192,12 @@ export interface Database {
           term_end_date: string | null;
           distribution_split: string | null;
           distribution_schedule: string | null;
+          term_sheet_status: DslDocStatus;
+          pds_status: DslDocStatus;
+          sa_status: DslDocStatus;
+          term_sheet_locked_at: string | null;
+          pds_locked_at: string | null;
+          sa_locked_at: string | null;
           pedigree_data: PedigreeData | null;
           soft_legal?: Json | null;
           marketing?: Json | null;
@@ -224,6 +236,14 @@ export interface Database {
           sa_url: string;
           term_start_date?: string | null;
           term_end_date?: string | null;
+          distribution_split?: string | null;
+          distribution_schedule?: string | null;
+          term_sheet_status?: DslDocStatus;
+          pds_status?: DslDocStatus;
+          sa_status?: DslDocStatus;
+          term_sheet_locked_at?: string | null;
+          pds_locked_at?: string | null;
+          sa_locked_at?: string | null;
           pedigree_data?: PedigreeData | null;
           soft_legal?: Json | null;
           marketing?: Json | null;
@@ -264,6 +284,12 @@ export interface Database {
           term_end_date?: string | null;
           distribution_split?: string | null;
           distribution_schedule?: string | null;
+          term_sheet_status?: DslDocStatus;
+          pds_status?: DslDocStatus;
+          sa_status?: DslDocStatus;
+          term_sheet_locked_at?: string | null;
+          pds_locked_at?: string | null;
+          sa_locked_at?: string | null;
           pedigree_data?: PedigreeData | null;
           soft_legal?: Json | null;
           marketing?: Json | null;

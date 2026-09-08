@@ -1,10 +1,20 @@
 /**
  * Product Disclosure Statement (PDS) Generator for Evolution Stables DSL.
  * Authority: evo_00/doc/DSL_MANUAL.md §1–§6 and evo_00/migration_bridge/04_LEGAL_DIFF_AUDIT.md
+ *
+ * Litmus rule (founder 2026-09-09): renders ONLY what is in the data. A missing
+ * field renders as a blank marker — never a hardcoded default. Proforma sections
+ * are generator output (read-only); the non-proforma fields are the data.
  */
 
 import type { SyndicateLegalContext, HorseSoftLegalContent } from './types';
-import { SHARE_MATH } from './types';
+import { BLANK } from './term_sheet';
+
+/** Coerce a value to its display string, or the blank marker when absent. */
+function v(x: string | number | null | undefined): string {
+  if (x === null || x === undefined || x === '') return BLANK;
+  return String(x);
+}
 
 /**
  * Normalizes soft text to prevent cryptographic hash drift from line endings or whitespace.
@@ -41,20 +51,82 @@ export function generatePdsMarkdown(context: SyndicateLegalContext): string {
     ? `\n\n### §2.4 Racing Expectation\n\n${soft.raceExpectation}\n`
     : '';
 
-  return `# Product Disclosure Statement
-## ${context.syndicateName}
+  // §1 minimum investment / step: data-driven, blank when unset.
+  const minInvestment = context.minInvestmentPct != null ? `${context.minInvestmentPct.toFixed(1)}%` : BLANK;
+  const stakeStep = context.stakeStepPct != null ? `${context.stakeStepPct.toFixed(1)}%` : BLANK;
 
-**Campaign:** ${context.campaignSlug}  
-**Version:** ${context.pdsVersion}  
-**Effective Date:** ${context.effectiveDate}
+  // §4 float & billing: model-aware, blank when the model is unset.
+  const paymentModel = context.paymentModel;
+  const termMonths = context.termMonths;
+  let floatSection: string;
+  if (paymentModel === 'upfront') {
+    const upfrontTotal = termMonths != null ? `$${(p.monthlyKeepUnitNzd * termMonths).toFixed(2)}` : BLANK;
+    const termLabel = termMonths != null ? `${termMonths}-month` : BLANK;
+    floatSection = `Participation is structured as an **upfront payment of ${upfrontTotal} per 1% stake**, covering the full ${termLabel} syndicate lease term.
+
+There are no recurring monthly subscription fees or capital calls.
+
+Upon formal termination or maturity of the syndicate lease, any unused prepaid keep is **refunded pro-rata** to the investor’s verified payment method within 14 business days.`;
+  } else if (paymentModel === 'subscription_float') {
+    floatSection = `At initial participation, an investor pays **$${p.joinFloatUnitNzd.toFixed(2)}**, representing:
+- 3 months security deposit reserve; and
+- 2 months prepaid keep.
+
+From month 2 onwards, the investor pays **$${p.monthlyKeepUnitNzd.toFixed(2)} per month** to maintain a constant 5-month float buffer.
+
+Upon formal termination or maturity of the syndicate lease, all unused prepaid keep and security deposit reserve funds are **refunded pro-rata** to the investor’s verified payment method within 14 business days.`;
+  } else {
+    floatSection = `**Payment Model:** ${BLANK}
+
+**Float & Billing:** ${BLANK}`;
+  }
+
+  // §5 gross stakes split: owner-set, never a platform default.
+  const distributionSplit = context.distributionSplit;
+  const distributionSchedule = context.distributionSchedule;
+  let splitSection: string;
+  if (distributionSplit) {
+    splitSection = `All prize money distributions are calculated strictly from **officially published NZTR / LoveRacing gross stakes earnings**.
+
+**Gross Stakes Distribution:** ${distributionSplit}
+
+**Distribution Schedule:** ${distributionSchedule ? distributionSchedule : BLANK}`;
+  } else {
+    splitSection = `All prize money distributions are calculated strictly from **officially published NZTR / LoveRacing gross stakes earnings**.
+
+**Gross Stakes Distribution:** ${BLANK}
+
+**Distribution Schedule:** ${BLANK}`;
+  }
+
+  // §6 exit / close style: blank when unset.
+  const closeStyleLabel =
+    context.closeStyle === 'fourteen_day'
+      ? 'Standard 14-Day Notice (Case B)'
+      : context.closeStyle === 'three_x_remaining'
+        ? '3× Buyout Liquidating Exit (Case B1)'
+        : BLANK;
+  const closeDetail =
+    context.closeStyle === 'fourteen_day'
+      ? 'An investor may exit by giving 14 calendar days written notice when the underlying head lease concludes or the horse is retired. No penalty buyout applies.'
+      : context.closeStyle === 'three_x_remaining'
+        ? 'Where the head lease provides liquidation proceeds, the syndicate may be wound up by payment of 3× the remaining lease value to co-owners.'
+        : BLANK;
+
+  return `# Product Disclosure Statement
+## ${v(context.syndicateName)}
+
+**Campaign:** ${v(context.campaignSlug)}  
+**Version:** ${v(context.pdsVersion)}  
+**Effective Date:** ${v(context.effectiveDate)}
 
 ---
 
 ## §1. Title & Structure
 
-This Product Disclosure Statement relates to the **${context.syndicateName}**, a digitally-syndicated thoroughbred ownership campaign managed by **${t.managerEntity}**, a registered Syndicate Manager under the New Zealand Thoroughbred Racing (NZTR) Rules of Racing and Syndication Code of Practice.
+This Product Disclosure Statement relates to the **${v(context.syndicateName)}**, a digitally-syndicated thoroughbred ownership campaign managed by **${v(t.managerEntity)}**, a registered Syndicate Manager under the New Zealand Thoroughbred Racing (NZTR) Rules of Racing and Syndication Code of Practice.
 
-Participation is offered in the form of fractional leasehold stakes. Each stake is a percentage interest in the syndicated leasehold of the thoroughbred described in §2, from a minimum investment of ${(context.minInvestmentPct ?? SHARE_MATH.DEFAULT_MIN_INVESTMENT_PCT).toFixed(1)}%, with increments of ${(context.stakeStepPct ?? SHARE_MATH.DEFAULT_STAKE_STEP_PCT).toFixed(1)}% thereafter.
+Participation is offered in the form of fractional leasehold stakes. Each stake is a percentage interest in the syndicated leasehold of the thoroughbred described in §2, from a minimum investment of ${minInvestment}, with increments of ${stakeStep} thereafter.
 
 ---
 
@@ -64,15 +136,15 @@ ${aboutSection}### §2.2 Key Details
 
 | Attribute | Detail |
 | :--- | :--- |
-| Legal Name | ${h.legalName} |
-| Barn Name | ${h.barnName} |
-| Foaling Year | ${h.foalingYear} |
-| Gender | ${h.gender} |
-| Breeder | ${h.breeder} |
-| Sire | ${h.sire} |
-| Dam | ${h.dam} |
-| Microchip | ${h.microchip || 'Recorded with NZTR'} |
-| Trainer | ${t.name} (${t.location}) |${outlookSection}${raceExpectationSection}
+| Legal Name | ${v(h.legalName)} |
+| Barn Name | ${v(h.barnName)} |
+| Foaling Year | ${v(h.foalingYear)} |
+| Gender | ${v(h.gender)} |
+| Breeder | ${v(h.breeder)} |
+| Sire | ${v(h.sire)} |
+| Dam | ${v(h.dam)} |
+| Microchip | ${v(h.microchip)} |
+| Trainer | ${v(t.name)}${t.location ? ` (${t.location})` : ''} |${outlookSection}${raceExpectationSection}
 ---
 
 ## §3. Commercial Model
@@ -93,48 +165,21 @@ The manager margin and processing buffer are embedded in the listed rate. No add
 
 ## §4. Float & Billing
 
-${(context.paymentModel || 'subscription_float') === 'upfront'
-    ? `Participation is structured as an **upfront payment of $${(p.monthlyKeepUnitNzd * (context.termMonths || 12)).toFixed(2)} per 1% stake**, covering the full ${context.termMonths || 12}-month syndicate lease term.
-
-There are no recurring monthly subscription fees or capital calls.
-
-Upon formal termination or maturity of the syndicate lease, any unused prepaid keep is **refunded pro-rata** to the investor’s verified payment method within 14 business days.`
-    : `At initial participation, an investor pays **$${p.joinFloatUnitNzd.toFixed(2)}**, representing:
-- 3 months security deposit reserve; and
-- 2 months prepaid keep.
-
-From month 2 onwards, the investor pays **$${p.monthlyKeepUnitNzd.toFixed(2)} per month** to maintain a constant 5-month float buffer.
-
-Upon formal termination or maturity of the syndicate lease, all unused prepaid keep and security deposit reserve funds are **refunded pro-rata** to the investor’s verified payment method within 14 business days.`}
+${floatSection}
 
 ---
 
 ## §5. Gross Stakes Split
 
-All prize money distributions are calculated strictly from **officially published NZTR / LoveRacing gross stakes earnings**.
-
-| Pool | Share | Purpose |
-| :--- | ---: | :--- |
-| Investor Syndicate Pool | 75% | Distributed pro-rata to co-owners |
-| Owner Expense Buffer | 25% | Retained by owner to absorb trainer/jockey fees, nominations, acceptances, and race-day incidentals |
-
-**Fixed-Cost Shield:** Investors receive their clean 75% share of official gross stakes without being asked for additional capital contributions. New Zealand Thoroughbred Racing deducts trainer and jockey percentages at source; the 25% owner retention absorbs these deductions plus nomination and race-day incidentals.
-
-**Quarterly Distribution Cadence:** Distributions are issued quarterly.
-
-**Carry-Forward Cut-Off Rule:** Stakes won in the final calendar month of a quarter whose cash settlement has not yet cleared into the manager’s bank account are carried forward to the following quarter’s distribution statement.
-
-**2-Month Paid-Up Qualification Rule:** An investor must have been an active, paid-up syndicate member for at least two full consecutive calendar months prior to the race date to qualify for prize money returns from that race.
+${splitSection}
 
 ---
 
 ## §6. Exit & Close Style
 
-This syndicate operates under the **${context.closeStyle === 'fourteen_day' ? 'Standard 14-Day Notice (Case B)' : '3× Buyout Liquidating Exit (Case B1)'}** mechanism.
+This syndicate operates under the **${closeStyleLabel}** mechanism.
 
-${context.closeStyle === 'fourteen_day'
-    ? 'An investor may exit by giving 14 calendar days written notice when the underlying head lease concludes or the horse is retired. No penalty buyout applies.'
-    : 'Where the head lease provides liquidation proceeds, the syndicate may be wound up by payment of 3× the remaining lease value to co-owners.'}
+${closeDetail}
 
 Upon exit, any unused float is refunded pro-rata within 14 business days.
 

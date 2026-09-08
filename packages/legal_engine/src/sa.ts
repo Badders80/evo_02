@@ -1,9 +1,20 @@
 /**
  * Syndicate Agreement (SA) Generator for Evolution Stables DSL.
  * Authority: evo_00/doc/DSL_MANUAL.md and evo_00/migration_bridge/04_LEGAL_DIFF_AUDIT.md
+ *
+ * Litmus rule (founder 2026-09-09): renders ONLY what is in the data. A missing
+ * field renders as a blank marker — never a hardcoded default. Proforma clauses
+ * (75% majority vote, 5.0% margin) are legal/platform constants, not data.
  */
 
 import type { SyndicateLegalContext } from './types';
+import { BLANK } from './term_sheet';
+
+/** Coerce a value to its display string, or the blank marker when absent. */
+function v(x: string | number | null | undefined): string {
+  if (x === null || x === undefined || x === '') return BLANK;
+  return String(x);
+}
 
 export function generateSaMarkdown(context: SyndicateLegalContext): string {
   const p = context.pricing;
@@ -11,17 +22,17 @@ export function generateSaMarkdown(context: SyndicateLegalContext): string {
   const t = context.trainer;
 
   return `# Syndicate Agreement
-## ${context.syndicateName}
+## ${v(context.syndicateName)}
 
-**Campaign:** ${context.campaignSlug}  
-**Version:** ${context.saVersion}  
-**Effective Date:** ${context.effectiveDate}
+**Campaign:** ${v(context.campaignSlug)}  
+**Version:** ${v(context.saVersion)}  
+**Effective Date:** ${v(context.effectiveDate)}
 
 ---
 
 ## Clause 1: Formation & Purpose
 
-The **${context.syndicateName}** is formed to acquire and hold a syndicated leasehold interest in the thoroughbred described in Schedule 1. The Syndicate Manager is **${t.managerEntity}**, registered as an Authorised Syndicator under the New Zealand Thoroughbred Racing (NZTR) Rules of Racing and Syndication Code of Practice.
+The **${v(context.syndicateName)}** is formed to acquire and hold a syndicated leasehold interest in the thoroughbred described in Schedule 1. The Syndicate Manager is **${v(t.managerEntity)}**, registered as an Authorised Syndicator under the New Zealand Thoroughbred Racing (NZTR) Rules of Racing and Syndication Code of Practice.
 
 ---
 
@@ -29,7 +40,7 @@ The **${context.syndicateName}** is formed to acquire and hold a syndicated leas
 
 The licensed Trainer and Racing Manager hold **sole, absolute, and unchallengeable discretion** regarding all training regimes, race nominations, trackwork, spelling, and veterinary care.
 
-Neither **${t.managerEntity}** nor any syndicate member may override veterinary or welfare decisions. The welfare of the thoroughbred is paramount at all times.
+Neither **${v(t.managerEntity)}** nor any syndicate member may override veterinary or welfare decisions. The welfare of the thoroughbred is paramount at all times.
 
 ---
 
@@ -78,14 +89,14 @@ Each subscriber confirms by executing this Agreement that they:
 - have provided verified proof of identity acceptable to the Syndicate Manager; and
 - understand that participation is in a leasehold interest only and does not confer direct ownership of the thoroughbred.
 
-**Thoroughbred:** ${h.legalName} (${h.barnName})  
-**Foaling Year:** ${h.foalingYear}  
-**Gender:** ${h.gender}  
-**Breeder:** ${h.breeder}  
-**Sire:** ${h.sire}  
-**Dam:** ${h.dam}  
-**Owner:** ${context.ownerName}  
-**Trainer:** ${t.name} (${t.location})
+**Thoroughbred:** ${v(h.legalName)}${h.barnName && h.barnName !== h.legalName ? ` (${h.barnName})` : ''}  
+**Foaling Year:** ${v(h.foalingYear)}  
+**Gender:** ${v(h.gender)}  
+**Breeder:** ${v(h.breeder)}  
+**Sire:** ${v(h.sire)}  
+**Dam:** ${v(h.dam)}  
+**Owner:** ${v(context.ownerName)}  
+**Trainer:** ${v(t.name)}${t.location ? ` (${t.location})` : ''}
 
 ---
 
