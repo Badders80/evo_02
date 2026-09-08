@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { getSupabaseBrowserClient } from '@/lib/supabase-client';
 import {
   type HorseCampaign,
   getCampaignMedia,
@@ -19,7 +18,6 @@ import {
   Layers,
   ArrowRight,
   TrendingUp,
-  LogOut,
 } from 'lucide-react';
 
 export type MyStableHolding = {
@@ -84,14 +82,10 @@ export function MyStableDashboard({
   const totalFloat = rows.reduce((sum, row) => sum + Number(row.holding.float_balance_nzd), 0);
   const totalKeep = rows.reduce((sum, row) => sum + Number(row.holding.monthly_keep_rate_nzd), 0);
 
-  const handleSignOut = async () => {
-    const supabase = getSupabaseBrowserClient();
-    await supabase.auth.signOut();
-    window.location.href = '/auth/login';
-  };
-
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 space-y-10 pb-24">
+      {/* C1: local KYC pill + Sign Out removed — Header (root layout) already
+          renders the top nav with the user chip + Sign Out. Duplicate removed. */}
       <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-border pb-6 gap-4">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs font-medium tracking-[0.2em] uppercase text-accent">
@@ -105,7 +99,6 @@ export function MyStableDashboard({
             Authenticated Account: <span className="text-foreground">{userEmail}</span>
           </p>
         </div>
-
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-xs">
             <ShieldCheck className={`h-4 w-4 ${kyc.className}`} />
@@ -114,16 +107,6 @@ export function MyStableDashboard({
               <span className={`font-medium ${kyc.className}`}>{kyc.text}</span>
             </div>
           </div>
-
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3.5 py-2.5 text-xs text-muted-foreground hover:text-foreground hover:border-destructive/40 hover:bg-destructive/10 transition-all"
-            title="Sign Out"
-          >
-            <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">Sign Out</span>
-          </button>
         </div>
       </div>
 
@@ -157,51 +140,77 @@ export function MyStableDashboard({
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-border bg-card p-5">
-          <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs uppercase font-medium tracking-[0.2em]">Active Syndicates</span>
-            <Layers className="h-4 w-4 text-accent" />
-          </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold font-mono text-foreground">{rows.length}</span>
-            <span className="text-xs text-muted-foreground">Thoroughbred{rows.length === 1 ? '' : 's'}</span>
-          </div>
-        </div>
+      {/* C4: stat cards chrome differentiates "has data" vs "no data".
+          Empty state: greyer border, muted text, smaller figure, hint copy. */}
+      {(() => {
+        const hasHoldings = rows.length > 0;
+        const cardBase = 'rounded-xl border bg-card p-5 transition-colors';
+        const cardEmpty = `${cardBase} border-border/60 opacity-70`;
+        const cardActive = `${cardBase} border-border`;
+        return (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className={hasHoldings ? cardActive : cardEmpty}>
+              <div className="flex items-center justify-between text-muted-foreground">
+                <span className="text-xs uppercase font-medium tracking-[0.2em]">Active Syndicates</span>
+                <Layers className={`h-4 w-4 ${hasHoldings ? 'text-accent' : 'text-muted-foreground/60'}`} />
+              </div>
+              <div className="mt-3 flex items-baseline gap-2">
+                <span className={`text-2xl font-semibold font-mono ${hasHoldings ? 'text-foreground' : 'text-muted-foreground'}`}>
+                  {rows.length}
+                </span>
+                <span className="text-xs text-muted-foreground">Thoroughbred{rows.length === 1 ? '' : 's'}</span>
+              </div>
+              {!hasHoldings && (
+                <p className="mt-2 text-[11px] font-light text-muted-foreground/80">No stakes held yet</p>
+              )}
+            </div>
 
-        <div className="rounded-xl border border-border bg-card p-5">
-          <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs uppercase font-medium tracking-[0.2em]">Float Deposit Held</span>
-            <ShieldCheck className="h-4 w-4 text-status-active" />
-          </div>
-          <div className="mt-3 flex items-baseline gap-1">
-            <span className="text-2xl font-semibold font-mono text-foreground">${totalFloat.toLocaleString()}</span>
-            <span className="text-xs font-mono text-muted-foreground">NZD</span>
-          </div>
-        </div>
+            <div className={totalFloat > 0 ? cardActive : cardEmpty}>
+              <div className="flex items-center justify-between text-muted-foreground">
+                <span className="text-xs uppercase font-medium tracking-[0.2em]">Float Deposit Held</span>
+                <ShieldCheck className={`h-4 w-4 ${totalFloat > 0 ? 'text-status-active' : 'text-muted-foreground/60'}`} />
+              </div>
+              <div className="mt-3 flex items-baseline gap-1">
+                <span className={`text-2xl font-semibold font-mono ${totalFloat > 0 ? 'text-foreground' : 'text-muted-foreground'}`}>
+                  ${totalFloat.toLocaleString()}
+                </span>
+                <span className="text-xs font-mono text-muted-foreground">NZD</span>
+              </div>
+              {totalFloat === 0 && (
+                <p className="mt-2 text-[11px] font-light text-muted-foreground/80">Awaiting first checkout</p>
+              )}
+            </div>
 
-        <div className="rounded-xl border border-border bg-card p-5">
-          <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs uppercase font-medium tracking-[0.2em]">Monthly Keep</span>
-            <CreditCard className="h-4 w-4 text-accent" />
-          </div>
-          <div className="mt-3 flex items-baseline gap-1">
-            <span className="text-2xl font-semibold font-mono text-accent">${totalKeep.toLocaleString()}</span>
-            <span className="text-xs font-mono text-muted-foreground">/mo</span>
-          </div>
-        </div>
+            <div className={totalKeep > 0 ? cardActive : cardEmpty}>
+              <div className="flex items-center justify-between text-muted-foreground">
+                <span className="text-xs uppercase font-medium tracking-[0.2em]">Monthly Keep</span>
+                <CreditCard className={`h-4 w-4 ${totalKeep > 0 ? 'text-accent' : 'text-muted-foreground/60'}`} />
+              </div>
+              <div className="mt-3 flex items-baseline gap-1">
+                <span className={`text-2xl font-semibold font-mono ${totalKeep > 0 ? 'text-accent' : 'text-muted-foreground'}`}>
+                  ${totalKeep.toLocaleString()}
+                </span>
+                <span className="text-xs font-mono text-muted-foreground">/mo</span>
+              </div>
+              {totalKeep === 0 && (
+                <p className="mt-2 text-[11px] font-light text-muted-foreground/80">No active keep</p>
+              )}
+            </div>
 
-        <div className="rounded-xl border border-border bg-card p-5">
-          <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs uppercase font-medium tracking-[0.2em]">Prize Distribution (75%)</span>
-            <TrendingUp className="h-4 w-4 text-purple-400" />
+            <div className={cardEmpty}>
+              <div className="flex items-center justify-between text-muted-foreground">
+                <span className="text-xs uppercase font-medium tracking-[0.2em]">Prize Distribution (75%)</span>
+                <TrendingUp className="h-4 w-4 text-muted-foreground/60" />
+              </div>
+              <div className="mt-3 flex items-baseline gap-1">
+                <span className="text-2xl font-semibold font-mono text-muted-foreground">$0.00</span>
+                <span className="text-xs font-mono text-muted-foreground">NZD</span>
+              </div>
+              <p className="mt-2 text-[11px] font-light text-muted-foreground/80">First race pending</p>
+            </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-1">
-            <span className="text-2xl font-semibold font-mono text-foreground">$0.00</span>
-            <span className="text-xs font-mono text-muted-foreground">NZD</span>
-          </div>
-        </div>
-      </div>
+        );
+      })()}
 
       <div className="flex border-b border-border">
         {(['holdings', 'feed', 'vault', 'billing'] as const).map((tab) => (
@@ -226,15 +235,18 @@ export function MyStableDashboard({
       {activeTab === 'holdings' && (
         <div className="space-y-6">
           {rows.length === 0 ? (
-            <div className="rounded-2xl border border-border bg-card p-10 text-center space-y-4">
-              <h3 className="text-lg font-medium text-foreground">No syndicate holdings yet</h3>
-              <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                After a verified checkout, your share of Lady Ketchikan (Nellie) will appear here. Other campaigns stay
-                visible, not buyable.
-              </p>
+            /* C3: empty state shrunk to match the stat cards above (p-6, single-line copy, compact CTA) */
+            <div className="rounded-xl border border-border bg-card p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="space-y-1">
+                <h3 className="text-sm font-medium text-foreground">No syndicate holdings yet</h3>
+                <p className="text-xs font-light text-muted-foreground max-w-xl">
+                  After a verified checkout, your share of Lady Ketchikan (Nellie) appears here. Other campaigns stay
+                  visible, not buyable.
+                </p>
+              </div>
               <Link
                 href="/horses/nellie"
-                className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-canvas hover:bg-accent-hover transition-all"
+                className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-canvas hover:bg-accent-hover transition-all shrink-0"
               >
                 <span>View Nellie</span>
                 <ArrowRight className="h-3.5 w-3.5" />

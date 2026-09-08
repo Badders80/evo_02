@@ -2,13 +2,24 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import footerData from "@/dna/content/footer.json";
 
 interface FooterProps {
   minimal?: boolean;
 }
 
+/**
+ * Routes where the marketing hero tagline ("The Future of Ownership / Has Arrived")
+ * should be suppressed. The hero is otherwise rendered inside <Footer /> on every
+ * page; investor-facing routes (/mystable) are post-conversion surfaces and the
+ * marketing tagline reads as off-context.
+ */
+const HERO_HIDDEN_ROUTES = new Set<string>(["/mystable"]);
+
 export function Footer({ minimal = false }: FooterProps) {
+  const pathname = usePathname();
+  const hideHero = minimal || HERO_HIDDEN_ROUTES.has(pathname ?? "");
   const [visible, setVisible] = useState(false);
   const [startCursor, setStartCursor] = useState(false);
   const [showCursor, setShowCursor] = useState(true);
@@ -67,8 +78,8 @@ export function Footer({ minimal = false }: FooterProps) {
   return (
     <footer className="relative bg-canvas overflow-hidden">
       <div className="mx-auto flex max-w-6xl flex-col px-8 pt-16 pb-12 md:px-16 md:pt-24 md:pb-16">
-        {/* Hero Tagline - Centerpiece */}
-        {!minimal && (
+        {/* Hero Tagline - Centerpiece (suppressed on /mystable — see HERO_HIDDEN_ROUTES) */}
+        {!hideHero && (
           <div className="flex flex-col items-center justify-center text-center py-16 md:py-24 animate-fade-in">
             <div className="max-w-4xl space-y-8">
               <div ref={containerRef} className="flex flex-col items-center gap-4">
