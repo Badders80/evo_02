@@ -130,15 +130,22 @@ export async function POST(request: Request) {
   try {
     const rawBody = await request.text();
     const sig = request.headers.get('stripe-signature');
-    const webhookSecret = process.env.STRIPE_CHECKOUT_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET;
+    const webhookSecrets = [
+      process.env.STRIPE_CHECKOUT_WEBHOOK_SECRET,
+      process.env.STRIPE_KYC_WEBHOOK_SECRET,
+      process.env.STRIPE_WEBHOOK_SECRET,
+    ].filter((s): s is string => Boolean(s));
 
-    if (!webhookSecret) {
+    if (webhookSecrets.length === 0) {
       return NextResponse.json(
         { error: 'Stripe webhook secret is not configured', code: 'WEBHOOK_SECRET_MISSING' },
         { status: 503 }
       );
     }
-    if (!sig || !verifyStripeSignature(rawBody, sig, webhookSecret)) {
+    // Resilient: accept the signature if it verifies against ANY configured
+    // secret. Checkout + Identity events may arrive on one endpoint signed with
+    // different secrets; a single-secret read silently 400s the other event type.
+    if (!sig || !webhookSecrets.some((secret) => verifyStripeSignature(rawBody, sig, secret))) {
       return NextResponse.json({ error: 'Invalid Stripe signature' }, { status: 400 });
     }
 

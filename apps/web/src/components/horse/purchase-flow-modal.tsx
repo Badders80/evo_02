@@ -391,8 +391,9 @@ function Step3AcceptanceGate({
   const [error, setError] = React.useState<string | null>(null);
   // KYC flow state: null = not prompted, 'prompt' = 403 received, 'pending', 'rejected'
   const [kycState, setKycState] = React.useState<'prompt' | 'pending' | 'rejected' | null>(null);
-  // F13 seam: Verify Identity is inert until mission 003 (kyc-port). Do not fake pending.
-  const [kycStubNotice, setKycStubNotice] = React.useState(false);
+  // Verify Identity → Stripe hosted flow (T3a). Failure keeps the prompt open with copy.
+  const [kycError, setKycError] = React.useState<string | null>(null);
+  const [kycStarting, setKycStarting] = React.useState(false);
 
   const toggleDoc = (doc: 'pds' | 'sa') => {
     setOpenDoc((prev) => (prev === doc ? null : doc));
@@ -423,6 +424,30 @@ function Step3AcceptanceGate({
       setTicks((prev) => ({ ...prev, [doc]: true }));
     } catch {
       setTicks((prev) => ({ ...prev, [doc]: false }));
+    }
+  };
+
+  /** T3a: start Stripe Identity — POST /api/kyc/create-session, redirect to hosted URL. */
+  const handleVerifyIdentity = async () => {
+    if (kycStarting) return;
+    setKycStarting(true);
+    setKycError(null);
+    try {
+      const res = await fetch('/api/kyc/create-session', { method: 'POST' });
+      const body = await res.json().catch(() => null);
+      if (!res.ok) {
+        setKycError(body?.error || 'Identity verification could not be started. Please try again.');
+        return;
+      }
+      if (body?.url) {
+        window.location.href = body.url;
+      } else {
+        setKycError('Identity verification could not be started. Please try again.');
+      }
+    } catch {
+      setKycError('Identity verification could not be started. Please try again.');
+    } finally {
+      setKycStarting(false);
     }
   };
 
@@ -614,21 +639,15 @@ function Step3AcceptanceGate({
           </p>
           <button
             type="button"
-            className="w-full rounded-full bg-pure-white py-3 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-black transition-all duration-300 hover:opacity-90"
-            onClick={() => {
-              // F13 / 002 soft-launch: KYC port (Firebase → Supabase) is kyc-port / 003.
-              // `/auth/verify` does not exist. CTA stays inert — never fake pending.
-              console.warn(
-                '[purchase-flow] KYC port pending — /auth/verify absent, CTA intentionally inert (F13 stub)'
-              );
-              setKycStubNotice(true);
-            }}
+            disabled={kycStarting}
+            className="w-full rounded-full bg-pure-white py-3 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-black transition-all duration-300 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+            onClick={handleVerifyIdentity}
           >
-            Verify Identity
+            {kycStarting ? 'Starting verification…' : 'Verify Identity'}
           </button>
-          {kycStubNotice ? (
-            <p className="text-[10px] font-light text-muted-foreground/80">
-              Identity verification is not live on this build. Your stake and documents stay saved. A member of Evolution Stables will complete this check with you.
+          {kycError ? (
+            <p className="text-[10px] font-light text-destructive/90">
+              {kycError}
             </p>
           ) : (
             <p className="text-[10px] font-light text-muted-foreground/80">
