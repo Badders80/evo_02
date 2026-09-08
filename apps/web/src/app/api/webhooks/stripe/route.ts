@@ -59,11 +59,13 @@ async function persistCompletedCheckout(event: StripeEvent): Promise<void> {
   const pricing = pricingForUnits(campaign.wholesaleMonthlyNzd, units);
   const amountPaid = resolvePaidAmountNzd(session.amount_total);
   const subscriptionId = typeof session.subscription === 'string' ? session.subscription : null;
+  // float_balance_nzd = the 5×M join float, NOT session.amount_total (which in
+  // subscription mode includes the first recurring month = 6×M).
   const holding = buildHoldingInsert({
     userId,
     inventoryId,
     units,
-    amountPaidNzd: amountPaid,
+    amountPaidNzd: pricing.joinFloatUnitNzd,
     monthlyKeepNzd: pricing.monthlyKeepUnitNzd,
     pdsHash: hashes.pdsHash,
     saHash: hashes.saHash,
@@ -71,6 +73,16 @@ async function persistCompletedCheckout(event: StripeEvent): Promise<void> {
   });
 
   const admin = getSupabaseServiceClient();
+  const customerId = typeof session.customer === 'string' ? session.customer : null;
+  if (customerId) {
+    const { error: customerError } = await admin
+      .from('profiles')
+      .update({ stripe_customer_id: customerId })
+      .eq('id', userId);
+    if (customerError) {
+      throw new HttpError(500, 'CUSTOMER_UPDATE_FAILED', customerError.message);
+    }
+  }
   const { error: holdingError } = await admin.from('holdings').insert(holding);
   if (holdingError && !isUniqueViolation(holdingError)) {
     throw new HttpError(500, 'HOLDINGS_INSERT_FAILED', holdingError.message);
