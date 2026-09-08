@@ -15,7 +15,6 @@ import {
   requirePaidCheckoutSession,
   resolveCampaignInventory,
   resolveLegalHashes,
-  resolvePaidAmountNzd,
   stakePctToStepUnits,
 } from '@/lib/nellie-loop';
 import { handleIdentityEvent, isIdentityEvent } from '@/lib/identity-webhook';
@@ -57,7 +56,6 @@ async function persistCompletedCheckout(event: StripeEvent): Promise<void> {
   }
 
   const pricing = pricingForUnits(campaign.wholesaleMonthlyNzd, units);
-  const amountPaid = resolvePaidAmountNzd(session.amount_total);
   const subscriptionId = typeof session.subscription === 'string' ? session.subscription : null;
   // float_balance_nzd = the 5×M join float, NOT session.amount_total (which in
   // subscription mode includes the first recurring month = 6×M).
