@@ -62,6 +62,8 @@ export interface HorseCampaign {
   paymentModel?: 'subscription_float' | 'upfront';
   termStartDate?: string;
   termEndDate?: string;
+  distributionSplit?: string;
+  distributionSchedule?: string;
 }
 
 /**
@@ -293,6 +295,8 @@ function rowToCampaign(
     paymentModel: row.payment_style as 'subscription_float' | 'upfront',
     termStartDate: row.term_start_date ?? undefined,
     termEndDate: row.term_end_date ?? undefined,
+    distributionSplit: row.distribution_split ?? undefined,
+    distributionSchedule: row.distribution_schedule ?? undefined,
   };
 
   // Sire sanity: enrich empty pedigree fields from registry when possible.
@@ -385,9 +389,11 @@ export function getCompiledLegalPackForCampaign(campaign: HorseCampaign): Compil
       paymentModel: campaign.paymentModel,
       termStartDate: campaign.termStartDate,
       termEndDate: campaign.termEndDate,
+      distributionSplit: campaign.distributionSplit,
+      distributionSchedule: campaign.distributionSchedule,
       pdsVersion: '1.0.0',
       saVersion: '1.0.0',
-      effectiveDate: campaign.termStartDate ?? '2026-08-17',
+      effectiveDate: campaign.termStartDate,
       softLegal: campaign.softLegal,
       marketing: campaign.marketing,
       listingPlatform: campaign.listingPlatform,

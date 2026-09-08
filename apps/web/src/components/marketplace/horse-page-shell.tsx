@@ -25,6 +25,9 @@ export interface HorsePageShellProps {
   maxInvestmentPct?: number;
   stakeStepPct?: number;
   legalPack?: LegalPackDigest | null;
+  termStartDate?: string;
+  termEndDate?: string;
+  distributionSplit?: string;
   /** Pass-through from page.tsx for status routing (listed / fully_subscribed / coming_soon / completed). */
   listingStatus: 'listed' | 'fully_subscribed' | 'coming_soon' | 'completed';
 }
@@ -53,6 +56,9 @@ export function HorsePageShell(props: HorsePageShellProps) {
         maxInvestmentPct={props.maxInvestmentPct}
         stakeStepPct={props.stakeStepPct}
         legalPack={props.legalPack}
+        termStartDate={props.termStartDate}
+        termEndDate={props.termEndDate}
+        distributionSplit={props.distributionSplit}
       />
     </>
   );

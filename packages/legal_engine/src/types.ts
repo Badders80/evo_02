@@ -78,12 +78,16 @@ export interface SyndicateLegalContext {
   termMonths?: number;
   termStartDate?: string;
   termEndDate?: string;
+  /** Owner-set prize split (e.g. "75% Investor Pool / 25% Owner Retention"). Never a platform default. */
+  distributionSplit?: string;
+  /** Distribution cadence (e.g. "Quarterly (2-month paid-up qualification prior to race date)"). */
+  distributionSchedule?: string;
   listingPlatform?: string;
   minInvestmentPct?: number;
   stakeStepPct?: number;
   pdsVersion: string;
   saVersion: string;
-  effectiveDate: string;
+  effectiveDate?: string;
   softLegal?: HorseSoftLegalContent;
   marketing?: HorseMarketingContent;
 }
@@ -101,7 +105,7 @@ export interface CompiledLegalPack {
     ownerName: string;
     pdsVersion: string;
     saVersion: string;
-    effectiveDate: string;
+    effectiveDate?: string;
   };
 }
 

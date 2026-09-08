@@ -41,6 +41,9 @@ const nellieContext: SyndicateLegalContext = {
   sharesAvailable: 10,
   minInvestmentPct: 1.0,
   stakeStepPct: 0.5,
+  paymentModel: 'subscription_float',
+  distributionSplit: '75% Investor Pool / 25% Owner Retention',
+  distributionSchedule: 'Quarterly (2-month paid-up qualification prior to race date)',
   pdsVersion: '1.0.0',
   saVersion: '1.0.0',
   effectiveDate: '2026-08-17',
@@ -81,6 +84,7 @@ const mulanContext: SyndicateLegalContext = {
   sharesAvailable: 10,
   minInvestmentPct: 1.0,
   stakeStepPct: 0.5,
+  paymentModel: 'subscription_float',
   pdsVersion: '1.0.0',
   saVersion: '1.0.0',
   effectiveDate: '2026-08-17',
@@ -305,6 +309,23 @@ export function runTests(): void {
     assertEqual(run1.pack.saHash, run2.pack.saHash, 'Repeated SA compile must produce identical SHA-256');
     assertEqual(run1.pack.termSheetHash, run2.pack.termSheetHash, 'Repeated term-sheet compile must produce identical SHA-256');
     console.log('✅ Fixed-input SHA-256 digests are deterministic across compiler runs');
+  }
+
+  // 16. Litmus rule: missing data renders blank marker, never a hardcoded default
+  {
+    const blankContext: SyndicateLegalContext = {
+      ...nellieContext,
+      distributionSplit: undefined,
+      distributionSchedule: undefined,
+      termStartDate: undefined,
+      termEndDate: undefined,
+      termMonths: undefined,
+    };
+    const blankPack = compileLegalPack(blankContext);
+    assertIncludes(blankPack.pack.termSheetMarkdown, '[not filled in yet]', 'Blank marker present when distribution split missing');
+    assert(!blankPack.pack.termSheetMarkdown.includes('75% Investor Pool'), 'No hardcoded 75/25 when split is absent');
+    assert(!blankPack.pack.termSheetMarkdown.includes('Quarterly (2-month'), 'No hardcoded schedule when absent');
+    console.log('✅ Litmus rule: missing data renders blank marker, no hardcoded fallback');
   }
 
   console.log('\n🎉 All legal_engine tests passed.');

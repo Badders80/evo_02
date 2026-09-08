@@ -184,6 +184,8 @@ export interface Database {
           sa_url: string;
           term_start_date: string | null;
           term_end_date: string | null;
+          distribution_split: string | null;
+          distribution_schedule: string | null;
           pedigree_data: PedigreeData | null;
           soft_legal?: Json | null;
           marketing?: Json | null;
@@ -260,6 +262,8 @@ export interface Database {
           sa_url?: string;
           term_start_date?: string | null;
           term_end_date?: string | null;
+          distribution_split?: string | null;
+          distribution_schedule?: string | null;
           pedigree_data?: PedigreeData | null;
           soft_legal?: Json | null;
           marketing?: Json | null;

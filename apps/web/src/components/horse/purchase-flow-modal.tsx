@@ -31,6 +31,28 @@ export interface LegalPackDigest {
   saHash?: string;
 }
 
+const TERM_MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+/** Format an ISO date (YYYY-MM-DD) as "1 September 2026" (deterministic, locale-free). */
+function formatTermDate(iso?: string): string | null {
+  if (!iso) return null;
+  const d = new Date(`${iso}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return null;
+  return `${d.getUTCDate()} ${TERM_MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+}
+
+/** Inclusive month count between two ISO dates (start = 1st, end = last day). */
+function monthsBetween(startIso?: string, endIso?: string): number | null {
+  if (!startIso || !endIso) return null;
+  const s = new Date(`${startIso}T00:00:00Z`);
+  const e = new Date(`${endIso}T00:00:00Z`);
+  if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime())) return null;
+  return (e.getUTCFullYear() - s.getUTCFullYear()) * 12 + (e.getUTCMonth() - s.getUTCMonth()) + 1;
+}
+
 export interface PurchaseFlowModalProps {
   horseName: string;
   horseSlug: string;
@@ -39,6 +61,11 @@ export interface PurchaseFlowModalProps {
   maxInvestmentPct?: number;
   stakeStepPct?: number;
   legalPack?: LegalPackDigest | null;
+  /** Lease term dates (whole-month model: start = 1st, end = last day). Blank when unset. */
+  termStartDate?: string;
+  termEndDate?: string;
+  /** Owner-set prize split (e.g. "75% Investor Pool / 25% Owner Retention"). Blank when unset. */
+  distributionSplit?: string;
   /** Optional initial stake % from the host (preferred over window.location read). */
   initialUnits?: number;
   onClose: () => void;
@@ -92,6 +119,9 @@ function Step2TermSheet({
   stakeStepPct = 0.5,
   stakePct,
   setStakePct,
+  termStartDate,
+  termEndDate,
+  distributionSplit,
   onProceed,
 }: {
   horseName: string;
@@ -101,6 +131,9 @@ function Step2TermSheet({
   stakeStepPct?: number;
   stakePct: number;
   setStakePct: (value: number) => void;
+  termStartDate?: string;
+  termEndDate?: string;
+  distributionSplit?: string;
   onProceed: () => void;
 }) {
   const [note, setNote] = React.useState<string | null>(null);
@@ -121,6 +154,11 @@ function Step2TermSheet({
     () => pricingForUnits(wholesale, stakePct),
     [wholesale, stakePct]
   );
+
+  // Lease term derived from data (whole-month model). Blank when unset — never a default.
+  const termMonths = monthsBetween(termStartDate, termEndDate);
+  const termStartLabel = formatTermDate(termStartDate);
+  const termEndLabel = formatTermDate(termEndDate);
 
   const showNote = (msg: string) => {
     setNote(msg);
@@ -315,17 +353,21 @@ function Step2TermSheet({
         <div className="border-b border-border pb-3.5">
           <p className="flex justify-between items-baseline">
             <span className="text-muted-foreground">Lease period</span>
-            <strong className="text-heading font-medium">12 months</strong>
+            <strong className="text-heading font-medium">
+              {termMonths != null ? `${termMonths} months` : '—'}
+            </strong>
           </p>
           <p className="text-[11px] text-muted-foreground/60 mt-1">
-            From 1 September 2026 to {`{dsl: service_end_date}`}
+            {termStartLabel && termEndLabel
+              ? `From ${termStartLabel} to ${termEndLabel}`
+              : 'Not yet set'}
           </p>
         </div>
         <div>
           <p className="flex justify-between items-baseline">
             <span className="text-muted-foreground">Distribution</span>
             <strong className="text-status-active text-[13px] font-medium">
-              75% of gross prize money
+              {distributionSplit ?? '—'}
             </strong>
           </p>
           <p className="text-[11px] text-muted-foreground/60 mt-1">
@@ -707,6 +749,9 @@ export default function PurchaseFlowModal({
   maxInvestmentPct = 10.0,
   stakeStepPct = 0.5,
   legalPack = null,
+  termStartDate,
+  termEndDate,
+  distributionSplit,
   initialUnits,
   onClose,
 }: PurchaseFlowModalProps) {
@@ -742,6 +787,9 @@ export default function PurchaseFlowModal({
           stakeStepPct={stakeStepPct}
           stakePct={stakePct}
           setStakePct={setStakePct}
+          termStartDate={termStartDate}
+          termEndDate={termEndDate}
+          distributionSplit={distributionSplit}
           onProceed={() => setStep('accept')}
         />
       ) : (

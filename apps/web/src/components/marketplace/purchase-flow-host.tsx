@@ -28,6 +28,9 @@ export interface PurchaseFlowHostProps {
   maxInvestmentPct?: number;
   stakeStepPct?: number;
   legalPack?: LegalPackDigest | null;
+  termStartDate?: string;
+  termEndDate?: string;
+  distributionSplit?: string;
 }
 
 export function PurchaseFlowHost(props: PurchaseFlowHostProps) {
