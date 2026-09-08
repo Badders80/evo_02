@@ -19,6 +19,7 @@ import {
   stakePctToStepUnits,
 } from '@/lib/nellie-loop';
 import { handleIdentityEvent, isIdentityEvent } from '@/lib/identity-webhook';
+import { sendWelcomeEmail } from '@/lib/welcome-email';
 
 type StripeEvent = {
   id: string;
@@ -108,6 +109,10 @@ async function persistCompletedCheckout(event: StripeEvent): Promise<void> {
       pack.saMarkdown
     );
   }
+
+  // E4: welcome email after the holding is durably inserted (never rolls back
+  // the checkout — sendWelcomeEmail swallows its own failures).
+  await sendWelcomeEmail({ userId, horseSlug, horseName: campaign.legalName, units });
 }
 
 export async function POST(request: Request) {
