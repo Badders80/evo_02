@@ -162,6 +162,66 @@ export function runTests(): void {
   assertIncludes(nelliePack.pack.saMarkdown, 'Clause 13: Governing Law', 'SA clause 13');
   console.log('✅ All mandatory SA clauses present');
 
+  // 4b. Full-document skeleton: extended PDS sections + full SA clause series
+  const fullPdsSections = [
+    'Key Information Summary',
+    'About Evolution Stables',
+    '§1. Title & Structure',
+    '§2. Asset Specifics',
+    '§3. Commercial Model',
+    '§4. Float & Billing',
+    '§5. Gross Stakes Split',
+    '§6. Exit & Close Style',
+    '§7. Taxes',
+    '§8. Insurance',
+    '§9. Valuation',
+    '§10. Veterinary Report',
+    '§11. Material Interests',
+    '§12. Risk Disclosure',
+    '§13. Responsible Investment',
+    '§14. Records & Financial Reporting',
+    '§15. Complaints',
+    '§16. Transfer of Interest',
+    '§17. Investment Details',
+    '§18. Investor Declaration',
+    '§19. Promoter Declaration',
+  ];
+  for (const sec of fullPdsSections) {
+    if (!nelliePack.pack.pdsMarkdown.includes(sec)) {
+      throw new Error(`Full PDS skeleton: missing section "${sec}"`);
+    }
+  }
+  console.log(`✅ Full PDS skeleton present (${fullPdsSections.length} sections)`);
+
+  const fullSaClauses = [
+    'Clause 1: Formation',
+    'Clause 2: Object',
+    'Clause 3: Agreement and Parties',
+    'Clause 4: Syndicate Shares',
+    'Clause 5: Lease Duration',
+    'Clause 6: Equine Welfare Supremacy',
+    'Clause 7: Manager\'s Powers and Duties',
+    'Clause 8: Default & Float Reserve Drawdown',
+    'Clause 9: Financial Contributions and Fees',
+    'Clause 10: Revenue Streams and Distribution',
+    'Clause 11: Syndicate Management Fee',
+    'Clause 12: Manager Removal — NZTR Code of Practice Rule 22.1',
+    'Clause 13: Governing Law & Jurisdiction',
+    'Clause 14: Insurance and Early Termination',
+    'Clause 15: Transfer of Shares',
+    'Clause 16: Dispute Resolution',
+    'Clause 17: Winding Up and Post-Lease Arrangements',
+    'Clause 18: Notices',
+    'Schedule 1: NZTR Statutory Member Declarations',
+    'Execution',
+  ];
+  for (const cl of fullSaClauses) {
+    if (!nelliePack.pack.saMarkdown.includes(cl)) {
+      throw new Error(`Full SA skeleton: missing clause "${cl}"`);
+    }
+  }
+  console.log(`✅ Full SA skeleton present (${fullSaClauses.length} clauses + execution)`);
+
   // 5. Pricing anchors
   assertIncludes(nelliePack.pack.pdsMarkdown, '$70.00', 'Nellie 1% base cost unit');
   assertIncludes(nelliePack.pack.pdsMarkdown, '$76.00', 'Nellie monthly keep');

@@ -5,6 +5,10 @@
  * Litmus rule (founder 2026-09-09): renders ONLY what is in the data. A missing
  * field renders as a blank marker — never a hardcoded default. Proforma clauses
  * (75% majority vote, 5.0% margin) are legal/platform constants, not data.
+ *
+ * Full contract skeleton (founder-locked 2026-09-10): the complete clause
+ * series (formation through notices) plus Schedule 1 and an execution block —
+ * contract-plain, numbered, signature-bound to the PDS.
  */
 
 import type { SyndicateLegalContext } from './types';
@@ -17,10 +21,20 @@ function v(x: string | number | null | undefined): string {
   return String(x);
 }
 
+/** Leased term label, data-driven (blank when unset). */
+function termLabel(context: SyndicateLegalContext): string {
+  if (context.termMonths == null) return BLANK;
+  if (context.termStartDate && context.termEndDate) {
+    return `${context.termMonths} months, commencing ${context.termStartDate} and ending ${context.termEndDate}`;
+  }
+  return `${context.termMonths} months`;
+}
+
 export function generateSaMarkdown(context: SyndicateLegalContext): string {
   const p = context.pricing;
   const h = context.horse;
   const t = context.trainer;
+  const manager = v(t.managerEntity);
 
   return `# Syndicate Agreement
 ## ${v(context.syndicateName)}
@@ -31,9 +45,33 @@ export function generateSaMarkdown(context: SyndicateLegalContext): string {
 
 ---
 
-## Clause 1: Formation & Purpose
+## Clause 1: Formation
 
-The **${v(context.syndicateName)}** is formed to acquire and hold a syndicated leasehold interest in the thoroughbred described in Schedule 1. The Syndicate Manager is **${v(t.managerEntity)}**, registered as an Authorised Syndicator under the New Zealand Thoroughbred Racing (NZTR) Rules of Racing and Syndication Code of Practice.
+A Syndicate is formed under the New Zealand Thoroughbred Racing Inc. ("NZTR") Bloodstock Syndication Code of Practice ("COP"), in accordance with its formation requirements, by the Promoter as set out in the attached Product Disclosure Statement ("the Syndicate").
+
+---
+
+## Clause 2: Object
+
+The object of the Syndicate is to lease and race ${v(h.legalName)}${h.barnName && h.barnName !== h.legalName ? ` (${h.barnName})` : ''} as a recreational pursuit, with all syndicate members holding fractional leasehold shares for the fixed term described in the Product Disclosure Statement.
+
+---
+
+## Clause 3: Agreement and Parties
+
+This Agreement is binding on the Promoter (${manager}), the Syndicate Manager (${manager}), and each Shareholder as defined in the Product Disclosure Statement. By signing the Application Form, each Shareholder agrees to be bound by this Agreement and the Product Disclosure Statement. This Agreement may only be altered by special resolution (75% of shareholding) and must not increase a Shareholder's liability beyond what is disclosed in the Product Disclosure Statement.
+
+---
+
+## Clause 4: Syndicate Shares
+
+The Syndicate is divided into ${v(context.totalShares)} shares of ${v(context.stakeStepPct)}% each, representing the ${v(context.totalHorsePercentage)}% leasehold interest in ${v(h.legalName)} for the Lease Term. Shares are issued and recorded by Evolution Stables, enabling digital onboarding, compliance, and (subject to Manager approval) transfer. Each Shareholder's rights and obligations are proportional to their shareholding.
+
+---
+
+## Clause 5: Lease Duration
+
+The lease term is fixed at ${termLabel(context)}. All lease terms are counted in full calendar months. The lease may be renewed or extended at the Manager's and Lessor's discretion, with terms disclosed to Shareholders prior to renewal.
 
 ---
 
@@ -41,15 +79,58 @@ The **${v(context.syndicateName)}** is formed to acquire and hold a syndicated l
 
 The licensed Trainer and Racing Manager hold **sole, absolute, and unchallengeable discretion** regarding all training regimes, race nominations, trackwork, spelling, and veterinary care.
 
-Neither **${v(t.managerEntity)}** nor any syndicate member may override veterinary or welfare decisions. The welfare of the thoroughbred is paramount at all times.
+Neither **${manager}** nor any syndicate member may override veterinary or welfare decisions. The welfare of the thoroughbred is paramount at all times.
+
+---
+
+## Clause 7: Manager's Powers and Duties
+
+The Manager (${manager}) is responsible for overall lease administration and NZTR compliance, including communication with shareholders and coordination with licensed professionals.
+
+The Manager may:
+
+- Make all day-to-day decisions relating to racing, training, spelling, and horse welfare.
+- Appoint or change trainers in consultation with the horse's owner or Racing Manager.
+- Deduct and retain management and platform fees as disclosed in the Product Disclosure Statement.
+- Delegate operational duties to licensed parties (e.g., trainers, racing managers) as required.
+- Provide regular reports and updates when the horse is in training or racing.
 
 ---
 
 ## Clause 8: Default & Float Reserve Drawdown
 
-If a monthly keep payment remains unpaid for more than 14 days after its due date, the investor will receive a default notice. If the default continues for 30 days, the Syndicate Manager may draw on the investor’s float reserve to bring the account into good standing.
+If a monthly keep payment remains unpaid for more than 14 days after its due date, the investor will receive a default notice. If the default continues for 30 days, the Syndicate Manager may draw on the investor's float reserve to bring the account into good standing.
 
 Drawdown is applied to prepaid keep and security deposit reserves only, in that order. No additional penalties are levied beyond the contractual obligations set out in this Agreement.
+
+---
+
+## Clause 9: Financial Contributions and Fees
+
+Members pay a monthly keep for the duration of their participation, structured as follows:
+
+- **Initial payment:** $${p.joinFloatUnitNzd.toFixed(2)} per 1% stake, representing 3 months security deposit reserve and 2 months prepaid keep.
+- **Monthly keep:** $${p.monthlyKeepUnitNzd.toFixed(2)} per month per 1% stake, paid on the first of each month to maintain a constant 5-month float buffer.
+
+The listed rate includes the 5.0% Evolution Stables margin and 3.0% Platform Fees. No separate management invoices or off-platform accounting fees are charged.
+
+---
+
+## Clause 10: Revenue Streams and Distribution
+
+Shareholders are entitled to a share of all revenue generated by ${v(h.legalName)} during the lease period, proportional to their leased stake. For ${v(h.legalName)}, the revenue split is ${context.distributionSplit ? context.distributionSplit : BLANK}.
+
+Potential Revenue Streams include:
+
+- Race winnings (prizemoney, bonuses)
+- Sponsorship & endorsements
+- Media & naming rights
+- Appearance fees
+- Merchandising & hospitality
+- Data licensing
+- Breeding or exit proceeds (if applicable, subject to the stated buyout clause)
+
+All distributions are calculated strictly from officially published NZTR / LoveRacing gross stakes earnings and are made ${context.distributionSchedule ? context.distributionSchedule : BLANK}. Insurance proceeds are not payable to lease holders. Distributions are made by direct bank transfer or card refund to the Shareholder's verified payment method within 14 business days of receipt from NZTR or other sources.
 
 ---
 
@@ -82,9 +163,40 @@ There are no foreign arbitration clauses, no Middle Eastern / offshore jurisdict
 
 ---
 
+## Clause 14: Insurance and Early Termination
+
+The horse will be insured for mortality and specified risks at the owner's discretion for the duration of the lease. Insurance proceeds, if any, are payable to the owner/lessor and not to the syndicate or lease holders. If the horse dies or is retired due to injury or illness during the lease term, this agreement and the lease will terminate immediately. Lease holders will receive a pro-rata refund of unused prepaid keep and security deposit reserve for the unused portion of the lease term, calculated from the date of termination to the scheduled end of the lease. No further compensation or insurance proceeds are payable to lease holders.
+
+---
+
+## Clause 15: Transfer of Shares
+
+Shares may only be transferred with the written consent of the Manager and in accordance with NZTR rules. Transfers must be processed through Evolution Stables, subject to AML/CFT and eligibility checks. There is no guarantee of liquidity or a secondary market for shares.
+
+---
+
+## Clause 16: Dispute Resolution
+
+Disputes must first be raised with the Manager in writing. If unresolved, disputes may be escalated to NZTR and, if necessary, to independent mediation as per NZTR guidelines.
+
+---
+
+## Clause 17: Winding Up and Post-Lease Arrangements
+
+At the end of the Lease Term, the Syndicate will be automatically wound up. The lease does not roll over unless the Manager offers a renewal and participants opt in under new terms. If the horse is retired, injured, or otherwise unable to race during the lease period, the lease will be terminated early. In such cases, lease holders will receive a pro-rata refund of unused prepaid keep and security deposit reserve based on the remaining portion of the lease term. Evolution Stables holds itself and its partners to the highest standards of care, ensuring that animal welfare remains central to all decisions made during the lease. All post-racing arrangements are the responsibility of the horse's connections and are expected to comply with NZTR's welfare guidelines.
+
+---
+
+## Clause 18: Notices
+
+Notices may be sent by email to the addresses provided by Shareholders. Notices to the Syndicate are sent to the address registered by the Manager with NZTR.
+
+---
+
 ## Schedule 1: NZTR Statutory Member Declarations
 
 Each subscriber confirms by executing this Agreement that they:
+
 - are at least 18 years of age;
 - are not subject to any racing disqualification or exclusion order;
 - have provided verified proof of identity acceptable to the Syndicate Manager; and
@@ -101,18 +213,49 @@ Each subscriber confirms by executing this Agreement that they:
 
 ---
 
+## Execution
+
+By executing the Application Form (whether physically or electronically via Evolution Stables), each Shareholder is deemed to have accepted and agreed to be bound by this Agreement and the accompanying Product Disclosure Statement.
+
+**Shareholder Name:** ${BLANK}
+
+**Signed:** _________________________
+
+**Date:** ${BLANK}
+
+---
+
+**Alex Baddeley**  
+**Director, Evolution Stables Ltd**  
+**8 Huia Street, Auckland, New Zealand**
+
+---
+
 *Executed under the NZTR Syndication Code of Practice.*
 `;
 }
 
 export function getSaClauseTitles(): string[] {
   return [
-    'Clause 1: Formation & Purpose',
+    'Clause 1: Formation',
+    'Clause 2: Object',
+    'Clause 3: Agreement and Parties',
+    'Clause 4: Syndicate Shares',
+    'Clause 5: Lease Duration',
     'Clause 6: Equine Welfare Supremacy',
+    'Clause 7: Manager\'s Powers and Duties',
     'Clause 8: Default & Float Reserve Drawdown',
+    'Clause 9: Financial Contributions and Fees',
+    'Clause 10: Revenue Streams and Distribution',
     'Clause 11: Syndicate Management Fee',
     'Clause 12: Manager Removal — NZTR Code of Practice Rule 22.1',
     'Clause 13: Governing Law & Jurisdiction',
+    'Clause 14: Insurance and Early Termination',
+    'Clause 15: Transfer of Shares',
+    'Clause 16: Dispute Resolution',
+    'Clause 17: Winding Up and Post-Lease Arrangements',
+    'Clause 18: Notices',
     'Schedule 1: NZTR Statutory Member Declarations',
+    'Execution',
   ];
 }

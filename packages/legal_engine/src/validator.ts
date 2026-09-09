@@ -8,20 +8,49 @@ import { SHARE_MATH } from './types';
 import { BANNED_LEGAL_TERMS } from '@evo/brand_dna/voice';
 
 export const MANDATORY_SA_CLAUSES = [
+  'Clause 1: Formation',
+  'Clause 2: Object',
+  'Clause 3: Agreement and Parties',
+  'Clause 4: Syndicate Shares',
+  'Clause 5: Lease Duration',
   'Clause 6: Equine Welfare Supremacy',
+  'Clause 7: Manager\'s Powers and Duties',
   'Clause 8: Default & Float Reserve Drawdown',
+  'Clause 9: Financial Contributions and Fees',
+  'Clause 10: Revenue Streams and Distribution',
   'Clause 11: Syndicate Management Fee',
   'Clause 12: Manager Removal',
   'Clause 13: Governing Law',
+  'Clause 14: Insurance and Early Termination',
+  'Clause 15: Transfer of Shares',
+  'Clause 16: Dispute Resolution',
+  'Clause 17: Winding Up and Post-Lease Arrangements',
+  'Clause 18: Notices',
+  'Schedule 1: NZTR Statutory Member Declarations',
 ] as const;
 
 export const MANDATORY_PDS_SECTIONS = [
+  'Key Information Summary',
+  'About Evolution Stables',
   '§1. Title & Structure',
   '§2. Asset Specifics',
   '§3. Commercial Model',
   '§4. Float & Billing',
   '§5. Gross Stakes Split',
   '§6. Exit & Close Style',
+  '§7. Taxes',
+  '§8. Insurance',
+  '§9. Valuation',
+  '§10. Veterinary Report',
+  '§11. Material Interests',
+  '§12. Risk Disclosure',
+  '§13. Responsible Investment',
+  '§14. Records & Financial Reporting',
+  '§15. Complaints',
+  '§16. Transfer of Interest',
+  '§17. Investment Details',
+  '§18. Investor Declaration',
+  '§19. Promoter Declaration',
 ] as const;
 
 export const MANDATORY_PDS_CLAUSES = [

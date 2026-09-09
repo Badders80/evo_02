@@ -26,6 +26,7 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import { compileLegalPack, computeDslPricing, foalingLabel } from '../src';
+import { prefillSoftSections } from '../src/soft-prefill';
 import type { SyndicateLegalContext } from '../src';
 
 const REF = 'ejdenhlpvtldiljxawtd';
@@ -145,6 +146,15 @@ async function loadRegistry(): Promise<Registry> {
 }
 
 // ── Campaign load (prod → SyndicateLegalContext) ────────────────────────────
+/** Inclusive whole-month count between two ISO dates (e.g. 2026-09-01 → 2028-06-30 = 22). */
+function monthsBetweenInclusive(start: string | undefined, end: string | undefined): number | undefined {
+  if (!start || !end) return undefined;
+  const s = new Date(`${start}T00:00:00Z`);
+  const e = new Date(`${end}T00:00:00Z`);
+  if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime()) || e < s) return undefined;
+  return (e.getUTCFullYear() - s.getUTCFullYear()) * 12 + (e.getUTCMonth() - s.getUTCMonth()) + 1;
+}
+
 async function loadCampaign(slug: string): Promise<{ context: SyndicateLegalContext; inv: Record<string, unknown> }> {
   const rows = await query(`select * from public.inventory where slug = '${slug}'`);
   const inv = rows[0];
@@ -185,6 +195,7 @@ async function loadCampaign(slug: string): Promise<{ context: SyndicateLegalCont
     totalShares: Number(inv.total_shares),
     sharesAvailable: Number(inv.shares_available),
     paymentModel: (inv.payment_style as 'subscription_float' | 'upfront') ?? 'subscription_float',
+    termMonths: monthsBetweenInclusive(inv.term_start_date as string | undefined, inv.term_end_date as string | undefined),
     termStartDate: (inv.term_start_date as string) ?? undefined,
     termEndDate: (inv.term_end_date as string) ?? undefined,
     distributionSplit: (inv.distribution_split as string) ?? undefined,
@@ -248,6 +259,81 @@ async function setDocStatus(slug: string, doc: 'term_sheet' | 'pds' | 'sa' | 'so
 async function flipListed(slug: string) {
   // The BEFORE UPDATE trigger enforces: listed requires all three docs approved.
   await query(`update public.inventory set status = 'listed' where slug = '${slug}'`);
+}
+
+// ── Soft approval stage (4 sections, accordion, Hotta exemplars) ─────────────
+type SoftField = 'raceExpectation' | 'aboutHorse' | 'trainerBio' | 'racingOutlookAndPedigree';
+
+const SECTION_DEFS: { field: SoftField; title: string; hint: string }[] = [
+  { field: 'raceExpectation', title: 'Key Information — Race Schedule Expectation', hint: 'renders §2.4; forward-looking, yard-confirmed only' },
+  { field: 'aboutHorse', title: '§2.1 About Horse', hint: 'identity + profile narrative' },
+  { field: 'trainerBio', title: '§2.1 Trainer', hint: 'stable + trainer editorial' },
+  { field: 'racingOutlookAndPedigree', title: '§2.3 Racing Outlook & Pedigree', hint: 'sire-line significance, no invented relatives' },
+];
+
+// Frozen Hotta excerpts — reference bar only, never rendered into output.
+const HOTTA_EXEMPLARS: Record<SoftField, string> = {
+  raceExpectation:
+    'Hottathanafantasy is returning to training from early January 2026. Syndicate members can expect regular updates and potential race entries as she builds fitness throughout her preparation.',
+  aboutHorse:
+    'Hottathanafantasy (NZ) is a New Zealand-bred bay filly by the champion sire Contributer (IRE) out of the winning dam Whiffle (USA) — producer of stakes-placed progeny — foaled on 24 October 2023.',
+  trainerBio:
+    'Wexford Stables is a name synonymous with excellence in New Zealand racing history, continuing its legacy under the leadership of Lance O\u2019Sullivan ONZM and Andrew Scott. Operating out of the world-class facilities in Matamata, Wexford Stables maintains one of the best strike rates in the country, ensuring horses like this promising filly receive top preparation for upcoming trials and races.',
+  racingOutlookAndPedigree:
+    'Hottathanafantasy carries a pedigree built for performance in Australasian racing conditions, combining a proven commercial sire with a durable New Zealand maternal line. Her sire, Contributer, is one of New Zealand\u2019s leading sires, consistently producing elite performers.',
+};
+
+const normSlug = (s: string) =>
+  s.toLowerCase().replace(/\s*\([^)]*\)\s*/g, '').trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+/** Merge DB soft_legal (wins) over engine/content pre-fill (drafts blanks). */
+function mergedSoft(
+  slug: string,
+  inv: Record<string, unknown>,
+  trainers: { slug: string; name: string; stableName: string }[]
+): { texts: Record<SoftField, string>; prefilled: SoftField[]; approved: Record<SoftField, boolean>; rejected: Record<SoftField, boolean> } {
+  const soft = ((inv.soft_legal ?? {}) as Record<string, unknown>);
+  const sectionState = ((soft._sectionState ?? {}) as Record<string, string>);
+  const sire = normSlug(String((inv as Record<string, unknown>).sire ?? ''));
+  const matchedTrainers = trainers.filter((t) =>
+    String((inv as Record<string, unknown>).trainer_name ?? '').includes(t.name)
+  );
+  const stableSlug =
+    normSlug(matchedTrainers[0]?.stableName ?? '') || undefined;
+  const pre = prefillSoftSections({
+    horseSlug: slug,
+    stableSlug,
+    sirePedigreeSlug: sire.split('-').slice(0, 2).join('-') || undefined,
+    trainerPersonSlugs: matchedTrainers.map((t) => t.slug),
+    barnName: (inv.barn_name as string) || (inv.legal_name as string),
+    legalName: inv.legal_name as string,
+    racingStatus: (soft.racingStatus as string) || 'in training',
+  });
+  const texts = {} as Record<SoftField, string>;
+  const prefilled: SoftField[] = [];
+  for (const d of SECTION_DEFS) {
+    const dbVal = (soft[d.field] as string) ?? '';
+    if (dbVal) {
+      texts[d.field] = dbVal;
+    } else {
+      texts[d.field] = pre[d.field] ?? '';
+      if (texts[d.field]) prefilled.push(d.field);
+    }
+  }
+  const approved = {} as Record<SoftField, boolean>;
+  const rejected = {} as Record<SoftField, boolean>;
+  for (const d of SECTION_DEFS) {
+    approved[d.field] = sectionState[d.field] === 'approved';
+    rejected[d.field] = sectionState[d.field] === 'rejected';
+  }
+  return { texts, prefilled, approved, rejected };
+}
+
+async function saveSoftLegalFields(slug: string, fields: Record<string, unknown>): Promise<void> {
+  const rows = await query(`select soft_legal from public.inventory where slug = '${slug}'`);
+  const current = ((rows[0]?.soft_legal ?? {}) as Record<string, unknown>);
+  const merged = { ...current, ...fields };
+  await query(`update public.inventory set soft_legal = '${escSql(JSON.stringify(merged))}' where slug = '${slug}'`);
 }
 
 // ── State file (so the agent can read progress) ────────────────────────────
@@ -716,11 +802,48 @@ $('delete').addEventListener('click', async () => { if (!confirm('Reset this doc
 </html>`;
 }
 
-function renderSoftContentHtml(context: SyndicateLegalContext, inv: Record<string, unknown>): string {
+function renderSoftContentHtml(
+  context: SyndicateLegalContext,
+  inv: Record<string, unknown>,
+  trainers: { slug: string; name: string; stableName: string }[]
+): string {
   const status = (inv.soft_content_status as string) ?? 'draft';
-  const soft = context.softLegal;
   const h = context.horse;
   const ep = '/soft-content';
+  const slug = context.campaignSlug;
+  const { texts, prefilled, approved, rejected } = mergedSoft(slug, inv, trainers);
+  const approvedCount = SECTION_DEFS.filter((d) => approved[d.field]).length;
+  const firstOpen = SECTION_DEFS.find((d) => !approved[d.field])?.field ?? SECTION_DEFS[0].field;
+
+  const sectionsHtml = SECTION_DEFS.map((d, i) => {
+    const state = approved[d.field] ? 'approved' : rejected[d.field] ? 'rejected' : 'draft';
+    const text = texts[d.field] ?? '';
+    const open = d.field === firstOpen ? ' open' : '';
+    const preTag = prefilled.includes(d.field) ? ' <span class="pre-tag">pre-filled — verify</span>' : '';
+    return `<div class="acc${open}" id="sec-${d.field}">
+  <button class="acc-head" onclick="toggleSec('${d.field}')">
+    <span class="n">${i + 1}</span>
+    <span class="t">${esc(d.title)}</span>
+    <span class="status-pill status-${state}">${state}</span>
+    <span class="chev">▾</span>
+  </button>
+  <div class="acc-body">
+    <p class="hint">${esc(d.hint)}${preTag}</p>
+    <div class="sec-text">${text ? esc(text) : '<span class="blank">not filled in yet</span>'}</div>
+    <div class="sec-edit" style="display:none">
+      <textarea id="edit-${d.field}" rows="6">${esc(text)}</textarea>
+      <button onclick="saveSec('${d.field}')">Save</button>
+    </div>
+    <details class="exemplar"><summary>Hotta example (reference only)</summary><p>${esc(HOTTA_EXEMPLARS[d.field])}</p></details>
+    <div class="sec-actions">
+      <button onclick="actSec('${d.field}','reject')">Reject</button>
+      <button onclick="toggleEdit('${d.field}')">Edit</button>
+      <button class="primary" onclick="actSec('${d.field}','approve')">Approve</button>
+    </div>
+  </div>
+</div>`;
+  }).join('\n');
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -735,14 +858,28 @@ function renderSoftContentHtml(context: SyndicateLegalContext, inv: Record<strin
   h1 { font-size:22px; font-weight:600; margin:0 0 2px; }
   h3 { font-size:13px; font-weight:600; margin:16px 0 6px; border-bottom:1px solid #ddd; padding-bottom:4px; }
   p { margin:6px 0; }
-  ul { margin:4px 0 4px 18px; padding:0; }
-  li { margin:3px 0; }
   hr { border:none; border-top:1px solid var(--line); margin:12px 0; }
   table { border-collapse:collapse; width:100%; margin:8px 0; }
   th,td { border:1px solid var(--line); padding:6px 8px; text-align:left; font-size:12px; }
   th { background:#f5f5f5; }
   .blank { display:inline-block; background:var(--blank-bg); border:1px dashed var(--blank-border); color:var(--blank-ink); border-radius:4px; padding:1px 8px; font-style:italic; font-size:11px; }
   .hint { font-size:11px; color:var(--muted); font-style:italic; }
+  .pre-tag { background:#e8f0fe; color:#1a56db; border-radius:4px; padding:1px 8px; font-style:normal; }
+  .acc { border:1px solid var(--line); border-radius:8px; margin:10px 0; overflow:hidden; }
+  .acc-head { width:100%; display:flex; gap:10px; align-items:center; background:#fafafa; border:none; padding:10px 14px; cursor:pointer; font:inherit; text-align:left; }
+  .acc-head .n { background:var(--ink); color:#fff; border-radius:50%; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; flex:none; }
+  .acc-head .t { font-weight:600; flex:1; }
+  .acc-head .chev { color:var(--muted); }
+  .acc .acc-body { display:none; padding:12px 14px; border-top:1px solid var(--line); }
+  .acc.open .acc-body { display:block; }
+  .acc.open .acc-head .chev { transform:rotate(180deg); }
+  .sec-text { white-space:pre-wrap; margin:8px 0; }
+  .sec-edit textarea { width:100%; font:inherit; padding:8px; border:1px solid var(--line); border-radius:6px; }
+  .exemplar { margin:8px 0; font-size:12px; color:var(--muted); }
+  .exemplar summary { cursor:pointer; font-style:italic; }
+  .sec-actions { display:flex; gap:8px; margin-top:8px; }
+  .sec-actions button, .sec-edit button { font:inherit; font-size:12px; padding:6px 14px; border-radius:6px; border:1px solid var(--line); cursor:pointer; background:#fff; }
+  .sec-actions button.primary { background:var(--ink); color:#fff; border-color:var(--ink); }
   .bar { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--line); padding:12px 20px; display:flex; gap:10px; align-items:center; justify-content:center; box-shadow:0 -1px 6px rgba(0,0,0,.06); }
   .bar button { font-family:inherit; font-size:13px; padding:8px 18px; border-radius:6px; border:1px solid var(--line); cursor:pointer; background:#fff; color:var(--ink); }
   .bar button.primary { background:var(--ink); color:#fff; border-color:var(--ink); }
@@ -759,18 +896,10 @@ function renderSoftContentHtml(context: SyndicateLegalContext, inv: Record<strin
 <body>
 <div class="sheet">
   <h1>Soft Content <span class="status-pill status-${esc(status)}">${esc(status)}</span></h1>
-  <p class="hint">Editorial sections rendered verbatim into the PDS and the website horse page. Verify every claim against the hard facts below — no invented wins, titles, or relatives. Hard content (right) is scraped from loveracing.nz and is LOCKED.</p>
+  <p class="hint">One section open at a time. Each section: Reject (collapses) · Edit (master overwrite) · Approve (closes, opens next). ${approvedCount}/4 approved. Hotta excerpts are reference only — never rendered into output.</p>
   <hr>
-
-  <h3>§2.1 About Horse &amp; Trainer <span class="hint">(soft — aboutHorse + trainerBio)</span></h3>
-  <p>${soft?.aboutHorse ? esc(soft.aboutHorse) : '<span class="blank">not filled in yet</span>'}</p>
-  ${soft?.trainerBio ? `<p>${esc(soft.trainerBio)}</p>` : ''}
-
-  <h3>§2.3 Racing Outlook &amp; Pedigree <span class="hint">(soft — racingOutlookAndPedigree)</span></h3>
-  <p>${soft?.racingOutlookAndPedigree ? esc(soft.racingOutlookAndPedigree) : '<span class="blank">not filled in yet</span>'}</p>
-
-  ${soft?.raceExpectation ? `<h3>§2.4 Racing Expectation <span class="hint">(soft — raceExpectation)</span></h3><p>${esc(soft.raceExpectation)}</p>` : ''}
-
+${sectionsHtml}
+  <hr>
   <h3>Hard facts to verify against <span class="hint">(LOCKED — from loveracing.nz)</span></h3>
   <table>
     <tr><th>Field</th><th>Value</th></tr>
@@ -778,7 +907,6 @@ function renderSoftContentHtml(context: SyndicateLegalContext, inv: Record<strin
     <tr><td>Microchip</td><td>${esc(h.microchip ?? '—')}</td></tr>
     <tr><td>Sire</td><td>${esc(h.sire)}</td></tr>
     <tr><td>Dam</td><td>${esc(h.dam)}</td></tr>
-    <tr><td>Dam's sire</td><td>${esc((context.softLegal && (context as unknown as { damSire?: string }).damSire) ?? '—')}</td></tr>
     <tr><td>Gender</td><td>${esc(h.gender)}</td></tr>
     <tr><td>Foaling date</td><td>${esc(foalingLabel(h.foalingDate) || String(h.foalingYear))}</td></tr>
     <tr><td>Breeder</td><td>${esc(h.breeder)}</td></tr>
@@ -788,13 +916,44 @@ function renderSoftContentHtml(context: SyndicateLegalContext, inv: Record<strin
 
 <div class="bar">
   <button id="pending">Pending</button>
-  <button id="approve" class="primary">Approve → PDS</button>
+  <button id="approve" class="primary">Approve → PDS (${approvedCount}/4)</button>
   <button id="delete" class="danger">Delete</button>
 </div>
 <div class="toast" id="toast"></div>
 <script>
 const $ = (id) => document.getElementById(id);
 const toast = (msg) => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); };
+const ORDER = ${JSON.stringify(SECTION_DEFS.map((d) => d.field))};
+function toggleSec(field) {
+  for (const f of ORDER) {
+    const el = $('sec-' + f);
+    if (f === field) el.classList.toggle('open');
+    else el.classList.remove('open');
+  }
+}
+function toggleEdit(field) {
+  const el = document.querySelector('#sec-' + field + ' .sec-edit');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+async function post2(action, body) {
+  const res = await fetch('${ep}/' + action, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const data = await res.json();
+  if (!res.ok) { toast('Error: ' + (data.error || res.status)); return null; }
+  return data;
+}
+async function actSec(field, action) {
+  const d = await post2(action + '-section', { field });
+  if (!d) return;
+  toast(action === 'approve' ? 'Section approved' : 'Section rejected');
+  setTimeout(() => location.reload(), 600);
+}
+async function saveSec(field) {
+  const text = $('edit-' + field).value;
+  const d = await post2('save-section', { field, text });
+  if (!d) return;
+  toast('Saved');
+  setTimeout(() => location.reload(), 600);
+}
 async function post(action) {
   const res = await fetch('${ep}/' + action, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
   const data = await res.json();
@@ -808,6 +967,7 @@ $('delete').addEventListener('click', async () => { if (!confirm('Reset soft con
 </body>
 </html>`;
 }
+
 
 function renderFlipHtml(context: SyndicateLegalContext, inv: Record<string, unknown>): string {
   const allApproved =
@@ -878,7 +1038,7 @@ async function serve(slug: string, port: number) {
         if (url.pathname === '/' || url.pathname === '/term-sheet') {
           send(renderTermSheetHtml(registry, inv));
         } else if (url.pathname === '/soft-content') {
-          send(renderSoftContentHtml(context, inv));
+          send(renderSoftContentHtml(context, inv, registry.trainers));
         } else if (url.pathname === '/pds') {
           send(renderDocHtml('Product Disclosure Statement', 'pds', pack.pdsMarkdown, inv.pds_status as string, 'SA', '/sa'));
         } else if (url.pathname === '/sa') {
@@ -902,6 +1062,37 @@ async function serve(slug: string, port: number) {
           action = parts[1];
         } else {
           action = parts[0] ?? '';
+        }
+
+        if (action === 'save-section' || action === 'approve-section' || action === 'reject-section') {
+          if (doc !== 'soft_content') {
+            sendJson({ error: 'Section actions live under /soft-content/' }, 400);
+            return;
+          }
+          const field = body.field as string;
+          if (!SECTION_DEFS.some((d) => d.field === field)) {
+            sendJson({ error: `Unknown section: ${field}` }, 400);
+            return;
+          }
+          const rows = await query(`select soft_legal from public.inventory where slug = '${slug}'`);
+          const current = ((rows[0]?.soft_legal ?? {}) as Record<string, unknown>);
+          const sectionState = ({ ...((current._sectionState ?? {}) as Record<string, string>) });
+          if (action === 'save-section') {
+            const text = (body.text as string) ?? '';
+            await saveSoftLegalFields(slug, { [field]: text, _sectionState: { ...sectionState, [field]: 'draft' } });
+          } else if (action === 'approve-section') {
+            const val = (current[field] as string) ?? '';
+            if (!val) {
+              sendJson({ error: 'Cannot approve an empty section — edit first' }, 400);
+              return;
+            }
+            await saveSoftLegalFields(slug, { _sectionState: { ...sectionState, [field]: 'approved' } });
+          } else {
+            await saveSoftLegalFields(slug, { _sectionState: { ...sectionState, [field]: 'rejected' } });
+          }
+          writeState({ action, slug, field, at: new Date().toISOString() });
+          sendJson({ ok: true });
+          return;
         }
 
         if (action === 'save') {
@@ -931,6 +1122,15 @@ async function serve(slug: string, port: number) {
               return;
             }
             await applyFullContext(slug, body);
+          }
+          if (doc === 'soft_content') {
+            const rows = await query(`select soft_legal from public.inventory where slug = '${slug}'`);
+            const sectionState = ((((rows[0]?.soft_legal ?? {}) as Record<string, unknown>)._sectionState ?? {}) as Record<string, string>);
+            const missing = SECTION_DEFS.filter((d) => sectionState[d.field] !== 'approved').map((d) => d.field);
+            if (missing.length > 0) {
+              sendJson({ error: `Sections pending: ${missing.join(', ')}` }, 400);
+              return;
+            }
           }
           await setDocStatus(slug, doc, 'approved');
           writeState({ action: 'approve', slug, doc, at: new Date().toISOString() });
@@ -987,7 +1187,7 @@ function readBody(req: http.IncomingMessage): Promise<Record<string, string>> {
 }
 
 // ── Headless mode ───────────────────────────────────────────────────────────
-async function headless(args: { slug: string; apply?: { distributionSplit: string; distributionSchedule: string }; approve?: string; flip?: boolean; reset?: boolean }) {
+async function headless(args: { slug: string; apply?: { distributionSplit: string; distributionSchedule: string }; approve?: string; flip?: boolean; reset?: boolean; saveSoft?: Record<string, string>; approveSection?: string }) {
   const { slug } = args;
   const { context, inv } = await loadCampaign(slug);
 
@@ -995,10 +1195,11 @@ async function headless(args: { slug: string; apply?: { distributionSplit: strin
   console.log(`status: ${inv.status} | term_sheet: ${inv.term_sheet_status} | pds: ${inv.pds_status} | sa: ${inv.sa_status}`);
   console.log(`distributionSplit: ${inv.distribution_split ?? '(unset)'}`);
   console.log(`distributionSchedule: ${inv.distribution_schedule ?? '(unset)'}`);
+  console.log(`softSections: ${JSON.stringify((inv.soft_legal as Record<string, unknown>)?._sectionState ?? {})}`);
 
   if (args.reset) {
-    await query(`update public.inventory set status = 'coming_soon', term_sheet_status = 'draft', term_sheet_locked_at = null, soft_content_status = 'draft', soft_content_locked_at = null, pds_status = 'draft', pds_locked_at = null, sa_status = 'draft', sa_locked_at = null, distribution_split = null, distribution_schedule = null where slug = '${slug}'`);
-    console.log('✓ Reset to clean draft (statuses draft, owner-set fields cleared)');
+    await query(`update public.inventory set status = 'coming_soon', term_sheet_status = 'draft', term_sheet_locked_at = null, soft_content_status = 'draft', soft_content_locked_at = null, pds_status = 'draft', pds_locked_at = null, sa_status = 'draft', sa_locked_at = null, distribution_split = null, distribution_schedule = null, soft_legal = '{}' where slug = '${slug}'`);
+    console.log('✓ Reset to clean draft (statuses draft, owner-set fields + soft text cleared)');
   }
 
   if (args.apply) {
@@ -1007,6 +1208,24 @@ async function headless(args: { slug: string; apply?: { distributionSplit: strin
       distributionSchedule: args.apply.distributionSchedule,
     });
     console.log(`\n✓ Applied distribution: ${args.apply.distributionSplit} | ${args.apply.distributionSchedule}`);
+  }
+
+  if (args.saveSoft) {
+    await saveSoftLegalFields(slug, args.saveSoft);
+    console.log(`✓ Saved soft fields: ${Object.keys(args.saveSoft).join(', ')}`);
+  }
+
+  if (args.approveSection) {
+    if (!SECTION_DEFS.some((d) => d.field === args.approveSection)) {
+      console.log(`✗ Unknown section: ${args.approveSection}`);
+    } else {
+      const rows = await query(`select soft_legal from public.inventory where slug = '${slug}'`);
+      const current = ((rows[0]?.soft_legal ?? {}) as Record<string, unknown>);
+      const sectionState = ({ ...((current._sectionState ?? {}) as Record<string, string>) });
+      sectionState[args.approveSection] = 'approved';
+      await saveSoftLegalFields(slug, { _sectionState: sectionState });
+      console.log(`✓ Approved section ${args.approveSection}`);
+    }
   }
 
   if (args.approve) {
@@ -1079,6 +1298,8 @@ async function main() {
       approve: args.approve,
       flip: args.flip === 'true',
       reset: args.reset === 'true',
+      saveSoft: args['save-soft'] ? JSON.parse(args['save-soft']) : undefined,
+      approveSection: args['approve-section'],
     });
     return;
   }
@@ -1086,6 +1307,7 @@ async function main() {
   console.log('Usage:');
   console.log('  tsx dsl-workflow.ts serve --slug i-stole-a-manolo [--port 4173]');
   console.log('  tsx dsl-workflow.ts headless --slug i-stole-a-manolo [--apply JSON] [--approve term_sheet|pds|sa|all] [--flip]');
+  console.log("  tsx dsl-workflow.ts headless --slug X --save-soft '{\"aboutHorse\":\"...\"}' --approve-section aboutHorse");
 }
 
 main().catch((e) => {
