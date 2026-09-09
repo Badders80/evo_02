@@ -443,7 +443,7 @@ function renderTermSheetHtml(registry: Registry, inv: Record<string, unknown>): 
     <li>
       <strong>Gross Stakes Distribution:</strong>
       <select id="split" class="blank">
-        <option value="" selected>not filled in yet</option>
+        <option value=""${currentSplit ? '' : ' selected'}>not filled in yet</option>
         ${SPLIT_OPTIONS.map((o) => `<option value="${esc(o)}"${o === currentSplit ? ' selected' : ''}>${esc(o)}</option>`).join('')}
         <option value="__custom__"${currentSplit && !SPLIT_OPTIONS.includes(currentSplit) ? ' selected' : ''}>Other (type below)…</option>
       </select>
@@ -452,7 +452,7 @@ function renderTermSheetHtml(registry: Registry, inv: Record<string, unknown>): 
     <li>
       <strong>Distribution Schedule:</strong>
       <select id="schedule" class="blank">
-        <option value="" selected>not filled in yet</option>
+        <option value=""${currentSchedule ? '' : ' selected'}>not filled in yet</option>
         ${SCHEDULE_OPTIONS.map((o) => `<option value="${esc(o)}"${o === currentSchedule ? ' selected' : ''}>${esc(o)}</option>`).join('')}
         <option value="__custom__"${currentSchedule && !SCHEDULE_OPTIONS.includes(currentSchedule) ? ' selected' : ''}>Other (type below)…</option>
       </select>
@@ -542,6 +542,10 @@ function syncCustom(selId, rowId, customId) {
 }
 $('split').addEventListener('change', () => syncCustom('split','split-custom-row','split-custom'));
 $('schedule').addEventListener('change', () => syncCustom('schedule','schedule-custom-row','schedule-custom'));
+// Initialize blank/filled styling + custom-row visibility on load (server renders
+// class="blank" unconditionally; without this an existing value still LOOKS blank).
+syncCustom('split','split-custom-row','split-custom');
+syncCustom('schedule','schedule-custom-row','schedule-custom');
 
 function render() {
   const horse = HORSES.find(h => h.slug === $('horse').value);
