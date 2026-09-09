@@ -16,7 +16,7 @@ A **Digitally Syndicated Lease (DSL)** is a fixed-term, fractional sub-lease int
 * **Formula:** \`list = cost × 1.05 × 1.03\` (round UP to whole NZD)
 * **Monthly Unit Rate (M):** \`M = list × stake%\` (round UP to whole NZD)
 * **5.0% Evolution Margin:** Embedded into the listed rate.
-* **3.0% Payment Processing Buffer:** Absorbs Stripe transaction charges.
+* **3.0% Platform Fees:** Covers Stripe transaction charges.
 * **Zero Cash Calls:** Investors will never receive surprise veterinary or agistment invoices.
 `,
  },

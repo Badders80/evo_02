@@ -153,13 +153,13 @@ ${aboutSection}### §2.2 Key Details
 | :--- | :--- | ---: |
 | Base lease & keep cost | 100% | $${(p.costMonthlyNzd * 0.01).toFixed(2)} |
 | Evolution operating margin | 5.0% | Included above |
-| Payment processing buffer | 3.0% | Included above |
+| Platform Fees | 3.0% | Included above |
 | **Listed monthly keep rate (M)** | — | **$${p.monthlyKeepUnitNzd.toFixed(2)}** |
 
 The listed monthly rate is calculated as:
 > M = CEIL(cost × 1.05 × 1.03)
 
-The manager margin and processing buffer are embedded in the listed rate. No additional invoices are issued.
+The manager margin and platform fees are embedded in the listed rate. No additional invoices are issued.
 
 ---
 

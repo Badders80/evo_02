@@ -181,7 +181,7 @@ export function PricingCard({
           <span className="font-mono text-foreground">{pricing.evolutionMarginPercent.toFixed(1)}%</span>
         </div>
         <div className="flex justify-between items-center py-1 border-b border-border/60 text-muted-foreground">
-          <span>Payment Processing Buffer</span>
+          <span>Platform Fees</span>
           <span className="font-mono text-foreground">{pricing.processingBufferPercent.toFixed(1)}%</span>
         </div>
         <div className="flex justify-between items-center py-1 border-b border-border/60 text-muted-foreground">

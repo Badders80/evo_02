@@ -339,7 +339,7 @@ function renderTermSheetHtml(registry: Registry, inv: Record<string, unknown>): 
     <li><strong>Syndicated Stake in Horse:</strong> <input type="number" id="stake" class="blank" step="0.5" min="0.5" max="100" placeholder="not filled in yet"> % available</li>
     <li><strong>Minimum Investment:</strong> <input type="number" id="min" class="blank" step="0.25" min="0.25" placeholder="not filled in yet"> % — increments of <input type="number" id="step" class="blank" step="0.25" min="0.25" placeholder="not filled in yet"> %</li>
     <li><strong>Wholesale Monthly Rate (M):</strong> $<input type="number" id="wholesale" class="blank" step="0.01" min="0" placeholder="not filled in yet"> <span class="auto">/ month per 1% stake</span></li>
-    <li><strong>Evolution Margin:</strong> <span class="locked">5.0%</span> | <strong>Platform Cost:</strong> <span class="locked">3.0%</span></li>
+    <li><strong>Evolution Margin:</strong> <span class="locked">5.0%</span> | <strong>Platform Fees:</strong> <span class="locked">3.0%</span></li>
     <li><strong>Retail Monthly Rate (M):</strong> <span id="retail" class="blank">not filled in yet</span> <span class="auto">auto</span></li>
     <li><strong>Lease Term:</strong> <input type="month" id="termStart" class="blank"> → <input type="month" id="termEnd" class="blank"> <span id="termLine" class="auto"></span></li>
   </ul>
