@@ -153,8 +153,8 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
                     className="h-full w-full object-contain opacity-90 transition-opacity duration-300 group-hover:opacity-100"
                     style={{ mixBlendMode: 'lighten' }}
                   />
-                  {/* T15: top vignette — dark above the horse, fading down to transparent at the subject. Founder-spec framing; bottom kept clean to preserve horse legs. */}
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-canvas/50 to-transparent" />
+                  {/* Top vignette — dark above the horse fading to transparent at the subject. Bottom stays clean (clamped by the rounded card border) so the studio floor reads against the canvas edge, not a fade. */}
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-2/3 bg-gradient-to-b from-canvas to-canvas/40" />
                   <StatusBadge status={card.status} />
                 </div>
               </Link>
