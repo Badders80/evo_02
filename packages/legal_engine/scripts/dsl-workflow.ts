@@ -987,7 +987,7 @@ function readBody(req: http.IncomingMessage): Promise<Record<string, string>> {
 }
 
 // ── Headless mode ───────────────────────────────────────────────────────────
-async function headless(args: { slug: string; apply?: { distributionSplit: string; distributionSchedule: string }; approve?: string; flip?: boolean }) {
+async function headless(args: { slug: string; apply?: { distributionSplit: string; distributionSchedule: string }; approve?: string; flip?: boolean; reset?: boolean }) {
   const { slug } = args;
   const { context, inv } = await loadCampaign(slug);
 
@@ -995,6 +995,11 @@ async function headless(args: { slug: string; apply?: { distributionSplit: strin
   console.log(`status: ${inv.status} | term_sheet: ${inv.term_sheet_status} | pds: ${inv.pds_status} | sa: ${inv.sa_status}`);
   console.log(`distributionSplit: ${inv.distribution_split ?? '(unset)'}`);
   console.log(`distributionSchedule: ${inv.distribution_schedule ?? '(unset)'}`);
+
+  if (args.reset) {
+    await query(`update public.inventory set status = 'coming_soon', term_sheet_status = 'draft', term_sheet_locked_at = null, soft_content_status = 'draft', soft_content_locked_at = null, pds_status = 'draft', pds_locked_at = null, sa_status = 'draft', sa_locked_at = null, distribution_split = null, distribution_schedule = null where slug = '${slug}'`);
+    console.log('✓ Reset to clean draft (statuses draft, owner-set fields cleared)');
+  }
 
   if (args.apply) {
     await applyFullContext(slug, {
@@ -1005,9 +1010,10 @@ async function headless(args: { slug: string; apply?: { distributionSplit: strin
   }
 
   if (args.approve) {
-    const docs = args.approve === 'all' ? ['term_sheet', 'pds', 'sa'] : [args.approve];
+    // Order matters: PDS approval is trigger-gated on soft_content (00014).
+    const docs = args.approve === 'all' ? ['term_sheet', 'soft_content', 'pds', 'sa'] : [args.approve];
     for (const doc of docs) {
-      await setDocStatus(slug, doc as 'term_sheet' | 'pds' | 'sa', 'approved');
+      await setDocStatus(slug, doc as 'term_sheet' | 'pds' | 'sa' | 'soft_content', 'approved');
       console.log(`✓ Approved ${doc}`);
     }
   }
@@ -1072,6 +1078,7 @@ async function main() {
       apply: args.apply ? JSON.parse(args.apply) : undefined,
       approve: args.approve,
       flip: args.flip === 'true',
+      reset: args.reset === 'true',
     });
     return;
   }
