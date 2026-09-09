@@ -5,6 +5,11 @@ import {
   generateSaMarkdown,
   southernHemisphereAge,
   formatFoalingDate,
+  retailFromWholesale,
+  FLOAT_TOTAL_MONTHS,
+  FLOAT_DEPOSIT_MONTHS,
+  FLOAT_PREPAID_MONTHS,
+  CLOSE_STYLES,
   type SyndicateLegalContext,
 } from '../src';
 
@@ -234,6 +239,17 @@ export function runTests(): void {
   assertIncludes(mulanPack.pack.pdsMarkdown, '$65.00', 'Mulan monthly keep');
   assertIncludes(mulanPack.pack.pdsMarkdown, '$325.00', 'Mulan join float');
   console.log('✅ Mulan pricing anchors correct');
+
+  // 5b. Commercial rules registry invariants
+  assertIncludes(String(retailFromWholesale(70)), '76', 'retail = CEIL(70 × 1.05 × 1.03)');
+  assertIncludes(String(retailFromWholesale(60)), '65', 'retail = CEIL(60 × 1.05 × 1.03)');
+  if (FLOAT_TOTAL_MONTHS !== FLOAT_DEPOSIT_MONTHS + FLOAT_PREPAID_MONTHS) {
+    throw new Error('Float invariant broken: 5 ≠ 3 + 2');
+  }
+  if (!CLOSE_STYLES.includes('fourteen_day') || !CLOSE_STYLES.includes('three_x_remaining')) {
+    throw new Error('CLOSE_STYLES missing a locked value');
+  }
+  console.log('✅ Commercial rules registry invariants correct');
 
   // 6. Compliance validator
   const validation = validateLegalPack(
