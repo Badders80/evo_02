@@ -153,7 +153,8 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
                     className="h-full w-full object-contain opacity-90 transition-transform duration-300 group-hover:scale-[1.03] group-hover:opacity-100"
                     style={{ mixBlendMode: 'lighten' }}
                   />
-                  {/* T15: removed bottom gradient — was washing out horse legs on standing-conformation photos. The bg-canvas container already provides the fade. */}
+                  {/* T15: top vignette — dark above the horse, fading down to transparent at the subject. Founder-spec framing; bottom kept clean to preserve horse legs. */}
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-canvas/50 to-transparent" />
                   <StatusBadge status={card.status} />
                 </div>
               </Link>
