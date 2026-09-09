@@ -128,7 +128,7 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
           return (
             <article
               key={card.slug}
-              className={`group flex cursor-pointer flex-col items-stretch gap-6 rounded-3xl border border-border bg-card/60 p-5 backdrop-blur-md transition-all duration-700 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.45)] md:flex-row md:gap-8 md:p-6 ${
+              className={`group flex cursor-pointer flex-col items-stretch gap-6 rounded-3xl border border-border bg-card/60 p-5 backdrop-blur-md transition-colors duration-700 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.45)] md:flex-row md:gap-8 md:p-6 ${
                 isFeatured ? 'md:gap-12 md:p-8' : ''
               }`}
               onClick={() => openCard(card)}
@@ -150,7 +150,7 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
                   <img
                     src={card.image}
                     alt={card.name}
-                    className="h-full w-full object-contain opacity-90 transition-transform duration-300 group-hover:scale-[1.03] group-hover:opacity-100"
+                    className="h-full w-full object-contain opacity-90 transition-opacity duration-300 group-hover:opacity-100"
                     style={{ mixBlendMode: 'lighten' }}
                   />
                   {/* T15: top vignette — dark above the horse, fading down to transparent at the subject. Founder-spec framing; bottom kept clean to preserve horse legs. */}

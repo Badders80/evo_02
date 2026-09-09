@@ -110,7 +110,7 @@ export function MyStableDashboard({
       </div>
 
       {checkoutSuccess && (
-        <div className="flex items-start justify-between gap-4 rounded-2xl border border-status-active/40 bg-status-active/10 p-6 shadow-[0_0_40px_rgba(16,185,129,0.08)]">
+        <div className="flex items-start justify-between gap-4 rounded-2xl border border-status-active/40 bg-status-active/10 p-6 shadow-[var(--shadow-success-glow)]">
           <div className="flex items-start gap-3">
             <ShieldCheck className="h-5 w-5 text-status-active mt-0.5 shrink-0" />
             <div className="space-y-1.5">
@@ -217,7 +217,7 @@ export function MyStableDashboard({
             key={tab}
             type="button"
             onClick={() => setActiveTab(tab)}
-            className={`pb-3 px-4 text-xs uppercase font-medium tracking-[0.2em] transition-all border-b-2 ${
+            className={`pb-3 px-4 text-xs uppercase font-medium tracking-[0.2em] transition-colors border-b-2 ${
               activeTab === tab
                 ? 'border-accent text-accent font-medium'
                 : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -245,7 +245,7 @@ export function MyStableDashboard({
               </div>
               <Link
                 href="/horses/nellie"
-                className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-canvas hover:bg-accent-hover transition-all shrink-0"
+                className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-canvas hover:bg-accent-hover transition-colors shrink-0"
               >
                 <span>View Nellie</span>
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -312,7 +312,7 @@ export function MyStableDashboard({
                       </div>
                       <Link
                         href={`/horses/${campaign.slug}`}
-                        className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-canvas hover:bg-accent-hover transition-all w-fit"
+                        className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-canvas hover:bg-accent-hover transition-colors w-fit"
                       >
                         <span>View Thoroughbred Profile</span>
                         <ArrowRight className="h-3.5 w-3.5" />
@@ -359,7 +359,7 @@ export function MyStableDashboard({
                     <a
                       href={`/api/legal/download?slug=${campaign.slug}&doc=pds`}
                       download
-                      className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3.5 py-1.5 text-xs text-foreground hover:border-accent hover:text-accent transition-all"
+                      className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3.5 py-1.5 text-xs text-foreground hover:border-accent hover:text-accent transition-colors"
                     >
                       <Download className="h-3.5 w-3.5" />
                       <span>Download</span>
@@ -378,7 +378,7 @@ export function MyStableDashboard({
                     <a
                       href={`/api/legal/download?slug=${campaign.slug}&doc=sa`}
                       download
-                      className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3.5 py-1.5 text-xs text-foreground hover:border-accent hover:text-accent transition-all"
+                      className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3.5 py-1.5 text-xs text-foreground hover:border-accent hover:text-accent transition-colors"
                     >
                       <Download className="h-3.5 w-3.5" />
                       <span>Download</span>
