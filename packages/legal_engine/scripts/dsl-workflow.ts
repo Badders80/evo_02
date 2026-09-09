@@ -813,13 +813,27 @@ function renderSoftContentHtml(
   const slug = context.campaignSlug;
   const { texts, prefilled, approved, rejected } = mergedSoft(slug, inv, trainers);
   const approvedCount = SECTION_DEFS.filter((d) => approved[d.field]).length;
-  const firstOpen = SECTION_DEFS.find((d) => !approved[d.field])?.field ?? SECTION_DEFS[0].field;
+  const firstOpen =
+    SECTION_DEFS.find((d) => !approved[d.field])?.field ??
+    SECTION_DEFS.find((d) => rejected[d.field])?.field ??
+    SECTION_DEFS[0].field;
 
   const sectionsHtml = SECTION_DEFS.map((d, i) => {
     const state = approved[d.field] ? 'approved' : rejected[d.field] ? 'rejected' : 'draft';
     const text = texts[d.field] ?? '';
-    const open = d.field === firstOpen ? ' open' : '';
+    const open = !approved[d.field] && d.field === firstOpen ? ' open' : '';
     const preTag = prefilled.includes(d.field) ? ' <span class="pre-tag">pre-filled — verify</span>' : '';
+    const actionBar = approved[d.field]
+      ? '<div class="sec-locked">✓ Approved — locked. Content confirmed for the PDS.</div>'
+      : `<div class="sec-actions">
+      <button onclick="actSec('${d.field}','reject')">Reject</button>
+      <button onclick="toggleEdit('${d.field}')">Edit</button>
+      <button class="primary" onclick="actSec('${d.field}','approve')">Approve</button>
+    </div>`;
+    const editPane = approved[d.field] ? '' : `<div class="sec-edit" style="display:none">
+      <textarea id="edit-${d.field}" rows="6">${esc(text)}</textarea>
+      <button onclick="saveSec('${d.field}')">Save</button>
+    </div>`;
     return `<div class="acc${open}" id="sec-${d.field}">
   <button class="acc-head" onclick="toggleSec('${d.field}')">
     <span class="n">${i + 1}</span>
@@ -830,16 +844,9 @@ function renderSoftContentHtml(
   <div class="acc-body">
     <p class="hint">${esc(d.hint)}${preTag}</p>
     <div class="sec-text">${text ? esc(text) : '<span class="blank">not filled in yet</span>'}</div>
-    <div class="sec-edit" style="display:none">
-      <textarea id="edit-${d.field}" rows="6">${esc(text)}</textarea>
-      <button onclick="saveSec('${d.field}')">Save</button>
-    </div>
+    ${editPane}
     <details class="exemplar"><summary>Hotta example (reference only)</summary><p>${esc(HOTTA_EXEMPLARS[d.field])}</p></details>
-    <div class="sec-actions">
-      <button onclick="actSec('${d.field}','reject')">Reject</button>
-      <button onclick="toggleEdit('${d.field}')">Edit</button>
-      <button class="primary" onclick="actSec('${d.field}','approve')">Approve</button>
-    </div>
+    ${actionBar}
   </div>
 </div>`;
   }).join('\n');
@@ -877,6 +884,7 @@ function renderSoftContentHtml(
   .sec-edit textarea { width:100%; font:inherit; padding:8px; border:1px solid var(--line); border-radius:6px; }
   .exemplar { margin:8px 0; font-size:12px; color:var(--muted); }
   .exemplar summary { cursor:pointer; font-style:italic; }
+  .sec-locked { margin-top:8px; font-size:12px; color:#155724; background:#d4edda; border:1px solid #b7dfb9; border-radius:6px; padding:6px 12px; }
   .sec-actions { display:flex; gap:8px; margin-top:8px; }
   .sec-actions button, .sec-edit button { font:inherit; font-size:12px; padding:6px 14px; border-radius:6px; border:1px solid var(--line); cursor:pointer; background:#fff; }
   .sec-actions button.primary { background:var(--ink); color:#fff; border-color:var(--ink); }
