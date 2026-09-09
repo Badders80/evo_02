@@ -25,6 +25,11 @@ export function HeroSection({
   useEffect(() => {
     if (!sectionRef.current || !bgRef.current || !contentRef.current) return;
 
+    // NS-6: honour prefers-reduced-motion. Hero parallax + content fade
+    // are decorative — skip entirely if the user has asked for less motion.
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
     const ctx = gsap.context(() => {
       // Background parallax — drifts down slightly as you scroll
       gsap.to(bgRef.current, {
@@ -87,17 +92,16 @@ export function HeroSection({
           />
         </h1>
 
-        {/* Tagline */}
-        <p
-          className="mt-8 max-w-[720px] font-medium leading-relaxed animate-hero-tagline uppercase"
-          style={{ fontSize: 12, letterSpacing: '3px', color: '#a1a1aa' }}
-        >
-          <span className="whitespace-nowrap">Grounded in tradition.</span>
-          <br />
-          <span className="whitespace-nowrap">Evolved through innovation.</span>
-          <br />
-          Ownership transformed.
-        </p>
+        {/* Tagline — three positioning pillars, gold rule dividers between each.
+            Hierarchy: subordinate to h1 wordmark but visible as a positioning
+            unit, not a footnote. Matches marketplace eyebrow scale per NS-5. */}
+        <div className="mt-8 flex animate-hero-tagline flex-wrap items-center gap-x-4 gap-y-3 text-[11px] font-light uppercase tracking-[0.2em] text-muted-foreground">
+          <span className="whitespace-nowrap">Grounded in tradition</span>
+          <span aria-hidden="true" className="inline-block h-3 w-px bg-accent/60" />
+          <span className="whitespace-nowrap">Evolved through innovation</span>
+          <span aria-hidden="true" className="inline-block h-3 w-px bg-accent/60" />
+          <span className="whitespace-nowrap">Ownership transformed</span>
+        </div>
       </div>
     </section>
   );
