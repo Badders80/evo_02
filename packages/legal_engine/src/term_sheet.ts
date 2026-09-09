@@ -108,7 +108,7 @@ export function generateTermSheetMarkdown(context: SyndicateLegalContext): strin
 * **Syndicated Stake in Horse:** ${context.totalHorsePercentage != null ? `${context.totalHorsePercentage.toFixed(1)}%` : BLANK} available (of the horse's total ownership)
 * **Minimum Investment:** ${context.minInvestmentPct != null ? `${context.minInvestmentPct.toFixed(1)}%` : BLANK} — increments of ${context.stakeStepPct != null ? `${context.stakeStepPct.toFixed(1)}%` : BLANK} thereafter
 * **Wholesale Monthly Rate (M):** $${wholesalePerPct.toFixed(2)} / month per 1% stake
-* **Evolution Margin:** ${p.evolutionMarginPercent.toFixed(1)}%  |  **Platform Fees:** ${p.processingBufferPercent.toFixed(1)}%
+* **Evolution Margin:** ${p.evolutionMarginPercent.toFixed(1)}%  |  **Platform Fees:** ${p.platformFeePercent.toFixed(1)}%
 * **Retail Monthly Rate (M):** $${p.monthlyKeepUnitNzd.toFixed(2)} / month per 1% stake
 ${termLine}
 

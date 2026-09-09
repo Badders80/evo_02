@@ -33,7 +33,7 @@ const manolo = {
     joinFloatUnitNzd: 380,
     stakePercentage: 1.0,
     evolutionMarginPercent: 5.0,
-    processingBufferPercent: 3.0,
+    platformFeePercent: 3.0,
     gstInclusive: true,
   },
   closeStyle: 'fourteen_day' as const,

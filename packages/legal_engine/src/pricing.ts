@@ -1,14 +1,20 @@
 /**
  * Canonical DSL Pricing Engine.
- * Authority: evo_00/doc/DSL_MANUAL.md
+ * Authority: evo_00/doc/DSL_MANUAL.md + commercial-rules registry (founder-locked 2026-09-10).
  *
- * Formula:
- * List Price = Wholesale Cost × 1.05 × 1.03
+ * Formula (from the registry — never re-derive):
+ * List Price = CEIL(Wholesale Cost × (1 + 5% margin) × (1 + 3% platform fee))
  * Unit Keep (M) = ⌈List Price × (stakePercentage / 100)⌉
- * Join Float = 5 × M (3 mo reserve + 2 mo advance keep)
+ * Join Float = FLOAT_TOTAL_MONTHS × M (3 mo reserve + 2 mo advance keep)
  */
 
 import type { DslPricing } from './types';
+import {
+  EVOLUTION_MARGIN_PCT,
+  PLATFORM_FEE_PCT,
+  FLOAT_TOTAL_MONTHS,
+  retailFromWholesale,
+} from './commercial-rules';
 
 export function computeDslPricing(
   wholesaleMonthlyNzd: number,
@@ -18,9 +24,9 @@ export function computeDslPricing(
     throw new Error(`stakePercentage must be between 0 and 100 (received ${stakePercentage})`);
   }
   const wholesale = Math.max(1, wholesaleMonthlyNzd);
-  const listPriceNzd = Math.ceil(wholesale * 1.05 * 1.03);
+  const listPriceNzd = retailFromWholesale(wholesale);
   const monthlyKeepUnitNzd = Math.ceil(listPriceNzd * (stakePercentage / 100));
-  const joinFloatUnitNzd = 5 * monthlyKeepUnitNzd;
+  const joinFloatUnitNzd = FLOAT_TOTAL_MONTHS * monthlyKeepUnitNzd;
 
   return {
     costMonthlyNzd: wholesale,
@@ -28,8 +34,8 @@ export function computeDslPricing(
     monthlyKeepUnitNzd,
     joinFloatUnitNzd,
     stakePercentage,
-    evolutionMarginPercent: 5.0,
-    processingBufferPercent: 3.0,
+    evolutionMarginPercent: EVOLUTION_MARGIN_PCT,
+    platformFeePercent: PLATFORM_FEE_PCT,
     gstInclusive: true,
   };
 }

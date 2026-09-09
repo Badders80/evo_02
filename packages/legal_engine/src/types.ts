@@ -43,7 +43,7 @@ export interface DslPricing {
   joinFloatUnitNzd: number;
   stakePercentage: number;
   evolutionMarginPercent: number;
-  processingBufferPercent: number;
+  platformFeePercent: number;
   gstInclusive: boolean;
 }
 

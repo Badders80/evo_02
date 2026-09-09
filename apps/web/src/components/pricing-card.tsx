@@ -182,7 +182,7 @@ export function PricingCard({
         </div>
         <div className="flex justify-between items-center py-1 border-b border-border/60 text-muted-foreground">
           <span>Platform Fees</span>
-          <span className="font-mono text-foreground">{pricing.processingBufferPercent.toFixed(1)}%</span>
+          <span className="font-mono text-foreground">{pricing.platformFeePercent.toFixed(1)}%</span>
         </div>
         <div className="flex justify-between items-center py-1 border-b border-border/60 text-muted-foreground">
           <span>NZ GST Breakdown (3/23 identity)</span>
