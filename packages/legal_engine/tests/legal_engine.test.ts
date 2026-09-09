@@ -149,14 +149,14 @@ export function runTests(): void {
   assertIncludes(nelliePack.pack.pdsMarkdown, '§1. Title & Structure', 'PDS section 1');
   assertIncludes(nelliePack.pack.pdsMarkdown, '§2. Asset Specifics', 'PDS section 2');
   assertIncludes(nelliePack.pack.pdsMarkdown, '§3. Commercial Model', 'PDS section 3');
-  assertIncludes(nelliePack.pack.pdsMarkdown, '§4. Float & Billing', 'PDS section 4');
-  assertIncludes(nelliePack.pack.pdsMarkdown, '§5. Gross Stakes Split', 'PDS section 5');
-  assertIncludes(nelliePack.pack.pdsMarkdown, '§6. Exit & Close Style', 'PDS section 6');
+  assertIncludes(nelliePack.pack.pdsMarkdown, '§4. Deposit & Billing', 'PDS section 4');
+  assertIncludes(nelliePack.pack.pdsMarkdown, '§5. Investor Return', 'PDS section 5');
+  assertIncludes(nelliePack.pack.pdsMarkdown, '§6. Exit & Termination', 'PDS section 6');
   console.log('✅ All mandatory PDS sections present');
 
   // 4. Mandatory SA clauses
   assertIncludes(nelliePack.pack.saMarkdown, 'Clause 6: Equine Welfare Supremacy', 'SA clause 6');
-  assertIncludes(nelliePack.pack.saMarkdown, 'Clause 8: Default & Float Reserve Drawdown', 'SA clause 8');
+  assertIncludes(nelliePack.pack.saMarkdown, 'Clause 8: Default & Forfeiture', 'SA clause 8');
   assertIncludes(nelliePack.pack.saMarkdown, 'Clause 11: Syndicate Management Fee', 'SA clause 11');
   assertIncludes(nelliePack.pack.saMarkdown, 'Clause 12: Manager Removal', 'SA clause 12');
   assertIncludes(nelliePack.pack.saMarkdown, 'Clause 13: Governing Law', 'SA clause 13');
@@ -169,9 +169,9 @@ export function runTests(): void {
     '§1. Title & Structure',
     '§2. Asset Specifics',
     '§3. Commercial Model',
-    '§4. Float & Billing',
-    '§5. Gross Stakes Split',
-    '§6. Exit & Close Style',
+    '§4. Deposit & Billing',
+    '§5. Investor Return',
+    '§6. Exit & Termination',
     '§7. Taxes',
     '§8. Insurance',
     '§9. Valuation',
@@ -201,7 +201,7 @@ export function runTests(): void {
     'Clause 5: Lease Duration',
     'Clause 6: Equine Welfare Supremacy',
     'Clause 7: Manager\'s Powers and Duties',
-    'Clause 8: Default & Float Reserve Drawdown',
+    'Clause 8: Default & Forfeiture',
     'Clause 9: Financial Contributions and Fees',
     'Clause 10: Revenue Streams and Distribution',
     'Clause 11: Syndicate Management Fee',
@@ -223,14 +223,14 @@ export function runTests(): void {
   console.log(`✅ Full SA skeleton present (${fullSaClauses.length} clauses + execution)`);
 
   // 5. Pricing anchors
-  assertIncludes(nelliePack.pack.pdsMarkdown, '$70.00', 'Nellie 1% base cost unit');
+  assertIncludes(nelliePack.pack.pdsMarkdown, 'fixed rate of **$76.00 per month per 1% stake**', 'Nellie retail keep rate');
   assertIncludes(nelliePack.pack.pdsMarkdown, '$76.00', 'Nellie monthly keep');
   assertIncludes(nelliePack.pack.pdsMarkdown, '$380.00', 'Nellie join float');
   assertIncludes(nelliePack.pack.saMarkdown, '**Owner:** Bax Bloodstock', 'SA Schedule 1 owner');
   console.log('✅ Nellie pricing anchors & SA schedule correct');
 
   const mulanPack = compileLegalPack(mulanContext);
-  assertIncludes(mulanPack.pack.pdsMarkdown, '$60.00', 'Mulan 1% base cost unit');
+  assertIncludes(mulanPack.pack.pdsMarkdown, 'fixed rate of **$65.00 per month per 1% stake**', 'Mulan retail keep rate');
   assertIncludes(mulanPack.pack.pdsMarkdown, '$65.00', 'Mulan monthly keep');
   assertIncludes(mulanPack.pack.pdsMarkdown, '$325.00', 'Mulan join float');
   console.log('✅ Mulan pricing anchors correct');

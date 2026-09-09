@@ -385,6 +385,7 @@ function renderTermSheetHtml(registry: Registry, inv: Record<string, unknown>): 
   select.blank, input.blank { background:var(--blank-bg); border:1px dashed var(--blank-border); color:var(--blank-ink); font-style:italic; }
   select:focus, input:focus { outline:1px solid var(--accent); }
   .auto { color:var(--muted); font-size:11px; }
+  .indent { margin-left:24px; }
   .locked { color:var(--muted); }
   .legend { font-size:11px; color:var(--muted); margin:6px 0 0; }
   .lock-tag { color:#155724; font-size:11px; font-weight:600; }
@@ -410,13 +411,12 @@ function renderTermSheetHtml(registry: Registry, inv: Record<string, unknown>): 
   <h1>DSL Term Sheet - <span id="h-name" class="blank">not filled in yet</span> <span class="status-pill status-${esc(status)}">${esc(status)}</span></h1>
   <p class="meta"><strong>Version:</strong> <span class="locked">1.0.0</span> | <strong>Effective Date:</strong> <span id="h-date" class="blank">not filled in yet</span></p>
   <p class="meta"><strong>Manager:</strong> <span class="locked">Evolution Stables (NZTR Authorised Syndicator)</span></p>
-  <p class="legend"><span class="lock-tag">🔒 LOCKED</span> = system-produced, not editable &nbsp;·&nbsp; <span class="var-tag">✎ VARIABLE</span> = you set it</p>
   <hr>
 
   <h3>1. Thoroughbred &amp; Parties</h3>
   <ul>
     <li><strong>Horse:</strong> <select id="horse" class="blank"><option value="" selected>not filled in yet</option></select></li>
-    <li><strong>Microchip / ID:</strong> <span id="microchip" class="blank">not filled in yet</span> <span id="microchip-lock" class="lock-tag" style="display:none;">🔒 LOCKED</span></li>
+    <li><strong>Microchip / ID:</strong> <span id="microchip" class="blank">not filled in yet</span></li>
     <li><strong>Owner:</strong> <select id="owner" class="blank"><option value="" selected>not filled in yet</option></select></li>
     <li><strong>Trainer:</strong> <select id="trainer" class="blank"><option value="" selected>not filled in yet</option></select></li>
   </ul>
@@ -424,11 +424,14 @@ function renderTermSheetHtml(registry: Registry, inv: Record<string, unknown>): 
   <h3>2. Syndicate Stake &amp; Commercials</h3>
   <ul>
     <li><strong>Syndicated Stake in Horse:</strong> <input type="number" id="stake" class="blank" step="0.5" min="0.5" max="100" placeholder="not filled in yet"> % available</li>
-    <li><strong>Minimum Investment:</strong> <input type="number" id="min" class="blank" step="0.25" min="0.25" placeholder="not filled in yet"> % — increments of <input type="number" id="step" class="blank" step="0.25" min="0.25" placeholder="not filled in yet"> %</li>
+    <li><strong>Minimum Investment:</strong> <input type="number" id="min" class="blank" step="0.25" min="0.25" placeholder="not filled in yet"> %</li>
+    <li><strong>Increments:</strong> <input type="number" id="step" class="blank" step="0.25" min="0.25" placeholder="not filled in yet"> %</li>
     <li><strong>Wholesale Monthly Rate (M):</strong> $<input type="number" id="wholesale" class="blank" step="0.01" min="0" placeholder="not filled in yet"> <span class="auto">/ month per 1% stake</span></li>
     <li><strong>Evolution Margin:</strong> <span class="locked">5.0%</span> | <strong>Platform Fees:</strong> <span class="locked">3.0%</span></li>
     <li><strong>Retail Monthly Rate (M):</strong> <span id="retail" class="blank">not filled in yet</span> <span class="auto">auto</span></li>
-    <li><strong>Lease Term:</strong> <input type="month" id="termStart" class="blank"> → <input type="month" id="termEnd" class="blank"> <span id="termLine" class="auto"></span></li>
+    <li><strong>Lease Term:</strong></li>
+    <li class="indent"><input type="month" id="termStart" class="blank"> → <input type="month" id="termEnd" class="blank"></li>
+    <li class="indent"><span id="termLine" class="auto"></span></li>
   </ul>
 
   <h3>3. Payment Structure &amp; Float</h3>
@@ -438,7 +441,7 @@ function renderTermSheetHtml(registry: Registry, inv: Record<string, unknown>): 
     <li><strong>Settlement:</strong> <span id="settlement" class="blank">not filled in yet</span></li>
   </ul>
 
-  <h3>4. Prize Money &amp; Exit Terms <span style="color:var(--accent);font-size:11px;">(owner-set — complete below)</span></h3>
+  <h3>4. Prize Money &amp; Exit Terms</h3>
   <ul>
     <li>
       <strong>Gross Stakes Distribution:</strong>
@@ -461,13 +464,6 @@ function renderTermSheetHtml(registry: Registry, inv: Record<string, unknown>): 
     <li><strong>Exit / Close Style:</strong> <select id="close" class="blank"><option value="" selected>not filled in yet</option></select></li>
   </ul>
 
-  <h3>5. Execution &amp; Approvals</h3>
-  <table>
-    <tr><th>Party</th><th>Signature</th><th>Date</th></tr>
-    <tr><td><strong>Evolution Stables</strong> (Syndicate Manager)</td><td>_________________________</td><td>_____________</td></tr>
-    <tr><td><strong><span id="owner-sig" class="blank">not filled in yet</span></strong> (Owner)</td><td>_________________________</td><td>_____________</td></tr>
-  </table>
-
   <hr>
   <p class="fineprint">Summary of terms under the NZTR Code of Practice Rule 22.1. Subject to execution of formal PDS and Syndicate Agreement.</p>
 </div>
@@ -489,8 +485,8 @@ const MODELS = [
   { id:'upfront', label:'Upfront (Lump Sum for Full Term)' },
 ];
 const CLOSES = [
-  { id:'fourteen_day', label:'Standard 14-Day Written Notice (Case B)' },
-  { id:'three_x_remaining', label:'3× Buyout Liquidating Exit (Case B1)' },
+  { id:'fourteen_day', label:'Lessor 14-Day Break' },
+  { id:'three_x_remaining', label:'Early Sale / Buyout (3× remaining lease value)' },
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -549,7 +545,7 @@ syncCustom('schedule','schedule-custom-row','schedule-custom');
 
 function render() {
   const horse = HORSES.find(h => h.slug === $('horse').value);
-  const owner = OWNERS.find(o => o.slug === $('owner').value);
+  const owner = OWNERS.find(o => (o.id ?? o.slug) === $('owner').value);
   const trainer = TRAINERS.find(t => t.slug === $('trainer').value);
   const model = MODELS.find(m => m.id === $('model').value);
   const close = CLOSES.find(c => c.id === $('close').value);
@@ -568,11 +564,8 @@ function render() {
   setBlank($('horse'), !!horse);
   $('microchip').textContent = horse && horse.microchip ? horse.microchip : 'not filled in yet';
   setBlank($('microchip'), !!(horse && horse.microchip));
-  $('microchip-lock').style.display = (horse && horse.microchip) ? 'inline' : 'none';
   setBlank($('owner'), !!owner);
   setBlank($('trainer'), !!trainer);
-  $('owner-sig').textContent = owner ? owner.entity : 'not filled in yet';
-  setBlank($('owner-sig'), !!owner);
 
   // §2
   setBlank($('stake'), Number.isFinite(stake));
@@ -637,7 +630,7 @@ $('termStart').addEventListener('change', render);
 $('termEnd').addEventListener('change', render);
 
 function currentValues() {
-  const owner = OWNERS.find(o => o.slug === $('owner').value);
+  const owner = OWNERS.find(o => (o.id ?? o.slug) === $('owner').value);
   const trainer = TRAINERS.find(t => t.slug === $('trainer').value);
   // Wholesale field is "per 1% stake"; DB cost_monthly_nzd is the TOTAL monthly
   // cost (per-1% × 100). Convert on save.
@@ -985,6 +978,8 @@ function renderFlipHtml(context: SyndicateLegalContext, inv: Record<string, unkn
   const allApproved =
     inv.term_sheet_status === 'approved' && inv.pds_status === 'approved' && inv.sa_status === 'approved';
   const listed = inv.status === 'listed';
+  const statusLabel = (s: unknown) => (s === 'draft' ? 'saved' : String(s ?? 'draft'));
+  const statusClass = (s: unknown) => (s === 'approved' ? 'ok' : s === 'rejected' ? 'no' : 'saved');
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"><title>Flip to Listed — ${esc(context.syndicateName)}</title>
@@ -992,9 +987,12 @@ function renderFlipHtml(context: SyndicateLegalContext, inv: Record<string, unkn
   body { font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:#1a1a1a; background:#f4f4f2; margin:0; padding:40px; line-height:1.6; }
   .card { max-width:600px; margin:0 auto; background:#fff; padding:32px; box-shadow:0 1px 6px rgba(0,0,0,.08); border-radius:8px; }
   h1 { font-size:20px; margin:0 0 16px; }
-  .row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; }
+  .row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #eee; }
   .ok { color:#155724; font-weight:600; }
   .no { color:#b00020; font-weight:600; }
+  .saved { color:#856404; font-weight:600; }
+  .view { font-size:12px; color:#1a1a1a; text-decoration:none; border:1px solid #ccc; border-radius:4px; padding:2px 10px; margin-left:8px; }
+  .view:hover { background:#f0f0f0; }
   button { font-family:inherit; font-size:14px; padding:10px 20px; border-radius:6px; border:1px solid #ccc; cursor:pointer; background:#1a1a1a; color:#fff; margin-top:16px; }
   button:disabled { opacity:.4; cursor:not-allowed; }
   .toast { position:fixed; top:16px; right:16px; background:#1a1a1a; color:#fff; padding:10px 16px; border-radius:6px; opacity:0; transition:opacity .2s; }
@@ -1004,9 +1002,9 @@ function renderFlipHtml(context: SyndicateLegalContext, inv: Record<string, unkn
 <body>
 <div class="card">
   <h1>Flip to Listed — ${esc(context.syndicateName)}</h1>
-  <div class="row"><span>Term Sheet</span><span class="${inv.term_sheet_status === 'approved' ? 'ok' : 'no'}">${esc(String(inv.term_sheet_status))}</span></div>
-  <div class="row"><span>PDS</span><span class="${inv.pds_status === 'approved' ? 'ok' : 'no'}">${esc(String(inv.pds_status))}</span></div>
-  <div class="row"><span>SA</span><span class="${inv.sa_status === 'approved' ? 'ok' : 'no'}">${esc(String(inv.sa_status))}</span></div>
+  <div class="row"><span>Term Sheet</span><span><span class="${statusClass(inv.term_sheet_status)}">${esc(statusLabel(inv.term_sheet_status))}</span><a class="view" href="/term-sheet">VIEW</a></span></div>
+  <div class="row"><span>PDS</span><span><span class="${statusClass(inv.pds_status)}">${esc(statusLabel(inv.pds_status))}</span><a class="view" href="/pds">VIEW</a></span></div>
+  <div class="row"><span>SA</span><span><span class="${statusClass(inv.sa_status)}">${esc(statusLabel(inv.sa_status))}</span><a class="view" href="/sa">VIEW</a></span></div>
   <div class="row"><span>Current status</span><span>${esc(String(inv.status))}</span></div>
   <p style="margin-top:16px;font-size:13px;color:#666;">
     ${listed ? '✅ Already listed.' : allApproved ? 'All three docs approved — ready to flip.' : '⚠️ Not all docs approved. The legal-lock gate will block the flip.'}
@@ -1095,10 +1093,17 @@ async function serve(slug: string, port: number) {
           } else if (action === 'approve-section') {
             const val = (current[field] as string) ?? '';
             if (!val) {
-              sendJson({ error: 'Cannot approve an empty section — edit first' }, 400);
-              return;
+              // Pre-filled registry text counts as content — persist it on approve.
+              const { texts } = mergedSoft(slug, inv, registry.trainers);
+              const pre = (texts as Record<string, string>)[field] ?? '';
+              if (!pre) {
+                sendJson({ error: 'Cannot approve an empty section — edit first' }, 400);
+                return;
+              }
+              await saveSoftLegalFields(slug, { [field]: pre, _sectionState: { ...sectionState, [field]: 'approved' } });
+            } else {
+              await saveSoftLegalFields(slug, { _sectionState: { ...sectionState, [field]: 'approved' } });
             }
-            await saveSoftLegalFields(slug, { _sectionState: { ...sectionState, [field]: 'approved' } });
           } else {
             await saveSoftLegalFields(slug, { _sectionState: { ...sectionState, [field]: 'rejected' } });
           }

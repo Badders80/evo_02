@@ -60,7 +60,7 @@ function keyInformationSummary(context: SyndicateLegalContext): string {
   const costsBlock =
     context.paymentModel === 'upfront'
       ? `- **Lease fee:** $${(p.monthlyKeepUnitNzd * (context.termMonths ?? 0)).toFixed(2)} per 1% stake (fixed, covers all costs for the term).`
-      : `- **Initial payment:** $${p.joinFloatUnitNzd.toFixed(2)} per 1% stake (3 months security deposit reserve + 2 months prepaid keep).\n- **Monthly keep:** $${p.monthlyKeepUnitNzd.toFixed(2)} per month per 1% stake thereafter, maintaining a 5-month float buffer.\n- **Fees:** 5.0% Evolution Stables margin + 3.0% Platform Fees, embedded in the listed rate.`;
+      : `- **Initial payment:** $${p.joinFloatUnitNzd.toFixed(2)} per 1% stake (3 months security deposit reserve + 2 months prepaid keep).\n- **Monthly keep:** $${p.monthlyKeepUnitNzd.toFixed(2)} per month per 1% stake thereafter, maintaining a 5-month float buffer.`;
 
   const structureBullets = [
     `- **Leasehold interest in:** ${v(h.legalName)}${h.barnName && h.barnName !== h.legalName ? ` (${h.barnName})` : ''}`,
@@ -94,7 +94,7 @@ ${structureBullets}
 
 **Returns**
 
-Returns are variable, based on race performance and commercial revenue. There are no guarantees, and you may not recover your original investment.
+Investors receive a fixed share of gross stakes won — ${context.distributionSplit ? context.distributionSplit.split('/')[0].trim() + ' of' : 'a pro-rata share of'} total stakes, distributed quarterly. There are no guarantees, and you may not recover your original investment.
 
 **Costs**
 
@@ -135,7 +135,7 @@ function extendedSections(context: SyndicateLegalContext): string {
 
   const insuranceSection = `## §8. Insurance
 
-Evolution Stables has not secured mortality insurance for the ${v(context.totalHorsePercentage)}% leasehold stake in ${v(h.legalName)}. Because this is a fixed-term leasehold interest and not an equity stake, the primary risk to the investor is the loss of the initial lease fee and any prepaid keep, rather than the capital value of the horse. In the event of the horse's death, the lease will terminate, and unspent funds will be refunded pro-rata as outlined in Section 6.`;
+Evolution Stables has not secured mortality insurance for this leasehold stake. Because this is a fixed-term leasehold interest rather than an equity ownership stake, capital mortality insurance is not applicable. In the event of the horse's death or permanent retirement, the lease terminates automatically, and all unspent deposit funds are refunded pro-rata as outlined in Section 6.`;
 
   const materialInterests = `## §11. Material Interests
 
@@ -274,50 +274,63 @@ There are no recurring monthly subscription fees or capital calls.
 
 Upon formal termination or maturity of the syndicate lease, any unused prepaid keep is **refunded pro-rata** to the investor’s verified payment method within 14 business days.`;
   } else if (paymentModel === 'subscription_float') {
-    floatSection = `At initial participation, an investor pays **$${p.joinFloatUnitNzd.toFixed(2)}**, representing:
+    floatSection = `The digitally syndicated campaign operates on a **five-month initial investment** upon participation, with recurring monthly payments due on the 1st of every month thereafter.
+
+The five-month initial investment follows a 3+2 structure outlined below:
+
 - 3 months security deposit reserve; and
-- 2 months prepaid keep.
+- 2 months keep (comprising the initial installment and 1 month in advance).
 
-From month 2 onwards, the investor pays **$${p.monthlyKeepUnitNzd.toFixed(2)} per month** to maintain a constant 5-month float buffer.
-
-Upon formal termination or maturity of the syndicate lease, all unused prepaid keep and security deposit reserve funds are **refunded pro-rata** to the investor’s verified payment method within 14 business days.`;
+Upon formal termination or maturity of the syndicate lease, all unused prepaid keep and security deposit reserve funds are **refunded pro-rata** to the investor's verified payment method within 14 business days.`;
   } else {
     floatSection = `**Payment Model:** ${BLANK}
 
-**Float & Billing:** ${BLANK}`;
+**Deposit & Billing:** ${BLANK}`;
   }
 
-  // §5 gross stakes split: owner-set, never a platform default.
+  // §5 investor return: owner-set, never a platform default.
   const distributionSplit = context.distributionSplit;
   const distributionSchedule = context.distributionSchedule;
   let splitSection: string;
   if (distributionSplit) {
-    splitSection = `All prize money distributions are calculated strictly from **officially published NZTR / LoveRacing gross stakes earnings**.
+    splitSection = `Investors receive a distribution calculated strictly from **official New Zealand Thoroughbred Racing (NZTR) gross stakes** won during their eligible participation period:
 
-**Gross Stakes Distribution:** ${distributionSplit}
-
-**Distribution Schedule:** ${distributionSchedule ? distributionSchedule : BLANK}`;
+- **Stakes Calculation:** Based on official NZTR stakes distributions published via loveracing.nz.
+- **Stakes Allocation:** ${distributionSplit} of total gross stakes won is allocated to the Investor Pool (distributed pro-rata relative to stake held).
+- **Distribution Schedule:** ${distributionSchedule ? distributionSchedule : BLANK}.
+- **Qualification Period:** Investors must have maintained fully paid-up status for two (2) full months prior to a race date to qualify for prize money distributions from that race.`;
   } else {
-    splitSection = `All prize money distributions are calculated strictly from **officially published NZTR / LoveRacing gross stakes earnings**.
+    splitSection = `Investors receive a distribution calculated strictly from **official New Zealand Thoroughbred Racing (NZTR) gross stakes** won during their eligible participation period:
 
-**Gross Stakes Distribution:** ${BLANK}
-
-**Distribution Schedule:** ${BLANK}`;
+- **Stakes Calculation:** Based on official NZTR stakes distributions published via loveracing.nz.
+- **Stakes Allocation:** ${BLANK} of total gross stakes won is allocated to the Investor Pool (distributed pro-rata relative to stake held).
+- **Distribution Schedule:** ${BLANK}.
+- **Qualification Period:** Investors must have maintained fully paid-up status for two (2) full months prior to a race date to qualify for prize money distributions from that race.`;
   }
 
-  // §6 exit / close style: blank when unset.
+  // §6 exit & termination: close-style-driven, blank when unset.
   const closeStyleLabel =
     context.closeStyle === 'fourteen_day'
-      ? 'Standard 14-Day Notice (Case B)'
+      ? 'Lessor 14-Day Break'
       : context.closeStyle === 'three_x_remaining'
-        ? '3× Buyout Liquidating Exit (Case B1)'
+        ? 'Early Sale / Buyout'
         : BLANK;
   const closeDetail =
     context.closeStyle === 'fourteen_day'
-      ? 'An investor may exit by giving 14 calendar days written notice when the underlying head lease concludes or the horse is retired. No penalty buyout applies.'
+      ? `**Lessor 14-Day Break:** This syndicate operates under the Standard 14-Day Notice mechanism stipulated by the horse owner, matching the underlying Head Lease agreement. The lease may be terminated upon 14 calendar days' written notice when the underlying head lease concludes or the horse is retired. This process is triggered exclusively by the owner, not Evolution Stables.`
       : context.closeStyle === 'three_x_remaining'
-        ? 'Where the head lease provides liquidation proceeds, the syndicate may be wound up by payment of 3× the remaining lease value to co-owners.'
+        ? `**Early Sale / Buyout:** If the horse is sold or bought out prior to the conclusion of the lease term, investors will receive a payout equivalent to 3× the remaining lease value per 1% stake, distributed pro-rata. This process is triggered by the owner, not Evolution Stables.`
         : BLANK;
+
+  const exitSection = `## §6. Exit & Termination
+
+Rules for exit and termination are designed around three core pillars: creating accessible investment opportunities, maintaining commercial viability, and prioritizing the long-term care of the horse.
+
+${closeStyleLabel ? `**${closeStyleLabel}:** ${closeDetail.replace(/^\*\*[^*]+\*\*:\s*/, '')}` : BLANK}
+
+**Investor Notice & Wind-Down Period:** An investor may give notice of exit prior to their next monthly installment date. Upon receiving notice, recurring monthly billing ceases, and the investor's 3+2 deposit structure serves as the active wind-down period until their participation concludes.
+
+**Default & Forfeiture:** An investor enters default if a scheduled monthly payment is missed. Evolution Stables will notify the investor during the default period. If the outstanding balance is not rectified prior to the next billing cycle, the investment is deemed in default. The investor forfeits all future rights to prize money distributions and their deposit, which is subsequently reallocated to the horse owner to secure the ongoing care and maintenance of the horse. Evolution Stables receives no material financial benefit from an investor default.`;
 
   const taxSection = `## §7. Taxes
 
@@ -367,39 +380,23 @@ ${aboutSection}### §2.2 Key Details
 
 ## §3. Commercial Model
 
-| Component | Rate | Monthly Amount (per 1% stake) |
-| :--- | :--- | ---: |
-| Base lease & keep cost | 100% | $${(p.costMonthlyNzd * 0.01).toFixed(2)} |
-| Evolution operating margin | 5.0% | Included above |
-| Platform Fees | 3.0% | Included above |
-| **Listed monthly keep rate (M)** | — | **$${p.monthlyKeepUnitNzd.toFixed(2)}** |
-
-The listed monthly rate is calculated as:
-> M = CEIL(cost × 1.05 × 1.03)
-
-The manager margin and platform fees are embedded in the listed rate. No additional invoices are issued.
+This syndicate operates on a fixed rate of **$${p.monthlyKeepUnitNzd.toFixed(2)} per month per 1% stake**.
 
 ---
 
-## §4. Float & Billing
+## §4. Deposit & Billing
 
 ${floatSection}
 
 ---
 
-## §5. Gross Stakes Split
+## §5. Investor Return
 
 ${splitSection}
 
 ---
 
-## §6. Exit & Close Style
-
-This syndicate operates under the **${closeStyleLabel}** mechanism.
-
-${closeDetail}
-
-Upon exit, any unused float is refunded pro-rata within 14 business days.
+${exitSection}
 
 ---
 
@@ -422,9 +419,9 @@ export function getPdsSectionTitles(): string[] {
     '§1. Title & Structure',
     '§2. Asset Specifics',
     '§3. Commercial Model',
-    '§4. Float & Billing',
-    '§5. Gross Stakes Split',
-    '§6. Exit & Close Style',
+    '§4. Deposit & Billing',
+    '§5. Investor Return',
+    '§6. Exit & Termination',
     '§7. Taxes',
     '§8. Insurance',
     '§9. Valuation',

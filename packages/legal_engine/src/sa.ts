@@ -97,11 +97,11 @@ The Manager may:
 
 ---
 
-## Clause 8: Default & Float Reserve Drawdown
+## Clause 8: Default & Forfeiture
 
-If a monthly keep payment remains unpaid for more than 14 days after its due date, the investor will receive a default notice. If the default continues for 30 days, the Syndicate Manager may draw on the investor's float reserve to bring the account into good standing.
+An investor enters default if a scheduled monthly payment is missed. Evolution Stables will notify the investor during the default period. If the outstanding balance is not rectified prior to the next billing cycle, the investment is deemed in default.
 
-Drawdown is applied to prepaid keep and security deposit reserves only, in that order. No additional penalties are levied beyond the contractual obligations set out in this Agreement.
+Upon default, the investor forfeits all future rights to prize money distributions and their deposit, which is subsequently reallocated to the horse owner to secure the ongoing care and maintenance of the horse. Evolution Stables receives no material financial benefit from an investor default.
 
 ---
 
@@ -137,9 +137,6 @@ All distributions are calculated strictly from officially published NZTR / LoveR
 ## Clause 11: Syndicate Management Fee
 
 A **5.0% syndicate management margin** is embedded in the monthly keep rate of **$${p.monthlyKeepUnitNzd.toFixed(2)} per 1% stake**. No separate management invoices or off-platform accounting fees are charged.
-
-The listed rate is calculated as:
-> M = CEIL(cost × 1.05 × 1.03)
 
 ---
 
@@ -244,7 +241,7 @@ export function getSaClauseTitles(): string[] {
     'Clause 5: Lease Duration',
     'Clause 6: Equine Welfare Supremacy',
     'Clause 7: Manager\'s Powers and Duties',
-    'Clause 8: Default & Float Reserve Drawdown',
+    'Clause 8: Default & Forfeiture',
     'Clause 9: Financial Contributions and Fees',
     'Clause 10: Revenue Streams and Distribution',
     'Clause 11: Syndicate Management Fee',
