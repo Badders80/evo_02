@@ -21,6 +21,8 @@ export interface ThoroughbredPedigree {
   legalName: string;
   barnName: string;
   foalingYear: number;
+  /** Full foaling date ISO (YYYY-MM-DD) — source of truth for age. foalingYear is derived legacy. */
+  foalingDate?: string;
   gender: 'Colt' | 'Filly' | 'Gelding' | 'Mare' | 'Horse';
   breeder: string;
   microchip?: string;

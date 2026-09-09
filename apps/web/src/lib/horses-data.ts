@@ -368,6 +368,7 @@ export function getCompiledLegalPackForCampaign(campaign: HorseCampaign): Compil
         legalName: campaign.legalName,
         barnName: campaign.barnName ?? campaign.legalName,
         foalingYear: campaign.pedigree.foalingDate ? parseInt(campaign.pedigree.foalingDate.split('-')[0], 10) : 0,
+        foalingDate: campaign.pedigree.foalingDate || undefined,
         gender: campaign.pedigree.gender as 'Colt' | 'Filly' | 'Gelding' | 'Mare' | 'Horse',
         breeder: campaign.pedigree.breeder,
         microchip: campaign.pedigree.microchip,

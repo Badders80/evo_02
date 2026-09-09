@@ -63,6 +63,7 @@ async function main() {
       foalingYear: ped.foaling_date
         ? parseInt(String(ped.foaling_date).split('-')[0], 10)
         : 0,
+      foalingDate: (ped.foaling_date as string) || undefined,
       gender: (ped.gender as 'Colt' | 'Filly' | 'Gelding' | 'Mare' | 'Horse') ?? 'Filly',
       breeder: (ped.breeder as string) ?? '',
       microchip: (ped.microchip as string) ?? undefined,

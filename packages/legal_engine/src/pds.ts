@@ -9,6 +9,7 @@
 
 import type { SyndicateLegalContext, HorseSoftLegalContent } from './types';
 import { BLANK } from './term_sheet';
+import { foalingLabel } from './age';
 
 /** Coerce a value to its display string, or the blank marker when absent. */
 function v(x: string | number | null | undefined): string {
@@ -138,7 +139,7 @@ ${aboutSection}### §2.2 Key Details
 | :--- | :--- |
 | Legal Name | ${v(h.legalName)} |
 | Barn Name | ${v(h.barnName)} |
-| Foaling Year | ${v(h.foalingYear)} |
+| Foaled | ${foalingLabel(h.foalingDate) || v(h.foalingYear)} |
 | Gender | ${v(h.gender)} |
 | Breeder | ${v(h.breeder)} |
 | Sire | ${v(h.sire)} |

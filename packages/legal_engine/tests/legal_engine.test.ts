@@ -3,6 +3,8 @@ import {
   validateLegalPack,
   generatePdsMarkdown,
   generateSaMarkdown,
+  southernHemisphereAge,
+  formatFoalingDate,
   type SyndicateLegalContext,
 } from '../src';
 
@@ -326,6 +328,25 @@ export function runTests(): void {
     assert(!blankPack.pack.termSheetMarkdown.includes('75% Investor Pool'), 'No hardcoded 75/25 when split is absent');
     assert(!blankPack.pack.termSheetMarkdown.includes('Quarterly (2-month'), 'No hardcoded schedule when absent');
     console.log('✅ Litmus rule: missing data renders blank marker, no hardcoded fallback');
+  }
+
+  // 17. Live age off the DOB (SH rule): 1 Aug birthday, never a hardcoded number
+  {
+    assertEqual(southernHemisphereAge('2023-08-30', new Date('2026-07-31')), 2, 'Manolo is 2 on 31 Jul 2026');
+    assertEqual(southernHemisphereAge('2023-08-30', new Date('2026-08-01')), 3, 'Manolo is 3 on 1 Aug 2026');
+    assertEqual(southernHemisphereAge('2023-08-30', new Date('2026-09-09')), 3, 'Manolo is 3 on 9 Sep 2026');
+    assertEqual(southernHemisphereAge('garbage'), null, 'Garbage DOB returns null');
+    assertEqual(formatFoalingDate('2023-08-30'), '30 Aug 2023', 'DOB formats as 30 Aug 2023');
+    const agedContext: SyndicateLegalContext = {
+      ...nellieContext,
+      horse: { ...nellieContext.horse, foalingDate: '2023-08-30' },
+    };
+    const agedPds = generatePdsMarkdown(agedContext);
+    assertIncludes(agedPds, '30 Aug 2023 (age ', 'PDS §2.2 renders live DOB-derived age');
+    assert(!agedPds.includes('Foaling Year'), 'PDS no longer renders static Foaling Year row');
+    const agedSa = generateSaMarkdown(agedContext);
+    assertIncludes(agedSa, '30 Aug 2023 (age ', 'SA renders live DOB-derived age');
+    console.log('✅ Live age off the DOB (SH rule), rendered in PDS + SA');
   }
 
   console.log('\n🎉 All legal_engine tests passed.');

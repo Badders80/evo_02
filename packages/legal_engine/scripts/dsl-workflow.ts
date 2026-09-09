@@ -25,7 +25,7 @@
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
-import { compileLegalPack, computeDslPricing } from '../src';
+import { compileLegalPack, computeDslPricing, foalingLabel } from '../src';
 import type { SyndicateLegalContext } from '../src';
 
 const REF = 'ejdenhlpvtldiljxawtd';
@@ -167,6 +167,7 @@ async function loadCampaign(slug: string): Promise<{ context: SyndicateLegalCont
       legalName: inv.legal_name as string,
       barnName: (inv.barn_name as string) || (inv.legal_name as string),
       foalingYear: ped.foaling_date ? parseInt(String(ped.foaling_date).split('-')[0], 10) : 0,
+      foalingDate: (ped.foaling_date as string) || undefined,
       gender: (ped.gender as 'Colt' | 'Filly' | 'Gelding' | 'Mare' | 'Horse') ?? 'Filly',
       breeder: (ped.breeder as string) ?? '',
       microchip: (ped.microchip as string) ?? undefined,
@@ -235,7 +236,7 @@ async function applyFullContext(slug: string, data: Record<string, string>) {
   await query(`update public.inventory set ${set.join(', ')} where slug = '${slug}'`);
 }
 
-async function setDocStatus(slug: string, doc: 'term_sheet' | 'pds' | 'sa', status: 'draft' | 'pending' | 'approved' | 'rejected') {
+async function setDocStatus(slug: string, doc: 'term_sheet' | 'pds' | 'sa' | 'soft_content', status: 'draft' | 'pending' | 'approved' | 'rejected') {
   const col = `${doc}_status`;
   const lockCol = `${doc}_locked_at`;
   const lockVal = status === 'approved' ? 'now()' : 'null';
@@ -593,7 +594,7 @@ $('approve').addEventListener('click', async () => {
   if (!v.horseSlug) { toast('Pick a horse first'); return; }
   if (!v.distributionSplit || !v.distributionSchedule) { toast('Fill both owner-set fields before approving'); return; }
   const data = await post('approve', v);
-  if (data) { toast('Term sheet approved → PDS'); setTimeout(() => location.href = '/pds', 600); }
+  if (data) { toast('Term sheet approved → Soft Content'); setTimeout(() => location.href = '/soft-content', 600); }
 });
 $('delete').addEventListener('click', async () => {
   if (!confirm('Reset this term sheet to draft and clear the owner-set values?')) return;
@@ -715,6 +716,99 @@ $('delete').addEventListener('click', async () => { if (!confirm('Reset this doc
 </html>`;
 }
 
+function renderSoftContentHtml(context: SyndicateLegalContext, inv: Record<string, unknown>): string {
+  const status = (inv.soft_content_status as string) ?? 'draft';
+  const soft = context.softLegal;
+  const h = context.horse;
+  const ep = '/soft-content';
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soft Content — ${esc(context.syndicateName)}</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#444; --line:#ccc; --blank-bg:#ececec; --blank-border:#bdbdbd; --blank-ink:#9a9a9a; }
+  * { box-sizing:border-box; }
+  body { font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); line-height:1.6; font-size:13px; background:#f4f4f2; margin:0; padding:24px 0 80px; }
+  .sheet { max-width:170mm; margin:0 auto; background:#fff; padding:20mm; box-shadow:0 1px 6px rgba(0,0,0,.08); }
+  h1 { font-size:22px; font-weight:600; margin:0 0 2px; }
+  h3 { font-size:13px; font-weight:600; margin:16px 0 6px; border-bottom:1px solid #ddd; padding-bottom:4px; }
+  p { margin:6px 0; }
+  ul { margin:4px 0 4px 18px; padding:0; }
+  li { margin:3px 0; }
+  hr { border:none; border-top:1px solid var(--line); margin:12px 0; }
+  table { border-collapse:collapse; width:100%; margin:8px 0; }
+  th,td { border:1px solid var(--line); padding:6px 8px; text-align:left; font-size:12px; }
+  th { background:#f5f5f5; }
+  .blank { display:inline-block; background:var(--blank-bg); border:1px dashed var(--blank-border); color:var(--blank-ink); border-radius:4px; padding:1px 8px; font-style:italic; font-size:11px; }
+  .hint { font-size:11px; color:var(--muted); font-style:italic; }
+  .bar { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--line); padding:12px 20px; display:flex; gap:10px; align-items:center; justify-content:center; box-shadow:0 -1px 6px rgba(0,0,0,.06); }
+  .bar button { font-family:inherit; font-size:13px; padding:8px 18px; border-radius:6px; border:1px solid var(--line); cursor:pointer; background:#fff; color:var(--ink); }
+  .bar button.primary { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .bar button.danger { color:#b00020; border-color:#b00020; }
+  .status-pill { display:inline-block; font-size:11px; padding:2px 10px; border-radius:10px; margin-left:8px; vertical-align:middle; }
+  .status-draft { background:#ececec; color:#666; }
+  .status-pending { background:#fff3cd; color:#856404; }
+  .status-approved { background:#d4edda; color:#155724; }
+  .status-rejected { background:#f8d7da; color:#721c24; }
+  .toast { position:fixed; top:16px; right:16px; background:var(--ink); color:#fff; padding:10px 16px; border-radius:6px; font-size:13px; opacity:0; transition:opacity .2s; }
+  .toast.show { opacity:1; }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <h1>Soft Content <span class="status-pill status-${esc(status)}">${esc(status)}</span></h1>
+  <p class="hint">Editorial sections rendered verbatim into the PDS and the website horse page. Verify every claim against the hard facts below — no invented wins, titles, or relatives. Hard content (right) is scraped from loveracing.nz and is LOCKED.</p>
+  <hr>
+
+  <h3>§2.1 About Horse &amp; Trainer <span class="hint">(soft — aboutHorse + trainerBio)</span></h3>
+  <p>${soft?.aboutHorse ? esc(soft.aboutHorse) : '<span class="blank">not filled in yet</span>'}</p>
+  ${soft?.trainerBio ? `<p>${esc(soft.trainerBio)}</p>` : ''}
+
+  <h3>§2.3 Racing Outlook &amp; Pedigree <span class="hint">(soft — racingOutlookAndPedigree)</span></h3>
+  <p>${soft?.racingOutlookAndPedigree ? esc(soft.racingOutlookAndPedigree) : '<span class="blank">not filled in yet</span>'}</p>
+
+  ${soft?.raceExpectation ? `<h3>§2.4 Racing Expectation <span class="hint">(soft — raceExpectation)</span></h3><p>${esc(soft.raceExpectation)}</p>` : ''}
+
+  <h3>Hard facts to verify against <span class="hint">(LOCKED — from loveracing.nz)</span></h3>
+  <table>
+    <tr><th>Field</th><th>Value</th></tr>
+    <tr><td>Horse</td><td>${esc(h.legalName)}</td></tr>
+    <tr><td>Microchip</td><td>${esc(h.microchip ?? '—')}</td></tr>
+    <tr><td>Sire</td><td>${esc(h.sire)}</td></tr>
+    <tr><td>Dam</td><td>${esc(h.dam)}</td></tr>
+    <tr><td>Dam's sire</td><td>${esc((context.softLegal && (context as unknown as { damSire?: string }).damSire) ?? '—')}</td></tr>
+    <tr><td>Gender</td><td>${esc(h.gender)}</td></tr>
+    <tr><td>Foaling date</td><td>${esc(foalingLabel(h.foalingDate) || String(h.foalingYear))}</td></tr>
+    <tr><td>Breeder</td><td>${esc(h.breeder)}</td></tr>
+    <tr><td>Trainer</td><td>${esc(context.trainer.name)} (${esc(context.trainer.location)})</td></tr>
+  </table>
+</div>
+
+<div class="bar">
+  <button id="pending">Pending</button>
+  <button id="approve" class="primary">Approve → PDS</button>
+  <button id="delete" class="danger">Delete</button>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const $ = (id) => document.getElementById(id);
+const toast = (msg) => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); };
+async function post(action) {
+  const res = await fetch('${ep}/' + action, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  const data = await res.json();
+  if (!res.ok) { toast('Error: ' + (data.error || res.status)); return null; }
+  return data;
+}
+$('pending').addEventListener('click', async () => { const d = await post('pending'); if (d) { toast('Marked pending'); setTimeout(() => location.reload(), 600); } });
+$('approve').addEventListener('click', async () => { const d = await post('approve'); if (d) { toast('Soft content approved → PDS'); setTimeout(() => location.href = '/pds', 600); } });
+$('delete').addEventListener('click', async () => { if (!confirm('Reset soft content status to draft? (The text is NOT deleted — only the lock.)')) return; const d = await post('delete'); if (d) { toast('Reset to draft'); setTimeout(() => location.reload(), 600); } });
+</script>
+</body>
+</html>`;
+}
+
 function renderFlipHtml(context: SyndicateLegalContext, inv: Record<string, unknown>): string {
   const allApproved =
     inv.term_sheet_status === 'approved' && inv.pds_status === 'approved' && inv.sa_status === 'approved';
@@ -783,6 +877,8 @@ async function serve(slug: string, port: number) {
       if (req.method === 'GET') {
         if (url.pathname === '/' || url.pathname === '/term-sheet') {
           send(renderTermSheetHtml(registry, inv));
+        } else if (url.pathname === '/soft-content') {
+          send(renderSoftContentHtml(context, inv));
         } else if (url.pathname === '/pds') {
           send(renderDocHtml('Product Disclosure Statement', 'pds', pack.pdsMarkdown, inv.pds_status as string, 'SA', '/sa'));
         } else if (url.pathname === '/sa') {
@@ -797,12 +893,12 @@ async function serve(slug: string, port: number) {
 
       if (req.method === 'POST') {
         const body = await readBody(req);
-        // Path shape: /<action> (term sheet) or /<doc>/<action> (pds|sa).
+        // Path shape: /<action> (term sheet) or /<doc>/<action> (pds|sa|soft-content).
         const parts = url.pathname.split('/').filter(Boolean);
-        let doc: 'term_sheet' | 'pds' | 'sa' = 'term_sheet';
+        let doc: 'term_sheet' | 'pds' | 'sa' | 'soft_content' = 'term_sheet';
         let action: string;
-        if (parts.length === 2 && (parts[0] === 'pds' || parts[0] === 'sa')) {
-          doc = parts[0] as 'pds' | 'sa';
+        if (parts.length === 2 && (parts[0] === 'pds' || parts[0] === 'sa' || parts[0] === 'soft-content')) {
+          doc = parts[0] === 'soft-content' ? 'soft_content' : (parts[0] as 'pds' | 'sa');
           action = parts[1];
         } else {
           action = parts[0] ?? '';
@@ -872,6 +968,7 @@ async function serve(slug: string, port: number) {
   server.listen(port, () => {
     console.log(`DSL workflow server → http://localhost:${port}/  (slug: ${slug})`);
     console.log(`  /term-sheet  CREATE-DSL capture form (all fields blank, horse cascades)`);
+    console.log(`  /soft-content soft content review (verify against hard facts)`);
     console.log(`  /pds         PDS view`);
     console.log(`  /sa          SA view`);
     console.log(`  /flip        flip-to-listed view`);

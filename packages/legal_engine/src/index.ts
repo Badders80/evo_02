@@ -4,6 +4,7 @@
  */
 
 export * from './types';
+export * from './age';
 export * from './pricing';
 export * from './term_sheet';
 export * from './pds';

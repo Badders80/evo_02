@@ -9,6 +9,7 @@
 
 import type { SyndicateLegalContext } from './types';
 import { BLANK } from './term_sheet';
+import { foalingLabel } from './age';
 
 /** Coerce a value to its display string, or the blank marker when absent. */
 function v(x: string | number | null | undefined): string {
@@ -90,7 +91,7 @@ Each subscriber confirms by executing this Agreement that they:
 - understand that participation is in a leasehold interest only and does not confer direct ownership of the thoroughbred.
 
 **Thoroughbred:** ${v(h.legalName)}${h.barnName && h.barnName !== h.legalName ? ` (${h.barnName})` : ''}  
-**Foaling Year:** ${v(h.foalingYear)}  
+**Foaled:** ${foalingLabel(h.foalingDate) || v(h.foalingYear)}  
 **Gender:** ${v(h.gender)}  
 **Breeder:** ${v(h.breeder)}  
 **Sire:** ${v(h.sire)}  

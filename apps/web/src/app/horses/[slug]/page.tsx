@@ -14,6 +14,7 @@ import { DataRoomCard } from '../../../components/data-room-card';
 import { DynamicHighlightPills } from '../../../components/thoroughbred-attributes';
 import { JsonLd } from '../../../components/json-ld';
 import { campaignShareMetadata, horseWebPageJsonLd } from '../../../lib/seo';
+import { foalingLabel } from '@evo/legal_engine';
 import {
   ArrowLeft,
   ExternalLink,
@@ -95,7 +96,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono uppercase tracking-[0.25em] text-accent">
-                {campaign.pedigree.gender} · Foaled {campaign.pedigree.foalingDate}
+                {campaign.pedigree.gender} · Foaled {foalingLabel(campaign.pedigree.foalingDate) || campaign.pedigree.foalingDate}
               </span>
               <span className="rounded bg-status-active/10 border border-status-active/40 px-2 py-0.5 text-[10px] font-mono text-status-active">
                 {campaign.listingStatus === 'completed'
