@@ -299,6 +299,9 @@ function renderTermSheetHtml(registry: Registry, inv: Record<string, unknown>): 
   select:focus, input:focus { outline:1px solid var(--accent); }
   .auto { color:var(--muted); font-size:11px; }
   .locked { color:var(--muted); }
+  .legend { font-size:11px; color:var(--muted); margin:6px 0 0; }
+  .lock-tag { color:#155724; font-size:11px; font-weight:600; }
+  .var-tag { color:#856404; font-size:11px; font-weight:600; }
   .custom-row { display:none; margin-top:4px; }
   .custom-row.show { display:block; }
   .bar { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--line); padding:12px 20px; display:flex; gap:10px; align-items:center; justify-content:center; box-shadow:0 -1px 6px rgba(0,0,0,.06); }
@@ -320,12 +323,13 @@ function renderTermSheetHtml(registry: Registry, inv: Record<string, unknown>): 
   <h1>DSL Term Sheet - <span id="h-name" class="blank">not filled in yet</span> <span class="status-pill status-${esc(status)}">${esc(status)}</span></h1>
   <p class="meta"><strong>Version:</strong> <span class="locked">1.0.0</span> | <strong>Effective Date:</strong> <span id="h-date" class="blank">not filled in yet</span></p>
   <p class="meta"><strong>Manager:</strong> <span class="locked">Evolution Stables (NZTR Authorised Syndicator)</span></p>
+  <p class="legend"><span class="lock-tag">🔒 LOCKED</span> = system-produced, not editable &nbsp;·&nbsp; <span class="var-tag">✎ VARIABLE</span> = you set it</p>
   <hr>
 
   <h3>1. Thoroughbred &amp; Parties</h3>
   <ul>
     <li><strong>Horse:</strong> <select id="horse" class="blank"><option value="" selected>not filled in yet</option></select></li>
-    <li><strong>Microchip / ID:</strong> <span id="microchip" class="blank">not filled in yet</span></li>
+    <li><strong>Microchip / ID:</strong> <span id="microchip" class="blank">not filled in yet</span> <span id="microchip-lock" class="lock-tag" style="display:none;">🔒 LOCKED</span></li>
     <li><strong>Owner:</strong> <select id="owner" class="blank"><option value="" selected>not filled in yet</option></select></li>
     <li><strong>Trainer:</strong> <select id="trainer" class="blank"><option value="" selected>not filled in yet</option></select></li>
   </ul>
@@ -473,6 +477,7 @@ function render() {
   setBlank($('horse'), !!horse);
   $('microchip').textContent = horse && horse.microchip ? horse.microchip : 'not filled in yet';
   setBlank($('microchip'), !!(horse && horse.microchip));
+  $('microchip-lock').style.display = (horse && horse.microchip) ? 'inline' : 'none';
   setBlank($('owner'), !!owner);
   setBlank($('trainer'), !!trainer);
   $('owner-sig').textContent = owner ? owner.entity : 'not filled in yet';
@@ -519,21 +524,12 @@ function render() {
   setBlank($('close'), !!close);
 }
 
-// Horse selection cascades everything
+// Horse selection fills ONLY the locked microchip — everything else stays blank
+// (owner/trainer/commercials are variable, set by the founder).
 $('horse').addEventListener('change', () => {
   const horse = HORSES.find(h => h.slug === $('horse').value);
   if (horse) {
     $('microchip').textContent = horse.microchip || 'not filled in yet';
-    $('owner').value = horse.ownerSlug || '';
-    $('trainer').value = horse.trainerSlug || '';
-    $('stake').value = horse.listedStakePct ?? '';
-    $('min').value = horse.minStakePct ?? '';
-    $('step').value = horse.stakeStepPct ?? '';
-    $('wholesale').value = horse.costMonthlyNzd ?? '';
-    $('termStart').value = horse.termStart ? horse.termStart.slice(0,7) : '';
-    $('termEnd').value = horse.termEnd ? horse.termEnd.slice(0,7) : '';
-    $('model').value = horse.paymentStyle || '';
-    $('close').value = horse.closeStyle || '';
   }
   render();
 });
@@ -550,7 +546,6 @@ $('termStart').addEventListener('change', render);
 $('termEnd').addEventListener('change', render);
 
 function currentValues() {
-  const horse = HORSES.find(h => h.slug === $('horse').value);
   const owner = OWNERS.find(o => o.slug === $('owner').value);
   const trainer = TRAINERS.find(t => t.slug === $('trainer').value);
   return {
