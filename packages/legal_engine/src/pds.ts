@@ -16,6 +16,16 @@
 import type { SyndicateLegalContext, HorseSoftLegalContent } from './types';
 import { BLANK } from './term_sheet';
 import { foalingLabel } from './age';
+import {
+  EVOLUTION_MARGIN_PCT,
+  PLATFORM_FEE_PCT,
+  PLATFORM_FEE_LABEL,
+  FLOAT_DEPOSIT_MONTHS,
+  FLOAT_PREPAID_MONTHS,
+  FLOAT_TOTAL_MONTHS,
+  QUALIFICATION_PAID_UP_MONTHS,
+  REFUND_WINDOW_DAYS,
+} from './commercial-rules';
 
 /** Coerce a value to its display string, or the blank marker when absent. */
 function v(x: string | number | null | undefined): string {
@@ -60,7 +70,7 @@ function keyInformationSummary(context: SyndicateLegalContext): string {
   const costsBlock =
     context.paymentModel === 'upfront'
       ? `- **Lease fee:** $${(p.monthlyKeepUnitNzd * (context.termMonths ?? 0)).toFixed(2)} per 1% stake (fixed, covers all costs for the term).`
-      : `- **Initial payment:** $${p.joinFloatUnitNzd.toFixed(2)} per 1% stake (3 months security deposit reserve + 2 months prepaid keep).\n- **Monthly keep:** $${p.monthlyKeepUnitNzd.toFixed(2)} per month per 1% stake thereafter, maintaining a 5-month float buffer.`;
+      : `- **Initial payment:** $${p.joinFloatUnitNzd.toFixed(2)} per 1% stake (${FLOAT_DEPOSIT_MONTHS} months security deposit reserve + ${FLOAT_PREPAID_MONTHS} months prepaid keep).\n- **Monthly keep:** $${p.monthlyKeepUnitNzd.toFixed(2)} per month per 1% stake thereafter, maintaining a ${FLOAT_TOTAL_MONTHS}-month float buffer.`;
 
   const structureBullets = [
     `- **Leasehold interest in:** ${v(h.legalName)}${h.barnName && h.barnName !== h.legalName ? ` (${h.barnName})` : ''}`,
@@ -139,7 +149,7 @@ Evolution Stables has not secured mortality insurance for this leasehold stake. 
 
   const materialInterests = `## §11. Material Interests
 
-Evolution Stables Ltd receives a 5.0% margin incorporated into the listed rate to cover the structuring, management, and regulatory oversight of the syndicate. Platform Fees of 3.0% cover payment processing and platform services. There are no other hidden fees or material conflicts of interest.`;
+Evolution Stables Ltd receives a ${EVOLUTION_MARGIN_PCT.toFixed(1)}% margin incorporated into the listed rate to cover the structuring, management, and regulatory oversight of the syndicate. ${PLATFORM_FEE_LABEL} of ${PLATFORM_FEE_PCT.toFixed(1)}% cover payment processing and platform services. There are no other hidden fees or material conflicts of interest.`;
 
   const riskDisclosure = `## §12. Risk Disclosure
 
@@ -272,16 +282,16 @@ export function generatePdsMarkdown(context: SyndicateLegalContext): string {
 
 There are no recurring monthly subscription fees or capital calls.
 
-Upon formal termination or maturity of the syndicate lease, any unused prepaid keep is **refunded pro-rata** to the investor’s verified payment method within 14 business days.`;
+Upon formal termination or maturity of the syndicate lease, any unused prepaid keep is **refunded pro-rata** to the investor’s verified payment method within ${REFUND_WINDOW_DAYS} business days.`;
   } else if (paymentModel === 'subscription_float') {
     floatSection = `The digitally syndicated campaign operates on a **five-month initial investment** upon participation, with recurring monthly payments due on the 1st of every month thereafter.
 
 The five-month initial investment follows a 3+2 structure outlined below:
 
-- 3 months security deposit reserve; and
-- 2 months keep (comprising the initial installment and 1 month in advance).
+- ${FLOAT_DEPOSIT_MONTHS} months security deposit reserve; and
+- ${FLOAT_PREPAID_MONTHS} months keep (comprising the initial installment and 1 month in advance).
 
-Upon formal termination or maturity of the syndicate lease, all unused prepaid keep and security deposit reserve funds are **refunded pro-rata** to the investor's verified payment method within 14 business days.`;
+Upon formal termination or maturity of the syndicate lease, all unused prepaid keep and security deposit reserve funds are **refunded pro-rata** to the investor's verified payment method within ${REFUND_WINDOW_DAYS} business days.`;
   } else {
     floatSection = `**Payment Model:** ${BLANK}
 
@@ -298,14 +308,14 @@ Upon formal termination or maturity of the syndicate lease, all unused prepaid k
 - **Stakes Calculation:** Based on official NZTR stakes distributions published via loveracing.nz.
 - **Stakes Allocation:** ${distributionSplit} of total gross stakes won is allocated to the Investor Pool (distributed pro-rata relative to stake held).
 - **Distribution Schedule:** ${distributionSchedule ? distributionSchedule : BLANK}.
-- **Qualification Period:** Investors must have maintained fully paid-up status for two (2) full months prior to a race date to qualify for prize money distributions from that race.`;
+- **Qualification Period:** Investors must have maintained fully paid-up status for two (${QUALIFICATION_PAID_UP_MONTHS}) full months prior to a race date to qualify for prize money distributions from that race.`;
   } else {
     splitSection = `Investors receive a distribution calculated strictly from **official New Zealand Thoroughbred Racing (NZTR) gross stakes** won during their eligible participation period:
 
 - **Stakes Calculation:** Based on official NZTR stakes distributions published via loveracing.nz.
 - **Stakes Allocation:** ${BLANK} of total gross stakes won is allocated to the Investor Pool (distributed pro-rata relative to stake held).
 - **Distribution Schedule:** ${BLANK}.
-- **Qualification Period:** Investors must have maintained fully paid-up status for two (2) full months prior to a race date to qualify for prize money distributions from that race.`;
+- **Qualification Period:** Investors must have maintained fully paid-up status for two (${QUALIFICATION_PAID_UP_MONTHS}) full months prior to a race date to qualify for prize money distributions from that race.`;
   }
 
   // §6 exit & termination: close-style-driven, blank when unset.

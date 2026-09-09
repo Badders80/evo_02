@@ -14,6 +14,14 @@
 import type { SyndicateLegalContext } from './types';
 import { BLANK } from './term_sheet';
 import { foalingLabel } from './age';
+import {
+  EVOLUTION_MARGIN_PCT,
+  PLATFORM_FEE_PCT,
+  PLATFORM_FEE_LABEL,
+  FLOAT_DEPOSIT_MONTHS,
+  FLOAT_PREPAID_MONTHS,
+  REFUND_WINDOW_DAYS,
+} from './commercial-rules';
 
 /** Coerce a value to its display string, or the blank marker when absent. */
 function v(x: string | number | null | undefined): string {
@@ -109,10 +117,10 @@ Upon default, the investor forfeits all future rights to prize money distributio
 
 Members pay a monthly keep for the duration of their participation, structured as follows:
 
-- **Initial payment:** $${p.joinFloatUnitNzd.toFixed(2)} per 1% stake, representing 3 months security deposit reserve and 2 months prepaid keep.
+- **Initial payment:** $${p.joinFloatUnitNzd.toFixed(2)} per 1% stake, representing ${FLOAT_DEPOSIT_MONTHS} months security deposit reserve and ${FLOAT_PREPAID_MONTHS} months prepaid keep.
 - **Monthly keep:** $${p.monthlyKeepUnitNzd.toFixed(2)} per month per 1% stake, paid on the first of each month to maintain a constant 5-month float buffer.
 
-The listed rate includes the 5.0% Evolution Stables margin and 3.0% Platform Fees. No separate management invoices or off-platform accounting fees are charged.
+The listed rate includes the ${EVOLUTION_MARGIN_PCT.toFixed(1)}% Evolution Stables margin and ${PLATFORM_FEE_PCT.toFixed(1)}% ${PLATFORM_FEE_LABEL}. No separate management invoices or off-platform accounting fees are charged.
 
 ---
 
@@ -130,13 +138,13 @@ Potential Revenue Streams include:
 - Data licensing
 - Breeding or exit proceeds (if applicable, subject to the stated buyout clause)
 
-All distributions are calculated strictly from officially published NZTR / LoveRacing gross stakes earnings and are made ${context.distributionSchedule ? context.distributionSchedule : BLANK}. Insurance proceeds are not payable to lease holders. Distributions are made by direct bank transfer or card refund to the Shareholder's verified payment method within 14 business days of receipt from NZTR or other sources.
+All distributions are calculated strictly from officially published NZTR / LoveRacing gross stakes earnings and are made ${context.distributionSchedule ? context.distributionSchedule : BLANK}. Insurance proceeds are not payable to lease holders. Distributions are made by direct bank transfer or card refund to the Shareholder's verified payment method within ${REFUND_WINDOW_DAYS} business days of receipt from NZTR or other sources.
 
 ---
 
 ## Clause 11: Syndicate Management Fee
 
-A **5.0% syndicate management margin** is embedded in the monthly keep rate of **$${p.monthlyKeepUnitNzd.toFixed(2)} per 1% stake**. No separate management invoices or off-platform accounting fees are charged.
+A **${EVOLUTION_MARGIN_PCT.toFixed(1)}% syndicate management margin** is embedded in the monthly keep rate of **$${p.monthlyKeepUnitNzd.toFixed(2)} per 1% stake**. No separate management invoices or off-platform accounting fees are charged.
 
 ---
 
