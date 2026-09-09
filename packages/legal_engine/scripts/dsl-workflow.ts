@@ -435,7 +435,7 @@ function setBlank(el, filled) { if (filled) el.classList.remove('blank'); else e
 function fillSelect(sel, items, labelFn) {
   for (const it of items) {
     const o = document.createElement('option');
-    o.value = it.slug;
+    o.value = it.id ?? it.slug;
     o.textContent = labelFn(it);
     sel.appendChild(o);
   }
@@ -548,12 +548,16 @@ $('termEnd').addEventListener('change', render);
 function currentValues() {
   const owner = OWNERS.find(o => o.slug === $('owner').value);
   const trainer = TRAINERS.find(t => t.slug === $('trainer').value);
+  // Wholesale field is "per 1% stake"; DB cost_monthly_nzd is the TOTAL monthly
+  // cost (per-1% × 100). Convert on save.
+  const wholesalePerPct = parseFloat($('wholesale').value);
+  const costMonthlyNzd = Number.isFinite(wholesalePerPct) ? String(wholesalePerPct * 100) : '';
   return {
     horseSlug: $('horse').value,
     ownerId: owner ? owner.id : '',
     trainerName: trainer ? trainer.name : '',
     trainerLocation: trainer ? trainer.location : '',
-    costMonthlyNzd: $('wholesale').value,
+    costMonthlyNzd,
     listedStakePct: $('stake').value,
     minStakePct: $('min').value,
     stakeStepPct: $('step').value,
