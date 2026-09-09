@@ -42,7 +42,7 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/",
-    "test": "tsx tests/legal_engine.test.ts && tsx tests/settlement.test.ts"
+    "test": "tsx tests/legal_engine.test.ts && tsx tests/settlement.test.ts && tsx tests/soft-prefill.test.ts"
   },
   "dependencies": {
     "@evo/db_models": "workspace:*",
