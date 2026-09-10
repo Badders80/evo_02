@@ -79,9 +79,14 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
   // Founder-locked 2026-09-07: coming-soon cards open the placeholder CTA modal
   // (future purchase-workflow host) instead of navigating. Other statuses navigate.
   const [ctaHorse, setCtaHorse] = useState<{ name: string; slug: string } | null>(null);
+  // Review-branch preview (NEXT_PUBLIC_WORKFLOW_PREVIEW=true): coming-soon cards
+  // navigate to the detail page (CTA card renders there). Never set in prod.
+  const preview =
+    typeof process !== 'undefined' && process.env.NEXT_PUBLIC_WORKFLOW_PREVIEW === 'true';
 
   const openCard = (card: MarketplaceCard) => {
-    if (card.status === 'coming_soon') setCtaHorse({ name: card.name, slug: card.slug });
+    if (card.status === 'coming_soon' && !preview)
+      setCtaHorse({ name: card.name, slug: card.slug });
     else router.push(`/marketplace/${card.slug}`);
   };
 
@@ -138,7 +143,7 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
               <Link
                 href={`/marketplace/${card.slug}`}
                 onClick={(e) => {
-                  if (card.status === 'coming_soon') {
+                  if (card.status === 'coming_soon' && !preview) {
                     e.preventDefault();
                     e.stopPropagation();
                     setCtaHorse({ name: card.name, slug: card.slug });
@@ -193,7 +198,7 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
                     }}
                     className="inline-flex items-center gap-2 text-[10px] font-light uppercase tracking-[0.2em] text-foreground transition-colors group-hover:text-accent"
                   >
-                    <span>{card.status === 'coming_soon' ? 'Register Interest' : 'View Offering'}</span>
+                    <span>{card.status === 'coming_soon' && !preview ? 'Register Interest' : 'View Offering'}</span>
                     <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
                   </Link>
                 </div>
