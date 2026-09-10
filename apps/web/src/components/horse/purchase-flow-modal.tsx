@@ -23,6 +23,7 @@ import { useRouter } from 'next/navigation';
 import { pricingForUnits, investorCheckoutError } from '@/lib/nellie-loop';
 import type { DslPricing } from '@evo/legal_engine';
 import { WhitePillCTA } from '@evo/ui';
+import { marked } from 'marked';
 
 export interface LegalPackDigest {
   termSheetMarkdown?: string;
@@ -73,7 +74,7 @@ export interface PurchaseFlowModalProps {
   onClose: () => void;
 }
 
-type Step = 'terms' | 'accept';
+type Step = 'terms' | 'accept' | 'kyc';
 
 /** Shared modal shell — max-w-lg × h-[900px] (bumped from locked 720px 2026-09-04 to match prod's natural content fit for Step 2).
  *  Viewport guard: clamps to max-h-[calc(100vh-2rem)] my-auto on shorter viewports (re-audit guard 2026-09-04).
@@ -149,6 +150,7 @@ function Step2TermSheet({
   const [stakeError, setStakeError] = React.useState<string | null>(null);
   const [editing, setEditing] = React.useState(false);
   const [draft, setDraft] = React.useState<string>(stakePct.toFixed(1));
+  const [termSheetAccepted, setTermSheetAccepted] = React.useState(false);
   const noteTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Clean up the note timer on unmount (audit chunk-2 #11).
@@ -398,9 +400,10 @@ function Step2TermSheet({
             )}
           </p>
           <div className="rounded-xl border border-border bg-canvas/60 h-44 overflow-y-auto p-4">
-            <p className="text-[11px] font-light leading-relaxed text-foreground/80 whitespace-pre-line select-text">
-              {termSheetMarkdown}
-            </p>
+            <div
+              className="prose prose-sm max-w-none text-foreground"
+              dangerouslySetInnerHTML={{ __html: marked.parse(termSheetMarkdown) }}
+            />
           </div>
         </div>
       ) : (
@@ -419,7 +422,21 @@ function Step2TermSheet({
       )}
 
       {/* CTA → Step 3 */}
-      <WhitePillCTA onClick={onProceed}>Invest in {horseName}</WhitePillCTA>
+      <div className="flex items-center gap-3 p-4 border rounded-lg bg-muted/50">
+        <input
+          type="checkbox"
+          id="term-sheet-accept"
+          onChange={(e) => setTermSheetAccepted(e.target.checked)}
+          className="h-4 w-4 rounded border-input text-accent focus:ring-accent"
+          required
+        />
+        <label htmlFor="term-sheet-accept" className="text-sm font-medium">
+          I have read and accept these terms
+        </label>
+      </div>
+      <WhitePillCTA onClick={onProceed} disabled={!termSheetAccepted}>
+        Invest in {horseName}
+      </WhitePillCTA>
       <p className="text-[11px] font-light text-muted-foreground leading-relaxed text-center">
         Subject to{' '}
         <a
@@ -445,8 +462,8 @@ function Step2TermSheet({
   );
 }
 
-/** Step 3 — Accept gate: accordion docs, Completed badges, audit ticks, checkout, KYC prompt. */
-function Step3AcceptanceGate({
+/** Step 3 — Subscription Agreement Acceptance (Investor-SA checkout) */
+function Step3SAAcceptance({
   horseName,
   horseSlug,
   stakePct,
@@ -454,6 +471,7 @@ function Step3AcceptanceGate({
   stakeStepPct = 0.5,
   maxInvestmentPct = 10.0,
   onBack,
+  onProceed,
 }: {
   horseName: string;
   horseSlug: string;
@@ -463,150 +481,12 @@ function Step3AcceptanceGate({
   maxInvestmentPct?: number;
   /** F10: in-modal back to Step 2 (term sheet) without closing the modal. */
   onBack: () => void;
+  /** Proceed to KYC (Step 4) */
+  onProceed: () => void;
 }) {
   const router = useRouter();
-  const [openDoc, setOpenDoc] = React.useState<'pds' | 'sa' | null>('pds');
-  const [ticks, setTicks] = React.useState<{ pds: boolean; sa: boolean }>({ pds: false, sa: false });
-  const [submitting, setSubmitting] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-  // KYC flow state: null = not prompted, 'prompt' = 403 received, 'pending', 'rejected'
-  const [kycState, setKycState] = React.useState<'prompt' | 'pending' | 'rejected' | null>(null);
-  // Verify Identity → Stripe hosted flow (T3a). Failure keeps the prompt open with copy.
-  const [kycError, setKycError] = React.useState<string | null>(null);
-  const [kycStarting, setKycStarting] = React.useState(false);
-
-  const toggleDoc = (doc: 'pds' | 'sa') => {
-    setOpenDoc((prev) => (prev === doc ? null : doc));
-  };
-
-  /** Each tick records an acceptance audit event (chunk-3, locked: tick = audit event). */
-  const handleTick = async (doc: 'pds' | 'sa', checked: boolean) => {
-    if (!checked) {
-      setTicks((prev) => ({ ...prev, [doc]: false }));
-      return;
-    }
-    try {
-      const res = await fetch('/api/acceptance', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          horseSlug,
-          stakePct,
-          doc,
-          docHash: doc === 'pds' ? legalPack?.pdsHash : legalPack?.saHash,
-          // Investor-SA checkout (Task 3): the event IS the contract record — carry
-          // the exact markdown the investor read (same-request bytes as the hash).
-          docMarkdown: doc === 'pds' ? legalPack?.pdsMarkdown : legalPack?.saMarkdown,
-        }),
-      });
-      if (!res.ok) {
-        // Audit-tick failure must not silently fake acceptance (audit #3).
-        setTicks((prev) => ({ ...prev, [doc]: false }));
-        return;
-      }
-      setTicks((prev) => ({ ...prev, [doc]: true }));
-    } catch {
-      setTicks((prev) => ({ ...prev, [doc]: false }));
-    }
-  };
-
-  /** T3a: start Stripe Identity — POST /api/kyc/create-session, redirect to hosted URL. */
-  const handleVerifyIdentity = async () => {
-    if (kycStarting) return;
-    setKycStarting(true);
-    setKycError(null);
-    try {
-      const res = await fetch('/api/kyc/create-session', { method: 'POST' });
-      const body = await res.json().catch(() => null);
-      if (!res.ok) {
-        setKycError(body?.error || 'Identity verification could not be started. Please try again.');
-        return;
-      }
-      if (body?.url) {
-        window.location.href = body.url;
-      } else {
-        setKycError('Identity verification could not be started. Please try again.');
-      }
-    } catch {
-      setKycError('Identity verification could not be started. Please try again.');
-    } finally {
-      setKycStarting(false);
-    }
-  };
-
-  const handleProceed = async () => {
-    if (!ticks.pds || !ticks.sa || submitting) return;
-    setSubmitting(true);
-    setError(null);
-    setKycState(null);
-
-    try {
-      const res = await fetch('/api/checkout/create-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ horseSlug, units: stakePct }),
-      });
-
-      if (res.status === 401) {
-        // Session expired / not logged in — preserve stake and send to login.
-        const nextUrl = encodeURIComponent(`${window.location.pathname}?units=${stakePct}`);
-        router.push(`/login?next=${nextUrl}`);
-        return;
-      }
-
-      if (res.status === 403) {
-        // Only KYC_REQUIRED maps to the in-modal prompt — other 403s surface as errors.
-        const body = await res.json().catch(() => null);
-        if (body?.code === 'KYC_REQUIRED') {
-          // Chunk-4: server returns the investor's real kyc_status — render the honest
-          // state (prompt / pending / rejected) instead of guessing.
-          const status = body.kycStatus ?? null;
-          if (status === 'pending') setKycState('pending');
-          else if (status === 'rejected') setKycState('rejected');
-          else setKycState('prompt');
-          setSubmitting(false);
-          return;
-        }
-        throw new Error(
-          investorCheckoutError(body?.code, body?.error || 'Forbidden', {
-            step: stakeStepPct,
-            max: maxInvestmentPct,
-          })
-        );
-      }
-
-      const data = await res.json();
-      if (!res.ok) {
-        // Chunk-5 (f10): server returns { error, code }; render the locked investor copy.
-        throw new Error(
-          investorCheckoutError(data?.code, data?.error || 'Checkout initialization failed', {
-            step: stakeStepPct,
-            max: maxInvestmentPct,
-          })
-        );
-      }
-
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error('No checkout URL returned from server');
-      }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Checkout encountered an error';
-      setError(message);
-      setSubmitting(false);
-    }
-  };
-
-  const pdsText =
-    legalPack?.pdsMarkdown ||
-    `Product Disclosure Statement (PDS) for ${horseName} Syndicate.\n\n` +
-      `Issued under the NZTR Authorised Syndication Code.\n\n` +
-      `1. The Offer: Fixed-duration syndicate stakes in thoroughbred ${horseName}.\n` +
-      `2. Upfront float deposit covers 5 months advance reserve.\n` +
-      `3. Monthly keep is fixed per 1% stake as shown in the term sheet. Contact Evolution Stables for current pricing.\n` +
-      `4. Downside protection: if the horse is injured and unable to train/race, keep contributions stop immediately.\n` +
-      `5. Return mechanics: 75% gross prize money pro-rata quarterly.`;
+  const [saAccepted, setSAAccepted] = React.useState(false);
+  const [saLoading, setSALoading] = React.useState(false);
 
   const saText =
     legalPack?.saMarkdown ||
@@ -617,30 +497,29 @@ function Step3AcceptanceGate({
       `3. Transfers: Secondary transfer facilitated through Evolution Stables upon formal request.\n` +
       `4. Term: Fixed lease duration with predefined settlement date.`;
 
-  const docRows: Array<{
-    id: 'pds' | 'sa';
-    title: string;
-    hashLabel: string;
-    body: string;
-    tickLabel: string;
-  }> = [
-    {
-      id: 'pds',
-      title: 'Product Disclosure Statement',
-      hashLabel: legalPack?.pdsHash ? `sha256: ${legalPack.pdsHash.slice(0, 4)}…${legalPack.pdsHash.slice(-4)}` : '',
-      body: pdsText,
-      tickLabel: 'I have read and accept the Product Disclosure Statement',
-    },
-    {
-      id: 'sa',
-      title: 'Syndicate Agreement',
-      hashLabel: legalPack?.saHash ? `sha256: ${legalPack.saHash.slice(0, 4)}…${legalPack.saHash.slice(-4)}` : '',
-      body: saText,
-      tickLabel: 'I have read and accept the Syndicate Agreement',
-    },
-  ];
-
-  const bothTicked = ticks.pds && ticks.sa;
+  const handleSAAccept = async () => {
+    setSALoading(true);
+    try {
+      // Call the Investor-SA checkout endpoint (from G009 session-2)
+      const res = await fetch('/api/investor-sa/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ horseSlug, units: stakePct }),
+      });
+      const data = await res.json();
+      if (data.kycUrl) {
+        // Redirect to KYC (Step 4)
+        window.location.href = data.kycUrl;
+      } else {
+        onProceed(); // fallback if KYC not required
+      }
+    } catch (e) {
+      console.error('SA accept failed:', e);
+      alert('Failed to proceed. Please try again.');
+    } finally {
+      setSALoading(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -654,127 +533,52 @@ function Step3AcceptanceGate({
           <span aria-hidden>←</span>
           <span>Back</span>
         </button>
-        <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">Acceptance</p>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">
+          Subscription Agreement
+        </p>
         <h3 className="text-[22px] font-light text-heading tracking-tight">
-          {horseName} — your documents
+          {horseName} — your agreement
         </h3>
         <p className="text-[11px] font-light text-muted-foreground/60 leading-relaxed mt-2">
-          Read each document in full, then tick to accept. Each acceptance is recorded against the exact document version.
+          Read the document in full, then tick to accept. This acceptance is recorded against the exact document version.
         </p>
       </div>
 
-      {/* Document accordion rows */}
-      {docRows.map((doc) => (
-        <div key={doc.id} className="rounded-xl border border-border bg-surface overflow-hidden">
-          <button
-            type="button"
-            onClick={() => toggleDoc(doc.id)}
-            className="w-full flex items-center justify-between gap-3 px-4 py-3.5 text-left hover:bg-white/[0.03] transition-colors"
-            aria-expanded={openDoc === doc.id}
-          >
-            <span className="flex items-center gap-3 min-w-0">
-              <span className="text-[12px] font-light text-heading">{doc.title}</span>
-              {doc.hashLabel && (
-                <span className="font-mono text-[10px] text-muted-foreground shrink-0">{doc.hashLabel}</span>
-              )}
+      {/* SA Document */}
+      <div className="rounded-xl border border-border bg-surface overflow-hidden">
+        <div className="px-4 py-3.5 space-y-3">
+          <div className="rounded-xl border border-border bg-canvas/60 h-44 overflow-y-auto p-4">
+            <div
+              className="prose prose-sm max-w-none text-foreground"
+              dangerouslySetInnerHTML={{ __html: marked.parse(saText) }}
+            />
+          </div>
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={saAccepted}
+              onChange={(e) => setSAAccepted(e.target.checked)}
+              className="mt-0.5 h-4 w-4 rounded border-border bg-background text-accent focus:ring-accent focus:ring-offset-0"
+            />
+            <span className="text-[12px] font-light text-muted-foreground">
+              I accept the Subscription Agreement and wish to proceed
             </span>
-            <span className="flex items-center gap-2 shrink-0">
-              {ticks[doc.id] && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-status-active">
-                  <span aria-hidden>✓</span> Completed
-                </span>
-              )}
-              <span
-                className={`text-muted-foreground text-lg leading-none transition-transform duration-200 ${
-                  openDoc === doc.id ? 'rotate-180' : ''
-                }`}
-              >
-                +
-              </span>
-            </span>
-          </button>
-          {openDoc === doc.id && (
-            <div className="px-4 pb-4 space-y-3">
-              <div className="rounded-xl border border-border bg-canvas/60 h-36 overflow-y-auto p-4">
-                <p className="text-[11px] font-light leading-relaxed text-foreground/80 whitespace-pre-line select-text">
-                  {doc.body}
-                </p>
-              </div>
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={ticks[doc.id]}
-                  onChange={(e) => handleTick(doc.id, e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-border bg-background text-accent focus:ring-accent focus:ring-offset-0"
-                />
-                <span className="text-[12px] font-light text-muted-foreground">{doc.tickLabel}</span>
-              </label>
-            </div>
-          )}
+          </label>
         </div>
-      ))}
-
-      {/* KYC prompt (read-then-verify, LOCKED 2026-09-01) */}
-      {kycState === 'prompt' && (
-        <div className="rounded-2xl border border-accent/40 bg-accent/10 p-4 space-y-3">
-          <p className="text-[12px] font-light leading-relaxed text-foreground/90">
-            Identity verification is required before checkout. This is a one-time check under New Zealand law.
-          </p>
-          <button
-            type="button"
-            disabled={kycStarting}
-            className="w-full rounded-full bg-pure-white py-3 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-black transition-all duration-300 hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
-            onClick={handleVerifyIdentity}
-          >
-            {kycStarting ? 'Starting verification…' : 'Verify Identity'}
-          </button>
-          {kycError ? (
-            <p className="text-[10px] font-light text-destructive/90">
-              {kycError}
-            </p>
-          ) : (
-            <p className="text-[10px] font-light text-muted-foreground/80">
-              After verification, return here — your stake and documents are preserved.
-            </p>
-          )}
-        </div>
-      )}
-      {kycState === 'pending' && (
-        <div className="rounded-2xl border border-border bg-surface p-4">
-          <p className="text-[12px] font-light leading-relaxed text-muted-foreground">
-            Your identity check is being reviewed. We will email you when it is complete.
-          </p>
-        </div>
-      )}
-      {kycState === 'rejected' && (
-        <div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-4">
-          <p className="text-[12px] font-light leading-relaxed text-muted-foreground">
-            Your identity check could not be completed. A member of Evolution Stables will contact you shortly to help complete the process.
-          </p>
-        </div>
-      )}
-
-      {error && (
-        <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-4">
-          <p className="text-[12px] font-light leading-relaxed text-foreground/90">
-            {error}
-          </p>
-        </div>
-      )}
+      </div>
 
       {/* Modal Action Footer */}
       <div className="pt-2 border-t border-border space-y-3">
         <button
           type="button"
-          disabled={!bothTicked || submitting}
-          onClick={handleProceed}
+          disabled={!saAccepted || saLoading}
+          onClick={handleSAAccept}
           className="w-full rounded-full bg-accent py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-accent-foreground transition-all duration-300 hover:brightness-110 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100"
         >
-          {submitting ? 'Preparing Secure Checkout…' : 'Proceed to Secure Checkout'}
+          {saLoading ? 'Processing…' : 'Complete KYC Verification'}
         </button>
         <p className="text-[10px] font-light leading-relaxed text-muted-foreground/70 text-center">
-          Each document expands to read — a <span className="text-status-active">Completed</span> tick appears once accepted. Button unlocks when both are ticked.{' '}
-          <span className="text-accent">Each tick = recorded acceptance</span> — who + document hash + timestamp, logged at the instant of the tick.
+          <span className="text-accent">Acceptance = recorded</span> — who + document hash + timestamp, logged at the instant of the tick.
         </p>
       </div>
     </div>
@@ -867,8 +671,8 @@ export default function PurchaseFlowModal({
           termSheetHash={mergedLegalPack?.termSheetHash}
           onProceed={() => setStep('accept')}
         />
-      ) : (
-        <Step3AcceptanceGate
+      ) : step === 'accept' ? (
+        <Step3SAAcceptance
           horseName={horseName}
           horseSlug={horseSlug}
           stakePct={stakePct}
@@ -876,7 +680,12 @@ export default function PurchaseFlowModal({
           stakeStepPct={stakeStepPct}
           maxInvestmentPct={maxInvestmentPct}
           onBack={() => setStep('terms')}
+          onProceed={() => setStep('kyc')}
         />
+      ) : (
+        <div className="space-y-6">
+          <p className="text-center text-muted-foreground">KYC Step — handled via redirect</p>
+        </div>
       )}
     </ModalShell>
   );
