@@ -82,8 +82,10 @@ function keyInformationSummary(context: SyndicateLegalContext): string {
         ? context.totalHorsePercentage.toFixed(1)
         : BLANK;
 
+  // Split label is "75% Investor Pool / 25% Owner Retention" — extract ONLY the
+  // leading percentage for prose ("75% of gross stakes"), never the pool label.
   const splitPct = context.distributionSplit
-    ? context.distributionSplit.split('/')[0].trim()
+    ? (context.distributionSplit.match(/^\s*(\d+(?:\.\d+)?%)/) ?? [])[1] ?? context.distributionSplit.split('/')[0].trim()
     : 'a pro-rata share';
 
   const structureBullets = [
