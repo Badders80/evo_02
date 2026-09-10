@@ -74,7 +74,7 @@ export interface PurchaseFlowModalProps {
   onClose: () => void;
 }
 
-type Step = 'terms' | 'accept' | 'kyc';
+type Step = 'terms' | 'accept' | 'kyc' | 'checkout';
 
 /** Shared modal shell — max-w-lg × h-[900px] (bumped from locked 720px 2026-09-04 to match prod's natural content fit for Step 2).
  *  Viewport guard: clamps to max-h-[calc(100vh-2rem)] my-auto on shorter viewports (re-audit guard 2026-09-04).
@@ -638,19 +638,44 @@ export default function PurchaseFlowModal({
     };
   }, [legalPack, stakeLegalPack]);
   React.useEffect(() => {
-    const raw =
-      typeof initialUnits === 'number' && Number.isFinite(initialUnits)
-        ? String(initialUnits)
-        : new URLSearchParams(window.location.search).get('units');
-    if (!raw) return;
-    const parsed = parseFloat(raw);
-    if (!Number.isFinite(parsed)) return;
-    const step = Math.max(stakeStepPct, 0.01);
-    const snapped = Math.round(parsed / step) * step;
-    if (snapped >= minInvestmentPct - 1e-9 && snapped <= maxInvestmentPct + 1e-9) {
-      setStakePct(Math.round(snapped * 100) / 100);
+    const params = new URLSearchParams(window.location.search);
+    // KYC return handling: if we just came back from KYC, trigger checkout
+    if (params.get('kyc') === 'return' && step === 'kyc') {
+      params.delete('kyc');
+      window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+      triggerCheckout();
     }
-  }, [initialUnits, minInvestmentPct, maxInvestmentPct, stakeStepPct]);
+    // Checkout success handled by MyStable page
+    if (params.get('checkout') === 'success') {
+      params.delete('checkout');
+      params.delete('slug');
+      params.delete('units');
+      window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+    }
+  }, []);
+
+  const triggerCheckout = async () => {
+    setStep('checkout');
+    try {
+      const res = await fetch('/api/checkout/create-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ horseSlug, units: stakePct }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error('Checkout failed:', data);
+        alert(data.error || 'Failed to start checkout. Please try again.');
+        setStep('kyc');
+      }
+    } catch (e) {
+      console.error('Checkout error:', e);
+      alert('Failed to start checkout. Please try again.');
+      setStep('kyc');
+    }
+  };
 
   return (
     <ModalShell onClose={onClose}>
@@ -671,19 +696,17 @@ export default function PurchaseFlowModal({
           termSheetHash={mergedLegalPack?.termSheetHash}
           onProceed={() => setStep('accept')}
         />
-      ) : step === 'accept' ? (
-        <Step3SAAcceptance
-          horseName={horseName}
-          horseSlug={horseSlug}
-          stakePct={stakePct}
-          legalPack={mergedLegalPack}
-          stakeStepPct={stakeStepPct}
-          maxInvestmentPct={maxInvestmentPct}
-          onBack={() => setStep('terms')}
-          onProceed={() => setStep('kyc')}
-        />
+      ) : step === 'checkout' ? (
+        <div className="space-y-6 text-center">
+          <div className="h-12 w-12 mx-auto animate-spin rounded-full border-4 border-accent border-t-transparent" />
+          <p className="text-[15px] font-light text-foreground">Redirecting to Stripe Checkout…</p>
+        </div>
+      ) : step === 'kyc' ? (
+        <div className="space-y-6 text-center">
+          <p className="text-center text-muted-foreground">KYC Step — handled via redirect</p>
+        </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-6 text-center">
           <p className="text-center text-muted-foreground">KYC Step — handled via redirect</p>
         </div>
       )}

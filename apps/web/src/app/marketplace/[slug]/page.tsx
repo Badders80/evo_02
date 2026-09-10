@@ -103,8 +103,29 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
 
   return (
     <div className="min-h-screen bg-canvas font-sans selection:bg-accent selection:text-black">
-      <main className="min-h-screen pb-24 pt-32">
-        <div className="mx-auto max-w-6xl px-6 sm:px-10 lg:px-12">
+      <main className="min-h-screen pb-24">
+        <div id="page-intro" className="mx-auto max-w-6xl px-12 pt-32 md:px-16 lg:px-20">
+          <p className="text-[11px] font-light uppercase tracking-[0.2em] text-muted-foreground">
+            Evolution Stables
+          </p>
+          <h1 className="mt-4 text-[36px] font-light tracking-[-0.04em] text-heading md:text-[64px] leading-[1.05]">
+            Ownership,
+            <br />
+            evolved.
+          </h1>
+          <p className="mt-4 max-w-2xl text-[15px] font-light leading-[1.7] text-muted-foreground">
+            Browse active offerings, coming-soon offerings, and completed track record. For a deeper
+            dive into our ownership model, read the{' '}
+            <a
+              href="/marketplace#ownership-faq"
+              className="text-accent underline decoration-accent/40 underline-offset-4 transition-colors hover:text-heading"
+            >
+              Ownership FAQ
+            </a>{' '}
+            below.
+          </p>
+        </div>
+        <div className="mx-auto mt-16 max-w-6xl px-6 sm:px-10 lg:px-12">
           {/* Breadcrumb */}
           <div className="mb-10 flex items-center justify-between text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
             <div className="flex items-center gap-2">
@@ -203,8 +224,9 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
               />
             </div>
 
-            {/* RIGHT COLUMN — RightRail's <aside lg:fixed> is the direct grid child; fixed (not sticky)
-            so it never releases at the footer — stays pinned under the nav for the whole document.
+            {/* RIGHT COLUMN — RightRail's <aside> is the direct grid child; sticky
+            (not fixed): travels level with the image, pins under the nav once
+            scrolled to, releases at the grid end.
             F8: modal is page-level via HorsePageShell, reachable from any CTA via ?open=1&units=X. */}
             {(() => {
               const legalPack = getCompiledLegalPackForCampaign(campaign);

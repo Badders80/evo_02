@@ -279,33 +279,11 @@ export default function RightRail({
   const previewAll =
     typeof process !== 'undefined' && process.env.NEXT_PUBLIC_WORKFLOW_PREVIEW === 'true';
 
-  // lg:fixed pulls the aside out of grid flow — position it over the 1fr (right) track
-  // explicitly, recomputed on resize (grid gap 48px = gap-12; 1fr of 2fr_1fr).
-  const railRef = React.useRef<HTMLElement | null>(null);
-  React.useEffect(() => {
-    const el = railRef.current;
-    if (!el || typeof window === 'undefined') return;
-    const apply = () => {
-      const grid = el.parentElement;
-      if (!grid) return;
-      if (window.innerWidth < 1024) {
-        el.style.left = '';
-        el.style.width = '';
-        return;
-      }
-      const gap = 48;
-      const trackW = (grid.clientWidth - gap) / 3;
-      const left = grid.getBoundingClientRect().left + 2 * trackW + gap;
-      el.style.left = `${Math.round(left)}px`;
-      el.style.width = `${Math.floor(trackW)}px`;
-    };
-    apply();
-    window.addEventListener('resize', apply);
-    return () => window.removeEventListener('resize', apply);
-  }, []);
-
+  // Sticky rail: travels in grid flow level with the horse image, pins 32px
+  // under the nav (top-28) once scrolled to, releases at the grid end. The grid's 1fr
+  // track handles width/position natively — no measuring. Normal flow below lg.
   return (
-    <aside ref={railRef} className="space-y-6 z-20 lg:fixed lg:top-20">
+    <aside className="space-y-6 z-20 self-start lg:sticky lg:top-28">
       {(safeStatus === 'listed' || (previewAll && safeStatus === 'coming_soon')) && (
         <ListedInvestmentCard
           horseName={horseName}

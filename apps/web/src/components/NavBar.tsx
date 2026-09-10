@@ -77,11 +77,17 @@ export function NavBar() {
   }, []);
 
   /**
-   * Track scroll position to toggle nav bar appearance
+   * Track scroll position to toggle nav bar appearance.
+   * Anchor-based: the intro block ("Evolution Stables / Ownership, evolved.")
+   * is the trigger. While it is on screen the nav floats transparent over it;
+   * once it scrolls out the nav pins solid as the new top bar — and STAYS
+   * (never comes back). Fallback: scroll listener at 60% viewport height.
    */
   useEffect(() => {
-    const hero = document.getElementById('hero');
-    if (hero && 'IntersectionObserver' in window) {
+    const anchor =
+      document.getElementById('page-intro') ||
+      document.getElementById('hero');
+    if (anchor && 'IntersectionObserver' in window) {
       const observer = new IntersectionObserver(
         (entries) => {
           const entry = entries[0];
@@ -94,7 +100,7 @@ export function NavBar() {
         }
       );
 
-      observer.observe(hero);
+      observer.observe(anchor);
       return () => observer.disconnect();
     }
 
