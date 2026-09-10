@@ -146,15 +146,15 @@ console.log('Running @evo/web Nellie loop tests...\n');
 {
   // Founder-locked 2026-09-07: all live campaigns flipped to coming_soon (brochure
   // mode) — no campaign is buyable until the purchase workflows land.
-  // Founder-locked 2026-09-10: Manolo flipped to listed via the DSL walk — the
-  // purchase workflow IS live for Manolo; the rest stay brochure mode.
+  // Founder-locked 2026-09-10: Manolo's DSL walk completed (3/3 docs approved) but
+  // the flip was reverted same-day — checkout isn't live yet, so all stay brochure.
   const open = (await getAllCampaigns()).filter(isCheckoutOpen).map((c: { slug: string }) => c.slug);
-  assert.deepEqual(open, ['i-stole-a-manolo']);
+  assert.deepEqual(open, []);
   assert.throws(() => assertNellieOnly('tml-x-yearn'), (err: unknown) => err instanceof HttpError && err.status === 409);
   assert.rejects(async () => assertCheckoutCampaign('tml-x-yearn'), (err: unknown) => err instanceof HttpError && (err as HttpError).status === 409);
   assert.rejects(async () => assertCheckoutCampaign('nellie'), (err: unknown) => err instanceof HttpError && (err as HttpError).status === 409);
   assert.equal(getInventoryId('nellie'), NELLIE_INVENTORY_ID);
-  console.log('✅ only Manolo is buyable (DSL-listed); rest brochure mode');
+  console.log('✅ no campaign is buyable (brochure mode)');
 }
 
 {
