@@ -12,6 +12,12 @@
 - Build loop: [`build-loop/README.md`](build-loop/README.md) — cycle dirs & one-client-first per SSOT build-loop skill Rules 12–13.
 - UI tool catalog (which skill/MCP for which job): `/home/evo/toolbox/reference/ui-tool-catalog.md` — reference only; enforcement laws stay in this file + `../SSOT/`. Shelf-first: before inventing a UI workflow, check `/home/evo/toolbox/INDEX.md` — pick one proven path, never load the shelf.
 
+## GBrain search guidance (wired 2026-09-11)
+
+- Semantic questions first: `gbrain search "checkout flow"` / `gbrain code-def` / `code-refs` / `code-callers` from this repo (pinned source `gstack-code-evo02`) before grep. Grep is the fallback for exact-string lookups.
+- gbrain runs at `http://localhost:3456/mcp` (systemd `gbrain-mcp.service`); CLI writes need the serve stopped (PGLite single-writer) — read-only `search`/`code-*` work while it runs.
+- Durable learnings/decisions → gbrain `remember`/`put_page` (fact cards), not chat history.
+
 ## Verify (island walk commands — done-means-walked is SSOT law 4)
 
 1. `just check` (10/10 must pass) — from repo root.

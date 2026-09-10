@@ -47,3 +47,4 @@ build-loop/.monitor-stamp
 # build-loop raw payload dumps (audit/trace inputs — findings live in audit-graph.json only)
 build-loop/**/*-input.txt
 build-loop/**/*-result.txt
+.gbrain-source
