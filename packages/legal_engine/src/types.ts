@@ -90,6 +90,11 @@ export interface SyndicateLegalContext {
   pdsVersion: string;
   saVersion: string;
   effectiveDate?: string;
+  /** Investor-specific execution (investor-SA checkout, Task 4): the tick is a valid
+   * NZTR pro-forma execution — the SA Execution block carries the investor's name
+   * and the tick date, not blank markers. Only set when the investor is authenticated. */
+  investorName?: string;
+  executionDate?: string;
   softLegal?: HorseSoftLegalContent;
   marketing?: HorseMarketingContent;
 }

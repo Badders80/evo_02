@@ -49,8 +49,14 @@ async function persistCompletedCheckout(event: StripeEvent): Promise<void> {
   assertNellieOnly(horseSlug);
   const { campaign, inventoryId } = await resolveCampaignInventory(horseSlug);
   // Investor-SA checkout: verify against the investor's stake-specific compile —
-  // the SA hash the investor ticked, not the 1.0% default.
-  const hashes = await resolveLegalHashes(horseSlug, units);
+  // the SA hash the investor ticked, not the 1.0% default. Task 4: the execution
+  // block (name + tick date) is part of the signed bytes — recompile with the
+  // same execution context carried in Stripe metadata.
+  const execution =
+    metadata.investor_name && metadata.execution_date
+      ? { investorName: metadata.investor_name, executionDate: metadata.execution_date }
+      : undefined;
+  const hashes = await resolveLegalHashes(horseSlug, units, execution);
   if (metadata.pds_hash && metadata.pds_hash !== hashes.pdsHash) {
     throw new HttpError(400, 'PDS_HASH_MISMATCH', 'Stripe metadata PDS hash does not match compiled pack');
   }

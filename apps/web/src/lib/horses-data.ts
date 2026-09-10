@@ -358,10 +358,13 @@ export function getCampaignMedia(slug: string, trainerSlug: string) {
  * stakePct defaults to 1.0 — the PDS + term sheet are locked offer docs compiled at the
  * default (identical for every investor); the SA is investor-specific and compiled with the
  * investor's chosen stake. The merged pack keeps PDS/TS hashes constant and varies only the SA.
+ * execution (Task 4): the SA Execution block carries the investor's name + tick date — a valid
+ * NZTR pro-forma execution. Only set when the investor is authenticated.
  */
 export function getCompiledLegalPackForCampaign(
   campaign: HorseCampaign,
-  stakePct = 1.0
+  stakePct = 1.0,
+  execution?: { investorName?: string; executionDate?: string }
 ): CompiledLegalPack {
   const buildContext = (pricing: DslPricing) => ({
     syndicateName: `${campaign.legalName} Syndicate`,
@@ -398,6 +401,8 @@ export function getCompiledLegalPackForCampaign(
     pdsVersion: '1.0.0',
     saVersion: '1.0.0',
     effectiveDate: campaign.termStartDate,
+    investorName: execution?.investorName,
+    executionDate: execution?.executionDate,
     softLegal: campaign.softLegal,
     marketing: campaign.marketing,
     listingPlatform: campaign.listingPlatform,

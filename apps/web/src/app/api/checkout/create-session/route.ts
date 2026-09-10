@@ -79,8 +79,22 @@ export async function POST(request: Request) {
     }
     const pricing = pricingForUnits(campaign.wholesaleMonthlyNzd, units);
     // Investor-SA checkout: the SA hash in Stripe metadata must be the investor's
-    // stake-specific compile — the doc they ticked in Step 3.
-    const legalPack = await resolveLegalHashes(horseSlug, units);
+    // stake-specific compile — the doc they ticked in Step 3. Task 4: the execution
+    // block (name + tick date) is part of the signed bytes, so the compile carries
+    // the same execution context the investor ticked.
+    const { data: execProfile } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', userId)
+      .maybeSingle();
+    const fullName =
+      execProfile && typeof execProfile === 'object' && 'full_name' in execProfile
+        ? String((execProfile as { full_name: string | null }).full_name ?? '')
+        : '';
+    const execution = fullName
+      ? { investorName: fullName, executionDate: new Date().toISOString().slice(0, 10) }
+      : undefined;
+    const legalPack = await resolveLegalHashes(horseSlug, units, execution);
 
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       return NextResponse.json(
@@ -128,6 +142,10 @@ export async function POST(request: Request) {
         pds_hash: legalPack.pdsHash,
         sa_hash: legalPack.saHash,
         owner_name: campaign.owner.entity,
+        // Task 4: the execution block (name + tick date) is part of the signed SA
+        // bytes — carry it so the webhook recompiles the identical document.
+        investor_name: execution?.investorName ?? '',
+        execution_date: execution?.executionDate ?? '',
       },
     });
 

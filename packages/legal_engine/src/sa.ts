@@ -222,11 +222,11 @@ Each subscriber confirms by executing this Agreement that they:
 
 By executing the Application Form (whether physically or electronically via Evolution Stables), each Shareholder is deemed to have accepted and agreed to be bound by this Agreement and the accompanying Product Disclosure Statement.
 
-**Shareholder Name:** ${BLANK}
+**Shareholder Name:** ${context.investorName ? context.investorName : BLANK}
 
 **Signed:** _________________________
 
-**Date:** ${BLANK}
+**Date:** ${context.executionDate ? context.executionDate : BLANK}
 
 ---
 
