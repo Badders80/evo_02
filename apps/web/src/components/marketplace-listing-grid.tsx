@@ -144,17 +144,14 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
                     setCtaHorse({ name: card.name, slug: card.slug });
                   }
                 }}
-                className="relative block w-full flex-shrink-0 overflow-hidden rounded-2xl md:order-last md:w-[40%]"
+                className="relative block w-full flex-shrink-0 self-start overflow-hidden rounded-2xl md:order-last md:w-[40%]"
               >
                 <div className="relative aspect-[16/9] w-full bg-canvas">
                   <img
                     src={card.image}
                     alt={card.name}
                     className="h-full w-full object-contain opacity-90 transition-opacity duration-300 group-hover:opacity-100"
-                    style={{ mixBlendMode: 'lighten' }}
                   />
-                  {/* Top vignette — dark above the horse fading to transparent at the subject. Bottom stays clean (clamped by the rounded card border) so the studio floor reads against the canvas edge, not a fade. */}
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-2/3 bg-gradient-to-b from-canvas to-canvas/40" />
                   <StatusBadge status={card.status} />
                 </div>
               </Link>

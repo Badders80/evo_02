@@ -124,7 +124,7 @@ export function MediaDeck({ heroImage, gallery, videoUrl, age, sex, colour, sire
             onClick={() => setLightboxOpen(true)}
           >
             {slide.type === 'image' ? (
-              <img src={slide.src} alt={`Horse media slide ${currentIndex + 1}`} className="max-h-full max-w-full object-contain" style={{ mixBlendMode: 'lighten' }} />
+              <img src={slide.src} alt={`Horse media slide ${currentIndex + 1}`} className="max-h-full max-w-full object-contain" />
             ) : (
               <video ref={videoRef} src={slide.src} muted loop playsInline className="max-h-full max-w-full object-contain" />
             )}
@@ -175,7 +175,7 @@ export function MediaDeck({ heroImage, gallery, videoUrl, age, sex, colour, sire
                 </span>
               </span>
             ) : (
-              <img src={s.src} alt={`Slide ${idx + 1}`} className="h-full w-full object-cover" style={{ mixBlendMode: 'lighten' }} />
+              <img src={s.src} alt={`Slide ${idx + 1}`} className="h-full w-full object-cover" />
             )}
           </button>
         ))}
