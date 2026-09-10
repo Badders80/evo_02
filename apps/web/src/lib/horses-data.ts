@@ -355,9 +355,14 @@ export function getCampaignMedia(slug: string, trainerSlug: string) {
 
 /**
  * Compiles the legal pack dynamically via @evo/legal_engine and computes verified SHA-256 digests.
+ * stakePct defaults to 1.0 — the PDS is a locked offer doc compiled at the default;
+ * the SA is investor-specific and compiled with the investor's chosen stake.
  */
-export function getCompiledLegalPackForCampaign(campaign: HorseCampaign): CompiledLegalPack {
-  const pricing = computeDslPricing(campaign.wholesaleMonthlyNzd, 1.0);
+export function getCompiledLegalPackForCampaign(
+  campaign: HorseCampaign,
+  stakePct = 1.0
+): CompiledLegalPack {
+  const pricing = computeDslPricing(campaign.wholesaleMonthlyNzd, stakePct);
 
   const { pack } = compileLegalPack(
     {
