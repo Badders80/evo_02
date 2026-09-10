@@ -135,12 +135,17 @@ export function assertNellieOnly(slug: string): void {
   }
 }
 
-export async function resolveLegalHashes(slug: string): Promise<{ pdsHash: string; saHash: string }> {
+export async function resolveLegalHashes(
+  slug: string,
+  stakePct = 1.0
+): Promise<{ pdsHash: string; saHash: string }> {
   const campaign = await getCampaignBySlug(slug);
   if (!campaign) {
     throw new HttpError(404, 'CAMPAIGN_NOT_FOUND', 'Thoroughbred campaign not found');
   }
-  const pack = getCompiledLegalPackForCampaign(campaign);
+  // Investor-SA checkout: the SA hash must match the investor's stake (the doc they
+  // ticked). The PDS stays the locked 1.0% compile — identical for every investor.
+  const pack = getCompiledLegalPackForCampaign(campaign, stakePct);
   if (!isSha256Hex(pack.pdsHash) || !isSha256Hex(pack.saHash)) {
     throw new HttpError(500, 'INVALID_LEGAL_HASH', 'Legal pack hashes must be 64-hex SHA-256');
   }

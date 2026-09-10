@@ -48,7 +48,9 @@ async function persistCompletedCheckout(event: StripeEvent): Promise<void> {
   requirePaidCheckoutSession(session);
   assertNellieOnly(horseSlug);
   const { campaign, inventoryId } = await resolveCampaignInventory(horseSlug);
-  const hashes = await resolveLegalHashes(horseSlug);
+  // Investor-SA checkout: verify against the investor's stake-specific compile —
+  // the SA hash the investor ticked, not the 1.0% default.
+  const hashes = await resolveLegalHashes(horseSlug, units);
   if (metadata.pds_hash && metadata.pds_hash !== hashes.pdsHash) {
     throw new HttpError(400, 'PDS_HASH_MISMATCH', 'Stripe metadata PDS hash does not match compiled pack');
   }

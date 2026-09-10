@@ -78,7 +78,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
     }
     const pricing = pricingForUnits(campaign.wholesaleMonthlyNzd, units);
-    const legalPack = await resolveLegalHashes(horseSlug);
+    // Investor-SA checkout: the SA hash in Stripe metadata must be the investor's
+    // stake-specific compile — the doc they ticked in Step 3.
+    const legalPack = await resolveLegalHashes(horseSlug, units);
 
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       return NextResponse.json(

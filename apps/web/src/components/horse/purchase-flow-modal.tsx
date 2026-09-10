@@ -456,6 +456,9 @@ function Step3AcceptanceGate({
           stakePct,
           doc,
           docHash: doc === 'pds' ? legalPack?.pdsHash : legalPack?.saHash,
+          // Investor-SA checkout (Task 3): the event IS the contract record — carry
+          // the exact markdown the investor read (same-request bytes as the hash).
+          docMarkdown: doc === 'pds' ? legalPack?.pdsMarkdown : legalPack?.saMarkdown,
         }),
       });
       if (!res.ok) {
