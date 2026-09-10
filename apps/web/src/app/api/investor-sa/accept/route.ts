@@ -124,7 +124,8 @@ export async function POST(request: Request) {
 
     // Start KYC flow (same as /api/kyc/create-session)
     const origin = request.headers.get('origin') || new URL(request.url).origin;
-    const returnUrl = `${origin}/mystable?kyc=return`;
+    // Return to the horse page so the modal can trigger checkout after KYC
+    const returnUrl = `${origin}/marketplace/${horseSlug}?kyc=return`;
 
     const session = await createVerificationSession(userId, returnUrl);
 
