@@ -44,6 +44,7 @@
   --color-status-active: #10b981;
   --color-status-pending: #f59e0b;
   --color-status-closed: #64748b;
+  --color-spot-mint: #00e599;
 
   /* ---- Elevation system (tonal layering, no drop shadows) ---- */
   --color-canvas: #030303;

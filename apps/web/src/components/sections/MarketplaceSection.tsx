@@ -94,7 +94,7 @@ export function MarketplaceSection() {
             <h2 className="text-[36px] md:text-[48px] leading-[1.1] text-heading font-light tracking-tight mb-6">
               Transformation Powered
               <br />
-              by <span className="text-[#00E599]">Regulation</span>
+              by <span className="text-spot-mint">Regulation</span>
             </h2>
           </div>
 

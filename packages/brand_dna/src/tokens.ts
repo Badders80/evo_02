@@ -37,6 +37,10 @@ export const BRAND_COLORS = {
     pending: '#f59e0b',  // Amber (Funding / Carry-Forward)
     closed: '#64748b',   // Slate (Spelling / Closed)
   },
+  // Spot accent — headline emphasis ONLY, never body text
+  spot: {
+    mint: '#00E599', // Regulation mint (marketplace headline accent)
+  },
 } as const;
 
 export const BRAND_RADII = {
