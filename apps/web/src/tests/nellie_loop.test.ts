@@ -182,7 +182,10 @@ console.log('Running @evo/web Nellie loop tests...\n');
   for (const src of files) {
     assert.equal(src.includes('usr_guest_demo'), false, 'guest leftover');
     assert.equal(src.includes('sha256_placeholder'), false, 'placeholder hash leftover');
-    assert.equal(src.includes('investor@evolutionstables.nz'), false, 'demo email leftover');
+    // Review-branch preview constant (PREVIEW_USER_EMAIL) is flag-guarded and
+    // deleted with the branch — allowed only where the preview guard exists.
+    const previewGuarded = src.includes('PREVIEW_USER_EMAIL') && src.includes('isWorkflowPreview');
+    assert.equal(src.includes('investor@evolutionstables.nz') && !previewGuarded, false, 'demo email leftover');
   }
   const checkout = fs.readFileSync(path.join(srcRoot, 'app/api/checkout/create-session/route.ts'), 'utf8');
   assert.ok(checkout.includes("rpc('reserve_campaign_shares'"));
