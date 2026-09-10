@@ -274,6 +274,11 @@ export default function RightRail({
       ? s
       : 'coming_soon';
 
+  // Review-branch preview (NEXT_PUBLIC_WORKFLOW_PREVIEW=true): coming_soon horses
+  // render the full investment card + CTA so the workflow walks. Never set in prod.
+  const previewAll =
+    typeof process !== 'undefined' && process.env.NEXT_PUBLIC_WORKFLOW_PREVIEW === 'true';
+
   // lg:fixed pulls the aside out of grid flow — position it over the 1fr (right) track
   // explicitly, recomputed on resize (grid gap 48px = gap-12; 1fr of 2fr_1fr).
   const railRef = React.useRef<HTMLElement | null>(null);
@@ -301,7 +306,7 @@ export default function RightRail({
 
   return (
     <aside ref={railRef} className="space-y-6 z-20 lg:fixed lg:top-20">
-      {safeStatus === 'listed' && (
+      {(safeStatus === 'listed' || (previewAll && safeStatus === 'coming_soon')) && (
         <ListedInvestmentCard
           horseName={horseName}
           horseSlug={horseSlug}
@@ -318,7 +323,7 @@ export default function RightRail({
         <ClosedCampaignCard status={safeStatus} horseName={horseName} horseSlug={horseSlug} />
       )}
 
-      {safeStatus === 'coming_soon' && (
+      {safeStatus === 'coming_soon' && !previewAll && (
         <ComingSoonCard horseName={horseName} horseSlug={horseSlug} />
       )}
     </aside>

@@ -72,7 +72,15 @@ export function interpretReserveResult(
   return { reservationId: result.reservation_id, expiresAt: result.expires_at };
 }
 
+/** Review-branch preview flag (WORKFLOW_PREVIEW=true): strips workflow blocks so the
+ * founder can walk the purchase chain on coming_soon horses. Never set in prod.
+ * Remove with the review branch. */
+export function isWorkflowPreview(env: NodeJS.Dict<string> = process.env): boolean {
+  return env.WORKFLOW_PREVIEW === 'true' || env.NEXT_PUBLIC_WORKFLOW_PREVIEW === 'true';
+}
+
 export function purchasesAreEnabled(env: NodeJS.Dict<string> = process.env): boolean {
+  if (isWorkflowPreview(env)) return true;
   return Boolean(env.STRIPE_SECRET_KEY) && env.PURCHASES_ENABLED === 'true';
 }
 
@@ -171,9 +179,13 @@ export async function resolveCampaignInventory(slug: string) {
 }
 
 export async function assertCheckoutCampaign(slug: string) {
-  assertNellieOnly(slug);
+  // Review-branch preview: any slug, any status — lets the workflow walk on
+  // coming_soon horses. Never set WORKFLOW_PREVIEW in prod.
+  if (!isWorkflowPreview()) {
+    assertNellieOnly(slug);
+  }
   const resolved = await resolveCampaignInventory(slug);
-  if (!isCheckoutOpen(resolved.campaign)) {
+  if (!isCheckoutOpen(resolved.campaign) && !isWorkflowPreview()) {
     throw new HttpError(409, 'CHECKOUT_CLOSED', 'This campaign is not open for stakes');
   }
   return resolved;

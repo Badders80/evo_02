@@ -62,7 +62,9 @@ export async function POST(request: Request) {
     // Chunk-4: KYC_REQUIRED carries the investor's current kyc_status so the modal can
     // render the honest state (prompt / pending / rejected) instead of guessing. The KYC
     // port (Firebase → Supabase) is a separate workstream — this route stays the gate.
-    if (kycStatus !== 'verified') {
+    // Review-branch preview (WORKFLOW_PREVIEW=true): skip the KYC gate so the chain
+    // walks end-to-end without Stripe Identity. Never set in prod.
+    if (kycStatus !== 'verified' && process.env.WORKFLOW_PREVIEW !== 'true') {
       return NextResponse.json(
         {
           error: 'KYC verification required before checkout',
