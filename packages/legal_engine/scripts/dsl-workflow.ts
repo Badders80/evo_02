@@ -684,6 +684,7 @@ $('save').addEventListener('click', async () => {
   const v = currentValues();
   if (!v.horseSlug) { toast('Pick a horse first'); return; }
   if (!v.distributionSplit || !v.distributionSchedule) { toast('Fill both owner-set fields first'); return; }
+  if (!v.closeStyle) { toast('Pick an Exit / Close Style (Section 4) before saving'); return; }
   const data = await post('save', v);
   if (data) { toast('Saved to prod ✓'); setTimeout(() => location.reload(), 600); }
 });
@@ -695,6 +696,7 @@ $('approve').addEventListener('click', async () => {
   const v = currentValues();
   if (!v.horseSlug) { toast('Pick a horse first'); return; }
   if (!v.distributionSplit || !v.distributionSchedule) { toast('Fill both owner-set fields before approving'); return; }
+  if (!v.closeStyle) { toast('Pick an Exit / Close Style (Section 4) before approving'); return; }
   const data = await post('approve', v);
   if (data) { toast('Term sheet approved → Soft Content'); setTimeout(() => location.href = '/soft-content', 600); }
 });
@@ -1166,9 +1168,13 @@ async function serve(slug: string, port: number) {
         }
 
         if (action === 'save') {
-          const { distributionSplit, distributionSchedule } = body;
+          const { distributionSplit, distributionSchedule, closeStyle } = body;
           if (!distributionSplit || !distributionSchedule) {
             sendJson({ error: 'Both owner-set fields required' }, 400);
+            return;
+          }
+          if (!closeStyle) {
+            sendJson({ error: 'Exit / Close Style required' }, 400);
             return;
           }
           await applyFullContext(slug, body);
@@ -1186,9 +1192,13 @@ async function serve(slug: string, port: number) {
 
         if (action === 'approve') {
           if (doc === 'term_sheet') {
-            const { distributionSplit, distributionSchedule } = body;
+            const { distributionSplit, distributionSchedule, closeStyle } = body;
             if (!distributionSplit || !distributionSchedule) {
               sendJson({ error: 'Both owner-set fields required before approve' }, 400);
+              return;
+            }
+            if (!closeStyle) {
+              sendJson({ error: 'Exit / Close Style required before approve' }, 400);
               return;
             }
             await applyFullContext(slug, body);
