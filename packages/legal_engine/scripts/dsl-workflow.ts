@@ -183,6 +183,7 @@ async function loadCampaign(slug: string): Promise<{ context: SyndicateLegalCont
       microchip: (ped.microchip as string) ?? undefined,
       sire: (inv.sire as string) ?? '',
       dam: (inv.dam as string) ?? '',
+      studBookUrl: (ped.stud_book_url as string) ?? undefined,
     },
     trainer: {
       name: inv.trainer_name as string,
@@ -404,9 +405,33 @@ function renderTermSheetHtml(registry: Registry, inv: Record<string, unknown>): 
   .status-rejected { background:#f8d7da; color:#721c24; }
   .toast { position:fixed; top:16px; right:16px; background:var(--ink); color:#fff; padding:10px 16px; border-radius:6px; font-size:13px; opacity:0; transition:opacity .2s; }
   .toast.show { opacity:1; }
+  .side { position:fixed; top:0; left:0; bottom:0; width:200px; background:#fff; border-right:1px solid var(--line); padding:16px 12px; display:flex; flex-direction:column; gap:6px; overflow-y:auto; z-index:10; }
+  .side .brand { font-size:12px; font-weight:600; margin-bottom:8px; letter-spacing:.02em; }
+  .side a { display:block; font-size:12px; color:var(--ink); text-decoration:none; padding:6px 10px; border-radius:6px; }
+  .side a:hover { background:#f0f0f0; }
+  .side a.active { background:var(--ink); color:#fff; }
+  .side .sep { border-top:1px solid var(--line); margin:8px 0; }
+  .side button { font-family:inherit; font-size:12px; padding:7px 10px; border-radius:6px; border:1px solid var(--line); cursor:pointer; background:#fff; color:var(--ink); text-align:left; }
+  .side button.primary { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .side button.danger { color:#b00020; border-color:#b00020; }
+  .side button:disabled { opacity:.4; cursor:not-allowed; }
+  .sheet { margin-left:240px; }
 </style>
 </head>
 <body>
+<div class="side">
+  <div class="brand">DSL Workflow</div>
+  <a href="/" class="active">Term Sheet</a>
+  <a href="/soft-content">Soft Content</a>
+  <a href="/pds">PDS</a>
+  <a href="/sa">SA</a>
+  <a href="/flip">Flip to Listed</a>
+  <div class="sep"></div>
+  <button id="save" class="primary">Save</button>
+  <button id="pending">Pending</button>
+  <button id="approve">Approve → PDS</button>
+  <button id="delete" class="danger">Delete</button>
+</div>
 <div class="sheet">
   <h1>DSL Term Sheet - <span id="h-name" class="blank">not filled in yet</span> <span class="status-pill status-${esc(status)}">${esc(status)}</span></h1>
   <p class="meta"><strong>Version:</strong> <span class="locked">1.0.0</span> | <strong>Effective Date:</strong> <span id="h-date" class="blank">not filled in yet</span></p>
@@ -468,12 +493,6 @@ function renderTermSheetHtml(registry: Registry, inv: Record<string, unknown>): 
   <p class="fineprint">Summary of terms under the NZTR Code of Practice Rule 22.1. Subject to execution of formal PDS and Syndicate Agreement.</p>
 </div>
 
-<div class="bar">
-  <button id="save" class="primary">Save</button>
-  <button id="pending">Pending</button>
-  <button id="approve">Approve → PDS</button>
-  <button id="delete" class="danger">Delete</button>
-</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -769,17 +788,34 @@ function renderDocHtml(title: string, doc: 'pds' | 'sa', markdown: string, statu
   .status-rejected { background:#f8d7da; color:#721c24; }
   .toast { position:fixed; top:16px; right:16px; background:var(--ink); color:#fff; padding:10px 16px; border-radius:6px; font-size:13px; opacity:0; transition:opacity .2s; }
   .toast.show { opacity:1; }
+  .side { position:fixed; top:0; left:0; bottom:0; width:200px; background:#fff; border-right:1px solid var(--line); padding:16px 12px; display:flex; flex-direction:column; gap:6px; overflow-y:auto; z-index:10; }
+  .side .brand { font-size:12px; font-weight:600; margin-bottom:8px; letter-spacing:.02em; }
+  .side a { display:block; font-size:12px; color:var(--ink); text-decoration:none; padding:6px 10px; border-radius:6px; }
+  .side a:hover { background:#f0f0f0; }
+  .side a.active { background:var(--ink); color:#fff; }
+  .side .sep { border-top:1px solid var(--line); margin:8px 0; }
+  .side button { font-family:inherit; font-size:12px; padding:7px 10px; border-radius:6px; border:1px solid var(--line); cursor:pointer; background:#fff; color:var(--ink); text-align:left; }
+  .side button.primary { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .side button.danger { color:#b00020; border-color:#b00020; }
+  .sheet { margin-left:240px; }
 </style>
 </head>
 <body>
-<div class="sheet">
-  <h1>${esc(title)} <span class="status-pill status-${esc(status)}">${esc(status)}</span></h1>
-  ${mdToHtml(markdown)}
-</div>
-<div class="bar">
+<div class="side">
+  <div class="brand">DSL Workflow</div>
+  <a href="/">Term Sheet</a>
+  <a href="/soft-content">Soft Content</a>
+  <a href="/pds"${doc === 'pds' ? ' class="active"' : ''}>PDS</a>
+  <a href="/sa"${doc === 'sa' ? ' class="active"' : ''}>SA</a>
+  <a href="/flip">Flip to Listed</a>
+  <div class="sep"></div>
   <button id="pending">Pending</button>
   <button id="approve" class="primary">Approve → ${esc(nextLabel)}</button>
   <button id="delete" class="danger">Delete</button>
+</div>
+<div class="sheet">
+  <h1>${esc(title)} <span class="status-pill status-${esc(status)}">${esc(status)}</span></h1>
+  ${mdToHtml(markdown)}
 </div>
 <div class="toast" id="toast"></div>
 <script>
@@ -896,9 +932,31 @@ function renderSoftContentHtml(
   .status-rejected { background:#f8d7da; color:#721c24; }
   .toast { position:fixed; top:16px; right:16px; background:var(--ink); color:#fff; padding:10px 16px; border-radius:6px; font-size:13px; opacity:0; transition:opacity .2s; }
   .toast.show { opacity:1; }
+  .side { position:fixed; top:0; left:0; bottom:0; width:200px; background:#fff; border-right:1px solid var(--line); padding:16px 12px; display:flex; flex-direction:column; gap:6px; overflow-y:auto; z-index:10; }
+  .side .brand { font-size:12px; font-weight:600; margin-bottom:8px; letter-spacing:.02em; }
+  .side a { display:block; font-size:12px; color:var(--ink); text-decoration:none; padding:6px 10px; border-radius:6px; }
+  .side a:hover { background:#f0f0f0; }
+  .side a.active { background:var(--ink); color:#fff; }
+  .side .sep { border-top:1px solid var(--line); margin:8px 0; }
+  .side button { font-family:inherit; font-size:12px; padding:7px 10px; border-radius:6px; border:1px solid var(--line); cursor:pointer; background:#fff; color:var(--ink); text-align:left; }
+  .side button.primary { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .side button.danger { color:#b00020; border-color:#b00020; }
+  .sheet { margin-left:240px; }
 </style>
 </head>
 <body>
+<div class="side">
+  <div class="brand">DSL Workflow</div>
+  <a href="/">Term Sheet</a>
+  <a href="/soft-content" class="active">Soft Content</a>
+  <a href="/pds">PDS</a>
+  <a href="/sa">SA</a>
+  <a href="/flip">Flip to Listed</a>
+  <div class="sep"></div>
+  <button id="pending">Pending</button>
+  <button id="approve" class="primary">Approve → PDS (${approvedCount}/4)</button>
+  <button id="delete" class="danger">Delete</button>
+</div>
 <div class="sheet">
   <h1>Soft Content <span class="status-pill status-${esc(status)}">${esc(status)}</span></h1>
   <p class="hint">One section open at a time. Each section: Reject (collapses) · Edit (master overwrite) · Approve (closes, opens next). ${approvedCount}/4 approved. Hotta excerpts are reference only — never rendered into output.</p>
@@ -919,11 +977,6 @@ ${sectionsHtml}
   </table>
 </div>
 
-<div class="bar">
-  <button id="pending">Pending</button>
-  <button id="approve" class="primary">Approve → PDS (${approvedCount}/4)</button>
-  <button id="delete" class="danger">Delete</button>
-</div>
 <div class="toast" id="toast"></div>
 <script>
 const $ = (id) => document.getElementById(id);

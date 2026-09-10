@@ -160,11 +160,11 @@ export function runTests(): void {
   console.log('✅ All mandatory PDS sections present');
 
   // 4. Mandatory SA clauses
-  assertIncludes(nelliePack.pack.saMarkdown, 'Clause 6: Equine Welfare Supremacy', 'SA clause 6');
-  assertIncludes(nelliePack.pack.saMarkdown, 'Clause 8: Default & Forfeiture', 'SA clause 8');
-  assertIncludes(nelliePack.pack.saMarkdown, 'Clause 11: Syndicate Management Fee', 'SA clause 11');
-  assertIncludes(nelliePack.pack.saMarkdown, 'Clause 12: Manager Removal', 'SA clause 12');
-  assertIncludes(nelliePack.pack.saMarkdown, 'Clause 13: Governing Law', 'SA clause 13');
+  assertIncludes(nelliePack.pack.saMarkdown, '6. Equine Welfare Supremacy', 'SA clause 6');
+  assertIncludes(nelliePack.pack.saMarkdown, '8. Default & Forfeiture', 'SA clause 8');
+  assertIncludes(nelliePack.pack.saMarkdown, '11. Syndicate Management Fee', 'SA clause 11');
+  assertIncludes(nelliePack.pack.saMarkdown, '12. Manager Removal', 'SA clause 12');
+  assertIncludes(nelliePack.pack.saMarkdown, '13. Governing Law', 'SA clause 13');
   console.log('✅ All mandatory SA clauses present');
 
   // 4b. Full-document skeleton: extended PDS sections + full SA clause series
@@ -199,24 +199,24 @@ export function runTests(): void {
   console.log(`✅ Full PDS skeleton present (${fullPdsSections.length} sections)`);
 
   const fullSaClauses = [
-    'Clause 1: Formation',
-    'Clause 2: Object',
-    'Clause 3: Agreement and Parties',
-    'Clause 4: Syndicate Shares',
-    'Clause 5: Lease Duration',
-    'Clause 6: Equine Welfare Supremacy',
-    'Clause 7: Manager\'s Powers and Duties',
-    'Clause 8: Default & Forfeiture',
-    'Clause 9: Financial Contributions and Fees',
-    'Clause 10: Revenue Streams and Distribution',
-    'Clause 11: Syndicate Management Fee',
-    'Clause 12: Manager Removal — NZTR Code of Practice Rule 22.1',
-    'Clause 13: Governing Law & Jurisdiction',
-    'Clause 14: Insurance and Early Termination',
-    'Clause 15: Transfer of Shares',
-    'Clause 16: Dispute Resolution',
-    'Clause 17: Winding Up and Post-Lease Arrangements',
-    'Clause 18: Notices',
+    '1. Formation',
+    '2. Object',
+    '3. Agreement and Parties',
+    '4. Syndicate Shares',
+    '5. Lease Duration',
+    '6. Equine Welfare Supremacy',
+    "7. Manager's Powers and Duties",
+    '8. Default & Forfeiture',
+    '9. Financial Contributions and Fees',
+    '10. Investor Returns',
+    '11. Syndicate Management Fee',
+    '12. Manager Removal — NZTR Code of Practice Rule 22.1',
+    '13. Governing Law & Jurisdiction',
+    '14. Insurance and Early Termination',
+    '15. Transfer of Shares',
+    '16. Dispute Resolution',
+    '17. Winding Up and Post-Lease Arrangements',
+    '18. Notices',
     'Schedule 1: NZTR Statutory Member Declarations',
     'Execution',
   ];

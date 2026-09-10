@@ -28,6 +28,8 @@ export interface ThoroughbredPedigree {
   microchip?: string;
   sire: string;
   dam: string;
+  /** Official LoveRacing stud-book page for this horse (fork: fall back to the search page when absent). */
+  studBookUrl?: string;
 }
 
 export interface TrainerDetails {
