@@ -761,6 +761,35 @@ export default function PurchaseFlowModal({
   // back to window.location read for any future CTA that mounts modal without
   // prop — preserves the f6/f6b cancel_url / login redirect pre-fill behavior.
   const [stakePct, setStakePct] = React.useState<number>(minInvestmentPct);
+  // Investor-SA checkout (Task 2): the SA is compiled with the investor's stake.
+  // The modal is a client component, so it re-fetches the stake-specific pack from
+  // the server route; the PDS stays the locked page-level compile (identical hash).
+  const [stakeLegalPack, setStakeLegalPack] = React.useState<LegalPackDigest | null>(null);
+  React.useEffect(() => {
+    let cancelled = false;
+    if (!horseSlug) return;
+    fetch(`/api/legal/pack?slug=${encodeURIComponent(horseSlug)}&stake=${stakePct}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: LegalPackDigest | null) => {
+        if (!cancelled) setStakeLegalPack(data);
+      })
+      .catch(() => {
+        if (!cancelled) setStakeLegalPack(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [horseSlug, stakePct]);
+  // Merged digest: PDS stays locked (page-level), SA is the stake-specific compile.
+  const mergedLegalPack: LegalPackDigest | null = React.useMemo(() => {
+    if (!stakeLegalPack) return legalPack;
+    return {
+      pdsMarkdown: legalPack?.pdsMarkdown ?? stakeLegalPack.pdsMarkdown,
+      saMarkdown: stakeLegalPack.saMarkdown ?? legalPack?.saMarkdown,
+      pdsHash: legalPack?.pdsHash ?? stakeLegalPack.pdsHash,
+      saHash: stakeLegalPack.saHash ?? legalPack?.saHash,
+    };
+  }, [legalPack, stakeLegalPack]);
   React.useEffect(() => {
     const raw =
       typeof initialUnits === 'number' && Number.isFinite(initialUnits)
@@ -797,7 +826,7 @@ export default function PurchaseFlowModal({
           horseName={horseName}
           horseSlug={horseSlug}
           stakePct={stakePct}
-          legalPack={legalPack}
+          legalPack={mergedLegalPack}
           stakeStepPct={stakeStepPct}
           maxInvestmentPct={maxInvestmentPct}
           onBack={() => setStep('terms')}

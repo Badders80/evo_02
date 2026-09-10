@@ -355,57 +355,68 @@ export function getCampaignMedia(slug: string, trainerSlug: string) {
 
 /**
  * Compiles the legal pack dynamically via @evo/legal_engine and computes verified SHA-256 digests.
- * stakePct defaults to 1.0 — the PDS is a locked offer doc compiled at the default;
- * the SA is investor-specific and compiled with the investor's chosen stake.
+ * stakePct defaults to 1.0 — the PDS + term sheet are locked offer docs compiled at the
+ * default (identical for every investor); the SA is investor-specific and compiled with the
+ * investor's chosen stake. The merged pack keeps PDS/TS hashes constant and varies only the SA.
  */
 export function getCompiledLegalPackForCampaign(
   campaign: HorseCampaign,
   stakePct = 1.0
 ): CompiledLegalPack {
-  const pricing = computeDslPricing(campaign.wholesaleMonthlyNzd, stakePct);
-
-  const { pack } = compileLegalPack(
-    {
-      syndicateName: `${campaign.legalName} Syndicate`,
-      campaignSlug: campaign.slug,
-      ownerName: campaign.owner.entity,
-      horse: {
-        legalName: campaign.legalName,
-        barnName: campaign.barnName ?? campaign.legalName,
-        foalingYear: campaign.pedigree.foalingDate ? parseInt(campaign.pedigree.foalingDate.split('-')[0], 10) : 0,
-        foalingDate: campaign.pedigree.foalingDate || undefined,
-        gender: campaign.pedigree.gender as 'Colt' | 'Filly' | 'Gelding' | 'Mare' | 'Horse',
-        breeder: campaign.pedigree.breeder,
-        microchip: campaign.pedigree.microchip,
-        sire: campaign.pedigree.sire,
-        dam: campaign.pedigree.dam,
-      },
-      trainer: {
-        name: campaign.trainer.name,
-        location: campaign.trainer.location,
-        // Manager is Evolution Stables (locked: Evolution is the syndicate manager,
-        // never an owner row). The trainer's stable is NOT the manager.
-        managerEntity: 'Evolution Stables',
-      },
-      pricing,
-      closeStyle: campaign.closeStyle,
-      totalHorsePercentage: campaign.totalSyndicateStakePct,
-      totalShares: Math.round(campaign.totalSyndicateStakePct),
-      sharesAvailable: Math.round(campaign.capTableFixture.availablePct),
-      paymentModel: campaign.paymentModel,
-      termStartDate: campaign.termStartDate,
-      termEndDate: campaign.termEndDate,
-      distributionSplit: campaign.distributionSplit,
-      distributionSchedule: campaign.distributionSchedule,
-      pdsVersion: '1.0.0',
-      saVersion: '1.0.0',
-      effectiveDate: campaign.termStartDate,
-      softLegal: campaign.softLegal,
-      marketing: campaign.marketing,
-      listingPlatform: campaign.listingPlatform,
+  const buildContext = (pricing: DslPricing) => ({
+    syndicateName: `${campaign.legalName} Syndicate`,
+    campaignSlug: campaign.slug,
+    ownerName: campaign.owner.entity,
+    horse: {
+      legalName: campaign.legalName,
+      barnName: campaign.barnName ?? campaign.legalName,
+      foalingYear: campaign.pedigree.foalingDate ? parseInt(campaign.pedigree.foalingDate.split('-')[0], 10) : 0,
+      foalingDate: campaign.pedigree.foalingDate || undefined,
+      gender: campaign.pedigree.gender as 'Colt' | 'Filly' | 'Gelding' | 'Mare' | 'Horse',
+      breeder: campaign.pedigree.breeder,
+      microchip: campaign.pedigree.microchip,
+      sire: campaign.pedigree.sire,
+      dam: campaign.pedigree.dam,
     },
-    { skipValidation: true }
-  );
+    trainer: {
+      name: campaign.trainer.name,
+      location: campaign.trainer.location,
+      // Manager is Evolution Stables (locked: Evolution is the syndicate manager,
+      // never an owner row). The trainer's stable is NOT the manager.
+      managerEntity: 'Evolution Stables',
+    },
+    pricing,
+    closeStyle: campaign.closeStyle,
+    totalHorsePercentage: campaign.totalSyndicateStakePct,
+    totalShares: Math.round(campaign.totalSyndicateStakePct),
+    sharesAvailable: Math.round(campaign.capTableFixture.availablePct),
+    paymentModel: campaign.paymentModel,
+    termStartDate: campaign.termStartDate,
+    termEndDate: campaign.termEndDate,
+    distributionSplit: campaign.distributionSplit,
+    distributionSchedule: campaign.distributionSchedule,
+    pdsVersion: '1.0.0',
+    saVersion: '1.0.0',
+    effectiveDate: campaign.termStartDate,
+    softLegal: campaign.softLegal,
+    marketing: campaign.marketing,
+    listingPlatform: campaign.listingPlatform,
+  });
 
-  return pack;
+  // Locked docs (PDS + term sheet) always compile at the default 1.0% — identical for every investor.
+  const lockedPricing = computeDslPricing(campaign.wholesaleMonthlyNzd, 1.0);
+  const { pack: lockedPack } = compileLegalPack(buildContext(lockedPricing), { skipValidation: true });
+
+  // Default stake → the locked pack IS the pack (fast path, 8 existing callers unaffected).
+  if (stakePct === 1.0) return lockedPack;
+
+  // Investor-specific SA: recompile with the investor's stake, keep PDS/TS locked.
+  const saPricing = computeDslPricing(campaign.wholesaleMonthlyNzd, stakePct);
+  const { pack: saPack } = compileLegalPack(buildContext(saPricing), { skipValidation: true });
+
+  return {
+    ...lockedPack,
+    saMarkdown: saPack.saMarkdown,
+    saHash: saPack.saHash,
+  };
 }
