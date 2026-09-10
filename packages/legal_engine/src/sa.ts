@@ -85,9 +85,9 @@ The lease term is fixed at ${termLabel(context)}. All lease terms are counted in
 
 ## Clause 6: Equine Welfare Supremacy
 
-The licensed Trainer and Racing Manager hold **sole, absolute, and unchallengeable discretion** regarding all training regimes, race nominations, trackwork, spelling, and veterinary care.
+The licensed Trainer and Racing Manager hold sole, absolute, and unchallengeable discretion regarding all training regimes, race nominations, trackwork, spelling, and veterinary care.
 
-Neither **${manager}** nor any syndicate member may override veterinary or welfare decisions. The welfare of the thoroughbred is paramount at all times.
+Neither ${manager} nor any syndicate member may override veterinary or welfare decisions. The welfare of the thoroughbred is paramount at all times.
 
 ---
 
@@ -120,7 +120,7 @@ Members pay a monthly keep for the duration of their participation, structured a
 - **Initial payment:** $${p.joinFloatUnitNzd.toFixed(2)} per 1% stake, representing ${FLOAT_DEPOSIT_MONTHS} months security deposit reserve and ${FLOAT_PREPAID_MONTHS} months prepaid keep.
 - **Monthly keep:** $${p.monthlyKeepUnitNzd.toFixed(2)} per month per 1% stake, paid on the first of each month to maintain a constant 5-month float buffer.
 
-The listed rate includes the ${EVOLUTION_MARGIN_PCT.toFixed(1)}% Evolution Stables margin and ${PLATFORM_FEE_PCT.toFixed(1)}% ${PLATFORM_FEE_LABEL}. No separate management invoices or off-platform accounting fees are charged.
+The listed rate includes the ${EVOLUTION_MARGIN_PCT.toFixed(1)}% Evolution Stables margin and ${PLATFORM_FEE_PCT.toFixed(1)}% ${PLATFORM_FEE_LABEL}. No separate management invoices, off-platform accounting fees, or additional capital calls are charged.
 
 ---
 
@@ -138,22 +138,22 @@ Potential Revenue Streams include:
 - Data licensing
 - Breeding or exit proceeds (if applicable, subject to the stated buyout clause)
 
-All distributions are calculated strictly from officially published NZTR / LoveRacing gross stakes earnings and are made ${context.distributionSchedule ? context.distributionSchedule : BLANK}. Insurance proceeds are not payable to lease holders. Distributions are made by direct bank transfer or card refund to the Shareholder's verified payment method within ${REFUND_WINDOW_DAYS} business days of receipt from NZTR or other sources.
+All distributions are calculated strictly from officially published NZTR / LoveRacing gross stakes earnings during each Shareholder's eligible participation period and are made ${context.distributionSchedule ? context.distributionSchedule : BLANK}. Insurance proceeds are not payable to lease holders. Distributions are made by direct bank transfer or card refund to the Shareholder's verified payment method within ${REFUND_WINDOW_DAYS} business days of receipt from NZTR or other sources.
 
 ---
 
 ## Clause 11: Syndicate Management Fee
 
-A **${EVOLUTION_MARGIN_PCT.toFixed(1)}% syndicate management margin** is embedded in the monthly keep rate of **$${p.monthlyKeepUnitNzd.toFixed(2)} per 1% stake**. No separate management invoices or off-platform accounting fees are charged.
+A ${EVOLUTION_MARGIN_PCT.toFixed(1)}% syndicate management margin is embedded in the monthly keep rate of $${p.monthlyKeepUnitNzd.toFixed(2)} per 1% stake. No separate management invoices or off-platform accounting fees are charged.
 
 ---
 
 ## Clause 12: Manager Removal — NZTR Code of Practice Rule 22.1
 
-The removal or replacement of the Syndicate Manager is governed strictly by **NZTR Code of Practice Rule 22.1**.
+The removal or replacement of the Syndicate Manager is governed strictly by NZTR Code of Practice Rule 22.1.
 
 A manager may only be removed by:
-1. A **75% majority vote** of syndicate members; or
+1. A 75% majority vote of syndicate members; or
 2. Intervention by the NZTR Board for cause under the Rules of Racing.
 
 All disputes must first be referred to NZTR for mediation in accordance with the Code of Practice.
@@ -162,7 +162,7 @@ All disputes must first be referred to NZTR for mediation in accordance with the
 
 ## Clause 13: Governing Law & Jurisdiction
 
-This Agreement is governed exclusively by the laws of **New Zealand** and the **NZTR Rules of Racing**. All disputes arising under this Agreement are subject to the jurisdiction of New Zealand courts and NZTR dispute resolution procedures.
+This Agreement is governed exclusively by the laws of New Zealand and the NZTR Rules of Racing. All disputes arising under this Agreement are subject to the jurisdiction of New Zealand courts and NZTR dispute resolution procedures.
 
 There are no foreign arbitration clauses, no Middle Eastern / offshore jurisdiction clauses, and no offshore governing law provisions.
 

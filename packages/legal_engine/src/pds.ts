@@ -65,19 +65,35 @@ function termLabel(context: SyndicateLegalContext): string {
 function keyInformationSummary(context: SyndicateLegalContext): string {
   const p = context.pricing;
   const h = context.horse;
+  const t = context.trainer;
   const soft = canonicalizeSoftLegal(context.softLegal);
 
   const costsBlock =
     context.paymentModel === 'upfront'
       ? `- **Lease fee:** $${(p.monthlyKeepUnitNzd * (context.termMonths ?? 0)).toFixed(2)} per 1% stake (fixed, covers all costs for the term).`
-      : `- **Initial payment:** $${p.joinFloatUnitNzd.toFixed(2)} per 1% stake (${FLOAT_DEPOSIT_MONTHS} months security deposit reserve + ${FLOAT_PREPAID_MONTHS} months prepaid keep).\n- **Monthly keep:** $${p.monthlyKeepUnitNzd.toFixed(2)} per month per 1% stake thereafter, maintaining a ${FLOAT_TOTAL_MONTHS}-month float buffer.`;
+      : `- $${p.monthlyKeepUnitNzd.toFixed(2)} per month per 1% stake, recurring monthly for the duration of the investment.\n- A one-time upfront payment covers the deposit and initial payment.`;
+
+  // Current Available Stake = available units × step (percent), falling back to the
+  // total syndicate stake when availability is unset (fresh campaign, nothing sold).
+  const availablePct =
+    context.sharesAvailable != null && context.stakeStepPct != null
+      ? (context.sharesAvailable * context.stakeStepPct).toFixed(1)
+      : context.totalHorsePercentage != null
+        ? context.totalHorsePercentage.toFixed(1)
+        : BLANK;
+
+  const splitPct = context.distributionSplit
+    ? context.distributionSplit.split('/')[0].trim()
+    : 'a pro-rata share';
 
   const structureBullets = [
-    `- **Leasehold interest in:** ${v(h.legalName)}${h.barnName && h.barnName !== h.legalName ? ` (${h.barnName})` : ''}`,
-    `- **Syndicated leasehold stake:** ${v(context.totalHorsePercentage)}% of the horse's total ownership`,
-    `- **Minimum investment:** ${context.minInvestmentPct != null ? `${context.minInvestmentPct.toFixed(1)}%` : BLANK} (increments of ${context.stakeStepPct != null ? `${context.stakeStepPct.toFixed(1)}%` : BLANK})`,
+    '- **Asset Type:** Leasehold interest in a thoroughbred racehorse',
+    `- **Asset Name:** ${v(h.legalName)}${h.barnName && h.barnName !== h.legalName ? ` (${h.barnName})` : ''}`,
+    `- **Current Available Stake:** ${availablePct}% syndicated share of total ownership`,
+    `- **Minimum Investment:** ${context.minInvestmentPct != null ? `${context.minInvestmentPct.toFixed(1)}%` : BLANK}`,
     context.termMonths != null ? `- **Term:** ${termLabel(context)}` : `- **Term:** ${BLANK}`,
-    '- **Fully managed by:** Evolution Stables (NZTR Authorised Syndicator)',
+    `- **Managed by:** ${v(t.managerEntity)} (Authorised Syndicator)`,
+    '- **Governing Authority:** New Zealand Thoroughbred Racing (NZTR)',
   ].join('\n');
 
   const expectation = soft.raceExpectation
@@ -96,15 +112,15 @@ Individuals seeking exposure to racehorse ownership in a structured, managed for
 
 **How does it work?**
 
-You lease a share of the syndicated leasehold interest in ${v(h.legalName)}. Your payments cover the costs of the lease for the term. You receive ${context.distributionSplit ? context.distributionSplit.split('/')[0].trim() + ' of' : 'a pro-rata share of'} any revenue generated from racing, proportional to your interest.
+You invest in a share of the syndicated leasehold interest in ${v(h.legalName)}. Your fixed-price payments cover the costs of the lease for the term, with no additional capital calls. Your returns are linked directly to the performance of the asset, where you receive ${splitPct} of gross stakes, generated from racing, proportional to your interest.
 
-**Structure**
+**About the Asset**
 
 ${structureBullets}
 
 **Returns**
 
-Investors receive a fixed share of gross stakes won — ${context.distributionSplit ? context.distributionSplit.split('/')[0].trim() + ' of' : 'a pro-rata share of'} total stakes, distributed quarterly. There are no guarantees, and you may not recover your original investment.
+Investors receive ${splitPct} of gross stakes won during their eligible investment period. There are no guarantees, and you may not recover your original investment.
 
 **Costs**
 
@@ -303,14 +319,14 @@ Upon formal termination or maturity of the syndicate lease, all unused prepaid k
   const distributionSchedule = context.distributionSchedule;
   let splitSection: string;
   if (distributionSplit) {
-    splitSection = `Investors receive a distribution calculated strictly from **official New Zealand Thoroughbred Racing (NZTR) gross stakes** won during their eligible participation period:
+    splitSection = `Investors receive a distribution calculated strictly from official New Zealand Thoroughbred Racing (NZTR) gross stakes won during their eligible participation period:
 
 - **Stakes Calculation:** Based on official NZTR stakes distributions published via loveracing.nz.
 - **Stakes Allocation:** ${distributionSplit} of total gross stakes won is allocated to the Investor Pool (distributed pro-rata relative to stake held).
 - **Distribution Schedule:** ${distributionSchedule ? distributionSchedule : BLANK}.
 - **Qualification Period:** Investors must have maintained fully paid-up status for two (${QUALIFICATION_PAID_UP_MONTHS}) full months prior to a race date to qualify for prize money distributions from that race.`;
   } else {
-    splitSection = `Investors receive a distribution calculated strictly from **official New Zealand Thoroughbred Racing (NZTR) gross stakes** won during their eligible participation period:
+    splitSection = `Investors receive a distribution calculated strictly from official New Zealand Thoroughbred Racing (NZTR) gross stakes won during their eligible participation period:
 
 - **Stakes Calculation:** Based on official NZTR stakes distributions published via loveracing.nz.
 - **Stakes Allocation:** ${BLANK} of total gross stakes won is allocated to the Investor Pool (distributed pro-rata relative to stake held).
@@ -365,7 +381,7 @@ ${aboutEvolutionStables()}
 
 ## §1. Title & Structure
 
-This Product Disclosure Statement relates to the **${v(context.syndicateName)}**, a digitally-syndicated thoroughbred ownership campaign managed by **${v(t.managerEntity)}**, a registered Syndicate Manager under the New Zealand Thoroughbred Racing (NZTR) Rules of Racing and Syndication Code of Practice.
+This Product Disclosure Statement relates to the ${v(context.syndicateName)}, a digitally-syndicated thoroughbred ownership campaign managed by ${v(t.managerEntity)}, a registered Syndicate Manager under the New Zealand Thoroughbred Racing (NZTR) Rules of Racing and Syndication Code of Practice.
 
 Participation is offered in the form of fractional leasehold stakes. Each stake is a percentage interest in the syndicated leasehold of the thoroughbred described in §2, from a minimum investment of ${minInvestment}, with increments of ${stakeStep} thereafter.
 
