@@ -73,7 +73,7 @@ console.log('Running Mission Control Cap Table & Investor Registry integration t
  assert.equal(capHotta.totalCampaignShares, 20);
  assert.equal(capHotta.isBalanced, true, 'Hottathanafantasy listed pool must be balanced: 20 + 0 + 0 == 20');
 
- // Manolo (5% campaign, 0.5% step = 10 units coming soon)
+ // Manolo (5% campaign, 0.5% step = 10 units, DSL-listed)
  const manoloAllocated = getCampaignAllocatedShares('i-stole-a-manolo');
  const capManolo = computeHorseCapTable(10, manoloAllocated, 0);
  assert.equal(capManolo.allocatedShares, 0);

@@ -41,13 +41,7 @@ const HORSES_IN_STABLE: HorseCapState[] = [
  totalCampaignShares: 5,
  reservedShares: 0,
  },
- {
- slug: 'i-stole-a-manolo',
- name: 'I Stole A Manolo',
- totalCampaignShares: 5,
- reservedShares: 0,
- },
-];
+ ];
 
 export function CapTableView() {
  const [activeTab, setActiveTab] = useState<string>('nellie');
