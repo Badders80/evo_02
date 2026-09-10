@@ -228,8 +228,10 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
                   termEndDate={campaign.termEndDate}
                   distributionSplit={campaign.distributionSplit}
                   legalPack={{
+                    termSheetMarkdown: legalPack.termSheetMarkdown,
                     pdsMarkdown: legalPack.pdsMarkdown,
                     saMarkdown: legalPack.saMarkdown,
+                    termSheetHash: legalPack.termSheetHash,
                     pdsHash: legalPack.pdsHash,
                     saHash: legalPack.saHash,
                   }}

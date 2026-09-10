@@ -61,8 +61,10 @@ export async function GET(request: Request) {
 
   const pack = getCompiledLegalPackForCampaign(campaign, stake, execution);
   return NextResponse.json({
+    termSheetMarkdown: pack.termSheetMarkdown,
     pdsMarkdown: pack.pdsMarkdown,
     saMarkdown: pack.saMarkdown,
+    termSheetHash: pack.termSheetHash,
     pdsHash: pack.pdsHash,
     saHash: pack.saHash,
   });

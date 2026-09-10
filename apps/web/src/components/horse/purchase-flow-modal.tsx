@@ -25,8 +25,10 @@ import type { DslPricing } from '@evo/legal_engine';
 import { WhitePillCTA } from '@evo/ui';
 
 export interface LegalPackDigest {
+  termSheetMarkdown?: string;
   pdsMarkdown?: string;
   saMarkdown?: string;
+  termSheetHash?: string;
   pdsHash?: string;
   saHash?: string;
 }
@@ -113,6 +115,7 @@ function ModalShell({ children, onClose }: { children: React.ReactNode; onClose:
 /** Step 2 — The Term Sheet (mockup lines 170–268). Stake is lifted to the modal host. */
 function Step2TermSheet({
   horseName,
+  horseSlug,
   wholesaleMonthlyNzd,
   minInvestmentPct = 1.0,
   maxInvestmentPct = 10.0,
@@ -122,9 +125,12 @@ function Step2TermSheet({
   termStartDate,
   termEndDate,
   distributionSplit,
+  termSheetMarkdown,
+  termSheetHash,
   onProceed,
 }: {
   horseName: string;
+  horseSlug: string;
   wholesaleMonthlyNzd?: number;
   minInvestmentPct?: number;
   maxInvestmentPct?: number;
@@ -134,6 +140,9 @@ function Step2TermSheet({
   termStartDate?: string;
   termEndDate?: string;
   distributionSplit?: string;
+  /** Generated DSL term sheet (compileLegalPack output) — replaces the static mockup. */
+  termSheetMarkdown?: string;
+  termSheetHash?: string;
   onProceed: () => void;
 }) {
   const [note, setNote] = React.useState<string | null>(null);
@@ -376,29 +385,58 @@ function Step2TermSheet({
         </div>
       </div>
 
-      {/* Prize distribution explained */}
-      <div className="space-y-2">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-          Prize distribution explained
-        </p>
-        <p className="text-[11px] font-light text-muted-foreground/60 leading-relaxed">
-          Prize money is pro-rata based on your ownership in Evolution&apos;s syndicate stake,
-          calculated according to official NZTR results and distributed quarterly after settlement.{' '}
-          <a href="#" className="text-muted underline underline-offset-2">
-            Learn more about how prize money is distributed
-          </a>
-        </p>
-      </div>
+      {/* Generated DSL term sheet (compileLegalPack output — replaces the static mockup).
+          Rendered verbatim from the same bytes the acceptance gate hashes. */}
+      {termSheetMarkdown ? (
+        <div className="space-y-2">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+            Term sheet
+            {termSheetHash && (
+              <span className="ml-2 font-mono normal-case tracking-normal text-muted-foreground/60">
+                sha256: {termSheetHash.slice(0, 4)}…{termSheetHash.slice(-4)}
+              </span>
+            )}
+          </p>
+          <div className="rounded-xl border border-border bg-canvas/60 h-44 overflow-y-auto p-4">
+            <p className="text-[11px] font-light leading-relaxed text-foreground/80 whitespace-pre-line select-text">
+              {termSheetMarkdown}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+            Prize distribution explained
+          </p>
+          <p className="text-[11px] font-light text-muted-foreground/60 leading-relaxed">
+            Prize money is pro-rata based on your ownership in Evolution&apos;s syndicate stake,
+            calculated according to official NZTR results and distributed quarterly after settlement.{' '}
+            <a href="#" className="text-muted underline underline-offset-2">
+              Learn more about how prize money is distributed
+            </a>
+          </p>
+        </div>
+      )}
 
       {/* CTA → Step 3 */}
       <WhitePillCTA onClick={onProceed}>Invest in {horseName}</WhitePillCTA>
       <p className="text-[11px] font-light text-muted-foreground leading-relaxed text-center">
         Subject to{' '}
-        <a href="#" className="text-muted underline underline-offset-2 hover:text-heading transition-colors">
+        <a
+          href={`/api/legal/download?slug=${encodeURIComponent(horseSlug)}&doc=pds`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-muted underline underline-offset-2 hover:text-heading transition-colors"
+        >
           Product Disclosure Statement
         </a>{' '}
         and{' '}
-        <a href="#" className="text-muted underline underline-offset-2 hover:text-heading transition-colors">
+        <a
+          href={`/api/legal/download?slug=${encodeURIComponent(horseSlug)}&doc=sa`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-muted underline underline-offset-2 hover:text-heading transition-colors"
+        >
           Syndicate Agreement
         </a>
         .
@@ -787,8 +825,10 @@ export default function PurchaseFlowModal({
   const mergedLegalPack: LegalPackDigest | null = React.useMemo(() => {
     if (!stakeLegalPack) return legalPack;
     return {
+      termSheetMarkdown: legalPack?.termSheetMarkdown ?? stakeLegalPack.termSheetMarkdown,
       pdsMarkdown: legalPack?.pdsMarkdown ?? stakeLegalPack.pdsMarkdown,
       saMarkdown: stakeLegalPack.saMarkdown ?? legalPack?.saMarkdown,
+      termSheetHash: legalPack?.termSheetHash ?? stakeLegalPack.termSheetHash,
       pdsHash: legalPack?.pdsHash ?? stakeLegalPack.pdsHash,
       saHash: stakeLegalPack.saHash ?? legalPack?.saHash,
     };
@@ -813,6 +853,7 @@ export default function PurchaseFlowModal({
       {step === 'terms' ? (
         <Step2TermSheet
           horseName={horseName}
+          horseSlug={horseSlug}
           wholesaleMonthlyNzd={wholesaleMonthlyNzd}
           minInvestmentPct={minInvestmentPct}
           maxInvestmentPct={maxInvestmentPct}
@@ -822,6 +863,8 @@ export default function PurchaseFlowModal({
           termStartDate={termStartDate}
           termEndDate={termEndDate}
           distributionSplit={distributionSplit}
+          termSheetMarkdown={mergedLegalPack?.termSheetMarkdown}
+          termSheetHash={mergedLegalPack?.termSheetHash}
           onProceed={() => setStep('accept')}
         />
       ) : (
