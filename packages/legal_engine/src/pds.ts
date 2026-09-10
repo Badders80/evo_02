@@ -24,7 +24,6 @@ import {
   FLOAT_PREPAID_MONTHS,
   FLOAT_TOTAL_MONTHS,
   QUALIFICATION_PAID_UP_MONTHS,
-  REFUND_WINDOW_DAYS,
 } from './commercial-rules';
 
 /** Coerce a value to its display string, or the blank marker when absent. */
@@ -173,16 +172,16 @@ Evolution Stables Ltd receives a ${EVOLUTION_MARGIN_PCT.toFixed(1)}% margin inco
 
 Participation in racehorse syndication is highly speculative and carries significant risks.
 
-- **Performance Risk:** The horse may not perform well, may not win prize money, and may not generate any revenue.
-- **Health Risk:** The horse may suffer injury, illness, or death, preventing it from racing.
-- **Liquidity Risk:** Your interest is a fixed-term leasehold. There is no guarantee of an active secondary market or that you will be able to sell your interest before the term ends.
-- **Capital Loss:** You may lose the entirety of your initial investment.`;
+12.1. **Performance Risk:** The horse may not perform well, may not win prize money, and may not generate any revenue.
+12.2. **Health Risk:** The horse may suffer injury, illness, or death, preventing it from racing.
+12.3. **Liquidity Risk:** Your interest is a fixed-term leasehold. There is no guarantee of an active secondary market or that you will be able to sell your interest before the term ends.
+12.4. **Capital Loss:** You may lose the entirety of your initial investment.`;
 
   const investmentDetails = `I hereby apply for the following interest in the ${v(context.syndicateName)}:
 
-- **Stake Percentage:** ${BLANK}%
-- **Initial Payment:** $${p.joinFloatUnitNzd.toFixed(2)} per 1% stake
-- **Monthly Commitment:** $${p.monthlyKeepUnitNzd.toFixed(2)} per month per 1% stake`;
+17.1. **Stake Percentage:** ${BLANK}
+17.2. **Initial Payment:** $${p.joinFloatUnitNzd.toFixed(2)} per 1% stake
+17.3. **Monthly Commitment:** $${p.monthlyKeepUnitNzd.toFixed(2)} per month per 1% stake`;
 
   const investorDeclaration = `By signing this Application Form, on ${BLANK} I acknowledge and agree that:
 
@@ -300,16 +299,16 @@ export function generatePdsMarkdown(context: SyndicateLegalContext): string {
 
 There are no recurring monthly subscription fees or capital calls.
 
-Upon formal termination or maturity of the syndicate lease, any unused prepaid keep is **refunded pro-rata** to the investor’s verified payment method within ${REFUND_WINDOW_DAYS} business days.`;
+Upon formal termination or maturity of the syndicate lease, any unused prepaid keep is refunded pro-rata to the investor’s verified payment method.`;
   } else if (paymentModel === 'subscription_float') {
-    floatSection = `The digitally syndicated campaign operates on a **five-month initial investment** upon participation, with recurring monthly payments due on the 1st of every month thereafter.
+    floatSection = `The digitally syndicated campaign operates on a five-month initial investment upon participation, with recurring monthly payments due on the 1st of every month thereafter.
 
 The five-month initial investment follows a 3+2 structure outlined below:
 
 - ${FLOAT_DEPOSIT_MONTHS} months security deposit reserve; and
 - ${FLOAT_PREPAID_MONTHS} months keep (comprising the initial installment and 1 month in advance).
 
-Upon formal termination or maturity of the syndicate lease, all unused prepaid keep and security deposit reserve funds are **refunded pro-rata** to the investor's verified payment method within ${REFUND_WINDOW_DAYS} business days.`;
+Upon formal termination or maturity of the syndicate lease, all unused prepaid keep and security deposit reserve funds are refunded pro-rata to the investor's verified payment method.`;
   } else {
     floatSection = `**Payment Model:** ${BLANK}
 
@@ -323,17 +322,17 @@ Upon formal termination or maturity of the syndicate lease, all unused prepaid k
   if (distributionSplit) {
     splitSection = `Investors receive a distribution calculated strictly from official New Zealand Thoroughbred Racing (NZTR) gross stakes won during their eligible participation period:
 
-- **Stakes Calculation:** Based on official NZTR stakes distributions published via loveracing.nz.
-- **Stakes Allocation:** ${distributionSplit} of total gross stakes won is allocated to the Investor Pool (distributed pro-rata relative to stake held).
-- **Distribution Schedule:** ${distributionSchedule ? distributionSchedule : BLANK}.
-- **Qualification Period:** Investors must have maintained fully paid-up status for two (${QUALIFICATION_PAID_UP_MONTHS}) full months prior to a race date to qualify for prize money distributions from that race.`;
+5.1. **Stakes Calculation:** Based on official NZTR stakes distributions published via loveracing.nz.
+5.2. **Stakes Allocation:** ${distributionSplit} of total gross stakes won is allocated to the Investor Pool (distributed pro-rata relative to stake held).
+5.3. **Distribution Schedule:** ${distributionSchedule ? distributionSchedule : BLANK}.
+5.4. **Qualification Period:** Investors must have maintained fully paid-up status for two (${QUALIFICATION_PAID_UP_MONTHS}) full months prior to a race date to qualify for prize money distributions from that race.`;
   } else {
     splitSection = `Investors receive a distribution calculated strictly from official New Zealand Thoroughbred Racing (NZTR) gross stakes won during their eligible participation period:
 
-- **Stakes Calculation:** Based on official NZTR stakes distributions published via loveracing.nz.
-- **Stakes Allocation:** ${BLANK} of total gross stakes won is allocated to the Investor Pool (distributed pro-rata relative to stake held).
-- **Distribution Schedule:** ${BLANK}.
-- **Qualification Period:** Investors must have maintained fully paid-up status for two (${QUALIFICATION_PAID_UP_MONTHS}) full months prior to a race date to qualify for prize money distributions from that race.`;
+5.1. **Stakes Calculation:** Based on official NZTR stakes distributions published via loveracing.nz.
+5.2. **Stakes Allocation:** ${BLANK} of total gross stakes won is allocated to the Investor Pool (distributed pro-rata relative to stake held).
+5.3. **Distribution Schedule:** ${BLANK}.
+5.4. **Qualification Period:** Investors must have maintained fully paid-up status for two (${QUALIFICATION_PAID_UP_MONTHS}) full months prior to a race date to qualify for prize money distributions from that race.`;
   }
 
   // §6 exit & termination: close-style-driven, blank when unset.

@@ -97,11 +97,11 @@ The Manager (${manager}) is responsible for overall lease administration and NZT
 
 The Manager may:
 
-7.1. Make all day-to-day decisions relating to racing, training, spelling, and horse welfare.
-7.2. Appoint or change trainers in consultation with the horse's owner or Racing Manager.
-7.3. Deduct and retain management and platform fees as disclosed in the Product Disclosure Statement.
-7.4. Delegate operational duties to licensed parties (e.g., trainers, racing managers) as required.
-7.5. Provide regular reports and updates when the horse is in training or racing.
+- 7.1. Make all day-to-day decisions relating to racing, training, spelling, and horse welfare.
+- 7.2. Appoint or change trainers in consultation with the horse's owner or Racing Manager.
+- 7.3. Deduct and retain management and platform fees as disclosed in the Product Disclosure Statement.
+- 7.4. Delegate operational duties to licensed parties (e.g., trainers, racing managers) as required.
+- 7.5. Provide regular reports and updates when the horse is in training or racing.
 
 ---
 
