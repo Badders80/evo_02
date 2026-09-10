@@ -119,7 +119,7 @@ export function NavBar() {
 
   return (
     <nav
-      className={`fixed inset-x-0 top-0 z-[9999] w-full transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+      className={`fixed inset-x-0 top-0 z-[9999] w-full transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] ${
         isSolid
           ? 'bg-canvas/80 text-heading'
           : 'bg-canvas/40 text-heading'

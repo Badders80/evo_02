@@ -9,6 +9,8 @@ import {
   resolveLegalHashes,
   pricingForUnits,
   stakePctToStepUnits,
+  isWorkflowPreview,
+  PREVIEW_USER_EMAIL,
 } from '@/lib/nellie-loop';
 import { buildSubscriptionCheckoutParams } from '@/lib/stripe-subscription';
 
@@ -38,7 +40,8 @@ export async function POST(request: Request) {
       data: { user },
     } = await supabase.auth.getUser();
     const userId = requireUserId(user);
-    const userEmail = user?.email;
+    // Review-branch preview: fall back to the test investor's email.
+    const userEmail = user?.email ?? (isWorkflowPreview() ? PREVIEW_USER_EMAIL : null);
     if (!userEmail) {
       return NextResponse.json({ error: 'Authenticated user is missing an email' }, { status: 401 });
     }

@@ -58,7 +58,7 @@ function SweepText({ children }: { children: React.ReactNode }) {
   return (
     <span className="relative inline-block">
       {children}
-      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-black/70 to-transparent -translate-x-full opacity-0 group-hover:translate-x-full group-hover:opacity-100 group-hover:transition-all group-hover:duration-700 group-hover:ease-in-out transition-none" />
+      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-black/70 to-transparent -translate-x-full opacity-0 group-hover:translate-x-full group-hover:opacity-100 group-hover:transition-all group-hover:duration-400 group-hover:ease-in-out transition-none" />
     </span>
   );
 }
@@ -162,7 +162,7 @@ export default function DesignLabPage() {
             {howItWorksCards.map((card) => (
               <div
                 key={card.title}
-                className="group relative border border-border rounded-xl flex flex-col cursor-pointer transition-all duration-500 hover:border-steel-border hover:scale-[1.02] h-[340px]"
+                className="group relative border border-border rounded-xl flex flex-col cursor-pointer transition-all duration-400 hover:border-steel-border hover:scale-[1.02] h-[340px]"
                 style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}
               >
                 <div className="p-6 border-b border-border h-[112px] flex flex-col justify-center" style={{ backgroundColor: 'rgba(255,255,255,0.015)' }}>
@@ -204,9 +204,9 @@ export default function DesignLabPage() {
               { t: 'Fractional entry, real ownership', d: 'Clean lot fractions with cap-table entries — not points, not promises.' },
               { t: 'Transparent economics', d: 'Fees, prize split and monthly costs visible before you commit.' },
             ].map((b) => (
-              <div key={b.t} className="group py-2 transition-transform duration-500 hover:scale-[1.05] cursor-pointer">
+              <div key={b.t} className="group py-2 transition-transform duration-400 hover:scale-[1.05] cursor-pointer">
                 <div className="flex items-center gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center transition-all duration-500 group-hover:[filter:brightness(0)_saturate(100%)_invert(100%)]" style={{ filter: 'brightness(0) saturate(100%) invert(80%)' }}>
+                  <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center transition-all duration-400 group-hover:[filter:brightness(0)_saturate(100%)_invert(100%)]" style={{ filter: 'brightness(0) saturate(100%) invert(80%)' }}>
                     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9M12 3l1.9 5.8a2 2 0 001.3 1.3L21 12l-5.8 1.9a2 2 0 00-1.3 1.3L12 21l-1.9-5.8a2 2 0 00-1.3-1.3L3 12l5.8-1.9a2 2 0 001.3-1.3L12 3z" />
                     </svg>
@@ -215,7 +215,7 @@ export default function DesignLabPage() {
                     <h4 className="text-[14px] font-[300] tracking-[0.05em] uppercase text-heading mb-3 relative overflow-hidden">
                       <SweepText>{b.t}</SweepText>
                     </h4>
-                    <p className="text-[15px] leading-[1.6] font-light text-muted-foreground group-hover:text-frost transition-colors duration-500">{b.d}</p>
+                    <p className="text-[15px] leading-[1.6] font-light text-muted-foreground group-hover:text-frost transition-colors duration-400">{b.d}</p>
                   </div>
                 </div>
               </div>

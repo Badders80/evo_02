@@ -34,6 +34,8 @@ export function stepUnitsToStakePct(stepUnits: number, stepPct: number = SHARE_M
 }
 
 export function requireUserId(user: { id?: string | null } | null | undefined): string {
+  // Review-branch preview: treat the session as the test investor.
+  if (isWorkflowPreview()) return PREVIEW_USER_ID;
   if (!user?.id) {
     throw new HttpError(401, 'UNAUTHENTICATED', 'Authentication required');
   }
@@ -77,6 +79,14 @@ export function interpretReserveResult(
  * Remove with the review branch. */
 export function isWorkflowPreview(env: NodeJS.Dict<string> = process.env): boolean {
   return env.WORKFLOW_PREVIEW === 'true' || env.NEXT_PUBLIC_WORKFLOW_PREVIEW === 'true';
+}
+
+/** Preview-mode test investor (local Supabase seed). Branch-only, never prod. */
+export const PREVIEW_USER_ID = '4375543a-a629-4dd9-90ff-e8a0ab6d2a37';
+export const PREVIEW_USER_EMAIL = 'test.investor@evolutionstables.nz';
+
+export function previewUser(): { id: string; email: string } | null {
+  return isWorkflowPreview() ? { id: PREVIEW_USER_ID, email: PREVIEW_USER_EMAIL } : null;
 }
 
 export function purchasesAreEnabled(env: NodeJS.Dict<string> = process.env): boolean {

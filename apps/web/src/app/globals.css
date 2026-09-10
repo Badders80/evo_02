@@ -31,6 +31,12 @@
   --color-frost: #c9d3ee;
   --color-pure-white: #ffffff;
 
+  /* ---- Grayscale ramp (G008 T10) — additive, dormant until consumed ---- */
+  --color-hairline: #050505;
+  --color-smoke: #454545;
+  --color-ash: #575757;
+  --color-stage-black: #000000;
+
   /* ---- Accent: single source of truth for gold ---- */
   --color-accent: #d4a964;
   --color-accent-hover: #c49a5a;
@@ -155,6 +161,16 @@
     --color-accent-hover: #96691f;
     --color-pure-white: #0b0d10;
     --color-heading: #0c0e12;
+
+    /* ---- Light-desk tokens (G008 T10) — dormant arsenal, NOT activated on any route.
+       Light canvas / ink / borders for a future light console. No wrapper changes. ---- */
+    --color-light-canvas: #f7f7f5;
+    --color-light-ink: #0b0d12;
+    --color-light-ink-soft: #3f3f46;
+    --color-light-border: #e4e4e7;
+    --color-light-border-strong: #d4d4d8;
+    --color-light-surface: #ffffff;
+    --color-light-surface-alt: #f0f0ee;
   }
 
   * {
@@ -172,6 +188,13 @@
     background-color 300ms ease,
     color 300ms ease,
     border-color 300ms ease;
+}
+
+/* Reduced-motion: kill the theme transition entirely (G008 T10 motion pass) */
+@media (prefers-reduced-motion: reduce) {
+  [data-theme] {
+    transition: none;
+  }
 }
 
 html.dark body,

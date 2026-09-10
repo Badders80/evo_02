@@ -73,16 +73,15 @@ function StatusBadge({ status }: { status: ListingStatus }) {
   );
 }
 
-export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) {
+export function MarketplaceListingGrid({ cards, preview = false }: { cards: MarketplaceCard[]; preview?: boolean }) {
   const [filter, setFilter] = useState<FilterKey>('all');
   const router = useRouter();
   // Founder-locked 2026-09-07: coming-soon cards open the placeholder CTA modal
   // (future purchase-workflow host) instead of navigating. Other statuses navigate.
   const [ctaHorse, setCtaHorse] = useState<{ name: string; slug: string } | null>(null);
-  // Review-branch preview (NEXT_PUBLIC_WORKFLOW_PREVIEW=true): coming-soon cards
-  // navigate to the detail page (CTA card renders there). Never set in prod.
-  const preview =
-    typeof process !== 'undefined' && process.env.NEXT_PUBLIC_WORKFLOW_PREVIEW === 'true';
+  // Review-branch preview (NEXT_PUBLIC_WORKFLOW_PREVIEW=true) arrives as a prop
+  // from the server component — never read env here (hydration mismatch class).
+  // Never set in prod.
 
   const openCard = (card: MarketplaceCard) => {
     if (card.status === 'coming_soon' && !preview)
@@ -133,7 +132,7 @@ export function MarketplaceListingGrid({ cards }: { cards: MarketplaceCard[] }) 
           return (
             <article
               key={card.slug}
-              className={`group flex cursor-pointer flex-col items-stretch gap-6 rounded-3xl border border-border bg-card/60 p-5 backdrop-blur-md transition-colors duration-700 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.45)] md:flex-row md:gap-8 md:p-6 ${
+              className={`group flex cursor-pointer flex-col items-stretch gap-6 rounded-3xl border border-border bg-card/60 p-5 backdrop-blur-md transition-colors duration-400 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.45)] md:flex-row md:gap-8 md:p-6 ${
                 isFeatured ? 'md:gap-12 md:p-8' : ''
               }`}
               onClick={() => openCard(card)}

@@ -30,7 +30,7 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
 
-  if (request.nextUrl.pathname.startsWith('/mystable') && !user) {
+  if (request.nextUrl.pathname.startsWith('/mystable') && !user && process.env.WORKFLOW_PREVIEW !== 'true') {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = '/auth/login';
     redirectUrl.search = '';

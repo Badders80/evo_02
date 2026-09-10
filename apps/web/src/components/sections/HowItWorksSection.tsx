@@ -132,7 +132,7 @@ export function HowItWorksSection() {
           {cards.map((card, index) => (
             <div
               key={index}
-              className="group relative border border-border rounded-xl flex flex-col cursor-pointer transition-all duration-500 hover:border-steel-border hover:scale-[1.02] h-auto lg:h-[340px]"
+              className="group relative border border-border rounded-xl flex flex-col cursor-pointer transition-all duration-400 hover:border-steel-border hover:scale-[1.02] h-auto lg:h-[340px]"
               style={{ backgroundColor: "rgba(255,255,255,0.02)" }}
             >
               {/* Top — header (fixed height, lighter tone) */}
@@ -146,7 +146,7 @@ export function HowItWorksSection() {
                       <span className="relative inline-block">
                         {card.subtitle}
                         {/* Text sweep on hover */}
-                        <span className="absolute inset-0 bg-gradient-to-r from-transparent via-black/70 to-transparent -translate-x-full opacity-0 group-hover:translate-x-full group-hover:opacity-100 group-hover:transition-all group-hover:duration-700 group-hover:ease-in-out transition-none" />
+                        <span className="absolute inset-0 bg-gradient-to-r from-transparent via-black/70 to-transparent -translate-x-full opacity-0 group-hover:translate-x-full group-hover:opacity-100 group-hover:transition-all group-hover:duration-400 group-hover:ease-in-out transition-none" />
                       </span>
                     </p>
                   </div>
@@ -161,7 +161,7 @@ export function HowItWorksSection() {
 
               {/* Bottom — description (darker tone) */}
               <div className="p-6 relative overflow-hidden lg:flex-1 bg-canvas/40">
-                <p className="text-[14px] leading-[1.8] font-light text-muted-foreground group-hover:text-frost transition-colors duration-500">
+                <p className="text-[14px] leading-[1.8] font-light text-muted-foreground group-hover:text-[#b9b3a9] transition-colors duration-400">
                   {card.description}
                 </p>
                 {/* Fade overlay at bottom — only on desktop fixed height */}

@@ -21,6 +21,9 @@ export const metadata: Metadata = {
 
 export default async function MarketplacePage() {
   const campaigns = await getAllCampaigns();
+  // Single source of truth for preview: server env read here means server HTML
+  // and client hydration always agree (never read env in the Client Component).
+  const preview = process.env.NEXT_PUBLIC_WORKFLOW_PREVIEW === 'true';
   const cards: MarketplaceCard[] = campaigns.map((campaign) => {
     const media = getCampaignMedia(campaign.slug, campaign.trainer.slug);
     return {
@@ -40,8 +43,10 @@ export default async function MarketplacePage() {
           <p className="text-[11px] font-light uppercase tracking-[0.2em] text-muted-foreground">
             Evolution Stables
           </p>
-          <h1 className="mt-4 text-[36px] font-light tracking-tight text-heading md:text-[48px] leading-[1.05]">
-            Ownership, evolved.
+          <h1 className="mt-4 text-[36px] font-light tracking-[-0.04em] text-heading md:text-[64px] leading-[1.05]">
+            Ownership,
+            <br />
+            evolved.
           </h1>
           <p className="mt-4 max-w-2xl text-[15px] font-light leading-[1.7] text-muted-foreground">
             Browse active offerings, coming-soon offerings, and completed track record. For a deeper
@@ -56,7 +61,7 @@ export default async function MarketplacePage() {
           </p>
         </div>
         <div className="mt-16">
-          <MarketplaceListingGrid cards={cards} />
+          <MarketplaceListingGrid cards={cards} preview={preview} />
         </div>
         <OwnershipFAQSection />
       </main>

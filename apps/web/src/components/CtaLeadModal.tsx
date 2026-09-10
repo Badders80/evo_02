@@ -210,7 +210,7 @@ export function CtaLeadModal({ forceInstant = false }: CtaLeadModalProps) {
             <div className="mx-auto mt-0 w-full max-w-[620px]">
               <form onSubmit={handleSubmit} className="group relative">
                 <div className="relative flex w-full flex-col items-stretch gap-2 transition-all duration-500 md:flex-row md:items-center md:gap-0 md:overflow-hidden md:rounded-full md:border md:border-border md:bg-surface-base/80 md:p-1.5 group-focus-within:border-white/40 group-focus-within:shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-                  <div className="pointer-events-none absolute inset-0 opacity-20 mix-blend-overlay transition-opacity duration-700 group-hover:opacity-40 group-focus-within:opacity-40">
+                  <div className="pointer-events-none absolute inset-0 opacity-20 mix-blend-overlay transition-opacity duration-400 group-hover:opacity-40 group-focus-within:opacity-40">
                     <div className="h-full w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-white/30 to-transparent blur-xl animate-border-shimmer" />
                   </div>
                   <input

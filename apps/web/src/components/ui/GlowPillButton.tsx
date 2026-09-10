@@ -21,12 +21,12 @@ export const GlowPillButton = React.forwardRef<
       {/* Subtle breathing glow */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-[2px] rounded-full bg-gradient-to-r from-white/5 via-white/10 to-white/5 blur-md opacity-0 transition-opacity duration-500 group-hover:opacity-60"
+        className="pointer-events-none absolute -inset-[2px] rounded-full bg-gradient-to-r from-white/5 via-white/10 to-white/5 blur-md opacity-0 transition-opacity duration-400 group-hover:opacity-60"
       />
       {/* Gold accent line */}
       <div
         aria-hidden
-        className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 h-[1px] w-0 bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 blur-[2px] transition-all duration-500 ease-out group-hover:w-full group-hover:opacity-100"
+        className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 h-[1px] w-0 bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 blur-[2px] transition-all duration-400 ease-out group-hover:w-full group-hover:opacity-100"
       />
       <button
         ref={ref}

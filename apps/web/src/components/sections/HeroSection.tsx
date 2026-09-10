@@ -25,6 +25,13 @@ export function HeroSection({
   useEffect(() => {
     if (!sectionRef.current || !bgRef.current || !contentRef.current) return;
 
+    // NS-6 / G008 T10: honour prefers-reduced-motion — skip the parallax tween
+    // entirely so reduced-motion users get a static hero (no drift, no fade).
+    const reduceMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
+
     const ctx = gsap.context(() => {
       // Background parallax — drifts down slightly as you scroll
       gsap.to(bgRef.current, {

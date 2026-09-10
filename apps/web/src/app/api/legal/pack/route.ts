@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCampaignBySlug, getCompiledLegalPackForCampaign } from '@/lib/horses-data';
 import { createClient } from '@/lib/supabase-server';
+import { isWorkflowPreview, previewUser } from '@/lib/nellie-loop';
 
 /**
  * Stake-specific legal pack (investor-SA checkout, Task 2 + Task 4).
@@ -31,17 +32,20 @@ export async function GET(request: Request) {
   }
 
   // Task 4: fill the SA Execution block only for an authenticated investor.
+  // Review-branch preview: the test investor stands in for the session.
   let execution: { investorName?: string; executionDate?: string } | undefined;
   try {
     const supabase = await createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (user) {
+    const preview = isWorkflowPreview() ? previewUser() : null;
+    const effectiveUser = user ?? preview;
+    if (effectiveUser) {
       const { data: profile } = await supabase
         .from('profiles')
         .select('full_name')
-        .eq('id', user.id)
+        .eq('id', effectiveUser.id)
         .maybeSingle();
       const fullName =
         profile && typeof profile === 'object' && 'full_name' in profile

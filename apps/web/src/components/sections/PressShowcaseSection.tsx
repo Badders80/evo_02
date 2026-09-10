@@ -237,7 +237,7 @@ export function PressShowcaseSection() {
                   </div>
                 </div>
 
-                <div className="relative w-full h-96 overflow-hidden rounded-sm shadow-2xl opacity-90 transition-opacity duration-500 group-hover:opacity-100">
+                <div className="relative w-full h-96 overflow-hidden rounded-sm shadow-2xl opacity-90 transition-opacity duration-400 group-hover:opacity-100">
                   {leadArticle.imageUrl && (
                     <Image
                       src={leadArticle.imageUrl}
@@ -354,7 +354,7 @@ export function PressShowcaseSection() {
                               rel="noopener noreferrer"
                               className="block"
                             >
-                              <div className="relative aspect-[16/9] w-full overflow-hidden rounded-sm grayscale hover:grayscale-0 transition-all duration-700">
+                              <div className="relative aspect-[16/9] w-full overflow-hidden rounded-sm grayscale hover:grayscale-0 transition-all duration-400">
                                 {article.imageUrl && (
                                   <Image
                                     src={article.imageUrl}
