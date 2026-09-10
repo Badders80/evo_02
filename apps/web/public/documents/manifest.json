@@ -1,0 +1,24 @@
+{
+  "generated": "2026-09-10",
+  "source": "war-room/_today/manolo-pds.md, manolo-sa.md (founder-locked copy)",
+  "documents": {
+    "pds": {
+      "campaign": "i-stole-a-manolo",
+      "title": "Product Disclosure Statement",
+      "file": "i-stole-a-manolo-pds.pdf",
+      "sha256": "48ff974c018d2e8ba4ee14f6cf4d5ce6682fb2030e003794b14556cf2de63355",
+      "sizeBytes": 428686,
+      "version": "1.0.0",
+      "effectiveDate": "2026-09-01"
+    },
+    "sa": {
+      "campaign": "i-stole-a-manolo",
+      "title": "Syndicate Agreement",
+      "file": "i-stole-a-manolo-sa.pdf",
+      "sha256": "81e82134806160c018f32084f9c89ff8f54bc969f16ddbe935226cf6b89ae9ea",
+      "sizeBytes": 303516,
+      "version": "1.0.0",
+      "effectiveDate": "2026-09-01"
+    }
+  }
+}
