@@ -26,7 +26,7 @@
       --destructive: #ef4444;
     }
     * { box-sizing: border-box; }
-    body { font-family: 'Geist', sans-serif; background: var(--bg); color: var(--text-foreground); }
+    body { font-family: 'Geist', sans-serif; background: var(--bg); color: var(--text-foreground); overflow: hidden; }
     .font-mono { font-family: 'Geist Mono', monospace; }
     .prose { max-width: none; }
     .prose p { margin-bottom: 1rem; line-height: 1.7; }
@@ -59,6 +59,11 @@
     .doc-light .tick-sign span, .doc-light .tick-sign p { color: #333; }
     .doc-light .tick-sign strong { color: #000; }
     .doc-light input[type="checkbox"] { background-color: #fff; border-color: #999; accent-color: #b98a2f; }
+    /* Doc type scale: body 10px justified, h1/h2 12px bold, h3 10px extra-bold uppercase, one-line section spacing */
+    .doc-light .prose { font-size: 10px; line-height: 1.7; text-align: justify; }
+    .doc-light .prose p, .doc-light .prose ul, .doc-light .prose table { margin-bottom: 1em; }
+    .doc-light .prose h1, .doc-light .prose h2 { font-size: 12px; font-weight: 700; margin-top: 1em; margin-bottom: 0.5em; text-align: left; }
+    .doc-light .prose h3 { font-size: 10px; font-weight: 800; margin-top: 1em; margin-bottom: 0.5em; text-align: left; letter-spacing: 0.02em; text-transform: uppercase; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -80,7 +85,7 @@
         </div>
 
         <!-- Two-Doc Accordion (FAQ pattern) — flex-fills the middle; footer always pinned -->
-        <div class="flex-1 min-h-0 overflow-hidden space-y-3" id="accordion-container">
+        <div class="flex-1 min-h-0 overflow-hidden space-y-3 flex flex-col" id="accordion-container">
           <!-- PDS Panel (Panel 1 - auto-opens) -->
           <div class="rounded-xl border border-[var(--border)] bg-[var(--bg-surface-base)] overflow-hidden" id="pds-panel">
             <button type="button" class="w-full px-4 py-3.5 flex items-center justify-between gap-4 text-left" aria-expanded="true" aria-controls="pds-content" onclick="togglePanel('pds')">

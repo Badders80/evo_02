@@ -89,6 +89,16 @@ function ModalShell({ children, onClose }: { children: React.ReactNode; onClose:
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
 
+  // Scroll lock: while any flow popup is open the wheel belongs to the popup,
+  // never the page behind it.
+  React.useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
   return (
     <div
       className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/85 p-4 sm:p-6 backdrop-blur-md"
@@ -591,6 +601,10 @@ function Step3SAAcceptance({
         .doc-light th { background: #f5f5f5; }
         .doc-light th, .doc-light td { border-color: #ddd; }
         .doc-light input[type="checkbox"] { accent-color: #b98a2f; }
+        .doc-light .prose { font-size: 10px; line-height: 1.7; text-align: justify; }
+        .doc-light .prose p, .doc-light .prose ul, .doc-light .prose table { margin-bottom: 1em; }
+        .doc-light .prose h1, .doc-light .prose h2 { font-size: 12px; font-weight: 700; margin-top: 1em; margin-bottom: 0.5em; text-align: left; }
+        .doc-light .prose h3 { font-size: 10px; font-weight: 800; margin-top: 1em; margin-bottom: 0.5em; text-align: left; letter-spacing: 0.02em; text-transform: uppercase; }
       `}</style>
       <div className="shrink-0">
         <button
@@ -615,7 +629,7 @@ function Step3SAAcceptance({
       </div>
 
       {/* Two-doc accordion — flex-fills the middle; footer always pinned. */}
-      <div className="flex-1 min-h-0 overflow-hidden space-y-3">
+      <div className="flex-1 min-h-0 overflow-hidden space-y-3 flex flex-col">
         {renderPanel(
           'pds',
           'Product Disclosure Statement',
