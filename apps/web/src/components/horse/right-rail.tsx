@@ -14,6 +14,7 @@ import * as React from 'react';
 import { Landmark, Activity } from 'lucide-react';
 import { Eyebrow, StatRow, WhitePillCTA } from '@evo/ui';
 import { pricingForUnits } from '@/lib/nellie-loop';
+import { monthsBetween } from './purchase-flow-modal';
 
 export interface LegalPackDigest {
   pdsMarkdown?: string;
@@ -33,6 +34,9 @@ export interface RightRailProps {
   legalPack?: LegalPackDigest | null;
   /** F8: opens the page-level PurchaseFlowModal via URL push. Required. */
   onOpenModal: (units?: number) => void;
+  /** Lease term dates (whole-month model) — feed the Duration row, never a hardcoded string. */
+  termStartDate?: string;
+  termEndDate?: string;
 }
 
 type ListingStatus = 'listed' | 'fully_subscribed' | 'coming_soon' | 'completed';
@@ -116,6 +120,8 @@ function ListedInvestmentCard({
   stakeStepPct = 0.5,
   legalPack,
   onOpenModal,
+  termStartDate,
+  termEndDate,
 }: {
   horseName: string;
   horseSlug: string;
@@ -126,12 +132,15 @@ function ListedInvestmentCard({
   legalPack?: LegalPackDigest | null;
   /** F8: opens the page-level PurchaseFlowModal via URL push (parent owns state). */
   onOpenModal: (units?: number) => void;
+  termStartDate?: string;
+  termEndDate?: string;
 }) {
   const wholesale = wholesaleMonthlyNzd ?? 3800;
   // Locked Step-1 figures are DSL values, never mockup placeholders: monthly keep per 1%,
   // 75% of gross prize money, and the campaign's available stake. Duration row uses the
   // campaign's wholesale/term defaults — placeholder-free (locked: numbers from data only).
   const pricing = React.useMemo(() => pricingForUnits(wholesale, 1.0), [wholesale]);
+  const termMonths = monthsBetween(termStartDate, termEndDate);
 
   return (
     <div className="rounded-3xl border border-border bg-surface backdrop-blur-2xl px-6 py-4 space-y-3.5 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
@@ -152,7 +161,12 @@ function ListedInvestmentCard({
           sub={`for a ${minInvestmentPct.toFixed(1)}% stake`}
         />
         <StatRow label="Return" value="75%" unit="return" sub="of gross prize money" />
-        <StatRow label="Duration" value="12" unit="months" sub="investment term" />
+        <StatRow
+          label="Duration"
+          value={termMonths != null ? String(termMonths) : '—'}
+          unit="months"
+          sub="investment term"
+        />
       </div>
 
       <div className="pt-3 mt-auto space-y-3.5">
@@ -267,6 +281,8 @@ export default function RightRail({
   stakeStepPct = 0.5,
   legalPack = null,
   onOpenModal,
+  termStartDate,
+  termEndDate,
 }: RightRailProps) {
   const s = status as ListingStatus;
   const safeStatus: ListingStatus =
@@ -294,6 +310,8 @@ export default function RightRail({
           stakeStepPct={stakeStepPct}
           legalPack={legalPack}
           onOpenModal={onOpenModal}
+          termStartDate={termStartDate}
+          termEndDate={termEndDate}
         />
       )}
 

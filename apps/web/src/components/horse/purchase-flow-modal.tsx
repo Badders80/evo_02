@@ -1,10 +1,10 @@
 /* PurchaseFlowModal — Steps 2–6 host (chunk-2: Step 2 term sheet; chunk-3: Step 3 gate).
  *
- * Locked rules (flow-mock/index.html LOOK LOCKED 2026-09-02/03):
- * - Modal shell: max-w-lg × h-[720px], content scrolls inside — all Steps 2–6 share it.
- * - Step 2 header: "Digital-Syndication Terms" (mockup, newer than spec).
- * - Step 3 header: "Acceptance — {horse} your documents"; accordion + Completed badge,
- *   CTA label LOCKED: "Proceed to Secure Checkout".
+ * Locked rules (C5 port of the flow-mockups lock, 2026-09-11 — mockups are the visual spec):
+ * - Modal shell: max-w-lg × h-[900px] locked frame, never scrolls; overlay above nav (z-10000).
+ * - Step 2 = terms summary only (no tick; CTA always live); term-sheet doc lives in Step 3.
+ * - Step 3 = PDS→SA accordion: scroll-gated in-doc tick, auto-collapse COMPLETE, NZTR 4 ticks,
+ *   sign-from-login, ticks lock; Next (KYC) gates on both docs.
  * - Stepper: ▲/▼ buttons, opens at min, 0.5% steps, max = availablePct.
  * - 4-row summary: Initial Payment / Monthly thereafter / Lease period / Distribution.
  * - Distribution value GREEN (text-status-active) — LOCKED 2026-09-03 (label "Distribution" per VOICE.md §4, 2026-09-07).
@@ -19,7 +19,7 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/use-auth';
 import { pricingForUnits, investorCheckoutError } from '@/lib/nellie-loop';
 import type { DslPricing } from '@evo/legal_engine';
 import { WhitePillCTA } from '@evo/ui';
@@ -48,7 +48,7 @@ function formatTermDate(iso?: string): string | null {
 }
 
 /** Inclusive month count between two ISO dates (start = 1st, end = last day). */
-function monthsBetween(startIso?: string, endIso?: string): number | null {
+export function monthsBetween(startIso?: string, endIso?: string): number | null {
   if (!startIso || !endIso) return null;
   const s = new Date(`${startIso}T00:00:00Z`);
   const e = new Date(`${endIso}T00:00:00Z`);
@@ -76,9 +76,10 @@ export interface PurchaseFlowModalProps {
 
 type Step = 'terms' | 'accept' | 'kyc' | 'checkout';
 
-/** Shared modal shell — max-w-lg × h-[900px] (bumped from locked 720px 2026-09-04 to match prod's natural content fit for Step 2).
- *  Viewport guard: clamps to max-h-[calc(100vh-2rem)] my-auto on shorter viewports (re-audit guard 2026-09-04).
- *  Content scrolls inside via overflow-y-auto. All Steps 2–6 share this shell (f14). */
+/** Shared modal shell — max-w-lg × h-[900px] locked frame for all Steps 2–6 (C5 port of mockup lock).
+ *  Viewport guard: clamps to max-h-[calc(100vh-2rem)] on shorter viewports.
+ *  The shell NEVER scrolls (overflow-hidden flex-col): progress/top pinned, each step owns a
+ *  flex-1 middle zone, footers pinned. Overlay sits above the nav (z-[10000] > NavBar z-[9999]). */
 function ModalShell({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -90,13 +91,13 @@ function ModalShell({ children, onClose }: { children: React.ReactNode; onClose:
 
   return (
     <div
-      className="fixed inset-0 z-[999] flex items-center justify-center bg-black/85 p-4 sm:p-6 backdrop-blur-md"
+      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/85 p-4 sm:p-6 backdrop-blur-md"
       role="dialog"
       aria-modal="true"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-lg h-[900px] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-y-auto rounded-3xl border border-border bg-surface p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]"
+        className="relative w-full max-w-lg h-[900px] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-hidden flex flex-col rounded-3xl border border-border bg-surface p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -126,9 +127,9 @@ function Step2TermSheet({
   termStartDate,
   termEndDate,
   distributionSplit,
-  termSheetMarkdown,
   termSheetHash,
   onProceed,
+  onBack,
 }: {
   horseName: string;
   horseSlug: string;
@@ -145,12 +146,13 @@ function Step2TermSheet({
   termSheetMarkdown?: string;
   termSheetHash?: string;
   onProceed: () => void;
+  /** In-modal back (Step 2 → horse page: closes the modal). */
+  onBack: () => void;
 }) {
   const [note, setNote] = React.useState<string | null>(null);
   const [stakeError, setStakeError] = React.useState<string | null>(null);
   const [editing, setEditing] = React.useState(false);
   const [draft, setDraft] = React.useState<string>(stakePct.toFixed(1));
-  const [termSheetAccepted, setTermSheetAccepted] = React.useState(false);
   const noteTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Clean up the note timer on unmount (audit chunk-2 #11).
@@ -232,8 +234,18 @@ function Step2TermSheet({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex-1 min-h-0 flex flex-col overflow-hidden space-y-6">
+      <div className="flex-1 min-h-0 overflow-y-auto space-y-6">
       <div>
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label="Back"
+          className="inline-flex items-center gap-1.5 text-[12px] font-light text-muted-foreground hover:text-heading transition-colors mb-3"
+        >
+          <span aria-hidden>←</span>
+          <span>Back</span>
+        </button>
         <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">
           Digital-Syndication Terms
         </p>
@@ -387,54 +399,19 @@ function Step2TermSheet({
         </div>
       </div>
 
-      {/* Generated DSL term sheet (compileLegalPack output — replaces the static mockup).
-          Rendered verbatim from the same bytes the acceptance gate hashes. */}
-      {termSheetMarkdown ? (
-        <div className="space-y-2">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-            Term sheet
-            {termSheetHash && (
-              <span className="ml-2 font-mono normal-case tracking-normal text-muted-foreground/60">
-                sha256: {termSheetHash.slice(0, 4)}…{termSheetHash.slice(-4)}
-              </span>
-            )}
-          </p>
-          <div className="rounded-xl border border-border bg-canvas/60 h-44 overflow-y-auto p-4">
-            <div
-              className="prose prose-sm max-w-none text-foreground"
-              dangerouslySetInnerHTML={{ __html: marked.parse(termSheetMarkdown) }}
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-2">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-            Prize distribution explained
-          </p>
-          <p className="text-[11px] font-light text-muted-foreground/60 leading-relaxed">
-            Prize money is pro-rata based on your ownership in Evolution&apos;s syndicate stake,
-            calculated according to official NZTR results and distributed quarterly after settlement.{' '}
-            <a href="#" className="text-muted underline underline-offset-2">
-              Learn more about how prize money is distributed
-            </a>
-          </p>
-        </div>
+      </div>
+
+      {/* Modal Action Footer — pinned. Step 2 = terms summary only (mockup lock);
+          PDS/SA live in Step 3's accordion; the hash rides here as the audit trail. */}
+      <div className="pt-2 border-t border-border space-y-3 shrink-0">
+      {termSheetHash && (
+        <p className="font-mono text-[10px] text-muted-foreground/60">
+          sha256: {termSheetHash.slice(0, 4)}…{termSheetHash.slice(-4)}
+        </p>
       )}
 
-      {/* CTA → Step 3 */}
-      <div className="flex items-center gap-3 p-4 border rounded-lg bg-muted/50">
-        <input
-          type="checkbox"
-          id="term-sheet-accept"
-          onChange={(e) => setTermSheetAccepted(e.target.checked)}
-          className="h-4 w-4 rounded border-input text-accent focus:ring-accent"
-          required
-        />
-        <label htmlFor="term-sheet-accept" className="text-sm font-medium">
-          I have read and accept these terms
-        </label>
-      </div>
-      <WhitePillCTA onClick={onProceed} disabled={!termSheetAccepted}>
+      {/* CTA → Step 3 (acceptance lives only in Step 3 — always live). */}
+      <WhitePillCTA onClick={onProceed}>
         Invest in {horseName}
       </WhitePillCTA>
       <p className="text-[11px] font-light text-muted-foreground leading-relaxed text-center">
@@ -458,18 +435,27 @@ function Step2TermSheet({
         </a>
         .
       </p>
+      </div>
     </div>
   );
 }
 
-/** Step 3 — Subscription Agreement Acceptance (Investor-SA checkout) */
+/** Step 3 — Subscription Agreement Acceptance (C5: two-doc accordion port of the mockup lock).
+ *  PDS auto-opens; scroll-to-bottom enables the in-doc tick; ticking auto-collapses the panel
+ *  to COMPLETE and opens SA (same pattern + 4 NZTR declaration ticks). Next (KYC) gates on
+ *  both docs. Ticks lock after signing — re-opening is read-only. Identity from useAuth. */
+const NZTR_DECLARATIONS = [
+  'I am at least 18 years of age.',
+  'I am not subject to any racing disqualification or exclusion order.',
+  'I have provided verified proof of identity acceptable to the Syndicate Manager.',
+  'I understand participation is strictly as a leaseholder and confers no direct ownership.',
+];
+
 function Step3SAAcceptance({
   horseName,
   horseSlug,
   stakePct,
   legalPack,
-  stakeStepPct = 0.5,
-  maxInvestmentPct = 10.0,
   onBack,
   onProceed,
 }: {
@@ -477,25 +463,41 @@ function Step3SAAcceptance({
   horseSlug: string;
   stakePct: number;
   legalPack?: LegalPackDigest | null;
-  stakeStepPct?: number;
-  maxInvestmentPct?: number;
   /** F10: in-modal back to Step 2 (term sheet) without closing the modal. */
   onBack: () => void;
-  /** Proceed to KYC (Step 4) */
+  /** Proceed to KYC (Step 4) — fallback when the accept endpoint returns no kycUrl. */
   onProceed: () => void;
 }) {
-  const router = useRouter();
-  const [saAccepted, setSAAccepted] = React.useState(false);
+  const { user } = useAuth();
+  const profileName = user?.displayName ?? 'Investor';
   const [saLoading, setSALoading] = React.useState(false);
+  const [openPanel, setOpenPanel] = React.useState<'pds' | 'sa'>('pds');
+  const [pdsTickOn, setPdsTickOn] = React.useState(false);
+  const [saTickOn, setSaTickOn] = React.useState(false);
+  const [pdsComplete, setPdsComplete] = React.useState(false);
+  const [saComplete, setSaComplete] = React.useState(false);
+  const [decls, setDecls] = React.useState<boolean[]>([false, false, false, false]);
 
-  const saText =
-    legalPack?.saMarkdown ||
-    `Syndicate Agreement (SA) for ${horseName} Syndicate.\n\n` +
-      `Manager: Evolution Stables.\n\n` +
-      `1. Governance: The Manager administers all racing, veterinary, training, and nomination decisions in accordance with welfare-first standards.\n` +
-      `2. Financials: Monies held in segregated trust account.\n` +
-      `3. Transfers: Secondary transfer facilitated through Evolution Stables upon formal request.\n` +
-      `4. Term: Fixed lease duration with predefined settlement date.`;
+  const pdsHtml = React.useMemo(
+    () => marked.parse(legalPack?.pdsMarkdown ?? ''),
+    [legalPack],
+  );
+  const saHtml = React.useMemo(
+    () => marked.parse(legalPack?.saMarkdown ?? ''),
+    [legalPack],
+  );
+
+  const handleDocScroll =
+    (doc: 'pds' | 'sa') => (e: React.UIEvent<HTMLDivElement>) => {
+      const el = e.currentTarget;
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - 50) {
+        if (doc === 'pds') setPdsTickOn(true);
+        else setSaTickOn(true);
+      }
+    };
+
+  const toggleDecl = (i: number) =>
+    setDecls((prev) => prev.map((v, j) => (j === i ? !v : v)));
 
   const handleSAAccept = async () => {
     setSALoading(true);
@@ -521,9 +523,76 @@ function Step3SAAcceptance({
     }
   };
 
+  const renderPanel = (
+    which: 'pds' | 'sa',
+    title: string,
+    status: string,
+    statusDone: boolean,
+    docHtml: string | Promise<string>,
+    onScroll: (e: React.UIEvent<HTMLDivElement>) => void,
+    tickBlock: React.ReactNode,
+  ) => {
+    const open = openPanel === which;
+    const locked = which === 'sa' && !pdsComplete;
+    return (
+      <div
+        className={`rounded-xl border border-border bg-surface overflow-hidden flex flex-col ${
+          open ? 'flex-1 min-h-0' : 'shrink-0'
+        }`}
+      >
+        <button
+          type="button"
+          onClick={() => {
+            if (!locked) setOpenPanel(which);
+          }}
+          aria-expanded={open}
+          disabled={locked}
+          className="w-full px-4 py-3.5 flex items-center justify-between gap-4 text-left shrink-0 disabled:cursor-not-allowed"
+        >
+          <span className="font-medium text-heading">{title}</span>
+          <span
+            className={`text-[11px] font-medium ${
+              statusDone ? 'text-status-active' : 'text-muted-foreground'
+            }`}
+          >
+            {status}
+          </span>
+        </button>
+        <div
+          className={`grid transition-all duration-300 ${
+            open ? 'grid-rows-[1fr] opacity-100 flex-1 min-h-0' : 'grid-rows-[0fr] opacity-0'
+          }`}
+        >
+          <div className="overflow-hidden min-h-0 flex flex-col px-4 pb-4">
+            <div className="rounded-xl border border-border overflow-hidden flex-1 min-h-0 flex flex-col bg-white">
+              <div
+                onScroll={onScroll}
+                className="prose prose-sm max-w-none p-4 overflow-y-auto flex-1 min-h-0 doc-light"
+              >
+                <div dangerouslySetInnerHTML={{ __html: docHtml as string }} />
+                {tickBlock}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const tickBoxClass =
+    'mt-0.5 h-4 w-4 rounded border-border bg-white text-accent focus:ring-accent focus:ring-offset-0 disabled:opacity-60 disabled:cursor-not-allowed';
+
   return (
-    <div className="space-y-6">
-      <div>
+    <div className="flex-1 min-h-0 flex flex-col overflow-hidden space-y-6">
+      <style>{`
+        .doc-light { background: #fff; color: #111; }
+        .doc-light h1, .doc-light h2, .doc-light h3 { color: #111; }
+        .doc-light strong { color: #111; }
+        .doc-light th { background: #f5f5f5; }
+        .doc-light th, .doc-light td { border-color: #ddd; }
+        .doc-light input[type="checkbox"] { accent-color: #b98a2f; }
+      `}</style>
+      <div className="shrink-0">
         <button
           type="button"
           onClick={onBack}
@@ -537,48 +606,107 @@ function Step3SAAcceptance({
           Subscription Agreement
         </p>
         <h3 className="text-[22px] font-light text-heading tracking-tight">
-          {horseName} — your agreement
+          {horseName} — your documents
         </h3>
         <p className="text-[11px] font-light text-muted-foreground/60 leading-relaxed mt-2">
-          Read the document in full, then tick to accept. This acceptance is recorded against the exact document version.
+          Read each document in full. Scroll to bottom to reveal the agreement tick. Both must
+          be COMPLETE to proceed.
         </p>
       </div>
 
-      {/* SA Document */}
-      <div className="rounded-xl border border-border bg-surface overflow-hidden">
-        <div className="px-4 py-3.5 space-y-3">
-          <div className="rounded-xl border border-border bg-canvas/60 h-44 overflow-y-auto p-4">
-            <div
-              className="prose prose-sm max-w-none text-foreground"
-              dangerouslySetInnerHTML={{ __html: marked.parse(saText) }}
-            />
-          </div>
-          <label className="flex items-start gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={saAccepted}
-              onChange={(e) => setSAAccepted(e.target.checked)}
-              className="mt-0.5 h-4 w-4 rounded border-border bg-background text-accent focus:ring-accent focus:ring-offset-0"
-            />
-            <span className="text-[12px] font-light text-muted-foreground">
-              I accept the Subscription Agreement and wish to proceed
-            </span>
-          </label>
-        </div>
+      {/* Two-doc accordion — flex-fills the middle; footer always pinned. */}
+      <div className="flex-1 min-h-0 overflow-hidden space-y-3">
+        {renderPanel(
+          'pds',
+          'Product Disclosure Statement',
+          pdsComplete ? 'PDS ✓ COMPLETE' : pdsTickOn ? 'Agree to proceed' : 'Reading…',
+          pdsComplete,
+          pdsHtml,
+          handleDocScroll('pds'),
+          <div
+            className={`mt-6 rounded-xl border p-4 transition-opacity ${
+              pdsTickOn ? 'opacity-100' : 'opacity-40'
+            }`}
+          >
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                disabled={!pdsTickOn || pdsComplete}
+                checked={pdsComplete}
+                onChange={() => {
+                  setPdsComplete(true);
+                  setOpenPanel('sa');
+                }}
+                className={tickBoxClass}
+              />
+              <span className="text-[12px] font-light text-[#333]">
+                I, <strong className="text-black">{profileName}</strong>, agree to be bound by
+                this document
+              </span>
+            </label>
+          </div>,
+        )}
+        {renderPanel(
+          'sa',
+          'Syndicate Agreement',
+          saComplete
+            ? 'SA ✓ COMPLETE'
+            : !pdsComplete
+              ? 'Locked'
+              : saTickOn
+                ? 'Agree to proceed'
+                : 'Reading…',
+          saComplete,
+          saHtml,
+          handleDocScroll('sa'),
+          <div
+            className={`mt-6 rounded-xl border p-4 space-y-3 transition-opacity ${
+              saTickOn ? 'opacity-100' : 'opacity-40'
+            }`}
+          >
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[#555]">
+              Schedule 1 — NZTR Statutory Member Declarations
+            </p>
+            {NZTR_DECLARATIONS.map((text, i) => (
+              <label key={i} className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  disabled={!saTickOn || saComplete}
+                  checked={decls[i]}
+                  onChange={() => toggleDecl(i)}
+                  className={tickBoxClass}
+                />
+                <span className="text-[12px] font-light text-[#333]">{text}</span>
+              </label>
+            ))}
+            <label className="flex items-start gap-3 cursor-pointer border-t border-[#ddd] pt-3">
+              <input
+                type="checkbox"
+                disabled={!saTickOn || saComplete || !decls.every(Boolean)}
+                checked={saComplete}
+                onChange={() => setSaComplete(true)}
+                className={tickBoxClass}
+              />
+              <span className="text-[12px] font-light text-[#333]">
+                I, <strong className="text-black">{profileName}</strong>, agree to be bound by
+                this document
+              </span>
+            </label>
+          </div>,
+        )}
       </div>
 
-      {/* Modal Action Footer */}
-      <div className="pt-2 border-t border-border space-y-3">
-        <button
-          type="button"
-          disabled={!saAccepted || saLoading}
+      {/* Modal Action Footer — pinned. Next gates on both docs COMPLETE. */}
+      <div className="pt-2 border-t border-border space-y-3 shrink-0">
+        <WhitePillCTA
           onClick={handleSAAccept}
-          className="w-full rounded-full bg-accent py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-accent-foreground transition-all duration-300 hover:brightness-110 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100"
+          disabled={!(pdsComplete && saComplete) || saLoading}
         >
-          {saLoading ? 'Processing…' : 'Complete KYC Verification'}
-        </button>
+          {saLoading ? 'Processing…' : 'Next (KYC)'}
+        </WhitePillCTA>
         <p className="text-[10px] font-light leading-relaxed text-muted-foreground/70 text-center">
-          <span className="text-accent">Acceptance = recorded</span> — who + document hash + timestamp, logged at the instant of the tick.
+          <span className="text-accent">Acceptance = recorded</span> — who + document hash +
+          timestamp, logged at the instant of the tick.
         </p>
       </div>
     </div>
@@ -695,19 +823,49 @@ export default function PurchaseFlowModal({
           termSheetMarkdown={mergedLegalPack?.termSheetMarkdown}
           termSheetHash={mergedLegalPack?.termSheetHash}
           onProceed={() => setStep('accept')}
+          onBack={onClose}
+        />
+      ) : step === 'accept' ? (
+        <Step3SAAcceptance
+          horseName={horseName}
+          horseSlug={horseSlug}
+          stakePct={stakePct}
+          legalPack={mergedLegalPack}
+          onBack={() => setStep('terms')}
+          onProceed={() => setStep('kyc')}
         />
       ) : step === 'checkout' ? (
-        <div className="space-y-6 text-center">
+        <div className="flex-1 min-h-0 overflow-y-auto space-y-6 text-center">
+          <button
+            type="button"
+            onClick={() => setStep('kyc')}
+            aria-label="Back"
+            className="inline-flex items-center gap-1.5 text-[12px] font-light text-muted-foreground hover:text-heading transition-colors mb-3"
+          >
+            <span aria-hidden>←</span>
+            <span>Back</span>
+          </button>
           <div className="h-12 w-12 mx-auto animate-spin rounded-full border-4 border-accent border-t-transparent" />
           <p className="text-[15px] font-light text-foreground">Redirecting to Stripe Checkout…</p>
         </div>
-      ) : step === 'kyc' ? (
-        <div className="space-y-6 text-center">
-          <p className="text-center text-muted-foreground">KYC Step — handled via redirect</p>
-        </div>
       ) : (
-        <div className="space-y-6 text-center">
-          <p className="text-center text-muted-foreground">KYC Step — handled via redirect</p>
+        <div className="flex-1 min-h-0 overflow-y-auto space-y-6 text-center">
+          <button
+            type="button"
+            onClick={() => setStep('accept')}
+            aria-label="Back"
+            className="inline-flex items-center gap-1.5 text-[12px] font-light text-muted-foreground hover:text-heading transition-colors mb-3"
+          >
+            <span aria-hidden>←</span>
+            <span>Back</span>
+          </button>
+          <div className="h-12 w-12 mx-auto animate-spin rounded-full border-4 border-accent border-t-transparent" />
+          <p className="text-[15px] font-light text-foreground">
+            Redirecting to Stripe Identity for KYC verification…
+          </p>
+          <p className="text-[12px] text-muted-foreground">
+            This is a one-time check under New Zealand AML/CFT law.
+          </p>
         </div>
       )}
     </ModalShell>

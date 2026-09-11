@@ -46,6 +46,8 @@ export function HorsePageShell(props: HorsePageShellProps) {
         maxInvestmentPct={props.maxInvestmentPct}
         stakeStepPct={props.stakeStepPct}
         legalPack={props.legalPack}
+        termStartDate={props.termStartDate}
+        termEndDate={props.termEndDate}
         onOpenModal={openModal}
       />
       <PurchaseFlowHost
