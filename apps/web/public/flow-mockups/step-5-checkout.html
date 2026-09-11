@@ -37,17 +37,14 @@
 </head>
 <body class="min-h-screen">
   <div class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/85 p-4 sm:p-6 backdrop-blur-md">
-    <div class="relative w-full max-w-lg h-[900px] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-y-auto rounded-3xl border border-[var(--border)] bg-[var(--bg-surface)] p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
+    <div class="relative w-full max-w-lg h-[900px] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-hidden flex flex-col rounded-3xl border border-[var(--border)] bg-[var(--bg-surface)] p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
       <button type="button" aria-label="Close" class="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-heading)] text-xl transition-colors">✕</button>
-
-      <div class="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-muted)] mb-4">
-        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">2</span>
-        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">3</span>
-        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">4</span>
-        <span class="px-2 py-1 bg-[var(--accent)] text-[var(--accent-foreground)] rounded">5</span>
-        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">6</span>
-      </div>
-
+      <!-- Middle: states (parent never scrolls; this zone scrolls internally only on short viewports) -->
+      <div class="flex-1 min-h-0 overflow-y-auto">
+      <button type="button" onclick="window.location.href='step-4-kyc.html'" aria-label="Back" class="inline-flex items-center gap-1.5 text-[12px] font-light text-[var(--text-muted)] hover:text-[var(--text-heading)] transition-colors mb-3">
+        <span aria-hidden>←</span>
+        <span>Back</span>
+      </button>
       <!-- State: Redirecting to Stripe -->
       <div id="checkout-redirect" class="space-y-6 text-center animate-fade-in">
         <div class="h-12 w-12 mx-auto animate-spin rounded-full border-4 border-[var(--accent)] border-t-transparent" aria-hidden="true"></div>
@@ -76,7 +73,7 @@
         <p class="text-[15px] font-light text-[var(--text-foreground)]">Payment could not be processed</p>
         <p class="text-[12px] text-[var(--text-muted)]" id="payment-error-msg">Your card provider declined the payment. Please try a different card, or contact your bank.</p>
         <div class="pt-4 space-y-3">
-          <button onclick="document.getElementById('checkout-failed').classList.add('hidden'); document.getElementById('checkout-redirect').classList.remove('hidden')" class="w-full rounded-full bg-[var(--accent)] py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent-foreground)] hover:brightness-110 transition-colors">Try Again</button>
+          <button onclick="document.getElementById('checkout-failed').classList.add('hidden'); document.getElementById('checkout-redirect').classList.remove('hidden')" class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-6 py-3.5 text-[11px] font-light tracking-[0.18em] uppercase text-[var(--text-foreground)] bg-[var(--bg-surface-base)] border border-[var(--border)] transition-all duration-300 hover:text-white hover:bg-[#212121] hover:border-[#575757] active:scale-[0.98]">Try Again</button>
           <a href="step-3-sa-acceptance.html" class="w-full rounded-full border border-[var(--border)] bg-transparent py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)] hover:text-[var(--text-foreground)] block transition-colors">← Back to Agreement</a>
         </div>
       </div>
@@ -89,25 +86,11 @@
         <p class="text-[15px] font-light text-[var(--text-foreground)]">Checkout was cancelled</p>
         <p class="text-[12px] text-[var(--text-muted)]">No payment was taken. Your stake reservation is held for 15 minutes.</p>
         <div class="pt-4 space-y-3">
-          <button onclick="document.getElementById('checkout-cancelled').classList.add('hidden'); document.getElementById('checkout-redirect').classList.remove('hidden')" class="w-full rounded-full bg-[var(--accent)] py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent-foreground)] hover:brightness-110 transition-colors">Retry Checkout</button>
+          <button onclick="document.getElementById('checkout-cancelled').classList.add('hidden'); document.getElementById('checkout-redirect').classList.remove('hidden')" class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-6 py-3.5 text-[11px] font-light tracking-[0.18em] uppercase text-[var(--text-foreground)] bg-[var(--bg-surface-base)] border border-[var(--border)] transition-all duration-300 hover:text-white hover:bg-[#212121] hover:border-[#575757] active:scale-[0.98]">Retry Checkout</button>
           <a href="step-3-sa-acceptance.html" class="w-full rounded-full border border-[var(--border)] bg-transparent py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)] hover:text-[var(--text-foreground)] block transition-colors">← Back to Agreement</a>
         </div>
       </div>
 
-      <!-- Horizontal Fallbacks -->
-      <div class="border-t border-[var(--border)] pt-6 mt-6 space-y-4">
-        <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Fallback Paths (Horizontal)</p>
-        <div class="flex flex-wrap gap-3">
-          <a href="step-4-kyc.html" class="px-4 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface-base)] text-[var(--text-foreground)] text-sm hover:bg-[var(--bg-surface)] transition-colors">← Back to KYC</a>
-          <a href="step-6-holding.html" class="px-4 py-2 rounded-lg border border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)] text-sm hover:bg-[var(--accent)]/20 transition-colors">Proceed to Step 6 (Holding) →</a>
-        </div>
-        <div class="flex flex-wrap gap-3 text-sm">
-          <span class="px-3 py-1.5 rounded-full border border-[var(--status-active)]/40 bg-[var(--status-active)]/10 text-[var(--status-active)]">Payment success → webhook → holding</span>
-          <span class="px-3 py-1.5 rounded-full border border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]">Card declined → retry / different card</span>
-          <span class="px-3 py-1.5 rounded-full border border-[var(--warning)]/40 bg-[var(--warning)]/10 text-[var(--warning)]">User cancelled → retry (15 min reservation)</span>
-          <span class="px-3 py-1.5 rounded-full border border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]">Stripe error → toast + retry</span>
-          <span class="px-3 py-1.5 rounded-full border border-[var(--text-muted)]/40 bg-[var(--bg-surface)] text-[var(--text-muted)]">Network timeout → idempotency key protects</span>
-        </div>
       </div>
     </div>
   </div>

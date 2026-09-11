@@ -44,26 +44,32 @@
     .tick-sign { opacity: 0; transform: translateY(8px); transition: opacity 0.2s ease-out, transform 0.2s ease-out; }
     .tick-sign.visible { opacity: 1; transform: translateY(0); }
     .scroll-indicator { transition: opacity 0.2s ease-out; }
+    /* Flex-fit: open panel fills leftover middle space; footer always pinned */
+    #accordion-container > div { display: flex; flex-direction: column; flex: none; min-height: 0; }
+    #accordion-container > div:has(> .accordion-panel.open) { flex: 1 1 auto; }
+    .accordion-panel.open { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+    /* Doc-light: legal panes read like the PDF — white page, black text */
+    #accordion-container .doc-light { background: #fff; }
+    .doc-light .prose { color: #111; }
+    .doc-light .prose h1, .doc-light .prose h2, .doc-light .prose h3 { color: #111; }
+    .doc-light .prose strong { color: #111; }
+    .doc-light .prose th { background: #f5f5f5; }
+    .doc-light .prose th, .doc-light .prose td { border-color: #ddd; }
+    .doc-light .tick-sign { border-color: #ccc; }
+    .doc-light .tick-sign span, .doc-light .tick-sign p { color: #333; }
+    .doc-light .tick-sign strong { color: #000; }
+    .doc-light input[type="checkbox"] { background-color: #fff; border-color: #999; accent-color: #b98a2f; }
   </style>
 </head>
 <body class="min-h-screen">
   <!-- Modal Overlay - z-index raised above nav -->
   <div class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/85 p-4 sm:p-6 backdrop-blur-md">
-    <!-- Modal Shell - 672px width for Step 3 -->
-    <div class="relative w-full max-w-[672px] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-y-auto rounded-3xl border border-[var(--border)] bg-[var(--bg-surface)] p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
+    <!-- Modal Shell - 512px locked (one size for all steps) -->
+    <div class="relative w-full max-w-lg h-[900px] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-hidden flex flex-col rounded-3xl border border-[var(--border)] bg-[var(--bg-surface)] p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
       <button type="button" aria-label="Close" class="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-heading)] text-xl transition-colors">✕</button>
-
-      <div class="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-muted)] mb-4">
-        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">2</span>
-        <span class="px-2 py-1 bg-[var(--accent)] text-[var(--accent-foreground)] rounded">3</span>
-        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">4</span>
-        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">5</span>
-        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">6</span>
-      </div>
-
-      <div class="space-y-6">
+      <div class="flex-1 min-h-0 flex flex-col overflow-hidden space-y-6">
         <!-- Header with Back Button -->
-        <div>
+        <div class="shrink-0">
           <button type="button" onclick="window.location.href='step-2-term-sheet.html'" aria-label="Back" class="inline-flex items-center gap-1.5 text-[12px] font-light text-[var(--text-muted)] hover:text-[var(--text-heading)] transition-colors mb-3">
             <span aria-hidden>←</span>
             <span>Back</span>
@@ -73,8 +79,8 @@
           <p class="text-[11px] font-light text-[var(--text-muted)]/60 leading-relaxed mt-2">Read each document in full. Scroll to bottom to reveal the agreement tick. Both must be COMPLETE to proceed.</p>
         </div>
 
-        <!-- Two-Doc Accordion (FAQ pattern) -->
-        <div class="space-y-3" id="accordion-container">
+        <!-- Two-Doc Accordion (FAQ pattern) — flex-fills the middle; footer always pinned -->
+        <div class="flex-1 min-h-0 overflow-hidden space-y-3" id="accordion-container">
           <!-- PDS Panel (Panel 1 - auto-opens) -->
           <div class="rounded-xl border border-[var(--border)] bg-[var(--bg-surface-base)] overflow-hidden" id="pds-panel">
             <button type="button" class="w-full px-4 py-3.5 flex items-center justify-between gap-4 text-left" aria-expanded="true" aria-controls="pds-content" onclick="togglePanel('pds')">
@@ -85,8 +91,8 @@
               </div>
             </button>
             <div id="pds-content" class="accordion-panel open px-4 pb-4" role="region" aria-labelledby="pds-panel">
-              <div class="rounded-xl border border-[var(--border)] bg-[var(--bg-canvas)]/60 overflow-hidden" style="height: 86vh; max-height: 86vh;">
-                <div class="prose prose-sm max-w-none text-[var(--text-foreground)] p-4 overflow-y-auto" style="height: 100%;" id="pds-doc">
+              <div class="doc-light rounded-xl border border-[var(--border)] bg-[var(--bg-canvas)]/60 overflow-hidden flex-1 min-h-0 flex flex-col">
+                <div class="prose prose-sm max-w-none text-[var(--text-foreground)] p-4 overflow-y-auto flex-1 min-h-0" id="pds-doc">
                   <!-- PDS content pasted from legal_engine/src/pds.ts -->
                   <h1># Product Disclosure Statement</h1>
 <h2>## I Stole A Manolo (NZ) Syndicate</h2>
@@ -346,14 +352,13 @@ I, Alex Baddeley, as the promoter of this syndicate, declare that the informatio
 ---
 
 *This PDS must be read together with the Syndicate Agreement.*
+                  <div id="pds-tick-sign" class="tick-sign mt-6 rounded-xl border border-[var(--border)] p-4" style="opacity: 0.35;">
+                    <label class="flex items-start gap-3 cursor-pointer" id="pds-tick-label">
+                      <input type="checkbox" id="pds-agree" disabled class="mt-0.5 h-4 w-4 rounded border-[var(--border)] bg-[var(--bg-surface)] text-[var(--accent)] focus:ring-[var(--accent)] focus:ring-offset-0 disabled:opacity-40 disabled:cursor-not-allowed"/>
+                      <span class="text-[12px] font-light text-[var(--text-muted)]">I, <strong id="pds-profile-name">[Login Profile Name]</strong>, agree to be bound by this document</span>
+                    </label>
+                  </div>
                 </div>
-              </div>
-              <!-- Tick sign row (revealed on scroll-to-bottom) -->
-              <div id="pds-tick-sign" class="tick-sign px-4 py-3" style="opacity: 0;">
-                <label class="flex items-start gap-3 cursor-pointer">
-                  <input type="checkbox" id="pds-agree" class="mt-0.5 h-4 w-4 rounded border-[var(--border)] bg-[var(--bg-surface)] text-[var(--accent)] focus:ring-[var(--accent)] focus:ring-offset-0"/>
-                  <span class="text-[12px] font-light text-[var(--text-muted)]">I, <strong id="pds-profile-name">[Login Profile Name]</strong>, agree to be bound by this document</span>
-                </label>
               </div>
             </div>
           </div>
@@ -368,8 +373,8 @@ I, Alex Baddeley, as the promoter of this syndicate, declare that the informatio
               </div>
             </button>
             <div id="sa-content" class="accordion-panel collapsed px-4 pb-4" role="region" aria-labelledby="sa-panel">
-              <div class="rounded-xl border border-[var(--border)] bg-[var(--bg-canvas)]/60 overflow-hidden" style="height: 86vh; max-height: 86vh;">
-                <div class="prose prose-sm max-w-none text-[var(--text-foreground)] p-4 overflow-y-auto" style="height: 100%;" id="sa-doc">
+              <div class="doc-light rounded-xl border border-[var(--border)] bg-[var(--bg-canvas)]/60 overflow-hidden flex-1 min-h-0 flex flex-col">
+                <div class="prose prose-sm max-w-none text-[var(--text-foreground)] p-4 overflow-y-auto flex-1 min-h-0" id="sa-doc">
                   <!-- SA content from existing mockup -->
                   <h1># Syndicate Agreement</h1>
 <p><strong>Campaign:</strong> i-stole-a-manolo | <strong>Version:</strong> 1.0.0 | <strong>Effective Date:</strong> 2026-09-01</p>
@@ -432,22 +437,26 @@ I, Alex Baddeley, as the promoter of this syndicate, declare that the informatio
 Director, Evolution Stables Ltd<br>
 8 Huia Street, Auckland, New Zealand</p>
 <p><em>Executed under the NZTR Syndication Code of Practice.</em></p>
+                  <div id="sa-tick-sign" class="tick-sign mt-6 rounded-xl border border-[var(--border)] p-4 space-y-3" style="opacity: 0.35;">
+                    <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Schedule 1 — NZTR Statutory Member Declarations</p>
+                    <label class="flex items-start gap-3 cursor-pointer"><input type="checkbox" class="nztr-decl mt-0.5 h-4 w-4 rounded border-[var(--border)] bg-[var(--bg-surface)] text-[var(--accent)]" disabled/><span class="text-[12px] font-light text-[var(--text-muted)]">I am at least 18 years of age</span></label>
+                    <label class="flex items-start gap-3 cursor-pointer"><input type="checkbox" class="nztr-decl mt-0.5 h-4 w-4 rounded border-[var(--border)] bg-[var(--bg-surface)] text-[var(--accent)]" disabled/><span class="text-[12px] font-light text-[var(--text-muted)]">I am not subject to any racing disqualification or exclusion order</span></label>
+                    <label class="flex items-start gap-3 cursor-pointer"><input type="checkbox" class="nztr-decl mt-0.5 h-4 w-4 rounded border-[var(--border)] bg-[var(--bg-surface)] text-[var(--accent)]" disabled/><span class="text-[12px] font-light text-[var(--text-muted)]">I have provided verified proof of identity acceptable to the Syndicate Manager</span></label>
+                    <label class="flex items-start gap-3 cursor-pointer"><input type="checkbox" class="nztr-decl mt-0.5 h-4 w-4 rounded border-[var(--border)] bg-[var(--bg-surface)] text-[var(--accent)]" disabled/><span class="text-[12px] font-light text-[var(--text-muted)]">I understand participation is strictly as a leaseholder and confers no direct ownership</span></label>
+                    <label class="flex items-start gap-3 cursor-pointer border-t border-[var(--border)] pt-3" id="sa-tick-label">
+                      <input type="checkbox" id="sa-agree" disabled class="mt-0.5 h-4 w-4 rounded border-[var(--border)] bg-[var(--bg-surface)] text-[var(--accent)] focus:ring-[var(--accent)] focus:ring-offset-0 disabled:opacity-40 disabled:cursor-not-allowed"/>
+                      <span class="text-[12px] font-light text-[var(--text-muted)]">I, <strong id="sa-profile-name">[Login Profile Name]</strong>, agree to be bound by this document</span>
+                    </label>
+                  </div>
                 </div>
-              </div>
-              <!-- Tick sign row (revealed on scroll-to-bottom) -->
-              <div id="sa-tick-sign" class="tick-sign px-4 py-3" style="opacity: 0;">
-                <label class="flex items-start gap-3 cursor-pointer">
-                  <input type="checkbox" id="sa-agree" class="mt-0.5 h-4 w-4 rounded border-[var(--border)] bg-[var(--bg-surface)] text-[var(--accent)] focus:ring-[var(--accent)] focus:ring-offset-0"/>
-                  <span class="text-[12px] font-light text-[var(--text-muted)]">I, <strong id="sa-profile-name">[Login Profile Name]</strong>, agree to be bound by this document</span>
-                </label>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Modal Action Footer -->
-        <div class="pt-2 border-t border-[var(--border)] space-y-3">
-          <button type="button" id="next-kyc-btn" disabled class="w-full rounded-full bg-[var(--accent)] py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent-foreground)] transition-all duration-300 hover:brightness-110 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100">
+        <!-- Modal Action Footer — pinned, never scrolls -->
+        <div class="pt-2 border-t border-[var(--border)] space-y-3 shrink-0">
+          <button type="button" id="next-kyc-btn" disabled class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-6 py-3.5 text-[11px] font-light tracking-[0.18em] uppercase text-[var(--text-foreground)] bg-[var(--bg-surface-base)] border border-[var(--border)] transition-all duration-300 hover:text-white hover:bg-[#212121] hover:border-[#575757] active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100">
             Next (KYC)
           </button>
           <p class="text-[10px] font-light leading-relaxed text-[var(--text-muted)]/70 text-center">
@@ -459,7 +468,7 @@ Director, Evolution Stables Ltd<br>
   </div>
 
   <!-- Horizontal Fallbacks (behind overlay - dev annotations only, never shipped) -->
-  <div class="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-[672px] px-4 z-[9999] pointer-events-none">
+  <div class="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-lg px-4 z-[9999] pointer-events-none">
     <div class="border-t border-[var(--border)] pt-6 mt-6 space-y-4 bg-[var(--bg-surface)]/50 backdrop-blur-sm rounded-2xl p-4 pointer-events-auto">
       <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Fallback Paths (Horizontal) — DEV ANNOTATIONS</p>
       <div class="flex flex-wrap gap-3">
@@ -484,7 +493,7 @@ Director, Evolution Stables Ltd<br>
     let pdsComplete = false;
     let saComplete = false;
 
-    // Scroll detection for tick sign reveal
+    // Scroll detection for in-doc tick reveal (position = gate; light-up on reach)
     function setupScrollDetection(docId, tickSignId, agreeCheckboxId, statusId, panelBtnId, otherPanelBtnId) {
       const doc = document.getElementById(docId);
       const tickSign = document.getElementById(tickSignId);
@@ -496,13 +505,15 @@ Director, Evolution Stables Ltd<br>
       let tickRevealed = false;
 
       doc.addEventListener('scroll', () => {
-        // Check if scrolled to bottom (within 50px)
+        // Check if scrolled to bottom (within 50px) — tick lives in-doc as last element
         const { scrollTop, scrollHeight, clientHeight } = doc;
         if (!tickRevealed && scrollTop + clientHeight >= scrollHeight - 50) {
           tickRevealed = true;
           tickSign.style.opacity = '1';
           tickSign.style.transform = 'translateY(0)';
           tickSign.classList.add('visible');
+          // Light-up: enable all ticks in this block
+          tickSign.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.disabled = false; });
           statusEl.textContent = 'Agree to proceed';
           statusEl.className = 'text-[11px] font-medium text-[var(--accent)]';
         }
@@ -510,6 +521,18 @@ Director, Evolution Stables Ltd<br>
 
       agreeCheckbox.addEventListener('change', () => {
         if (agreeCheckbox.checked) {
+          // SA gate: all 4 NZTR declarations must also be ticked
+          if (docId === 'sa-doc') {
+            const decls = Array.from(tickSign.querySelectorAll('.nztr-decl'));
+            if (!decls.every(cb => cb.checked)) {
+              agreeCheckbox.checked = false;
+              return;
+            }
+            // Lock all SA ticks — re-open can't un-sign
+            tickSign.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.disabled = true; });
+          } else {
+            agreeCheckbox.disabled = true;
+          }
           // Mark complete
           if (docId === 'pds-doc') {
             pdsComplete = true;
@@ -528,19 +551,8 @@ Director, Evolution Stables Ltd<br>
             togglePanel('sa');
           }
           updateNextButton();
-        } else {
-          // Unchecked - revert
-          if (docId === 'pds-doc') {
-            pdsComplete = false;
-            statusEl.textContent = 'Agree to proceed';
-            statusEl.className = 'text-[11px] font-medium text-[var(--accent)]';
-          } else {
-            saComplete = false;
-            statusEl.textContent = 'Agree to proceed';
-            statusEl.className = 'text-[11px] font-medium text-[var(--accent)]';
-          }
-          updateNextButton();
         }
+        // No un-sign: closed docs stay re-openable for reading, tick is locked
       });
     }
 

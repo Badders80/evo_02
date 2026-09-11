@@ -44,22 +44,16 @@
 <body class="min-h-screen">
   <!-- Modal Overlay -->
   <div class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/85 p-4 sm:p-6 backdrop-blur-md">
-    <div class="relative w-full max-w-lg max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-y-auto rounded-3xl border border-[var(--border)] bg-[var(--bg-surface)] p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
+    <div class="relative w-full max-w-lg h-[900px] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-hidden flex flex-col rounded-3xl border border-[var(--border)] bg-[var(--bg-surface)] p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
       <!-- Close Button -->
       <button type="button" aria-label="Close" class="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-heading)] text-xl transition-colors">✕</button>
-
-      <!-- Flow Progress Indicator -->
-      <div class="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-muted)] mb-4">
-        <span class="px-2 py-1 bg-[var(--accent)] text-[var(--accent-foreground)] rounded">2</span>
-        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">3</span>
-        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">4</span>
-        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">5</span>
-        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">6</span>
-      </div>
-
-      <div class="space-y-6">
+      <div class="flex-1 min-h-0 overflow-y-auto space-y-6">
         <!-- Header -->
         <div>
+          <button type="button" onclick="window.location.href='/marketplace/i-stole-a-manolo'" aria-label="Back" class="inline-flex items-center gap-1.5 text-[12px] font-light text-[var(--text-muted)] hover:text-[var(--text-heading)] transition-colors mb-3">
+            <span aria-hidden>←</span>
+            <span>Back</span>
+          </button>
           <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">Digital-Syndication Terms</p>
           <h3 class="text-[22px] font-light text-[var(--text-heading)] tracking-tight">I Stole A Manolo (NZ)</h3>
         </div>
@@ -112,20 +106,19 @@
           <div>
             <p class="flex justify-between items-baseline">
               <span class="text-[var(--text-muted)]">Distribution</span>
-              <strong class="text-[var(--status-active)] text-[13px] font-medium">75% Investor Pool / 25% Owner Retention</strong>
+              <strong class="text-[var(--status-active)] text-[13px] font-medium">75% Stakes won</strong>
             </p>
             <p class="text-[11px] text-[var(--text-muted)]/60 mt-1">distributed quarterly, pro-rated based on your investment &amp; official NZTR results</p>
           </div>
         </div>
+      </div>
 
-        <!-- CTA → Step 3 -->
-        <div class="flex items-center gap-3 p-4 border border-[var(--border)] rounded-lg bg-[var(--bg-canvas)]/50">
-          <input type="checkbox" id="term-sheet-accept" class="h-4 w-4 rounded border-[var(--border)] bg-[var(--bg-surface)] text-[var(--accent)] focus:ring-[var(--accent)]" required/>
-          <label for="term-sheet-accept" class="text-sm font-medium">I have read and accept these terms</label>
-        </div>
-        <button class="w-full rounded-full bg-[var(--accent)] py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent-foreground)] transition-all duration-300 hover:brightness-110 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+      <!-- Modal Action Footer — pinned, never scrolls -->
+      <div class="pt-2 border-t border-[var(--border)] space-y-3 shrink-0">
+        <!-- CTA → Step 3 (matches nav Get Started pill: grey, no gold fill) -->
+        <a href="step-3-sa-acceptance.html" class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-6 py-3.5 text-[11px] font-light tracking-[0.18em] uppercase text-[var(--text-foreground)] bg-[var(--bg-surface-base)] border border-[var(--border)] transition-all duration-300 hover:text-white hover:bg-[#212121] hover:border-[#575757] active:scale-[0.98]">
           Invest in I Stole A Manolo (NZ)
-        </button>
+        </a>
         <p class="text-[11px] font-light text-[var(--text-muted)] leading-relaxed text-center">
           Subject to
           <a href="#" class="text-[var(--text-muted)] underline underline-offset-2 hover:text-[var(--text-heading)] transition-colors">Product Disclosure Statement</a>
@@ -146,7 +139,6 @@
       </div>
       <div class="flex flex-wrap gap-3 text-sm text-[var(--text-muted)]">
         <span class="px-3 py-1.5 rounded-full border border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]">Stake validation error → inline alert</span>
-        <span class="px-3 py-1.5 rounded-full border border-[var(--text-muted)]/40 bg-[var(--bg-surface)] text-[var(--text-muted)]">Terms not accepted → CTA disabled</span>
       </div>
     </div>
   </div>

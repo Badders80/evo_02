@@ -37,17 +37,10 @@
 </head>
 <body class="min-h-screen">
   <div class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/85 p-4 sm:p-6 backdrop-blur-md">
-    <div class="relative w-full max-w-lg h-[900px] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-y-auto rounded-3xl border border-[var(--border)] bg-[var(--bg-surface)] p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
+    <div class="relative w-full max-w-lg h-[900px] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-hidden flex flex-col rounded-3xl border border-[var(--border)] bg-[var(--bg-surface)] p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
       <button type="button" aria-label="Close" class="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-heading)] text-xl transition-colors">✕</button>
-
-      <div class="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-muted)] mb-4">
-        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">2</span>
-        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">3</span>
-        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">4</span>
-        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">5</span>
-        <span class="px-2 py-1 bg-[var(--accent)] text-[var(--accent-foreground)] rounded">6</span>
-      </div>
-
+      <!-- Middle: states (parent never scrolls; this zone scrolls internally only on short viewports) -->
+      <div class="flex-1 min-h-0 overflow-y-auto">
       <!-- State: Processing Webhook -->
       <div id="webhook-processing" class="space-y-6 text-center animate-fade-in">
         <div class="h-12 w-12 mx-auto animate-spin rounded-full border-4 border-[var(--accent)] border-t-transparent" aria-hidden="true"></div>
@@ -109,7 +102,7 @@
         </div>
         
         <div class="pt-4 space-y-3">
-          <a href="mystable.html" class="w-full rounded-full bg-[var(--accent)] py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent-foreground)] block hover:brightness-110 transition-colors">View in MyStable →</a>
+          <a href="mystable.html" class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-6 py-3.5 text-[11px] font-light tracking-[0.18em] uppercase text-[var(--text-foreground)] bg-[var(--bg-surface-base)] border border-[var(--border)] transition-all duration-300 hover:text-white hover:bg-[#212121] hover:border-[#575757] active:scale-[0.98]">View in MyStable →</a>
           <a href="/marketplace/i-stole-a-manolo" class="w-full rounded-full border border-[var(--border)] bg-transparent py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)] hover:text-[var(--text-foreground)] transition-colors">Back to I Stole A Manolo</a>
         </div>
       </div>
@@ -122,7 +115,7 @@
         <p class="text-[15px] font-light text-[var(--text-foreground)]">Holding creation encountered an issue</p>
         <p class="text-[12px] text-[var(--text-muted)]" id="holding-error-msg">We received your payment but couldn't create the holding record. Our team has been notified.</p>
         <div class="pt-4 space-y-3">
-          <a href="mailto:support@evolutionstables.nz?subject=Holding%20Creation%20Issue&body=Holding%20creation%20failed%20after%20successful%20payment.%20Please%20investigate." class="w-full rounded-full bg-[var(--accent)] py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent-foreground)] block hover:brightness-110 transition-colors">Contact Support</a>
+          <a href="mailto:support@evolutionstables.nz?subject=Holding%20Creation%20Issue&body=Holding%20creation%20failed%20after%20successful%20payment.%20Please%20investigate." class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-6 py-3.5 text-[11px] font-light tracking-[0.18em] uppercase text-[var(--text-foreground)] bg-[var(--bg-surface-base)] border border-[var(--border)] transition-all duration-300 hover:text-white hover:bg-[#212121] hover:border-[#575757] active:scale-[0.98]">Contact Support</a>
           <a href="mystable.html" class="w-full rounded-full border border-[var(--border)] bg-transparent py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)] hover:text-[var(--text-foreground)] block transition-colors">Check MyStable (may already exist)</a>
         </div>
       </div>
@@ -135,10 +128,11 @@
         <p class="text-[15px] font-light text-[var(--text-foreground)]">Payment already processed</p>
         <p class="text-[12px] text-[var(--text-muted)]">This webhook was already handled. Your holding exists.</p>
         <div class="pt-4">
-          <a href="mystable.html" class="w-full rounded-full bg-[var(--accent)] py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent-foreground)] block hover:brightness-110 transition-colors">View MyStable →</a>
+          <a href="mystable.html" class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-6 py-3.5 text-[11px] font-light tracking-[0.18em] uppercase text-[var(--text-foreground)] bg-[var(--bg-surface-base)] border border-[var(--border)] transition-all duration-300 hover:text-white hover:bg-[#212121] hover:border-[#575757] active:scale-[0.98]">View MyStable →</a>
         </div>
       </div>
 
+      </div>
       <!-- Horizontal Fallbacks (behind overlay - dev annotations only, never shipped) -->
       <div class="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-lg px-4 z-[9999] pointer-events-none">
         <div class="border-t border-[var(--border)] pt-6 mt-6 space-y-4 bg-[var(--bg-surface)]/50 backdrop-blur-sm rounded-2xl p-4 pointer-events-auto">
