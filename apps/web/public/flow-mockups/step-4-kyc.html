@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Step 4 — KYC Verification | Purchase Flow Mockup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg-canvas: #0f0f0f;
+      --bg-surface: #141414;
+      --bg-surface-base: #1a1a1a;
+      --border: #2a2a2a;
+      --border-accent: #d4a964;
+      --text-heading: #fafafa;
+      --text-foreground: #e5e5e5;
+      --text-muted: #a3a3a3;
+      --text-muted-foreground: #737373;
+      --accent: #d4a964;
+      --accent-foreground: #0a0a0a;
+      --status-active: #22c55e;
+      --destructive: #ef4444;
+      --warning: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Geist', sans-serif; background: var(--bg); color: var(--text-foreground); }
+    .font-mono { font-family: 'Geist Mono', monospace; }
+    .animate-spin { animation: spin 1s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="min-h-screen">
+  <div class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/85 p-4 sm:p-6 backdrop-blur-md">
+    <div class="relative w-full max-w-lg h-[900px] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-y-auto rounded-3xl border border-[var(--border)] bg-[var(--bg-surface)] p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
+      <button type="button" aria-label="Close" class="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-heading)] text-xl transition-colors">✕</button>
+
+      <div class="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-muted)] mb-4">
+        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">2</span>
+        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">3</span>
+        <span class="px-2 py-1 bg-[var(--accent)] text-[var(--accent-foreground)] rounded">4</span>
+        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">5</span>
+        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">6</span>
+      </div>
+
+      <!-- Main KYC State: Redirect to Stripe Identity -->
+      <div id="kyc-redirect" class="space-y-6 text-center animate-fade-in">
+        <div class="h-16 w-16 mx-auto animate-spin rounded-full border-4 border-[var(--accent)] border-t-transparent" aria-hidden="true"></div>
+        <p class="text-[15px] font-light text-[var(--text-foreground)]">Redirecting to Stripe Identity for KYC verification…</p>
+        <p class="text-[12px] text-[var(--text-muted)]">This is a one-time check under New Zealand AML/CFT law.</p>
+        <div class="pt-4 border-t border-[var(--border)]">
+          <p class="text-[11px] font-light text-[var(--text-muted)]/70">If you are not redirected automatically, <a href="https://verify.stripe.com" target="_blank" rel="noopener noreferrer" class="text-[var(--accent)] underline">click here</a>.</p>
+        </div>
+      </div>
+
+      <!-- Fallback: KYC Return (after redirect) -->
+      <div id="kyc-return" class="space-y-6 text-center hidden animate-fade-in">
+        <div class="h-16 w-16 mx-auto rounded-full border-4 border-[var(--status-active)] border-t-transparent animate-spin" aria-hidden="true"></div>
+        <p class="text-[15px] font-light text-[var(--text-foreground)]">Welcome back — verifying your KYC status…</p>
+        <p class="text-[12px] text-[var(--text-muted)]">We'll automatically proceed to checkout once confirmed.</p>
+      </div>
+
+      <!-- Fallback: KYC Pending -->
+      <div id="kyc-pending" class="space-y-6 text-center hidden animate-fade-in">
+        <div class="h-16 w-16 mx-auto rounded-full border-4 border-[var(--warning)] border-t-transparent animate-spin" aria-hidden="true"></div>
+        <p class="text-[15px] font-light text-[var(--text-foreground)]">KYC verification is still being processed</p>
+        <p class="text-[12px] text-[var(--text-muted)]">This usually takes a few minutes. You'll receive an email when complete.</p>
+        <div class="pt-4 space-y-3">
+          <button class="w-full rounded-full border border-[var(--border)] bg-[var(--bg-surface-base)] py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-foreground)] hover:bg-[var(--bg-surface)] transition-colors">Check Status Again</button>
+          <button onclick="window.location.href='step-3-sa-acceptance.html'" class="w-full rounded-full border border-[var(--border)] bg-transparent py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)] hover:text-[var(--text-foreground)] transition-colors">← Back to Agreement</button>
+        </div>
+      </div>
+
+      <!-- Fallback: KYC Rejected -->
+      <div id="kyc-rejected" class="space-y-6 text-center hidden animate-fade-in">
+        <div class="h-16 w-16 mx-auto rounded-full bg-[var(--destructive)]/20 flex items-center justify-center">
+          <svg class="h-8 w-8 text-[var(--destructive)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"></path></svg>
+        </div>
+        <p class="text-[15px] font-light text-[var(--text-foreground)]">KYC verification was not successful</p>
+        <p class="text-[12px] text-[var(--text-muted)]">We couldn't verify your identity. This may be due to document quality or eligibility requirements.</p>
+        <div class="pt-4 space-y-3">
+          <a href="https://support.stripe.com" target="_blank" rel="noopener noreferrer" class="w-full rounded-full bg-[var(--accent)] py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent-foreground)] block hover:brightness-110 transition-colors">Contact Support</a>
+          <button onclick="window.location.href='step-3-sa-acceptance.html'" class="w-full rounded-full border border-[var(--border)] bg-transparent py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)] hover:text-[var(--text-foreground)] transition-colors">← Back to Agreement</button>
+        </div>
+      </div>
+
+      <!-- Horizontal Fallbacks (behind overlay - dev annotations only, never shipped) -->
+      <div class="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-lg px-4 z-[9999] pointer-events-none">
+        <div class="border-t border-[var(--border)] pt-6 mt-6 space-y-4 bg-[var(--bg-surface)]/50 backdrop-blur-sm rounded-2xl p-4 pointer-events-auto">
+          <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Fallback Paths (Horizontal) — DEV ANNOTATIONS</p>
+          <div class="flex flex-wrap gap-3">
+            <a href="step-3-sa-acceptance.html" class="px-4 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface-base)] text-[var(--text-foreground)] text-sm hover:bg-[var(--bg-surface)] transition-colors">← Back to Step 3</a>
+            <a href="step-5-checkout.html" class="px-4 py-2 rounded-lg border border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)] text-sm hover:bg-[var(--accent)]/20 transition-colors">Proceed to Step 5 (Checkout) →</a>
+          </div>
+          <div class="flex flex-wrap gap-3 text-sm">
+            <span class="px-3 py-1.5 rounded-full border border-[var(--status-active)]/40 bg-[var(--status-active)]/10 text-[var(--status-active)]">KYC verified → auto-advance to checkout</span>
+            <span class="px-3 py-1.5 rounded-full border border-[var(--warning)]/40 bg-[var(--warning)]/10 text-[var(--warning)]">KYC pending → poll / check again</span>
+            <span class="px-3 py-1.5 rounded-full border border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]">KYC rejected → support / retry</span>
+            <span class="px-3 py-1.5 rounded-full border border-[var(--text-muted)]/40 bg-[var(--bg-surface)] text-[var(--text-muted)]">Redirect fail → manual link</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simulate KYC flow states - in real app this is driven by URL params (?kyc=return, ?kyc=pending, ?kyc=rejected)
+    const params = new URLSearchParams(window.location.search);
+    const kycState = params.get('kyc') || 'redirect';
+    
+    document.getElementById('kyc-redirect').classList.toggle('hidden', kycState !== 'redirect');
+    document.getElementById('kyc-return').classList.toggle('hidden', kycState !== 'return');
+    document.getElementById('kyc-pending').classList.toggle('hidden', kycState !== 'pending');
+    document.getElementById('kyc-rejected').classList.toggle('hidden', kycState !== 'rejected');
+    
+    // In preview mode, auto-advance after 2s
+    if (kycState === 'redirect' && window.location.search.includes('preview')) {
+      setTimeout(() => {
+        window.location.href = 'step-5-checkout.html';
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

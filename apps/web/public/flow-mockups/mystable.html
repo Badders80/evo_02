@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>MyStable — Your Holdings | Purchase Flow Mockup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg-canvas: #0f0f0f;
+      --bg-surface: #141414;
+      --bg-surface-base: #1a1a1a;
+      --border: #2a2a2a;
+      --border-accent: #d4a964;
+      --text-heading: #fafafa;
+      --text-foreground: #e5e5e5;
+      --text-muted: #a3a3a3;
+      --text-muted-foreground: #737373;
+      --accent: #d4a964;
+      --accent-foreground: #0a0a0a;
+      --status-active: #22c55e;
+      --destructive: #ef4444;
+      --warning: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Geist', sans-serif; background: var(--bg); color: var(--text-foreground); }
+    .font-mono { font-family: 'Geist Mono', monospace; }
+    .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Nav -->
+  <nav class="fixed inset-x-0 top-0 z-[9999] w-full bg-[var(--bg-canvas)]/40 backdrop-blur-[32px] border-b border-[var(--border)]">
+    <div class="mx-auto flex h-20 w-full max-w-[1440px] items-center px-6 sm:px-10 lg:px-12">
+      <a href="/" class="flex shrink-0 items-center"><div class="relative h-7 w-auto"><div class="h-full w-auto bg-gradient-to-r from-[var(--accent)] to-yellow-400 rounded-sm flex items-center justify-center px-3"><span class="text-[var(--accent-foreground)] font-light text-[14px]">Evolution Stables</span></div></div></a>
+      <div class="flex flex-1 items-center justify-center lg:flex">
+        <div class="flex items-center gap-0"><a href="/#about" class="px-2.5 py-4 text-[12px] font-[300] tracking-[0.15em] uppercase text-[var(--text-foreground)] hover:text-[var(--text-heading)]">About</a><a href="/#mission" class="px-2.5 py-4 text-[12px] font-[300] tracking-[0.15em] uppercase text-[var(--text-foreground)] hover:text-[var(--text-heading)]">Mission</a><a href="/#digital-syndication" class="px-2.5 py-4 text-[12px] font-[300] tracking-[0.15em] uppercase text-[var(--text-foreground)] hover:text-[var(--text-heading)]">Model</a><a href="/marketplace" class="px-2.5 py-4 text-[12px] font-[300] tracking-[0.15em] uppercase text-[var(--text-foreground)] hover:text-[var(--text-heading)]">Marketplace</a><a href="/mystable" class="px-2.5 py-4 text-[12px] font-[300] tracking-[0.15em] uppercase text-[var(--accent)]">MyStable</a><a href="/#faq" class="px-2.5 py-4 text-[12px] font-[300] tracking-[0.15em] uppercase text-[var(--text-foreground)] hover:text-[var(--text-heading)]">FAQ</a></div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-1 pt-20">
+    <div class="mx-auto max-w-6xl px-6 sm:px-10 lg:px-12 py-12">
+      <!-- Header -->
+      <div class="mb-10 flex items-center justify-between text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)]">
+        <div class="flex items-center gap-2">
+          <a href="/marketplace" class="transition duration-300 hover:text-[var(--accent)]">Marketplace</a>
+          <span>/</span>
+          <span class="text-[var(--text-foreground)]">MyStable</span>
+        </div>
+      </div>
+
+      <div class="space-y-8">
+        <div>
+          <p class="text-[11px] font-light uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">My Stable</p>
+          <h1 class="text-[36px] font-light tracking-[-0.04em] text-[var(--text-heading)] md:text-[48px] leading-[1.05]">Your Holdings</h1>
+          <p class="mt-2 max-w-2xl text-[15px] font-light leading-[1.7] text-[var(--text-muted)]">Active, pending, and completed digital syndication stakes.</p>
+        </div>
+
+        <!-- Active Holdings -->
+        <section class="space-y-6">
+          <h2 class="text-[14px] font-medium uppercase tracking-[0.2em] text-[var(--text-muted)]">Active</h2>
+          
+          <!-- I Stole A Manolo Holding -->
+          <article class="rounded-3xl border border-[var(--border)] bg-[var(--bg-surface)] p-6 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)] animate-fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
+              <div class="flex items-start gap-4">
+                <div class="relative h-24 w-32 flex-shrink-0 overflow-hidden rounded-xl bg-[var(--bg-surface-base)]">
+                  <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-yellow-500/20 to-orange-500/20">
+                    <span class="text-[24px] font-light">🏇</span>
+                  </div>
+                </div>
+                <div>
+                  <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Digital Syndication</p>
+                  <h3 class="text-[22px] font-light text-[var(--text-heading)] tracking-tight">I Stole A Manolo (NZ)</h3>
+                  <p class="text-[12px] text-[var(--text-muted)] mt-1">Barn name: Manolo | Trainer: Lance O'Sullivan &amp; Andrew Scott</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 sm:ml-auto">
+                <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-widest border-[var(--status-active)]/40 bg-[var(--status-active)]/10 text-[var(--status-active)]"><span class="h-2 w-2 rounded-full bg-[var(--status-active)]"></span>Active</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 border-t border-[var(--border)] pt-6">
+              <div>
+                <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Stake</p>
+                <p class="text-[24px] font-light text-[var(--text-heading)] tracking-tight">1.0%</p>
+              </div>
+              <div>
+                <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Monthly Keep</p>
+                <p class="text-[24px] font-light text-[var(--text-heading)] tracking-tight">$76 NZD</p>
+              </div>
+              <div>
+                <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Float Balance</p>
+                <p class="text-[24px] font-light text-[var(--text-heading)] tracking-tight">$380 NZD</p>
+                <p class="text-[11px] text-[var(--text-muted)]/60 mt-0.5">5 months buffer</p>
+              </div>
+              <div>
+                <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Next Billing</p>
+                <p class="text-[24px] font-light text-[var(--text-heading)] tracking-tight">1 Oct 2026</p>
+              </div>
+            </div>
+
+            <div class="border-t border-[var(--border)] pt-6 space-y-3">
+              <div class="flex flex-wrap gap-3">
+                <a href="#" class="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--bg-surface-base)] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-foreground)] hover:bg-[var(--bg-surface)] transition-colors">View Race Record</a>
+                <a href="#" class="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--bg-surface-base)] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-foreground)] hover:bg-[var(--bg-surface)] transition-colors">Documents (PDS, SA)</a>
+                <a href="#" class="inline-flex items-center gap-2 rounded-full border border-[var(--accent)]/40 bg-[var(--accent)]/10 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent)] hover:bg-[var(--accent)]/20 transition-colors">Quarterly Returns</a>
+              </div>
+              <p class="text-[11px] font-light text-[var(--text-muted)]/70">Holding ID: <span class="font-mono text-[var(--text-foreground)]">hld_abc123def456</span> | Created: 11 September 2026</p>
+            </div>
+          </article>
+        </section>
+
+        <!-- Empty state for other sections -->
+        <section class="space-y-6">
+          <h2 class="text-[14px] font-medium uppercase tracking-[0.2em] text-[var(--text-muted)]">Pending</h2>
+          <div class="rounded-2xl border border-[var(--border)]/50 bg-[var(--bg-surface)]/50 p-8 text-center">
+            <p class="text-[var(--text-muted)]">No pending holdings. Complete a purchase to see it here.</p>
+          </div>
+        </section>
+
+        <section class="space-y-6">
+          <h2 class="text-[14px] font-medium uppercase tracking-[0.2em] text-[var(--text-muted)]">Completed</h2>
+          <div class="rounded-2xl border border-[var(--border)]/50 bg-[var(--bg-surface)]/50 p-8 text-center">
+            <p class="text-[var(--text-muted)]">No completed holdings yet.</p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-[var(--bg-canvas)] border-t border-[var(--border)] py-12">
+    <div class="mx-auto max-w-6xl px-6 sm:px-10 lg:px-12">
+      <p class="text-[11px] font-light text-[var(--text-muted)] text-center">Evolution Stables | Digital Syndication | <a href="/privacy" class="underline hover:text-[var(--accent)]">Privacy</a> | <a href="/terms" class="underline hover:text-[var(--accent)]">Terms</a></p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Purchase Flow Mockups — Index</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg-canvas: #0f0f0f;
+      --bg-surface: #141414;
+      --bg-surface-base: #1a1a1a;
+      --border: #2a2a2a;
+      --accent: #d4a964;
+      --accent-foreground: #0a0a0a;
+      --text-heading: #fafafa;
+      --text-foreground: #e5e5e5;
+      --text-muted: #a3a3a3;
+      --text-muted-foreground: #737373;
+      --status-active: #22c55e;
+      --destructive: #ef4444;
+      --warning: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Geist', sans-serif; background: var(--bg); color: var(--text-foreground); }
+    .font-mono { font-family: 'Geist Mono', monospace; }
+  </style>
+</head>
+<body class="min-h-screen py-12 px-6">
+  <div class="mx-auto max-w-4xl">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <p class="text-[11px] font-light uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">Purchase Flow Mockups</p>
+      <h1 class="text-[36px] font-light tracking-[-0.04em] text-[var(--text-heading)] md:text-[48px] leading-[1.05]">6-Step Flow + Fallbacks</h1>
+      <p class="mt-4 max-w-2xl mx-auto text-[15px] font-light leading-[1.7] text-[var(--text-muted)]">Static HTML renders of each step from <code class="font-mono text-[var(--accent)]">purchase-flow-modal.tsx</code> with horizontal fallback paths.</p>
+    </div>
+
+    <!-- Vertical Flow -->
+    <div class="space-y-4 mb-12">
+      <h2 class="text-[14px] font-medium uppercase tracking-[0.2em] text-[var(--text-muted)]">Vertical Flow (Happy Path)</h2>
+      <div class="space-y-3">
+        <a href="step-2-term-sheet.html?preview=1" class="flex items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-4 hover:border-[var(--accent)] hover:bg-[var(--bg-surface-base)] transition-colors group">
+          <div class="w-12 h-12 rounded-xl bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0">
+            <span class="text-[20px] font-light text-[var(--accent)]">2</span>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-[16px] font-light text-[var(--text-heading)] group-hover:text-[var(--accent)] transition-colors">Step 2 — Term Sheet</h3>
+            <p class="text-[12px] text-[var(--text-muted)] mt-0.5">Stake selector, 4-row summary, generated DSL term sheet, accept terms → proceed</p>
+          </div>
+          <span class="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">→</span>
+        </a>
+        <a href="step-3-sa-acceptance.html?preview=1" class="flex items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-4 hover:border-[var(--accent)] hover:bg-[var(--bg-surface-base)] transition-colors group">
+          <div class="w-12 h-12 rounded-xl bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0">
+            <span class="text-[20px] font-light text-[var(--accent)]">3</span>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-[16px] font-light text-[var(--text-heading)] group-hover:text-[var(--accent)] transition-colors">Step 3 — SA Acceptance</h3>
+            <p class="text-[12px] text-[var(--text-muted)] mt-0.5">Investor-SA document, recorded acceptance tick → Complete KYC Verification</p>
+          </div>
+          <span class="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">→</span>
+        </a>
+        <a href="step-4-kyc.html?kyc=redirect&preview=1" class="flex items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-4 hover:border-[var(--accent)] hover:bg-[var(--bg-surface-base)] transition-colors group">
+          <div class="w-12 h-12 rounded-xl bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0">
+            <span class="text-[20px] font-light text-[var(--accent)]">4</span>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-[16px] font-light text-[var(--text-heading)] group-hover:text-[var(--accent)] transition-colors">Step 4 — KYC Verification</h3>
+            <p class="text-[12px] text-[var(--text-muted)] mt-0.5">Redirect to Stripe Identity → return with ?kyc=return → auto-advance</p>
+          </div>
+          <span class="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">→</span>
+        </a>
+        <a href="step-5-checkout.html?checkout=redirect&preview=1" class="flex items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-4 hover:border-[var(--accent)] hover:bg-[var(--bg-surface-base)] transition-colors group">
+          <div class="w-12 h-12 rounded-xl bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0">
+            <span class="text-[20px] font-light text-[var(--accent)]">5</span>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-[16px] font-light text-[var(--text-heading)] group-hover:text-[var(--accent)] transition-colors">Step 5 — Stripe Checkout</h3>
+            <p class="text-[12px] text-[var(--text-muted)] mt-0.5">Redirect to Stripe → payment success/fail/cancel → webhook triggers</p>
+          </div>
+          <span class="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">→</span>
+        </a>
+        <a href="step-6-holding.html?holding=processing&preview=1" class="flex items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-4 hover:border-[var(--accent)] hover:bg-[var(--bg-surface-base)] transition-colors group">
+          <div class="w-12 h-12 rounded-xl bg-[var(--accent)]/20 flex items-center justify-center flex-shrink-0">
+            <span class="text-[20px] font-light text-[var(--accent)]">6</span>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-[16px] font-light text-[var(--text-heading)] group-hover:text-[var(--accent)] transition-colors">Step 6 — Holding Created</h3>
+            <p class="text-[12px] text-[var(--text-muted)] mt-0.5">Webhook processes → holding row created → legal docs attached → MyStable</p>
+          </div>
+          <span class="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">→</span>
+        </a>
+        <a href="mystable.html" class="flex items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-4 hover:border-[var(--accent)] hover:bg-[var(--bg-surface-base)] transition-colors group">
+          <div class="w-12 h-12 rounded-xl bg-[var(--status-active)]/20 flex items-center justify-center flex-shrink-0">
+            <svg class="h-6 w-6 text-[var(--status-active)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9m-4.5 0l4.5 4.5M3.75 15.75h4.5m0-4.5v-4.5m0 4.5l4.5-4.5M15.75 3.75v4.5m0-4.5h4.5m-4.5 0l4.5 4.5m0-4.5l-4.5 4.5M15.75 15.75h4.5m-4.5 0v4.5m0-4.5l-4.5-4.5"></path></svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-[16px] font-light text-[var(--text-heading)] group-hover:text-[var(--accent)] transition-colors">MyStable — Your Holdings</h3>
+            <p class="text-[12px] text-[var(--text-muted)] mt-0.5">Active/pending/completed holdings dashboard with race records, documents, returns</p>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Horizontal Fallbacks Reference -->
+    <div class="space-y-6">
+      <h2 class="text-[14px] font-medium uppercase tracking-[0.2em] text-[var(--text-muted)]">Horizontal Fallbacks per Step</h2>
+      
+      <div class="rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-6">
+        <h3 class="text-[14px] font-medium text-[var(--text-heading)] mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-[var(--accent)]/20 flex items-center justify-center text-[12px] font-light text-[var(--accent)]">2</span> Step 2 — Term Sheet</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1.5 rounded-full border border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)] text-sm">Stake validation error (over/under/non-multiple/empty)</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--text-muted)]/40 bg-[var(--bg-surface)] text-[var(--text-muted)] text-sm">Terms not accepted → CTA disabled</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--text-muted)]/40 bg-[var(--bg-surface)] text-[var(--text-muted)] text-sm">← Back to horse page</span>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-6">
+        <h3 class="text-[14px] font-medium text-[var(--text-heading)] mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-[var(--accent)]/20 flex items-center justify-center text-[12px] font-light text-[var(--accent)]">3</span> Step 3 — SA Acceptance</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1.5 rounded-full border border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)] text-sm">SA not accepted → CTA disabled</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)] text-sm">API error → toast + stay on step</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)] text-sm">KYC redirect fail → retry KYC</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--text-muted)]/40 bg-[var(--bg-surface)] text-[var(--text-muted)] text-sm">← Back to Step 2</span>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-6">
+        <h3 class="text-[14px] font-medium text-[var(--text-heading)] mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-[var(--accent)]/20 flex items-center justify-center text-[12px] font-light text-[var(--accent)]">4</span> Step 4 — KYC</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1.5 rounded-full border border-[var(--status-active)]/40 bg-[var(--status-active)]/10 text-[var(--status-active)] text-sm">KYC verified → auto-advance</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--warning)]/40 bg-[var(--warning)]/10 text-[var(--warning)] text-sm">KYC pending → poll / check again</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)] text-sm">KYC rejected → support / retry</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--text-muted)]/40 bg-[var(--bg-surface)] text-[var(--text-muted)] text-sm">Redirect fail → manual link</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--text-muted)]/40 bg-[var(--bg-surface)] text-[var(--text-muted)] text-sm">← Back to Step 3</span>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-6">
+        <h3 class="text-[14px] font-medium text-[var(--text-heading)] mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-[var(--accent)]/20 flex items-center justify-center text-[12px] font-light text-[var(--accent)]">5</span> Step 5 — Checkout</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1.5 rounded-full border border-[var(--status-active)]/40 bg-[var(--status-active)]/10 text-[var(--status-active)] text-sm">Payment success → webhook → holding</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)] text-sm">Card declined → retry / different card</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--warning)]/40 bg-[var(--warning)]/10 text-[var(--warning)] text-sm">User cancelled → retry (15 min hold)</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)] text-sm">Stripe error → toast + retry</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--text-muted)]/40 bg-[var(--bg-surface)] text-[var(--text-muted)] text-sm">Network timeout → idempotency key</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--text-muted)]/40 bg-[var(--bg-surface)] text-[var(--text-muted)] text-sm">← Back to KYC</span>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-6">
+        <h3 class="text-[14px] font-medium text-[var(--text-heading)] mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-[var(--accent)]/20 flex items-center justify-center text-[12px] font-light text-[var(--accent)]">6</span> Step 6 — Holding</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1.5 rounded-full border border-[var(--status-active)]/40 bg-[var(--status-active)]/10 text-[var(--status-active)] text-sm">Holding created → MyStable</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)] text-sm">DB error → alert ops + support</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--warning)]/40 bg-[var(--warning)]/10 text-[var(--warning)] text-sm">Duplicate webhook → idempotent</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)] text-sm">Reservation expired → refund</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--text-muted)]/40 bg-[var(--bg-surface)] text-[var(--text-muted)] text-sm">← Back to Checkout</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Credentials -->
+    <div class="mt-12 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-6">
+      <h3 class="text-[14px] font-medium text-[var(--text-heading)] mb-4">Local Dev Test Credentials</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div class="bg-[var(--bg-surface-base)] rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Admin Cheat-Code</p>
+          <p class="font-mono text-[var(--text-heading)]">admin@evolutionstables.nz</p>
+          <p class="font-mono text-[var(--text-muted)] mt-1">Bali</p>
+          <p class="text-[11px] text-[var(--status-active)] mt-2">✓ KYC verified</p>
+        </div>
+        <div class="bg-[var(--bg-surface-base)] rounded-xl p-4">
+          <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Original Demo User</p>
+          <p class="font-mono text-[var(--text-heading)]">alex@evolutionstables.nz</p>
+          <p class="font-mono text-[var(--text-muted)] mt-1">nellie-demo-2026</p>
+          <p class="text-[11px] text-[var(--status-active)] mt-2">✓ KYC verified</p>
+        </div>
+      </div>
+      <p class="text-[11px] text-[var(--text-muted)] mt-4">Both work with <code class="font-mono">WORKFLOW_PREVIEW=true</code> (bypasses KYC gate). Dev server: <a href="http://localhost:3000" class="text-[var(--accent)] underline">http://localhost:3000</a></p>
+    </div>
+  </div>
+</body>
+</html>

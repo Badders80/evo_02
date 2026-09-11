@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Step 3 — SA Acceptance | Purchase Flow Mockup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg-canvas: #0f0f0f;
+      --bg-surface: #141414;
+      --bg-surface-base: #1a1a1a;
+      --border: #2a2a2a;
+      --border-accent: #d4a964;
+      --text-heading: #fafafa;
+      --text-foreground: #e5e5e5;
+      --text-muted: #a3a3a3;
+      --text-muted-foreground: #737373;
+      --accent: #d4a964;
+      --accent-foreground: #0a0a0a;
+      --status-active: #22c55e;
+      --destructive: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Geist', sans-serif; background: var(--bg); color: var(--text-foreground); }
+    .font-mono { font-family: 'Geist Mono', monospace; }
+    .prose { max-width: none; }
+    .prose p { margin-bottom: 1rem; line-height: 1.7; }
+    .prose h1, .prose h2, .prose h3 { color: var(--text-heading); margin-top: 1.5rem; margin-bottom: 0.5rem; }
+    .prose table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .prose th, .prose td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; }
+    .prose th { background: var(--bg-surface); font-weight: 500; }
+    .prose strong { color: var(--text-heading); }
+    .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    /* Accordion styles */
+    .accordion-panel { transition: max-height 0.3s ease-out, opacity 0.2s ease-out; }
+    .accordion-panel.collapsed { max-height: 0; opacity: 0; pointer-events: none; }
+    .accordion-panel.open { max-height: 10000px; opacity: 1; }
+    .tick-sign { opacity: 0; transform: translateY(8px); transition: opacity 0.2s ease-out, transform 0.2s ease-out; }
+    .tick-sign.visible { opacity: 1; transform: translateY(0); }
+    .scroll-indicator { transition: opacity 0.2s ease-out; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Modal Overlay - z-index raised above nav -->
+  <div class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/85 p-4 sm:p-6 backdrop-blur-md">
+    <!-- Modal Shell - 672px width for Step 3 -->
+    <div class="relative w-full max-w-[672px] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-y-auto rounded-3xl border border-[var(--border)] bg-[var(--bg-surface)] p-8 space-y-6 shadow-[0_0_60px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
+      <button type="button" aria-label="Close" class="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-heading)] text-xl transition-colors">✕</button>
+
+      <div class="flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-muted)] mb-4">
+        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">2</span>
+        <span class="px-2 py-1 bg-[var(--accent)] text-[var(--accent-foreground)] rounded">3</span>
+        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">4</span>
+        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">5</span>
+        <span class="px-2 py-1 bg-[var(--bg-surface-base)] rounded">6</span>
+      </div>
+
+      <div class="space-y-6">
+        <!-- Header with Back Button -->
+        <div>
+          <button type="button" onclick="window.location.href='step-2-term-sheet.html'" aria-label="Back" class="inline-flex items-center gap-1.5 text-[12px] font-light text-[var(--text-muted)] hover:text-[var(--text-heading)] transition-colors mb-3">
+            <span aria-hidden>←</span>
+            <span>Back</span>
+          </button>
+          <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">Subscription Agreement</p>
+          <h3 class="text-[22px] font-light text-[var(--text-heading)] tracking-tight">I Stole A Manolo (NZ) — your documents</h3>
+          <p class="text-[11px] font-light text-[var(--text-muted)]/60 leading-relaxed mt-2">Read each document in full. Scroll to bottom to reveal the agreement tick. Both must be COMPLETE to proceed.</p>
+        </div>
+
+        <!-- Two-Doc Accordion (FAQ pattern) -->
+        <div class="space-y-3" id="accordion-container">
+          <!-- PDS Panel (Panel 1 - auto-opens) -->
+          <div class="rounded-xl border border-[var(--border)] bg-[var(--bg-surface-base)] overflow-hidden" id="pds-panel">
+            <button type="button" class="w-full px-4 py-3.5 flex items-center justify-between gap-4 text-left" aria-expanded="true" aria-controls="pds-content" onclick="togglePanel('pds')">
+              <span class="font-medium text-[var(--text-heading)]">Product Disclosure Statement</span>
+              <div class="flex items-center gap-2">
+                <span id="pds-status" class="text-[11px] font-medium text-[var(--text-muted)]">Reading…</span>
+                <svg class="w-5 h-5 text-[var(--text-muted)] transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </div>
+            </button>
+            <div id="pds-content" class="accordion-panel open px-4 pb-4" role="region" aria-labelledby="pds-panel">
+              <div class="rounded-xl border border-[var(--border)] bg-[var(--bg-canvas)]/60 overflow-hidden" style="height: 86vh; max-height: 86vh;">
+                <div class="prose prose-sm max-w-none text-[var(--text-foreground)] p-4 overflow-y-auto" style="height: 100%;" id="pds-doc">
+                  <!-- PDS content pasted from legal_engine/src/pds.ts -->
+                  <h1># Product Disclosure Statement</h1>
+<h2>## I Stole A Manolo (NZ) Syndicate</h2>
+
+**Campaign:** i-stole-a-manolo  
+**Version:** 1.0.0  
+**Effective Date:** 2026-09-01
+
+---
+
+## Key Information Summary
+
+**What is this?**
+
+This Product Disclosure Statement outlines a leasehold interest in I Stole A Manolo (NZ), a New Zealand thoroughbred. I Stole A Manolo (NZ) Syndicate makes fractional participation available to Members through its digital-syndication model. Full authority: the Commercial Model and Asset Specifics sections below and the Syndicate Agreement.
+
+**Who is this for?**
+
+Individuals seeking exposure to racehorse ownership in a structured, managed format — no prior ownership experience required.
+
+**How does it work?**
+
+You invest in a share of the syndicated leasehold interest in I Stole A Manolo (NZ). Your fixed-price payments cover the costs of the lease for the term, with no additional capital calls. Your returns are linked directly to the performance of the asset, where you receive 75% of gross stakes, generated from racing, proportional to your interest.
+
+**About the Asset**
+
+- **Asset Type:** Leasehold interest in a thoroughbred racehorse
+- **Asset Name:** I Stole A Manolo (NZ)
+- **Current Available Stake:** 5.0% syndicated share of total ownership
+- **Minimum Investment:** 1.0%
+- **Term:** 22 months (1 September 2026 → 30 June 2028)
+- **Managed by:** Evolution Stables (Authorised Syndicator)
+- **Governing Authority:** New Zealand Thoroughbred Racing (NZTR)
+
+**Returns**
+
+Investors receive 75% of gross stakes won during their eligible investment period. There are no guarantees, and you may not recover your original investment.
+
+**Costs**
+
+- $76.00 per month per 1% stake, recurring monthly for the duration of the investment.
+- A one-time upfront payment covers the deposit and initial payment.
+
+**Race Schedule Expectation**
+
+Race schedule expectations will be confirmed by the yard and communicated to Members.
+
+**Risks**
+
+The horse may underperform, suffer injury, or be retired early. Early termination may result in a pro-rata refund. Limited liquidity — resale may not be immediate or available. You could lose the full amount of your investment. (See Section 12.)
+
+**How to Invest**
+
+Applications are made directly through Evolution Stables. Identity verification is required under AML/CFT laws. (See Section 17 — Investment Details.)
+
+**Manager**
+
+Evolution Stables is an NZTR-authorised syndicator specialising in digital syndication of leasehold interests in New Zealand thoroughbreds. (See About Evolution Stables below.)
+
+---
+
+## About Evolution Stables
+
+Evolution Stables is a New Zealand-based, NZTR-authorised syndicator offering structured, digitally-syndicated ownership of leasehold interests in New Zealand thoroughbreds.
+
+We partner with leading owners and trainers to lease premium bloodstock, then make those opportunities available in fractional, fixed-term interests. This lowers the cost of entry and simplifies ownership, giving more people the chance to experience the sport from the inside.
+
+Our approach blends the tradition, passion, and community of racing with modern technology and transparent processes — helping to build the next generation of owners.
+
+---
+
+## §1. Title & Structure
+
+This Product Disclosure Statement relates to the I Stole A Manolo (NZ) Syndicate, a digitally-syndicated thoroughbred ownership campaign managed by Evolution Stables, a registered Syndicate Manager under the New Zealand Thoroughbred Racing (NZTR) Rules of Racing and Syndication Code of Practice.
+
+Participation is offered in the form of fractional leasehold stakes. Each stake is a percentage interest in the syndicated leasehold of the thoroughbred described in §2, from a minimum investment of 1.0%, with increments of 0.5% thereafter.
+
+---
+
+## §2. Asset Specifics
+
+### §2.1 About Horse & Trainer
+
+I Stole A Manolo (NZ) is a 3-year-old gelding by Proisir out of Manolo Blahnik, bred by B.A.X Bloodstock. A promising type with early speed, he has shown ability at Matamata trials and is targeting a spring campaign.
+
+Lance O'Sullivan & Andrew Scott (Matamata, NZ) — one of New Zealand's premier training partnerships, combining decades of Group 1 experience with a welfare-first philosophy. Their Matamata facility is purpose-built for thoroughbred development.
+
+### §2.3 Racing Outlook & Pedigree
+
+Proisir (sire) — Champion NZ 2YO, G1 Sistema Stakes winner, progeny include multiple stakes performers. Manolo Blahnik (dam) — unraced half-sister to stakes winners. This is a speed-oriented pedigree suited to 1200–1400m.
+
+### §2.4 Racing Expectation
+
+Targeting a 3YO spring campaign with potential for early black-type. Race schedule expectations will be confirmed by the yard and communicated to Members.
+
+### §2.2 Key Details
+
+| Attribute | Detail |
+| :--- | :--- |
+| Legal Name | I Stole A Manolo (NZ) |
+| Barn Name | Manolo |
+| Foaled | 2023 |
+| Gender | Gelding |
+| Breeder | B.A.X Bloodstock |
+| Sire | Proisir |
+| Dam | Manolo Blahnik |
+| Microchip | 985125000139219 |
+| Trainer | Lance O'Sullivan & Andrew Scott (Matamata, NZ) |
+
+---
+
+## §3. Commercial Model
+
+This syndicate operates on a fixed rate of **$76.00 per month per 1% stake**.
+
+---
+
+## §4. Deposit & Billing
+
+The digitally syndicated campaign operates on a five-month initial investment upon participation, with recurring monthly payments due on the 1st of every month thereafter.
+
+The five-month initial investment follows a 3+2 structure outlined below:
+
+- 3 months security deposit reserve; and
+- 2 months keep (comprising the initial installment and 1 month in advance).
+
+Upon formal termination or maturity of the syndicate lease, all unused prepaid keep and security deposit reserve funds are refunded pro-rata to the investor's verified payment method.
+
+---
+
+## §5. Investor Return
+
+Investors receive a distribution calculated strictly from official New Zealand Thoroughbred Racing (NZTR) gross stakes won during their eligible participation period:
+
+5.1. **Stakes Calculation:** Based on official NZTR stakes distributions published via loveracing.nz.
+5.2. **Stakes Allocation:** 75% Investor Pool / 25% Owner Retention of total gross stakes won is allocated to the Investor Pool (distributed pro-rata relative to stake held).
+5.3. **Distribution Schedule:** Quarterly.
+5.4. **Qualification Period:** Investors must have maintained fully paid-up status for two (2) full months prior to a race date to qualify for prize money distributions from that race.
+
+---
+
+## §6. Exit & Termination
+
+Rules for exit and termination are designed around three core pillars: creating accessible investment opportunities, maintaining commercial viability, and prioritizing the long-term care of the horse.
+
+**Lessor 14-Day Break:** This syndicate operates under the Standard 14-Day Notice mechanism stipulated by the horse owner, matching the underlying Head Lease agreement. The lease may be terminated upon 14 calendar days' written notice when the underlying head lease concludes or the horse is retired. This process is triggered exclusively by the owner, not Evolution Stables.
+
+**Investor Notice & Wind-Down Period:** An investor may give notice of exit prior to their next monthly installment date. Upon receiving notice, recurring monthly billing ceases, and the investor's 3+2 deposit structure serves as the active wind-down period until their participation concludes.
+
+**Default & Forfeiture:** An investor enters default if a scheduled monthly payment is missed. Evolution Stables will notify the investor during the default period. If the outstanding balance is not rectified prior to the next billing cycle, the investment is deemed in default. The investor forfeits all future rights to prize money distributions and their deposit, which is subsequently reallocated to the horse owner to secure the ongoing care and maintenance of the horse. Evolution Stables receives no material financial benefit from an investor default.
+
+---
+
+## §7. Taxes
+
+Investors are responsible for their own tax liabilities arising from any distributions or returns generated by their participation in this Syndicate. Evolution Stables does not provide tax advice. Participants should consult their own independent tax advisors regarding the implications of holding an interest and receiving racehorse distributions.
+
+---
+
+## §8. Insurance
+
+Evolution Stables has not secured mortality insurance for this leasehold stake. Because this is a fixed-term leasehold interest rather than an equity ownership stake, capital mortality insurance is not applicable. In the event of the horse's death or permanent retirement, the lease terminates automatically, and all unspent deposit funds are refunded pro-rata as outlined in Section 6.
+
+---
+
+## §9. Valuation
+
+No independent valuation of the horse's capital value has been undertaken for this offering. The pricing of the interests is based entirely on the wholesale operational cost of leasing the horse over the term, rather than the intrinsic capital value of the bloodstock.
+
+---
+
+## §10. Veterinary Report
+
+I Stole A Manolo (NZ) is an actively training thoroughbred. A general veterinary inspection is conducted prior to the commencement of the lease to ensure the horse is fit for racing purposes. However, investors acknowledge that racehorses are prone to injury and illness, and past fitness does not guarantee future soundness.
+
+---
+
+## §11. Material Interests
+
+Evolution Stables Ltd receives a 5.0% margin incorporated into the listed rate to cover the structuring, management, and regulatory oversight of the syndicate. Platform Fees of 3.0% cover payment processing and platform services. There are no other hidden fees or material conflicts of interest.
+
+---
+
+## §12. Risk Disclosure
+
+Participation in racehorse syndication is highly speculative and carries significant risks.
+
+12.1. **Performance Risk:** The horse may not perform well, may not win prize money, and may not generate any revenue.
+12.2. **Health Risk:** The horse may suffer injury, illness, or death, preventing it from racing.
+12.3. **Liquidity Risk:** Your interest is a fixed-term leasehold. There is no guarantee of an active secondary market or that you will be able to sell your interest before the term ends.
+12.4. **Capital Loss:** You may lose the entirety of your initial investment.
+
+---
+
+## §13. Responsible Investment
+
+Evolution Stables holds itself and its partners to the highest standards of care. Animal welfare remains central to all decisions made during the lease. All training, spelling, and veterinary decisions are made by licensed professionals. All post-racing arrangements are the responsibility of the horse's connections and are expected to comply with NZTR's welfare guidelines.
+
+---
+
+## §14. Records & Financial Reporting
+
+Evolution Stables will maintain a register of all Members. Financial updates, including prize money distributions and race reports, will be provided regularly. A final financial summary will be issued at the conclusion of the lease term.
+
+---
+
+## §15. Complaints
+
+Any complaints regarding the management of the Syndicate should be directed in the first instance to Evolution Stables. If the matter cannot be resolved, it may be escalated to New Zealand Thoroughbred Racing (NZTR) in accordance with the Rules of Racing.
+
+---
+
+## §16. Transfer of Interest
+
+Interests may only be transferred subject to the written consent of the Syndicate Manager and NZTR compliance requirements. Evolution Stables does not guarantee a secondary market.
+
+---
+
+## §17. Investment Details
+
+I hereby apply for the following interest in the I Stole A Manolo (NZ) Syndicate:
+
+17.1. **Stake Percentage:** 1.0%
+17.2. **Initial Payment:** $380.00 per 1% stake
+17.3. **Monthly Commitment:** $76.00 per month per 1% stake
+
+---
+
+## §18. Investor Declaration
+
+By signing this Application Form, on 2026-09-01 I acknowledge and agree that:
+
+1. I have received, read, and understood the Product Disclosure Statement (PDS) and the Syndicate Agreement for the I Stole A Manolo (NZ) Syndicate.
+2. I agree to be bound by the terms of the Syndicate Agreement, the PDS, and the Rules of Racing administered by NZTR.
+3. I understand that my participation is strictly as a leaseholder and confers no ownership rights in the horse.
+4. I understand the risks set out in the PDS, including that I may not recover my original investment.
+5. I consent to my details being provided to NZTR and Evolution Stables for compliance with AML/CFT, registration, and regulatory purposes.
+
+**Name:** [Login Profile Name]
+
+**Signed:** ✓ (tick recorded)
+
+**Date:** [Execution Timestamp]
+
+---
+
+## §19. Promoter Declaration
+
+I, Alex Baddeley, as the promoter of this syndicate, declare that the information provided in this Product Disclosure Statement is, to the best of my knowledge, true and correct, and that I am not aware of any information that would make this statement misleading in any material respect.
+
+**Signed:** Alex Baddeley
+
+**Director, Evolution Stables Ltd**
+
+**8 Huia Street, Auckland, New Zealand**
+
+---
+
+*This PDS must be read together with the Syndicate Agreement.*
+                </div>
+              </div>
+              <!-- Tick sign row (revealed on scroll-to-bottom) -->
+              <div id="pds-tick-sign" class="tick-sign px-4 py-3" style="opacity: 0;">
+                <label class="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" id="pds-agree" class="mt-0.5 h-4 w-4 rounded border-[var(--border)] bg-[var(--bg-surface)] text-[var(--accent)] focus:ring-[var(--accent)] focus:ring-offset-0"/>
+                  <span class="text-[12px] font-light text-[var(--text-muted)]">I, <strong id="pds-profile-name">[Login Profile Name]</strong>, agree to be bound by this document</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- SA Panel (Panel 2 - opens after PDS complete) -->
+          <div class="rounded-xl border border-[var(--border)] bg-[var(--bg-surface-base)] overflow-hidden" id="sa-panel">
+            <button type="button" class="w-full px-4 py-3.5 flex items-center justify-between gap-4 text-left" aria-expanded="false" aria-controls="sa-content" onclick="togglePanel('sa')" disabled>
+              <span class="font-medium text-[var(--text-heading)]">Syndicate Agreement</span>
+              <div class="flex items-center gap-2">
+                <span id="sa-status" class="text-[11px] font-medium text-[var(--text-muted)]">Locked</span>
+                <svg class="w-5 h-5 text-[var(--text-muted)] transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </div>
+            </button>
+            <div id="sa-content" class="accordion-panel collapsed px-4 pb-4" role="region" aria-labelledby="sa-panel">
+              <div class="rounded-xl border border-[var(--border)] bg-[var(--bg-canvas)]/60 overflow-hidden" style="height: 86vh; max-height: 86vh;">
+                <div class="prose prose-sm max-w-none text-[var(--text-foreground)] p-4 overflow-y-auto" style="height: 100%;" id="sa-doc">
+                  <!-- SA content from existing mockup -->
+                  <h1># Syndicate Agreement</h1>
+<p><strong>Campaign:</strong> i-stole-a-manolo | <strong>Version:</strong> 1.0.0 | <strong>Effective Date:</strong> 2026-09-01</p>
+<hr>
+<h2>1. Formation</h2>
+<p>A Syndicate is formed under the New Zealand Thoroughbred Racing Inc. ("NZTR") Bloodstock Syndication Code of Practice ("COP"), in accordance with its formation requirements, by the Promoter as set out in the attached Product Disclosure Statement ("the Syndicate").</p>
+<h2>2. Object</h2>
+<p>The object of the Syndicate is to lease and race I Stole A Manolo (NZ) as a recreational pursuit, with all syndicate members holding fractional leasehold shares for the fixed term described in the Product Disclosure Statement.</p>
+<h2>3. Agreement and Parties</h2>
+<p>This Agreement is binding on the Promoter (Evolution Stables), the Syndicate Manager (Evolution Stables), and each Shareholder as defined in the Product Disclosure Statement. By signing the Application Form, each Shareholder agrees to be bound by this Agreement and the Product Disclosure Statement. This Agreement may only be altered by special resolution (75% of shareholding) and must not increase a Shareholder's liability beyond what is disclosed in the Product Disclosure Statement.</p>
+<h2>4. Syndicate Shares</h2>
+<p>The Syndicate is divided into 5 shares of 1.0% each, representing the 5% leasehold interest in I Stole A Manolo (NZ) for the Lease Term. Shares are issued and recorded by Evolution Stables, enabling digital onboarding, compliance, and (subject to Manager approval) transfer. Each Shareholder's rights and obligations are proportional to their shareholding.</p>
+<h2>5. Lease Duration</h2>
+<p>The lease term is fixed at 22 months (1 September 2026 → 30 June 2028). All lease terms are counted in full calendar months. The lease may be renewed or extended at the Manager's and Lessor's discretion, with terms disclosed to Shareholders prior to renewal.</p>
+<h2>6. Equine Welfare Supremacy</h2>
+<p>The licensed Trainer and Racing Manager hold sole, absolute, and unchallengeable discretion regarding all training regimes, race nominations, trackwork, spelling, and veterinary care. Neither Evolution Stables nor any syndicate member may override veterinary or welfare decisions. The welfare of the thoroughbred is paramount at all times.</p>
+<h2>7. Manager's Powers and Duties</h2>
+<p>The Manager (Evolution Stables) is responsible for overall lease administration and NZTR compliance, including communication with shareholders and coordination with licensed professionals.</p>
+<h2>8. Default &amp; Forfeiture</h2>
+<p>An investor enters default if a scheduled monthly payment is missed. Evolution Stables will notify the investor during the default period. If the outstanding balance is not rectified prior to the next billing cycle, the investment is deemed in default. Upon default, the investor forfeits all future rights to prize money distributions and their deposit, which is subsequently reallocated to the horse owner to secure the ongoing care and maintenance of the horse. Evolution Stables receives no material financial benefit from an investor default.</p>
+<h2>9. Financial Contributions and Fees</h2>
+<ul>
+  <li><strong>Initial payment:</strong> $380.00 per 1% stake, representing 3 months security deposit reserve and 2 months prepaid keep.</li>
+  <li><strong>Monthly keep:</strong> $76.00 per month per 1% stake, paid on the first of each month to maintain a constant 5-month float buffer.</li>
+</ul>
+<h2>10. Investor Returns</h2>
+<p>Shareholders are entitled to a share of all revenue generated by I Stole A Manolo (NZ) during the lease period, proportional to their leased stake. For I Stole A Manolo (NZ), the revenue split is 75% Investor Pool / 25% Owner Retention.</p>
+<p>All distributions are calculated strictly from officially published NZTR / LoveRacing gross stakes earnings during each Shareholder's eligible participation period and are made quarterly. Insurance proceeds are not payable to lease holders. Distributions are made by direct bank transfer or card refund to the Shareholder's verified payment method within 14 business days of receipt from NZTR or other sources.</p>
+<h2>11. Syndicate Management Fee</h2>
+<p>A 5.0% Evolution Stables margin and 3.0% Platform Fees are included in the listed price of each stake. No separate management invoices or off-platform accounting fees are charged.</p>
+<h2>12. Manager Removal — NZTR Code of Practice Rule 22.1</h2>
+<p>The removal or replacement of the Syndicate Manager is governed strictly by NZTR Code of Practice Rule 22.1.</p>
+<h2>13. Governing Law &amp; Jurisdiction</h2>
+<p>This Agreement is governed exclusively by the laws of New Zealand and the NZTR Rules of Racing. All disputes arising under this Agreement are subject to the jurisdiction of New Zealand courts and NZTR dispute resolution procedures. There are no foreign arbitration clauses, no Middle Eastern / offshore jurisdiction clauses, and no offshore governing law provisions.</p>
+<h2>14. Insurance and Early Termination</h2>
+<p>The horse will be insured for mortality and specified risks at the owner's discretion for the duration of the lease. Insurance proceeds, if any, are payable to the owner/lessor and not to the syndicate or lease holders. If the horse dies or is retired due to injury or illness during the lease term, this agreement and the lease will terminate immediately. Lease holders will receive a pro-rata refund of unused prepaid keep and security deposit reserve for the unused portion of the lease term, calculated from the date of termination to the scheduled end of the lease. No further compensation or insurance proceeds are payable to lease holders.</p>
+<h2>15. Transfer of Shares</h2>
+<p>Shares may only be transferred with the written consent of the Manager and in accordance with NZTR rules. Transfers must be processed through Evolution Stables, subject to AML/CFT and eligibility checks. There is no guarantee of liquidity or a secondary market for shares.</p>
+<h2>16. Dispute Resolution</h2>
+<p>Disputes must first be raised with the Manager in writing. If unresolved, disputes may be escalated to NZTR and, if necessary, to independent mediation as per NZTR guidelines.</p>
+<h2>17. Winding Up and Post-Lease Arrangements</h2>
+<p>At the end of the Lease Term, the Syndicate will be automatically wound up. The lease does not roll over unless the Manager offers a renewal and participants opt in under new terms. If the horse is retired, injured, or otherwise unable to race during the lease period, the lease will be terminated early. In such cases, lease holders will receive a pro-rata refund of unused prepaid keep and security deposit reserve based on the remaining portion of the lease term.</p>
+<h2>18. Notices</h2>
+<p>Notices may be sent by email to the addresses provided by Shareholders. Notices to the Syndicate are sent to the address registered by the Manager with NZTR.</p>
+<h2>Schedule 1: NZTR Statutory Member Declarations</h2>
+<p>Each subscriber confirms by executing this Agreement that they:</p>
+<ul>
+  <li>are at least 18 years of age;</li>
+  <li>are not subject to any racing disqualification or exclusion order;</li>
+  <li>have provided verified proof of identity acceptable to the Syndicate Manager; and</li>
+  <li>understand that participation is strictly as a leaseholder and does not confer direct ownership of the thoroughbred.</li>
+</ul>
+<h2>Execution</h2>
+<p>By executing the Application Form (whether physically or electronically via Evolution Stables), each Shareholder is deemed to have accepted and agreed to be bound by this Agreement and the accompanying Product Disclosure Statement.</p>
+<p><strong>Shareholder Name:</strong> [Your Name]<br>
+<strong>Signed:</strong> _________________________<br>
+<strong>Date:</strong> [Execution Date]</p>
+<hr>
+<p><strong>Alex Baddeley</strong><br>
+Director, Evolution Stables Ltd<br>
+8 Huia Street, Auckland, New Zealand</p>
+<p><em>Executed under the NZTR Syndication Code of Practice.</em></p>
+                </div>
+              </div>
+              <!-- Tick sign row (revealed on scroll-to-bottom) -->
+              <div id="sa-tick-sign" class="tick-sign px-4 py-3" style="opacity: 0;">
+                <label class="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" id="sa-agree" class="mt-0.5 h-4 w-4 rounded border-[var(--border)] bg-[var(--bg-surface)] text-[var(--accent)] focus:ring-[var(--accent)] focus:ring-offset-0"/>
+                  <span class="text-[12px] font-light text-[var(--text-muted)]">I, <strong id="sa-profile-name">[Login Profile Name]</strong>, agree to be bound by this document</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Action Footer -->
+        <div class="pt-2 border-t border-[var(--border)] space-y-3">
+          <button type="button" id="next-kyc-btn" disabled class="w-full rounded-full bg-[var(--accent)] py-3.5 text-center text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--accent-foreground)] transition-all duration-300 hover:brightness-110 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:brightness-100">
+            Next (KYC)
+          </button>
+          <p class="text-[10px] font-light leading-relaxed text-[var(--text-muted)]/70 text-center">
+            <span class="text-[var(--accent)]">Acceptance = recorded</span> — who + document hash + timestamp, logged at the instant of the tick.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Horizontal Fallbacks (behind overlay - dev annotations only, never shipped) -->
+  <div class="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-[672px] px-4 z-[9999] pointer-events-none">
+    <div class="border-t border-[var(--border)] pt-6 mt-6 space-y-4 bg-[var(--bg-surface)]/50 backdrop-blur-sm rounded-2xl p-4 pointer-events-auto">
+      <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Fallback Paths (Horizontal) — DEV ANNOTATIONS</p>
+      <div class="flex flex-wrap gap-3">
+        <a href="step-2-term-sheet.html" class="px-4 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface-base)] text-[var(--text-foreground)] text-sm hover:bg-[var(--bg-surface)] transition-colors">← Back to Step 2</a>
+        <a href="step-4-kyc.html" class="px-4 py-2 rounded-lg border border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)] text-sm hover:bg-[var(--accent)]/20 transition-colors">Proceed to Step 4 (KYC) →</a>
+      </div>
+      <div class="flex flex-wrap gap-3 text-sm text-[var(--text-muted)]">
+        <span class="px-3 py-1.5 rounded-full border border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]">SA not accepted → CTA disabled</span>
+        <span class="px-3 py-1.5 rounded-full border border-[var(--text-muted)]/40 bg-[var(--bg-surface)] text-[var(--text-muted)]">API error → toast + stay on step</span>
+        <span class="px-3 py-1.5 rounded-full border border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)]">KYC redirect fail → retry KYC</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Profile name from login (mock for demo)
+    const PROFILE_NAME = 'Test Investor';
+    document.getElementById('pds-profile-name').textContent = PROFILE_NAME;
+    document.getElementById('sa-profile-name').textContent = PROFILE_NAME;
+
+    // Accordion state
+    let pdsComplete = false;
+    let saComplete = false;
+
+    // Scroll detection for tick sign reveal
+    function setupScrollDetection(docId, tickSignId, agreeCheckboxId, statusId, panelBtnId, otherPanelBtnId) {
+      const doc = document.getElementById(docId);
+      const tickSign = document.getElementById(tickSignId);
+      const agreeCheckbox = document.getElementById(agreeCheckboxId);
+      const statusEl = document.getElementById(statusId);
+      const panelBtn = document.getElementById(panelBtnId);
+      const otherBtn = document.getElementById(otherPanelBtnId);
+
+      let tickRevealed = false;
+
+      doc.addEventListener('scroll', () => {
+        // Check if scrolled to bottom (within 50px)
+        const { scrollTop, scrollHeight, clientHeight } = doc;
+        if (!tickRevealed && scrollTop + clientHeight >= scrollHeight - 50) {
+          tickRevealed = true;
+          tickSign.style.opacity = '1';
+          tickSign.style.transform = 'translateY(0)';
+          tickSign.classList.add('visible');
+          statusEl.textContent = 'Agree to proceed';
+          statusEl.className = 'text-[11px] font-medium text-[var(--accent)]';
+        }
+      });
+
+      agreeCheckbox.addEventListener('change', () => {
+        if (agreeCheckbox.checked) {
+          // Mark complete
+          if (docId === 'pds-doc') {
+            pdsComplete = true;
+            statusEl.textContent = 'PDS ✓ COMPLETE';
+            statusEl.className = 'text-[11px] font-medium text-[var(--status-active)]';
+            // Close PDS panel
+            togglePanel('pds');
+            // Enable and open SA panel
+            otherBtn.disabled = false;
+            otherBtn.click();
+          } else {
+            saComplete = true;
+            statusEl.textContent = 'SA ✓ COMPLETE';
+            statusEl.className = 'text-[11px] font-medium text-[var(--status-active)]';
+            // Close SA panel
+            togglePanel('sa');
+          }
+          updateNextButton();
+        } else {
+          // Unchecked - revert
+          if (docId === 'pds-doc') {
+            pdsComplete = false;
+            statusEl.textContent = 'Agree to proceed';
+            statusEl.className = 'text-[11px] font-medium text-[var(--accent)]';
+          } else {
+            saComplete = false;
+            statusEl.textContent = 'Agree to proceed';
+            statusEl.className = 'text-[11px] font-medium text-[var(--accent)]';
+          }
+          updateNextButton();
+        }
+      });
+    }
+
+    function togglePanel(panel) {
+      const content = document.getElementById(panel + '-content');
+      const btn = document.getElementById(panel + '-panel').querySelector('button');
+      const svg = btn.querySelector('svg');
+      
+      if (content.classList.contains('collapsed')) {
+        content.classList.remove('collapsed');
+        content.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+        svg.style.transform = 'rotate(180deg)';
+      } else {
+        content.classList.remove('open');
+        content.classList.add('collapsed');
+        btn.setAttribute('aria-expanded', 'false');
+        svg.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    function updateNextButton() {
+      const nextBtn = document.getElementById('next-kyc-btn');
+      nextBtn.disabled = !(pdsComplete && saComplete);
+    }
+
+    // Initialize scroll detection for both panels
+    setupScrollDetection('pds-doc', 'pds-tick-sign', 'pds-agree', 'pds-status', 'pds-panel', 'sa-panel');
+    setupScrollDetection('sa-doc', 'sa-tick-sign', 'sa-agree', 'sa-status', 'sa-panel', 'pds-panel');
+
+    // Ensure PDS panel starts open, SA panel starts collapsed
+    document.getElementById('pds-content').classList.remove('collapsed');
+    document.getElementById('pds-content').classList.add('open');
+    document.getElementById('sa-content').classList.remove('open');
+    document.getElementById('sa-content').classList.add('collapsed');
+  </script>
+</body>
+</html>
