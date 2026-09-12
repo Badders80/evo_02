@@ -22,7 +22,8 @@ import * as React from 'react';
 import { useAuth } from '@/lib/use-auth';
 import { pricingForUnits, investorCheckoutError } from '@/lib/nellie-loop';
 import type { DslPricing } from '@evo/legal_engine';
-import { WhitePillCTA } from '@evo/ui';
+import { GlowPillButton } from '@/components/ui/GlowPillButton';
+import { INVESTOR_RETURN_PCT } from '@evo/legal_engine';
 import { marked } from 'marked';
 
 export interface LegalPackDigest {
@@ -361,11 +362,11 @@ function Step2TermSheet({
         </p>
       )}
 
-      {/* 4-row summary block (LOCKED 2026-09-03) */}
+      {/* 4-row summary block (LOCKED 2026-09-03); labels white per founder 2026-09-11. */}
       <div className="space-y-4 text-[13px] font-light border-t border-border pt-5">
         <div className="border-b border-border pb-3.5">
           <p className="flex justify-between items-baseline">
-            <span className="text-muted-foreground">Initial Payment</span>
+            <span className="text-heading">Initial Payment</span>
             <strong className="text-heading font-medium">
               ${pricing.joinFloatUnitNzd.toLocaleString()} NZD
             </strong>
@@ -376,7 +377,7 @@ function Step2TermSheet({
         </div>
         <div className="border-b border-border pb-3.5">
           <p className="flex justify-between items-baseline">
-            <span className="text-muted-foreground">Monthly thereafter</span>
+            <span className="text-heading">Monthly thereafter</span>
             <strong className="text-heading font-medium">
               ${pricing.monthlyKeepUnitNzd.toLocaleString()} NZD
             </strong>
@@ -385,7 +386,7 @@ function Step2TermSheet({
         </div>
         <div className="border-b border-border pb-3.5">
           <p className="flex justify-between items-baseline">
-            <span className="text-muted-foreground">Lease period</span>
+            <span className="text-heading">Lease period</span>
             <strong className="text-heading font-medium">
               {termMonths != null ? `${termMonths} months` : '—'}
             </strong>
@@ -398,9 +399,9 @@ function Step2TermSheet({
         </div>
         <div>
           <p className="flex justify-between items-baseline">
-            <span className="text-muted-foreground">Distribution</span>
+            <span className="text-heading">Investor Return</span>
             <strong className="text-status-active text-[13px] font-medium">
-              {distributionSplit ?? '—'}
+              {`${INVESTOR_RETURN_PCT}% Gross Stakes`}
             </strong>
           </p>
           <p className="text-[11px] text-muted-foreground/60 mt-1">
@@ -413,24 +414,27 @@ function Step2TermSheet({
 
       {/* Modal Action Footer — pinned. Step 2 = terms summary only (mockup lock);
           PDS/SA live in Step 3's accordion; the hash rides here as the audit trail. */}
-      <div className="pt-2 border-t border-border space-y-3 shrink-0">
+      <div className="pt-3 border-t border-border space-y-4 shrink-0">
       {termSheetHash && (
         <p className="font-mono text-[10px] text-muted-foreground/60">
           sha256: {termSheetHash.slice(0, 4)}…{termSheetHash.slice(-4)}
         </p>
       )}
 
-      {/* CTA → Step 3 (acceptance lives only in Step 3 — always live). */}
-      <WhitePillCTA onClick={onProceed}>
-        Invest in {horseName}
-      </WhitePillCTA>
+      {/* CTA → Step 3 (acceptance lives only in Step 3 — always live).
+          Same GlowPillButton as the NavBar 'Get Started' (founder 2026-09-11). */}
+      <div className="mx-auto flex w-[90%]">
+        <GlowPillButton onClick={onProceed} className="w-full" wrapperClassName="flex-1">
+          Invest in {horseName}
+        </GlowPillButton>
+      </div>
       <p className="text-[11px] font-light text-muted-foreground leading-relaxed text-center">
         Subject to{' '}
         <a
           href={`/api/legal/download?slug=${encodeURIComponent(horseSlug)}&doc=pds`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-muted underline underline-offset-2 hover:text-heading transition-colors"
+          className="text-muted-foreground underline underline-offset-2 hover:text-heading transition-colors"
         >
           Product Disclosure Statement
         </a>{' '}
@@ -439,7 +443,7 @@ function Step2TermSheet({
           href={`/api/legal/download?slug=${encodeURIComponent(horseSlug)}&doc=sa`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-muted underline underline-offset-2 hover:text-heading transition-colors"
+          className="text-muted-foreground underline underline-offset-2 hover:text-heading transition-colors"
         >
           Syndicate Agreement
         </a>
@@ -481,9 +485,11 @@ function Step3SAAcceptance({
   const { user } = useAuth();
   const profileName = user?.displayName ?? 'Investor';
   const [saLoading, setSALoading] = React.useState(false);
-  const [openPanel, setOpenPanel] = React.useState<'pds' | 'sa'>('pds');
+  const [openPanel, setOpenPanel] = React.useState<'none' | 'pds' | 'sa'>('none');
   const [pdsTickOn, setPdsTickOn] = React.useState(false);
   const [saTickOn, setSaTickOn] = React.useState(false);
+  const [pdsScrolled, setPdsScrolled] = React.useState(false);
+  const [saScrolled, setSaScrolled] = React.useState(false);
   const [pdsComplete, setPdsComplete] = React.useState(false);
   const [saComplete, setSaComplete] = React.useState(false);
   const [decls, setDecls] = React.useState<boolean[]>([false, false, false, false]);
@@ -500,6 +506,8 @@ function Step3SAAcceptance({
   const handleDocScroll =
     (doc: 'pds' | 'sa') => (e: React.UIEvent<HTMLDivElement>) => {
       const el = e.currentTarget;
+      if (doc === 'pds') setPdsScrolled(true);
+      else setSaScrolled(true);
       if (el.scrollTop + el.clientHeight >= el.scrollHeight - 50) {
         if (doc === 'pds') setPdsTickOn(true);
         else setSaTickOn(true);
@@ -544,30 +552,46 @@ function Step3SAAcceptance({
   ) => {
     const open = openPanel === which;
     const locked = which === 'sa' && !pdsComplete;
+    const showBegin = !open && !statusDone && !locked;
+    const scrolled = which === 'pds' ? pdsScrolled : saScrolled;
+    const openDoc = (doc: 'pds' | 'sa') => {
+      setOpenPanel(doc);
+      if (doc === 'pds') setPdsScrolled(false);
+      else setSaScrolled(false);
+    };
     return (
       <div
         className={`rounded-xl border border-border bg-surface overflow-hidden flex flex-col ${
           open ? 'flex-1 min-h-0' : 'shrink-0'
         }`}
       >
-        <button
-          type="button"
-          onClick={() => {
-            if (!locked) setOpenPanel(which);
-          }}
-          aria-expanded={open}
-          disabled={locked}
-          className="w-full px-4 py-3.5 flex items-center justify-between gap-4 text-left shrink-0 disabled:cursor-not-allowed"
-        >
-          <span className="font-medium text-heading">{title}</span>
-          <span
-            className={`text-[11px] font-medium ${
-              statusDone ? 'text-status-active' : 'text-muted-foreground'
-            }`}
+        {showBegin ? (
+          <div className="w-full px-4 py-3 flex items-center justify-between gap-4 shrink-0">
+            <span className="font-medium text-heading">{title}</span>
+            <GlowPillButton onClick={() => openDoc(which)} className="!px-4 !py-1.5 text-[11px]">
+              Begin
+            </GlowPillButton>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              if (!locked) setOpenPanel(open ? 'none' : which);
+            }}
+            aria-expanded={open}
+            disabled={locked}
+            className="w-full px-4 py-3.5 flex items-center justify-between gap-4 text-left shrink-0 disabled:cursor-not-allowed"
           >
-            {status}
-          </span>
-        </button>
+            <span className="font-medium text-heading">{title}</span>
+            <span
+              className={`text-[11px] font-medium ${
+                statusDone ? 'text-status-active' : 'text-muted-foreground'
+              }`}
+            >
+              {status}
+            </span>
+          </button>
+        )}
         <div
           className={`grid transition-all duration-300 ${
             open ? 'grid-rows-[1fr] opacity-100 flex-1 min-h-0' : 'grid-rows-[0fr] opacity-0'
@@ -575,6 +599,20 @@ function Step3SAAcceptance({
         >
           <div className="overflow-hidden min-h-0 flex flex-col px-4 pb-4">
             <div className="rounded-xl border border-border overflow-hidden flex-1 min-h-0 flex flex-col bg-white">
+              {open && !scrolled && (
+                <div className="flex items-center justify-center gap-2 py-1.5 bg-white border-b border-[#eee] text-muted-foreground pointer-events-none shrink-0">
+                  <svg
+                    className="h-4 w-4 animate-bounce"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                  <span className="text-[10px] uppercase tracking-[0.2em]">Scroll to read</span>
+                </div>
+              )}
               <div
                 onScroll={onScroll}
                 className="prose prose-sm max-w-none p-4 overflow-y-auto flex-1 min-h-0 doc-light"
@@ -601,10 +639,21 @@ function Step3SAAcceptance({
         .doc-light th { background: #f5f5f5; }
         .doc-light th, .doc-light td { border-color: #ddd; }
         .doc-light input[type="checkbox"] { accent-color: #b98a2f; }
-        .doc-light .prose { font-size: 10px; line-height: 1.7; text-align: justify; }
-        .doc-light .prose p, .doc-light .prose ul, .doc-light .prose table { margin-bottom: 1em; }
-        .doc-light .prose h1, .doc-light .prose h2 { font-size: 12px; font-weight: 700; margin-top: 1em; margin-bottom: 0.5em; text-align: left; }
-        .doc-light .prose h3 { font-size: 10px; font-weight: 800; margin-top: 1em; margin-bottom: 0.5em; text-align: left; letter-spacing: 0.02em; text-transform: uppercase; }
+        /* Compound selectors: the scroll div itself carries .doc-light.prose,
+           so descendant selectors (.doc-light .prose) never matched. */
+        /* Body −30% (prose-sm 14px → ~10px), justified. */
+        .doc-light.prose { font-size: 10px; line-height: 1.5; text-align: justify; color: #111; }
+        .doc-light.prose p, .doc-light.prose ul, .doc-light.prose ol,
+        .doc-light.prose table { margin-top: 0; margin-bottom: 1em; }
+        /* Headers −25% (h1 ~19px → 14px, h2 ~17.5px → 13px), left-aligned. */
+        .doc-light.prose h1 { font-size: 14px; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.5em; text-align: left; }
+        .doc-light.prose h2 { font-size: 13px; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.5em; text-align: left; }
+        /* Sub-headers: same size as body, bold only. */
+        .doc-light.prose h3, .doc-light.prose h4 {
+          font-size: 10px; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.25em;
+          text-align: left; letter-spacing: 0; text-transform: none;
+        }
+        .doc-light.prose li { margin-top: 0; margin-bottom: 0.25em; }
       `}</style>
       <div className="shrink-0">
         <button
@@ -650,6 +699,7 @@ function Step3SAAcceptance({
                 onChange={() => {
                   setPdsComplete(true);
                   setOpenPanel('sa');
+                  setSaScrolled(false);
                 }}
                 className={tickBoxClass}
               />
@@ -698,7 +748,10 @@ function Step3SAAcceptance({
                 type="checkbox"
                 disabled={!saTickOn || saComplete || !decls.every(Boolean)}
                 checked={saComplete}
-                onChange={() => setSaComplete(true)}
+                onChange={() => {
+                  setSaComplete(true);
+                  setOpenPanel('none');
+                }}
                 className={tickBoxClass}
               />
               <span className="text-[12px] font-light text-[#333]">
@@ -711,13 +764,17 @@ function Step3SAAcceptance({
       </div>
 
       {/* Modal Action Footer — pinned. Next gates on both docs COMPLETE. */}
-      <div className="pt-2 border-t border-border space-y-3 shrink-0">
-        <WhitePillCTA
-          onClick={handleSAAccept}
-          disabled={!(pdsComplete && saComplete) || saLoading}
-        >
-          {saLoading ? 'Processing…' : 'Next (KYC)'}
-        </WhitePillCTA>
+      <div className="pt-3 border-t border-border space-y-4 shrink-0">
+        <div className="mx-auto flex w-[90%]">
+          <GlowPillButton
+            onClick={handleSAAccept}
+            disabled={!(pdsComplete && saComplete) || saLoading}
+            className="w-full"
+            wrapperClassName="flex-1"
+          >
+            {saLoading ? 'Processing…' : 'Next (KYC)'}
+          </GlowPillButton>
+        </div>
         <p className="text-[10px] font-light leading-relaxed text-muted-foreground/70 text-center">
           <span className="text-accent">Acceptance = recorded</span> — who + document hash +
           timestamp, logged at the instant of the tick.

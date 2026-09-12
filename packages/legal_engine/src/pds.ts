@@ -160,15 +160,15 @@ function extendedSections(context: SyndicateLegalContext): string {
   const p = context.pricing;
   const h = context.horse;
 
-  const insuranceSection = `## §8. Insurance
+  const insuranceSection = `## 8. Insurance
 
 Evolution Stables has not secured mortality insurance for this leasehold stake. Because this is a fixed-term leasehold interest rather than an equity ownership stake, capital mortality insurance is not applicable. In the event of the horse's death or permanent retirement, the lease terminates automatically, and all unspent deposit funds are refunded pro-rata as outlined in Section 6.`;
 
-  const materialInterests = `## §11. Material Interests
+  const materialInterests = `## 11. Material Interests
 
 Evolution Stables Ltd receives a ${EVOLUTION_MARGIN_PCT.toFixed(1)}% margin incorporated into the listed rate to cover the structuring, management, and regulatory oversight of the syndicate. ${PLATFORM_FEE_LABEL} of ${PLATFORM_FEE_PCT.toFixed(1)}% cover payment processing and platform services. There are no other hidden fees or material conflicts of interest.`;
 
-  const riskDisclosure = `## §12. Risk Disclosure
+  const riskDisclosure = `## 12. Risk Disclosure
 
 Participation in racehorse syndication is highly speculative and carries significant risks.
 
@@ -201,13 +201,13 @@ Participation in racehorse syndication is highly speculative and carries signifi
 
 ---
 
-## §9. Valuation
+## 9. Valuation
 
 No independent valuation of the horse's capital value has been undertaken for this offering. The pricing of the interests is based entirely on the wholesale operational cost of leasing the horse over the term, rather than the intrinsic capital value of the bloodstock.
 
 ---
 
-## §10. Veterinary Report
+## 10. Veterinary Report
 
 ${v(h.legalName)} is an actively training thoroughbred. A general veterinary inspection is conducted prior to the commencement of the lease to ensure the horse is fit for racing purposes. However, investors acknowledge that racehorses are prone to injury and illness, and past fitness does not guarantee future soundness.
 
@@ -221,51 +221,49 @@ ${riskDisclosure}
 
 ---
 
-## §13. Responsible Investment
+## 13. Responsible Investment
 
 Evolution Stables holds itself and its partners to the highest standards of care. Animal welfare remains central to all decisions made during the lease. All training, spelling, and veterinary decisions are made by licensed professionals. All post-racing arrangements are the responsibility of the horse's connections and are expected to comply with NZTR's welfare guidelines.
 
 ---
 
-## §14. Records & Financial Reporting
+## 14. Records & Financial Reporting
 
 Evolution Stables will maintain a register of all Members. Financial updates, including prize money distributions and race reports, will be provided regularly. A final financial summary will be issued at the conclusion of the lease term.
 
 ---
 
-## §15. Complaints
+## 15. Complaints
 
 Any complaints regarding the management of the Syndicate should be directed in the first instance to Evolution Stables. If the matter cannot be resolved, it may be escalated to New Zealand Thoroughbred Racing (NZTR) in accordance with the Rules of Racing.
 
 ---
 
-## §16. Transfer of Interest
+## 16. Transfer of Interest
 
 Interests may only be transferred subject to the written consent of the Syndicate Manager and NZTR compliance requirements. Evolution Stables does not guarantee a secondary market.
 
 ---
 
-## §17. Investment Details
+## 17. Investment Details
 
 ${investmentDetails}
 
 ---
 
-## §18. Investor Declaration
+## 18. Investor Declaration
 
 ${investorDeclaration}
 
 ---
 
-## §19. Promoter Declaration
+## 19. Promoter Declaration
 
 I, Alex Baddeley, as the promoter of this syndicate, declare that the information provided in this Product Disclosure Statement is, to the best of my knowledge, true and correct, and that I am not aware of any information that would make this statement misleading in any material respect.
 
 **Signed:** Alex Baddeley
 
-**Director, Evolution Stables Ltd**
-
-**8 Huia Street, Auckland, New Zealand`;
+**Director, Evolution Stables Ltd**`;
 }
 
 export function generatePdsMarkdown(context: SyndicateLegalContext): string {
@@ -275,13 +273,13 @@ export function generatePdsMarkdown(context: SyndicateLegalContext): string {
   const soft = canonicalizeSoftLegal(context.softLegal);
 
   const aboutSection = soft.aboutHorse
-    ? `### §2.1 About Horse & Trainer\n\n${soft.aboutHorse}\n\n${soft.trainerBio ? `${soft.trainerBio}\n\n` : ''}`
+    ? `### 2.1 About Horse & Trainer\n\n${soft.aboutHorse}\n\n${soft.trainerBio ? `${soft.trainerBio}\n\n` : ''}`
     : '';
   const outlookSection = soft.racingOutlookAndPedigree
-    ? `\n\n### §2.3 Racing Outlook & Pedigree\n\n${soft.racingOutlookAndPedigree}\n`
+    ? `\n\n### 2.3 Racing Outlook & Pedigree\n\n${soft.racingOutlookAndPedigree}\n`
     : '';
   const raceExpectationSection = soft.raceExpectation
-    ? `\n\n### §2.4 Racing Expectation\n\n${soft.raceExpectation}\n`
+    ? `\n\n### 2.4 Racing Expectation\n\n${soft.raceExpectation}\n`
     : '';
 
   // §1 minimum investment / step: data-driven, blank when unset.
@@ -323,15 +321,21 @@ Upon formal termination or maturity of the syndicate lease, all unused prepaid k
     splitSection = `Investors receive a distribution calculated strictly from official New Zealand Thoroughbred Racing (NZTR) gross stakes won during their eligible participation period:
 
 5.1. **Stakes Calculation:** Based on official NZTR stakes distributions published via loveracing.nz.
+
 5.2. **Stakes Allocation:** ${distributionSplit} of total gross stakes won is allocated to the Investor Pool (distributed pro-rata relative to stake held).
+
 5.3. **Distribution Schedule:** ${distributionSchedule ? distributionSchedule : BLANK}.
+
 5.4. **Qualification Period:** Investors must have maintained fully paid-up status for two (${QUALIFICATION_PAID_UP_MONTHS}) full months prior to a race date to qualify for prize money distributions from that race.`;
   } else {
     splitSection = `Investors receive a distribution calculated strictly from official New Zealand Thoroughbred Racing (NZTR) gross stakes won during their eligible participation period:
 
 5.1. **Stakes Calculation:** Based on official NZTR stakes distributions published via loveracing.nz.
+
 5.2. **Stakes Allocation:** ${BLANK} of total gross stakes won is allocated to the Investor Pool (distributed pro-rata relative to stake held).
+
 5.3. **Distribution Schedule:** ${BLANK}.
+
 5.4. **Qualification Period:** Investors must have maintained fully paid-up status for two (${QUALIFICATION_PAID_UP_MONTHS}) full months prior to a race date to qualify for prize money distributions from that race.`;
   }
 
@@ -349,7 +353,7 @@ Upon formal termination or maturity of the syndicate lease, all unused prepaid k
         ? `**Early Sale / Buyout:** If the horse is sold or bought out prior to the conclusion of the lease term, investors will receive a payout equivalent to 3× the remaining lease value per 1% stake, distributed pro-rata. This process is triggered by the owner, not Evolution Stables.`
         : BLANK;
 
-  const exitSection = `## §6. Exit & Termination
+  const exitSection = `## 6. Exit & Termination
 
 Rules for exit and termination are designed around three core pillars: creating accessible investment opportunities, maintaining commercial viability, and prioritizing the long-term care of the horse.
 
@@ -359,7 +363,7 @@ ${closeStyleLabel ? `**${closeStyleLabel}:** ${closeDetail.replace(/^\*\*[^*]+\*
 
 **Default & Forfeiture:** An investor enters default if a scheduled monthly payment is missed. Evolution Stables will notify the investor during the default period. If the outstanding balance is not rectified prior to the next billing cycle, the investment is deemed in default. The investor forfeits all future rights to prize money distributions and their deposit, which is subsequently reallocated to the horse owner to secure the ongoing care and maintenance of the horse. Evolution Stables receives no material financial benefit from an investor default.`;
 
-  const taxSection = `## §7. Taxes
+  const taxSection = `## 7. Taxes
 
 Investors are responsible for their own tax liabilities arising from any distributions or returns generated by their participation in this Syndicate. Evolution Stables does not provide tax advice. Participants should consult their own independent tax advisors regarding the implications of holding an interest and receiving racehorse distributions.`;
 
@@ -380,17 +384,17 @@ ${aboutEvolutionStables()}
 
 ---
 
-## §1. Title & Structure
+## 1. Title & Structure
 
 This Product Disclosure Statement relates to the ${v(context.syndicateName)}, a digitally-syndicated thoroughbred ownership campaign managed by ${v(t.managerEntity)}, a registered Syndicate Manager under the New Zealand Thoroughbred Racing (NZTR) Rules of Racing and Syndication Code of Practice.
 
-Participation is offered in the form of fractional leasehold stakes. Each stake is a percentage interest in the syndicated leasehold of the thoroughbred described in §2, from a minimum investment of ${minInvestment}, with increments of ${stakeStep} thereafter.
+Participation is offered in the form of fractional leasehold stakes. Each stake is a percentage interest in the syndicated leasehold of the thoroughbred described in Section 2, from a minimum investment of ${minInvestment}, with increments of ${stakeStep} thereafter.
 
 ---
 
-## §2. Asset Specifics
+## 2. Asset Specifics
 
-${aboutSection}### §2.2 Key Details
+${aboutSection}### 2.2 Key Details
 
 | Attribute | Detail |
 | :--- | :--- |
@@ -405,19 +409,19 @@ ${aboutSection}### §2.2 Key Details
 | Trainer | ${v(t.name)}${t.location ? ` (${t.location})` : ''} |${outlookSection}${raceExpectationSection}
 ---
 
-## §3. Commercial Model
+## 3. Commercial Model
 
 This syndicate operates on a fixed rate of **$${p.monthlyKeepUnitNzd.toFixed(2)} per month per 1% stake**.
 
 ---
 
-## §4. Deposit & Billing
+## 4. Deposit & Billing
 
 ${floatSection}
 
 ---
 
-## §5. Investor Return
+## 5. Investor Return
 
 ${splitSection}
 
@@ -443,24 +447,24 @@ export function getPdsSectionTitles(): string[] {
   return [
     'Key Information Summary',
     'About Evolution Stables',
-    '§1. Title & Structure',
-    '§2. Asset Specifics',
-    '§3. Commercial Model',
-    '§4. Deposit & Billing',
-    '§5. Investor Return',
-    '§6. Exit & Termination',
-    '§7. Taxes',
-    '§8. Insurance',
-    '§9. Valuation',
-    '§10. Veterinary Report',
-    '§11. Material Interests',
-    '§12. Risk Disclosure',
-    '§13. Responsible Investment',
-    '§14. Records & Financial Reporting',
-    '§15. Complaints',
-    '§16. Transfer of Interest',
-    '§17. Investment Details',
-    '§18. Investor Declaration',
-    '§19. Promoter Declaration',
+    '1. Title & Structure',
+    '2. Asset Specifics',
+    '3. Commercial Model',
+    '4. Deposit & Billing',
+    '5. Investor Return',
+    '6. Exit & Termination',
+    '7. Taxes',
+    '8. Insurance',
+    '9. Valuation',
+    '10. Veterinary Report',
+    '11. Material Interests',
+    '12. Risk Disclosure',
+    '13. Responsible Investment',
+    '14. Records & Financial Reporting',
+    '15. Complaints',
+    '16. Transfer of Interest',
+    '17. Investment Details',
+    '18. Investor Declaration',
+    '19. Promoter Declaration',
   ];
 }

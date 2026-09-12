@@ -28,6 +28,11 @@ export const QUALIFICATION_PAID_UP_MONTHS = 2;
 /** Refund window for unused float on termination/maturity (business days). */
 export const REFUND_WINDOW_DAYS = 14;
 
+/** Investor Return (locked 75/25, settlement.ts): % of NZTR gross stakes returned to the Investor Pool.
+ * This is the ONLY split exposed to investors. The manager's remainder is the implicit
+ * 25% (100 - INVESTOR_RETURN_PCT) and is never investor-facing. */
+export const INVESTOR_RETURN_PCT = 75;
+
 /** Close styles — the DSL form dropdown values. Adding one = 4 touch points (see architecture lock). */
 export const CLOSE_STYLES = ['fourteen_day', 'three_x_remaining'] as const;
 export type CloseStyle = (typeof CLOSE_STYLES)[number];

@@ -221,8 +221,7 @@ By executing the Application Form (whether physically or electronically via Evol
 ---
 
 **Alex Baddeley**  
-**Director, Evolution Stables Ltd**  
-**8 Huia Street, Auckland, New Zealand**
+**Director, Evolution Stables Ltd**
 
 ---
 

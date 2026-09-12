@@ -12,9 +12,11 @@
 
 import * as React from 'react';
 import { Landmark, Activity } from 'lucide-react';
-import { Eyebrow, StatRow, WhitePillCTA } from '@evo/ui';
+import { Eyebrow, StatRow } from '@evo/ui';
+import { GlowPillButton } from '@/components/ui/GlowPillButton';
 import { pricingForUnits } from '@/lib/nellie-loop';
 import { monthsBetween } from './purchase-flow-modal';
+import { INVESTOR_RETURN_PCT } from '@evo/legal_engine';
 
 export interface LegalPackDigest {
   pdsMarkdown?: string;
@@ -160,7 +162,7 @@ function ListedInvestmentCard({
           unit="per month"
           sub={`for a ${minInvestmentPct.toFixed(1)}% stake`}
         />
-        <StatRow label="Return" value="75%" unit="return" sub="of gross prize money" />
+        <StatRow label="Return" value={<span className="text-status-active">{INVESTOR_RETURN_PCT}%</span>} unit="return" sub="of gross prize money" />
         <StatRow
           label="Duration"
           value={termMonths != null ? String(termMonths) : '—'}
@@ -194,17 +196,18 @@ function ListedInvestmentCard({
             <span className="text-heading font-light text-xl tracking-tight">{maxInvestmentPct.toFixed(0)}%</span>
           </div>
 
-          {/* CTA: opens Step 2 term sheet (learn-more, not buy) */}
-          <WhitePillCTA onClick={() => onOpenModal()}>
+          {/* CTA: opens Step 2 term sheet (learn-more, not buy).
+              GlowPillButton — same CTA as NavBar 'Get Started' (2026-09-11 audit). */}
+          <GlowPillButton onClick={() => onOpenModal()} className="w-full">
             Become an Owner <span className="text-lg">→</span>
-          </WhitePillCTA>
+          </GlowPillButton>
           <p className="text-center text-xs font-light text-muted-foreground">
             Subject to{' '}
-            <a href="#" className="text-muted-foreground underline underline-offset-2 hover:text-heading transition-colors">
+            <a href={`/api/legal/download?slug=${encodeURIComponent(horseSlug)}&doc=pds`} target="_blank" rel="noopener noreferrer" className="text-muted-foreground underline underline-offset-2 hover:text-heading transition-colors">
               Product Disclosure Statement
             </a>{' '}
             and{' '}
-            <a href="#" className="text-muted-foreground underline underline-offset-2 hover:text-heading transition-colors">
+            <a href={`/api/legal/download?slug=${encodeURIComponent(horseSlug)}&doc=sa`} target="_blank" rel="noopener noreferrer" className="text-muted-foreground underline underline-offset-2 hover:text-heading transition-colors">
               Syndicate Agreement
             </a>
             .
@@ -295,11 +298,14 @@ export default function RightRail({
   const previewAll =
     typeof process !== 'undefined' && process.env.NEXT_PUBLIC_WORKFLOW_PREVIEW === 'true';
 
-  // Sticky rail: travels in grid flow level with the horse image, pins 32px
-  // under the nav (top-28) once scrolled to, releases at the grid end. The grid's 1fr
-  // track handles width/position natively — no measuring. Normal flow below lg.
+  // Pinned rail (founder 2026-09-12, v3: "meant to move, then lock").
+  // The card travels with the page; when its top reaches the nav bottom
+  // (top-28 = 112px) it locks there — and the self-stretch wrapper makes the
+  // sticky range the full page height, so it NEVER releases (no drift at the
+  // grid end). Below lg: normal flow, no pinning.
   return (
-    <aside className="space-y-6 z-20 self-start lg:sticky lg:top-28">
+    <div className="lg:self-stretch">
+      <aside className="space-y-6 z-20 h-fit lg:sticky lg:top-28">
       {(safeStatus === 'listed' || (previewAll && safeStatus === 'coming_soon')) && (
         <ListedInvestmentCard
           horseName={horseName}
@@ -322,6 +328,7 @@ export default function RightRail({
       {safeStatus === 'coming_soon' && !previewAll && (
         <ComingSoonCard horseName={horseName} horseSlug={horseSlug} />
       )}
-    </aside>
+      </aside>
+    </div>
   );
 }

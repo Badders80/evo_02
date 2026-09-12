@@ -151,12 +151,12 @@ export function runTests(): void {
   console.log('✅ Term Sheet generation & anchors verified');
 
   // 3. Mandatory PDS sections
-  assertIncludes(nelliePack.pack.pdsMarkdown, '§1. Title & Structure', 'PDS section 1');
-  assertIncludes(nelliePack.pack.pdsMarkdown, '§2. Asset Specifics', 'PDS section 2');
-  assertIncludes(nelliePack.pack.pdsMarkdown, '§3. Commercial Model', 'PDS section 3');
-  assertIncludes(nelliePack.pack.pdsMarkdown, '§4. Deposit & Billing', 'PDS section 4');
-  assertIncludes(nelliePack.pack.pdsMarkdown, '§5. Investor Return', 'PDS section 5');
-  assertIncludes(nelliePack.pack.pdsMarkdown, '§6. Exit & Termination', 'PDS section 6');
+  assertIncludes(nelliePack.pack.pdsMarkdown, '1. Title & Structure', 'PDS section 1');
+  assertIncludes(nelliePack.pack.pdsMarkdown, '2. Asset Specifics', 'PDS section 2');
+  assertIncludes(nelliePack.pack.pdsMarkdown, '3. Commercial Model', 'PDS section 3');
+  assertIncludes(nelliePack.pack.pdsMarkdown, '4. Deposit & Billing', 'PDS section 4');
+  assertIncludes(nelliePack.pack.pdsMarkdown, '5. Investor Return', 'PDS section 5');
+  assertIncludes(nelliePack.pack.pdsMarkdown, '6. Exit & Termination', 'PDS section 6');
   console.log('✅ All mandatory PDS sections present');
 
   // 4. Mandatory SA clauses
@@ -171,25 +171,25 @@ export function runTests(): void {
   const fullPdsSections = [
     'Key Information Summary',
     'About Evolution Stables',
-    '§1. Title & Structure',
-    '§2. Asset Specifics',
-    '§3. Commercial Model',
-    '§4. Deposit & Billing',
-    '§5. Investor Return',
-    '§6. Exit & Termination',
-    '§7. Taxes',
-    '§8. Insurance',
-    '§9. Valuation',
-    '§10. Veterinary Report',
-    '§11. Material Interests',
-    '§12. Risk Disclosure',
-    '§13. Responsible Investment',
-    '§14. Records & Financial Reporting',
-    '§15. Complaints',
-    '§16. Transfer of Interest',
-    '§17. Investment Details',
-    '§18. Investor Declaration',
-    '§19. Promoter Declaration',
+    '1. Title & Structure',
+    '2. Asset Specifics',
+    '3. Commercial Model',
+    '4. Deposit & Billing',
+    '5. Investor Return',
+    '6. Exit & Termination',
+    '7. Taxes',
+    '8. Insurance',
+    '9. Valuation',
+    '10. Veterinary Report',
+    '11. Material Interests',
+    '12. Risk Disclosure',
+    '13. Responsible Investment',
+    '14. Records & Financial Reporting',
+    '15. Complaints',
+    '16. Transfer of Interest',
+    '17. Investment Details',
+    '18. Investor Declaration',
+    '19. Promoter Declaration',
   ];
   for (const sec of fullPdsSections) {
     if (!nelliePack.pack.pdsMarkdown.includes(sec)) {
@@ -322,11 +322,11 @@ export function runTests(): void {
   const prudentiaPack = compileLegalPack(prudentiaSoftContext);
   assertIncludes(prudentiaPack.pack.pdsMarkdown, 'Prudentia (NZ) is a New Zealand-bred', 'PDS §2.1 About Horse');
   assertIncludes(prudentiaPack.pack.pdsMarkdown, 'Wexford Stables', 'PDS §2.1 Trainer Bio');
-  assertIncludes(prudentiaPack.pack.pdsMarkdown, '### §2.1 About Horse & Trainer', 'PDS §2.1 About Horse & Trainer Header');
-  assertIncludes(prudentiaPack.pack.pdsMarkdown, '### §2.2 Key Details', 'PDS §2.2 Key Details Table Header');
-  assertIncludes(prudentiaPack.pack.pdsMarkdown, '### §2.3 Racing Outlook & Pedigree', 'PDS §2.3 Racing Outlook Header');
+  assertIncludes(prudentiaPack.pack.pdsMarkdown, '### 2.1 About Horse & Trainer', 'PDS §2.1 About Horse & Trainer Header');
+  assertIncludes(prudentiaPack.pack.pdsMarkdown, '### 2.2 Key Details', 'PDS §2.2 Key Details Table Header');
+  assertIncludes(prudentiaPack.pack.pdsMarkdown, '### 2.3 Racing Outlook & Pedigree', 'PDS §2.3 Racing Outlook Header');
   assertIncludes(prudentiaPack.pack.pdsMarkdown, 'by champion sire Proisir', 'PDS §2.3 Racing Outlook Content');
-  assertIncludes(prudentiaPack.pack.pdsMarkdown, '### §2.4 Racing Expectation', 'PDS §2.4 Racing Expectation Header');
+  assertIncludes(prudentiaPack.pack.pdsMarkdown, '### 2.4 Racing Expectation', 'PDS §2.4 Racing Expectation Header');
   assertIncludes(prudentiaPack.pack.pdsMarkdown, 'expected back in work early in the new year', 'PDS §2.4 Racing Expectation Content');
   console.log('✅ Soft content PDS Section 2 layout verified');
 

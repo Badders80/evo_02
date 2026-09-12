@@ -61,16 +61,20 @@ console.log('Running @evo/ui primitives tests...');
   assert.equal(done.props.children[1].props.children, 'Campaign Concluded');
 }
 
-// StatRow — P5 (right-rail.tsx:184,194,202)
+// StatRow — P5 (right-rail.tsx:184,194,202); unit-below-value + muted sub (2026-09-11 audit)
 {
   const el: any = StatRow({ label: 'Price', value: '$3,800', unit: 'per month', sub: 'for a 1.0% stake' });
-  const [label, row] = el.props.children;
+  const label = el.props.children[0];
   assert.equal(label.props.className, 'text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground block mb-1');
   assert.equal(label.props.children, 'Price');
-  const [value, unit] = row.props.children;
+  const value = el.props.children[1];
   assert.equal(value.props.className, 'text-[30px] font-light tracking-tight text-heading leading-tight');
   assert.equal(value.props.children, '$3,800');
+  const unit = el.props.children[2];
+  assert.equal(unit.props.className, 'text-sm font-light text-muted-foreground block mt-0.5');
   assert.equal(unit.props.children, 'per month');
+  const sub = el.props.children[3];
+  assert.ok(sub.props.className.includes('text-muted-foreground'), 'sub uses muted-foreground for legibility');
 }
 
 // WhitePillCTA — P6a (right-rail.tsx:240)

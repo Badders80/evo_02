@@ -14,6 +14,7 @@ import { getTrainer } from '@evo/db_models';
 import { getStableLinks } from '@/lib/stable-links';
 import { getSupabaseServiceClient } from '@/lib/supabase-service';
 import { Eyebrow, StatusPill } from '@evo/ui';
+import { CollapsiblePageIntro } from '@/components/marketplace/collapsible-page-intro';
 import { DetailTabs } from '@/components/marketplace/detail-tabs';
 import { HorsePageShell } from '@/components/marketplace/horse-page-shell';
 import { DocumentsGate } from '@/components/horse/documents-gate';
@@ -104,7 +105,10 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
   return (
     <div className="min-h-screen bg-canvas font-sans selection:bg-accent selection:text-black">
       <main className="min-h-screen pb-24">
-        <div id="page-intro" className="mx-auto max-w-6xl px-12 pt-32 md:px-16 lg:px-20">
+        {/* One-time intro (founder 2026-09-12): collapses on scroll-past,
+            breadcrumb becomes the top. Resets only on route change. */}
+        <CollapsiblePageIntro>
+          <div id="page-intro" className="mx-auto max-w-6xl px-12 pt-32 md:px-16 lg:px-20">
           <p className="text-[11px] font-light uppercase tracking-[0.2em] text-muted-foreground">
             Evolution Stables
           </p>
@@ -124,10 +128,13 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
             </a>{' '}
             below.
           </p>
-        </div>
+          </div>
+        </CollapsiblePageIntro>
         <div className="mx-auto mt-16 max-w-6xl px-6 sm:px-10 lg:px-12">
-          {/* Breadcrumb */}
-          <div className="mb-10 flex items-center justify-between text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+          {/* Breadcrumb — 'new top' once the intro collapses. Founder 2026-09-12:
+              generous margin below the collapsed intro (PT-14 ≈ the intro's own
+              bottom rhythm); doubles as breathing room when intro is visible. */}
+          <div className="mb-10 flex items-center justify-between pt-10 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
             <div className="flex items-center gap-2">
               <Link
                 href="/marketplace"
@@ -140,7 +147,7 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
             </div>
           </div>
 
-          <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-[2fr_1fr]">
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-[2fr_1fr]">
             {/* LEFT COLUMN */}
             <div className="space-y-12">
               {/* MediaDeck — hero + spec strip + thumbnail carousel (video-ready) */}
