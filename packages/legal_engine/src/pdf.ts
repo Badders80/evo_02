@@ -18,7 +18,7 @@ const MARGIN_TOP = 64;
 const MARGIN_BOTTOM = 64;
 const BODY_SIZE = 9.6;
 const BODY_LEADING = 13.4;
-const HEAD = { '###': 11, '##': 12, '###3': 11 } as const;
+const HEADING_SIZES = [15, 12.5, 11] as const; // h1, h2, h3+
 
 /** WinAnsi-safe transliteration: curly punctuation and arrows have no glyph in
  * Helvetica/WinAnsi and would corrupt the content stream. */
@@ -32,8 +32,9 @@ function ascii(input: string): string {
     .replace(/\u00D7/g, 'x')
     .replace(/\u2022/g, '-')
     .replace(/\u00A0/g, ' ')
-    .replace(/[\u2018-\u201F]/g, "'")
-    .replace(/[^\x09\x0A\x0D\x20-\x7E\xA1-\xFF]/g, '');
+    // strip anything outside printable ASCII + Latin-1 (no control chars: the
+    // markdown is line-split first, so newlines never reach this function)
+    .replace(/[^\u0020-\u007E\u00A1-\u00FF]/g, '');
 }
 
 /** Approximate Helvetica advance widths (per 1000 units) — enough for wrapping. */
@@ -78,15 +79,10 @@ type Block = { text: string; size: number; bold: boolean; indent: number; gapAft
 
 function markdownToBlocks(md: string): Block[] {
   const blocks: Block[] = [];
-  const lines = ascii(md).split(/\r?\n/);
-  let inCode = false;
 
-  for (const raw of lines) {
-    const line = raw.replace(/\s+$/, '');
-    if (/^\s*```/.test(line)) {
-      inCode = !inCode;
-      continue;
-    }
+  for (const rawLine of md.split(/\r?\n/)) {
+    const line = ascii(rawLine).replace(/\s+$/, '');
+    if (/^\s*```/.test(line)) continue; // fenced-code markers never appear in the offer docs
     if (!line.trim()) continue;
     if (/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) {
       blocks.push({ text: '', size: BODY_SIZE, bold: false, indent: 0, gapAfter: 6, rule: true });
@@ -95,7 +91,7 @@ function markdownToBlocks(md: string): Block[] {
     const heading = line.match(/^(#{1,6})\s+(.*)$/);
     if (heading) {
       const level = heading[1].length;
-      const size = level === 1 ? 15 : level === 2 ? 12.5 : HEAD['###'];
+      const size = HEADING_SIZES[Math.min(level, 3) - 1];
       blocks.push({
         text: heading[2].replace(/\*\*/g, ''),
         size,
@@ -125,7 +121,6 @@ function markdownToBlocks(md: string): Block[] {
       indent: 0,
       gapAfter: 6,
     });
-    void inCode;
   }
   return blocks;
 }
