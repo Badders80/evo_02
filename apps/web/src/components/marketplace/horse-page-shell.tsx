@@ -43,7 +43,6 @@ export function HorsePageShell(props: HorsePageShellProps) {
         horseSlug={props.horseSlug}
         wholesaleMonthlyNzd={props.wholesaleMonthlyNzd}
         minInvestmentPct={props.minInvestmentPct}
-        maxInvestmentPct={props.maxInvestmentPct}
         stakeStepPct={props.stakeStepPct}
         legalPack={props.legalPack}
         onOpenModal={openModal}

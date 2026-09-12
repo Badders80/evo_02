@@ -30,7 +30,6 @@ export interface RightRailProps {
   horseSlug?: string;
   wholesaleMonthlyNzd?: number;
   minInvestmentPct: number;
-  maxInvestmentPct?: number;
   stakeStepPct?: number;
   legalPack?: LegalPackDigest | null;
   /** F8: opens the page-level PurchaseFlowModal via URL push. Required. */
@@ -114,7 +113,6 @@ function ListedInvestmentCard({
   horseSlug,
   wholesaleMonthlyNzd,
   minInvestmentPct,
-  maxInvestmentPct = 10.0,
   stakeStepPct = 0.5,
   legalPack,
   onOpenModal,
@@ -123,7 +121,6 @@ function ListedInvestmentCard({
   horseSlug: string;
   wholesaleMonthlyNzd?: number;
   minInvestmentPct: number;
-  maxInvestmentPct?: number;
   stakeStepPct?: number;
   legalPack?: LegalPackDigest | null;
   /** F8: opens the page-level PurchaseFlowModal via URL push (parent owns state). */
@@ -144,8 +141,9 @@ function ListedInvestmentCard({
       </div>
       <div className="w-10 h-px bg-gold" />
 
-      {/* Stat rows — straight left edge per prod reference (no icon-column indent on stat rows) */}
-      <div className="space-y-3.5">
+      {/* Stat rows — indented to the feature-text column (pl-[38px]) so Price/Return align with
+          the text below, NOT the icon column (founder 2026-09-12). */}
+      <div className="space-y-3.5 pl-[38px]">
         <StatRow
           label="Price"
           value={<>${pricing.monthlyKeepUnitNzd.toLocaleString()}</>}
@@ -159,26 +157,22 @@ function ListedInvestmentCard({
         {/* Feature rows — icon left of text column (38px = icon 22 + gap 16) */}
         <ul className="space-y-3 pb-2.5">
           <li className="flex items-start gap-4">
-            <Landmark className="text-gold h-[22px] w-[22px] mt-0.5 shrink-0" />
+            <Landmark className="text-muted-foreground h-[22px] w-[22px] mt-0.5 shrink-0" />
             <p className="text-muted-foreground text-sm font-light leading-relaxed">
               <strong className="text-heading font-medium block mb-1">Stable Access</strong>
               Quarterly visits to the training facility and trackside privileges.
             </p>
           </li>
           <li className="flex items-start gap-4">
-            <Activity className="text-gold h-[22px] w-[22px] mt-0.5 shrink-0" />
+            <Activity className="text-muted-foreground h-[22px] w-[22px] mt-0.5 shrink-0" />
             <p className="text-muted-foreground text-sm font-light leading-relaxed">
               <strong className="text-heading font-medium block mb-1">Real-time Updates</strong>
               Weekly audio and video reports from the trainer.
             </p>
           </li>
         </ul>
-        {/* Stake available + CTA + fine print — all aligned to the feature-row text column (pl-[38px]) */}
+        {/* CTA + fine print — aligned to the feature-row text column (pl-[38px]) */}
         <div className="pl-[38px] space-y-3">
-          <div className="flex items-center justify-between border-t border-border pt-3">
-            <span className="text-muted-foreground font-light text-base">Stake available</span>
-            <span className="text-heading font-light text-xl tracking-tight">{maxInvestmentPct.toFixed(0)}%</span>
-          </div>
 
           {/* CTA: opens Step 2 term sheet (learn-more, not buy).
               GlowPillButton — same CTA as NavBar 'Get Started' (2026-09-11 audit). */}
@@ -264,7 +258,6 @@ export default function RightRail({
   horseSlug = '',
   wholesaleMonthlyNzd,
   minInvestmentPct,
-  maxInvestmentPct = 10.0,
   stakeStepPct = 0.5,
   legalPack = null,
   onOpenModal,
@@ -294,7 +287,6 @@ export default function RightRail({
           horseSlug={horseSlug}
           wholesaleMonthlyNzd={wholesaleMonthlyNzd}
           minInvestmentPct={minInvestmentPct}
-          maxInvestmentPct={maxInvestmentPct}
           stakeStepPct={stakeStepPct}
           legalPack={legalPack}
           onOpenModal={onOpenModal}
