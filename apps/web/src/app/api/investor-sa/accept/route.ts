@@ -135,7 +135,9 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({ url: session.url, sessionId: session.id });
+    // kycUrl is what purchase-flow-modal.tsx reads to send the investor to Stripe
+    // Identity; url/sessionId kept for backward compatibility.
+    return NextResponse.json({ url: session.url, sessionId: session.id, kycUrl: session.url });
   } catch (error: unknown) {
     if (error instanceof Error && error.message === 'STRIPE_SECRET_KEY is not configured') {
       return NextResponse.json({ error: 'KYC is not configured', code: 'KYC_NOT_CONFIGURED' }, { status: 503 });
