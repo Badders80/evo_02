@@ -72,14 +72,14 @@ function keyInformationSummary(context: SyndicateLegalContext): string {
       ? `- **Lease fee:** $${(p.monthlyKeepUnitNzd * (context.termMonths ?? 0)).toFixed(2)} per 1% stake (fixed, covers all costs for the term).`
       : `- $${p.monthlyKeepUnitNzd.toFixed(2)} per month per 1% stake, recurring monthly for the duration of the investment.\n- A one-time upfront payment covers the deposit and initial payment.`;
 
-  // Current Available Stake = available units × step (percent), falling back to the
-  // total syndicate stake when availability is unset (fresh campaign, nothing sold).
-  const availablePct =
-    context.sharesAvailable != null && context.stakeStepPct != null
-      ? (context.sharesAvailable * context.stakeStepPct).toFixed(1)
-      : context.totalHorsePercentage != null
-        ? context.totalHorsePercentage.toFixed(1)
-        : BLANK;
+  // P0-D freeze (founder 2026-09-12): the offer line prints the FIXED syndicate size, never the
+  // live availability. The PDS is recompiled at payment time and its hash compared against the
+  // accepted bytes; a live figure mutated between tick and payment — the buyer's own checkout
+  // reservation writes inventory.shares_available — so the webhook PDS_HASH_MISMATCH guard
+  // rejected every real purchase after the card was charged. totalHorsePercentage is campaign
+  // static: identical bytes before and after any reservation.
+  const syndicateSizePct =
+    context.totalHorsePercentage != null ? context.totalHorsePercentage.toFixed(1) : BLANK;
 
   // Split label is "75% Investor Pool / 25% Owner Retention" — extract ONLY the
   // leading percentage for prose ("75% of gross stakes"), never the pool label.
@@ -90,7 +90,7 @@ function keyInformationSummary(context: SyndicateLegalContext): string {
   const structureBullets = [
     '- **Asset Type:** Leasehold interest in a thoroughbred racehorse',
     `- **Asset Name:** ${v(h.legalName)}${h.barnName && h.barnName !== h.legalName ? ` (${h.barnName})` : ''}`,
-    `- **Current Available Stake:** ${availablePct}% syndicated share of total ownership`,
+    `- Evolution Stables ${v(h.legalName)} Syndicate size ${syndicateSizePct}%`,
     `- **Minimum Investment:** ${context.minInvestmentPct != null ? `${context.minInvestmentPct.toFixed(1)}%` : BLANK}`,
     context.termMonths != null ? `- **Term:** ${termLabel(context)}` : `- **Term:** ${BLANK}`,
     `- **Managed by:** ${v(t.managerEntity)} (Authorised Syndicator)`,

@@ -169,6 +169,94 @@ console.log('Running @evo/web E3 Right Rail & Acceptance Gate tests...\n');
   console.log('✅ Hash-variance: SA varies with stake, PDS stays locked (investor-specific SA)');
 }
 
+// 2c. P0-D regression: the PDS must be byte-stable across live availability changes.
+// The Key Information Summary used to print "Current Available Stake" from the live inventory
+// figure (context.sharesAvailable ← inventory.shares_available). A checkout's own reservation
+// mutates that row, so the document's bytes changed between tick and payment, and the webhook's
+// recompile threw PDS_HASH_MISMATCH after the card was charged. The line now renders the FIXED
+// syndicate size (totalHorsePercentage): compiling the same horse with sharesAvailable 10 vs 2
+// must yield an IDENTICAL pdsHash and carry the same frozen line both times.
+{
+  const baseCampaign: HorseCampaign = {
+    slug: 'nellie',
+    legalName: 'Nellie',
+    barnName: 'Nellie',
+    wholesaleMonthlyNzd: 3800,
+    totalSyndicateStakePct: 10,
+    minStakePct: 1.0,
+    stakeStepPct: 0.5,
+    softLegal: {
+      aboutHorse: 'Nellie is a talented filly.',
+      trainerBio: 'Stephen Gray is a seasoned trainer.',
+      racingOutlookAndPedigree: 'Promising racing outlook.',
+    },
+    marketing: {
+      marketplaceHook: 'Attractive offer from Australia',
+      highlightTags: ['Group Performer'],
+    },
+    listingStatus: 'listed',
+    owner: {
+      entity: 'Evolution Stables',
+      contact: 'alex@evolutionstables.nz',
+    },
+    trainer: {
+      name: 'Stephen Gray',
+      stable: 'Stephen Gray Racing',
+      location: 'Palmerston North, NZ',
+      slug: 'stephen-gray',
+    },
+    pedigree: {
+      sire: 'Per Incanto',
+      dam: 'Nellie',
+      damSire: 'O’Reilly',
+      lineageSummary: 'Top tier lineage',
+      foalingDate: '2021-08-01',
+      gender: 'Filly',
+      colour: 'Bay',
+      breeder: 'Little Avondale Trust',
+      microchip: '985141001234567',
+      lifeNumber: 'NZ0012345',
+      studBookUrl: 'https://loveracing.nz',
+    },
+    capTableFixture: {
+      retainedPct: 90,
+      allocatedPct: 0,
+      reservedPct: 0,
+      availablePct: 10,
+      totalInvestors: 0,
+    },
+    closeStyle: 'fourteen_day',
+  };
+
+  const packAvailable = getCompiledLegalPackForCampaign({
+    ...baseCampaign,
+    capTableFixture: { ...baseCampaign.capTableFixture, availablePct: 10 },
+  });
+  const packReserved = getCompiledLegalPackForCampaign({
+    ...baseCampaign,
+    capTableFixture: { ...baseCampaign.capTableFixture, availablePct: 2 },
+  });
+
+  assert.equal(
+    packAvailable.pdsHash,
+    packReserved.pdsHash,
+    'PDS hash must be IDENTICAL when sharesAvailable drops 10 → 2 (a mid-checkout reservation must not rewrite the PDS)'
+  );
+
+  const fixedSizeLine = 'Evolution Stables Nellie Syndicate size 10.0%';
+  assert.ok(packAvailable.pdsMarkdown.includes(fixedSizeLine), 'PDS renders the fixed syndicate size when availability is full');
+  assert.ok(
+    packReserved.pdsMarkdown.includes(fixedSizeLine),
+    'PDS renders the same fixed syndicate size after reservation (2 of 10 available)'
+  );
+  assert.ok(
+    !packAvailable.pdsMarkdown.includes('Current Available Stake'),
+    'PDS no longer prints the live "Current Available Stake" figure'
+  );
+
+  console.log('✅ P0-D freeze: PDS byte-stable across availability (10 vs 2), line carries fixed syndicate size');
+}
+
 // 3. (Removed 2026-09-04 format-pass/rail rebuild: the E3 5-pillar accordion and stake
 // slider were deleted from the rail — locked Step-1 "Ownership" card replaced them.
 // Whistleblowing pillar copy was locked content, now retired with the surface.)
