@@ -3,8 +3,7 @@ import { createClient, getSupabaseServiceClient } from '@/lib/supabase-server';
 import { HttpError, requireUserId } from '@/lib/nellie-loop';
 import { createVerificationSession } from '@/lib/stripe-identity';
 import { getInventoryId } from '@/lib/inventory-ids';
-import { getCampaignBySlug } from '@/lib/horses-data';
-import { compileLegalPack, computeDslPricing } from '@evo/legal_engine';
+import { getCampaignBySlug, getCompiledLegalPackForCampaign } from '@/lib/horses-data';
 
 /**
  * POST /api/investor-sa/accept — Investor-SA checkout (Task 2 from G009).
@@ -32,60 +31,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
     }
 
-    // Build the legal context (same logic as getCompiledLegalPackForCampaign)
-    const buildContext = (pricing: any) => ({
-      syndicateName: `${campaign.legalName} Syndicate`,
-      campaignSlug: campaign.slug,
-      ownerName: campaign.owner.entity,
-      horse: {
-        legalName: campaign.legalName,
-        barnName: campaign.barnName ?? campaign.legalName,
-        foalingYear: campaign.pedigree.foalingDate ? parseInt(campaign.pedigree.foalingDate.split('-')[0], 10) : 0,
-        foalingDate: campaign.pedigree.foalingDate || undefined,
-        gender: campaign.pedigree.gender as 'Colt' | 'Filly' | 'Gelding' | 'Mare' | 'Horse',
-        breeder: campaign.pedigree.breeder,
-        microchip: campaign.pedigree.microchip,
-        sire: campaign.pedigree.sire,
-        dam: campaign.pedigree.dam,
-      },
-      trainer: {
-        name: campaign.trainer.name,
-        location: campaign.trainer.location,
-        managerEntity: 'Evolution Stables',
-      },
-      pricing,
-      closeStyle: campaign.closeStyle,
-      totalHorsePercentage: campaign.totalSyndicateStakePct,
-      totalShares: Math.round(campaign.totalSyndicateStakePct),
-      sharesAvailable: Math.round(campaign.capTableFixture.availablePct),
-      paymentModel: campaign.paymentModel,
-      termStartDate: campaign.termStartDate,
-      termEndDate: campaign.termEndDate,
-      distributionSplit: campaign.distributionSplit,
-      distributionSchedule: campaign.distributionSchedule,
-      pdsVersion: '1.0.0',
-      saVersion: '1.0.0',
-      effectiveDate: campaign.termStartDate,
-      investorName: undefined,
-      executionDate: undefined,
-      softLegal: campaign.softLegal,
-      marketing: campaign.marketing,
-      listingPlatform: campaign.listingPlatform,
-    });
+    // ONE source of truth: the acceptance must record the SAME bytes the investor
+    // ticked, so compile through the shared pack builder with the identical
+    // execution context (investor name + tick date) the modal used. A local copy
+    // of the context builder lived here and drifted from horses-data, producing a
+    // different saHash than the document on screen.
+    const { data: execProfile } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', userId)
+      .maybeSingle();
+    const fullName =
+      execProfile && typeof execProfile === 'object' && 'full_name' in execProfile
+        ? String((execProfile as { full_name: string | null }).full_name ?? '')
+        : '';
+    const execution = fullName
+      ? { investorName: fullName, executionDate: new Date().toISOString().slice(0, 10) }
+      : undefined;
 
-    // Locked docs (PDS + term sheet) always compile at 1.0%
-    const lockedPricing = computeDslPricing(campaign.wholesaleMonthlyNzd, 1.0);
-    const { pack: lockedPack } = compileLegalPack(buildContext(lockedPricing), { skipValidation: true });
-
-    // Investor-specific SA: recompile with the investor's stake, keep PDS/TS locked
-    const saPricing = computeDslPricing(campaign.wholesaleMonthlyNzd, units);
-    const { pack: saPack } = compileLegalPack(buildContext(saPricing), { skipValidation: true });
-
-    const legalPack = {
-      ...lockedPack,
-      saMarkdown: saPack.saMarkdown,
-      saHash: saPack.saHash,
-    };
+    const legalPack = getCompiledLegalPackForCampaign(campaign, units, execution);
 
     if (!legalPack?.saMarkdown || !legalPack?.saHash) {
       return NextResponse.json({ error: 'Legal pack compilation failed' }, { status: 503 });
