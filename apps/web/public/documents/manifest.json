@@ -1,8 +1,8 @@
 {
-  "generated": "2026-09-10",
-  "source": "war-room/_today/manolo-pds.md, manolo-sa.md (founder-locked copy)",
-  "documents": {
-    "pds": {
+  "generated": "2026-09-12",
+  "source": "live compiled pack @ https://www.evolutionstables.nz (/api/legal/pack?slug=\u2026)",
+  "documents": [
+    {
       "campaign": "i-stole-a-manolo",
       "title": "Product Disclosure Statement",
       "file": "i-stole-a-manolo-pds.pdf",
@@ -11,7 +11,7 @@
       "version": "1.0.0",
       "effectiveDate": "2026-09-01"
     },
-    "sa": {
+    {
       "campaign": "i-stole-a-manolo",
       "title": "Syndicate Agreement",
       "file": "i-stole-a-manolo-sa.pdf",
@@ -19,6 +19,50 @@
       "sizeBytes": 303516,
       "version": "1.0.0",
       "effectiveDate": "2026-09-01"
+    },
+    {
+      "campaign": "i-stole-a-manolo",
+      "doc": "PDS",
+      "title": "Product Disclosure Statement",
+      "file": "i-stole-a-manolo-pds.pdf",
+      "sha256": "a0216a9576f6eecb9c2836a1ff80cef504955715b7f391aeb9272c71681fee8f",
+      "sizeBytes": 420216,
+      "docHash": "b7d959ce8e0a0d7830f5e69f72a39d0f59de1162233c69007ddd704ac6e89db5",
+      "version": "1.0.0",
+      "generatedFrom": "https://www.evolutionstables.nz"
+    },
+    {
+      "campaign": "i-stole-a-manolo",
+      "doc": "SA",
+      "title": "Syndicate Agreement",
+      "file": "i-stole-a-manolo-sa.pdf",
+      "sha256": "9f149eaacb966beaa2447402877a0abee2c1efdf953d4f2e79cb2d471a95de62",
+      "sizeBytes": 288597,
+      "docHash": "41425f11d3f2089948788210138f743aff09432dfc7506b937322197a1b5fd6e",
+      "version": "1.0.0",
+      "generatedFrom": "https://www.evolutionstables.nz"
+    },
+    {
+      "campaign": "nellie",
+      "doc": "PDS",
+      "title": "Product Disclosure Statement",
+      "file": "nellie-pds.pdf",
+      "sha256": "da69b51bd08f71d3f0a9aca41419e9b36f69f2308222f05485be67dee33910aa",
+      "sizeBytes": 408579,
+      "docHash": "9af25434919e1c532c6d11d97e8370c181660d09a120db20848555d35e73d98c",
+      "version": "1.0.0",
+      "generatedFrom": "https://www.evolutionstables.nz"
+    },
+    {
+      "campaign": "nellie",
+      "doc": "SA",
+      "title": "Syndicate Agreement",
+      "file": "nellie-sa.pdf",
+      "sha256": "779ab8e2d053adb035ed9bbf620185b68109b3d9bfe0ea08cc6ae12282d47e70",
+      "sizeBytes": 289108,
+      "docHash": "6fa38eee979bade60161df5e4cc185ccc200d084fe142838f080ab855c20e7f3",
+      "version": "1.0.0",
+      "generatedFrom": "https://www.evolutionstables.nz"
     }
-  }
+  ]
 }
