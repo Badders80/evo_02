@@ -13,6 +13,7 @@ export * from './sa';
 export * from './validator';
 export * from './compiler';
 export * from './settlement';
+export * from './pdf';
 
 // Re-export hash helper for consumers who want to verify independently.
 export { computeSha256, verifySha256 } from '@evo/storage/hash';

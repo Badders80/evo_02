@@ -357,7 +357,7 @@ export function MyStableDashboard({
                       </div>
                     </div>
                     <a
-                      href={`/api/legal/download?slug=${campaign.slug}&doc=pds`}
+                      href={`/api/legal/artifact?slug=${campaign.slug}&doc=pds`}
                       download
                       className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3.5 py-1.5 text-xs text-foreground hover:border-accent hover:text-accent transition-colors"
                     >
@@ -376,7 +376,7 @@ export function MyStableDashboard({
                       </div>
                     </div>
                     <a
-                      href={`/api/legal/download?slug=${campaign.slug}&doc=sa`}
+                      href={`/api/legal/artifact?slug=${campaign.slug}&doc=sa`}
                       download
                       className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3.5 py-1.5 text-xs text-foreground hover:border-accent hover:text-accent transition-colors"
                     >

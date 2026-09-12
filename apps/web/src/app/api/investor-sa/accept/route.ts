@@ -55,19 +55,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Legal pack compilation failed' }, { status: 503 });
     }
 
-    // Record the SA acceptance audit event (same pattern as /api/acceptance)
+    // Record BOTH accepted documents as immutable audit events — the exact markdown
+    // bytes the investor ticked in Step 3 (the accordion gates the PDS, then the SA).
+    // These rows ARE the locked artifact: /api/legal/artifact renders the PDF from
+    // them, so the download can never drift from the accepted text.
     const adminClient = getSupabaseServiceClient();
-    const { error: eventError } = await adminClient.from('events').insert({
-      event_type: 'acceptance',
-      payload: {
-        horse_slug: horseSlug,
-        stake_pct: units,
-        doc: 'sa',
-        doc_hash: legalPack.saHash,
-        doc_markdown: legalPack.saMarkdown,
-        user_id: userId,
+    const { error: eventError } = await adminClient.from('events').insert([
+      {
+        event_type: 'acceptance',
+        payload: {
+          horse_slug: horseSlug,
+          stake_pct: units,
+          doc: 'pds',
+          doc_hash: legalPack.pdsHash,
+          doc_markdown: legalPack.pdsMarkdown,
+          user_id: userId,
+        },
       },
-    });
+      {
+        event_type: 'acceptance',
+        payload: {
+          horse_slug: horseSlug,
+          stake_pct: units,
+          doc: 'sa',
+          doc_hash: legalPack.saHash,
+          doc_markdown: legalPack.saMarkdown,
+          user_id: userId,
+        },
+      },
+    ]);
 
     if (eventError) {
       return NextResponse.json({ error: eventError.message }, { status: 503 });
