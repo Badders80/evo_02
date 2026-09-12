@@ -104,7 +104,7 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
 
   return (
     <div className="min-h-screen bg-canvas font-sans selection:bg-accent selection:text-black">
-      <main className="min-h-screen pb-24">
+      <main className="min-h-screen">{/* pb removed: the right-rail sticky box must reach the footer (founder 2026-09-12); the footer carries its own top padding. */}
         {/* One-time intro (founder 2026-09-12): collapses on scroll-past,
             breadcrumb becomes the top. Resets only on route change. */}
         <CollapsiblePageIntro>

@@ -49,7 +49,7 @@
           </div>
           <div class="flex-1">
             <h3 class="text-[16px] font-light text-[var(--text-heading)] group-hover:text-[var(--accent)] transition-colors">Step 2 — Term Sheet</h3>
-            <p class="text-[12px] text-[var(--text-muted)] mt-0.5">Stake selector, 4-row summary, generated DSL term sheet, accept terms → proceed</p>
+            <p class="text-[12px] text-[var(--text-muted)] mt-0.5">Stake selector, 4-row summary (Investor Return = INVESTOR_RETURN_PCT), CTA → Step 3 (no accept tick here — acceptance lives only in Step 3)</p>
           </div>
           <span class="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">→</span>
         </a>
@@ -59,7 +59,7 @@
           </div>
           <div class="flex-1">
             <h3 class="text-[16px] font-light text-[var(--text-heading)] group-hover:text-[var(--accent)] transition-colors">Step 3 — SA Acceptance</h3>
-            <p class="text-[12px] text-[var(--text-muted)] mt-0.5">Investor-SA document, recorded acceptance tick → Complete KYC Verification</p>
+            <p class="text-[12px] text-[var(--text-muted)] mt-0.5">Two-doc accordion (PDS → SA), Begin → scroll → in-doc tick, 4 NZTR declarations, both COMPLETE → Next (KYC)</p>
           </div>
           <span class="text-[var(--text-muted)] group-hover:text-[var(--accent)] transition-colors">→</span>
         </a>
@@ -113,7 +113,7 @@
         <h3 class="text-[14px] font-medium text-[var(--text-heading)] mb-4 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-[var(--accent)]/20 flex items-center justify-center text-[12px] font-light text-[var(--accent)]">2</span> Step 2 — Term Sheet</h3>
         <div class="flex flex-wrap gap-2">
           <span class="px-3 py-1.5 rounded-full border border-[var(--destructive)]/40 bg-[var(--destructive)]/10 text-[var(--destructive)] text-sm">Stake validation error (over/under/non-multiple/empty)</span>
-          <span class="px-3 py-1.5 rounded-full border border-[var(--text-muted)]/40 bg-[var(--bg-surface)] text-[var(--text-muted)] text-sm">Terms not accepted → CTA disabled</span>
+          <span class="px-3 py-1.5 rounded-full border border-[var(--text-muted)]/40 bg-[var(--bg-surface)] text-[var(--text-muted)] text-sm">CTA always live — no accept tick on Step 2 (acceptance lives in Step 3)</span>
           <span class="px-3 py-1.5 rounded-full border border-[var(--text-muted)]/40 bg-[var(--bg-surface)] text-[var(--text-muted)] text-sm">← Back to horse page</span>
         </div>
       </div>
@@ -168,16 +168,10 @@
       <h3 class="text-[14px] font-medium text-[var(--text-heading)] mb-4">Local Dev Test Credentials</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
         <div class="bg-[var(--bg-surface-base)] rounded-xl p-4">
-          <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Admin Cheat-Code</p>
-          <p class="font-mono text-[var(--text-heading)]">admin@evolutionstables.nz</p>
-          <p class="font-mono text-[var(--text-muted)] mt-1">Bali</p>
-          <p class="text-[11px] text-[var(--status-active)] mt-2">✓ KYC verified</p>
-        </div>
-        <div class="bg-[var(--bg-surface-base)] rounded-xl p-4">
-          <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Original Demo User</p>
-          <p class="font-mono text-[var(--text-heading)]">alex@evolutionstables.nz</p>
-          <p class="font-mono text-[var(--text-muted)] mt-1">nellie-demo-2026</p>
-          <p class="text-[11px] text-[var(--status-active)] mt-2">✓ KYC verified</p>
+          <p class="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Preview Test Investor</p>
+          <p class="font-mono text-[var(--text-heading)]">test.investor@evolutionstables.nz</p>
+          <p class="font-mono text-[var(--text-muted)] mt-1">TestPass123!</p>
+          <p class="text-[11px] text-[var(--status-active)] mt-2">✓ KYC verified — PREVIEW_USER_EMAIL (branch-only)</p>
         </div>
       </div>
       <p class="text-[11px] text-[var(--text-muted)] mt-4">Both work with <code class="font-mono">WORKFLOW_PREVIEW=true</code> (bypasses KYC gate). Dev server: <a href="http://localhost:3000" class="text-[var(--accent)] underline">http://localhost:3000</a></p>

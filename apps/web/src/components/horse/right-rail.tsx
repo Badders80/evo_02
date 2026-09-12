@@ -273,13 +273,66 @@ export default function RightRail({
   const previewAll =
     typeof process !== 'undefined' && process.env.NEXT_PUBLIC_WORKFLOW_PREVIEW === 'true';
 
-  // Pinned rail (founder 2026-09-12, v3: "meant to move, then lock").
+  // Pinned rail (founder 2026-09-12, v7 = v5 pin + v5 fixed length).
   // The card travels with the page; when its top reaches the nav bottom
-  // (top-28 = 112px) it locks there — and the self-stretch wrapper makes the
-  // sticky range the full page height, so it NEVER releases (no drift at the
-  // grid end). Below lg: normal flow, no pinning.
+  // (top-28 = 112px) it pins there and holds for the whole scroll range.
+  // The wrapper's height is hard-coded to the left column's PEDIGREE-expanded
+  // natural height (the tallest tab), so the page length is constant through
+  // every tab/layer, and at max scroll the card's bottom edge lands level
+  // with the pedigree bottom. Below lg: normal flow.
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    // <lg screens never pin (lg: prefix), so no stretch there.
+    if (!window.matchMedia('(min-width: 1024px)').matches) return;
+
+    const stretch = () => {
+      const wrapper = wrapperRef.current;
+      if (!wrapper) return;
+      const grid = wrapper.closest('[class*="grid-cols"]');
+      const leftColumn = grid ? grid.children[0] : null;
+      if (!leftColumn) return;
+
+      const buttons = Array.from(document.querySelectorAll('button'));
+      const findTab = (label: string) =>
+        buttons.find((t) => t.textContent?.trim().toUpperCase() === label);
+
+      const pedigreeTab = findTab('PEDIGREE');
+      const backTab =
+        findTab('OVERVIEW') ?? findTab('TRAINER') ?? findTab('RACE RECORD');
+      if (!pedigreeTab || !backTab) return;
+
+      // Neutral measure: clear our height so the grid row collapses to the
+      // left column's natural content height (measuring with the stretch
+      // applied feeds back — the runaway loop seen live: docH 2.5k -> 12k+).
+      wrapper.style.height = '';
+
+      // Open PEDIGREE, let the panel swap settle, read the left column's
+      // natural height, restore the original tab, then set the fixed height.
+      if (!grid) return;
+      pedigreeTab.click();
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const gridTop = grid.getBoundingClientRect().top + window.scrollY;
+          const leftBottom = leftColumn.getBoundingClientRect().bottom + window.scrollY;
+          const target = Math.max(0, Math.floor(leftBottom - gridTop));
+          backTab.click();
+          requestAnimationFrame(() => {
+            wrapper.style.height = `${target}px`;
+          });
+        });
+      });
+    };
+
+    stretch();
+    window.addEventListener('resize', stretch);
+    return () => {
+      window.removeEventListener('resize', stretch);
+    };
+  }, []);
+
   return (
-    <div className="lg:self-stretch">
+    <div ref={wrapperRef} className="lg:self-stretch">
       <aside className="space-y-6 z-20 h-fit lg:sticky lg:top-28">
       {(safeStatus === 'listed' || (previewAll && safeStatus === 'coming_soon')) && (
         <ListedInvestmentCard

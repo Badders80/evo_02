@@ -59,11 +59,19 @@
     .doc-light .tick-sign span, .doc-light .tick-sign p { color: #333; }
     .doc-light .tick-sign strong { color: #000; }
     .doc-light input[type="checkbox"] { background-color: #fff; border-color: #999; accent-color: #b98a2f; }
-    /* Doc type scale: body 10px justified, h1/h2 12px bold, h3 10px extra-bold uppercase, one-line section spacing */
-    .doc-light .prose { font-size: 10px; line-height: 1.7; text-align: justify; }
-    .doc-light .prose p, .doc-light .prose ul, .doc-light .prose table { margin-bottom: 1em; }
-    .doc-light .prose h1, .doc-light .prose h2 { font-size: 12px; font-weight: 700; margin-top: 1em; margin-bottom: 0.5em; text-align: left; }
-    .doc-light .prose h3 { font-size: 10px; font-weight: 800; margin-top: 1em; margin-bottom: 0.5em; text-align: left; letter-spacing: 0.02em; text-transform: uppercase; }
+    /* Doc type scale — LOCKED (founder spec, mirrors the modal's canonical <style> block):
+       body 10px justified line-height 1.5; h1 14px/700, h2 13px/700; h3/h4 10px/700 bold only,
+       NO uppercase or letter-spacing; headings margin 1.5em/0.5em; li margin-bottom 0.25em. */
+    .doc-light .prose { font-size: 10px; line-height: 1.5; text-align: justify; }
+    .doc-light .prose p, .doc-light .prose ul, .doc-light .prose ol,
+    .doc-light .prose table { margin-top: 0; margin-bottom: 1em; }
+    .doc-light .prose h1 { font-size: 14px; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.5em; text-align: left; }
+    .doc-light .prose h2 { font-size: 13px; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.5em; text-align: left; }
+    .doc-light .prose h3, .doc-light .prose h4 {
+      font-size: 10px; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.25em;
+      text-align: left; letter-spacing: 0; text-transform: none;
+    }
+    .doc-light .prose li { margin-top: 0; margin-bottom: 0.25em; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -86,9 +94,14 @@
 
         <!-- Two-Doc Accordion (FAQ pattern) — flex-fills the middle; footer always pinned -->
         <div class="flex-1 min-h-0 overflow-hidden space-y-3 flex flex-col" id="accordion-container">
-          <!-- PDS Panel (Panel 1 - auto-opens) -->
-          <div class="rounded-xl border border-[var(--border)] bg-[var(--bg-surface-base)] overflow-hidden" id="pds-panel">
-            <button type="button" class="w-full px-4 py-3.5 flex items-center justify-between gap-4 text-left" aria-expanded="true" aria-controls="pds-content" onclick="togglePanel('pds')">
+          <!-- PDS Panel (Panel 1 — arrives COLLAPSED with a Begin button; founder 2026-09-12:
+               the step triggers the read, it never auto-opens) -->
+          <div class="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden flex flex-col flex-none min-h-0" id="pds-panel">
+            <div id="pds-begin-row" class="w-full px-4 py-3 flex items-center justify-between gap-4">
+              <span class="font-medium text-[var(--text-heading)]">Product Disclosure Statement</span>
+              <button type="button" onclick="beginDoc('pds')" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-1.5 text-[11px] font-light tracking-[0.18em] uppercase text-[var(--text-foreground)] bg-[var(--bg-surface-base)] border border-[var(--border)] transition-all duration-300 hover:text-white hover:bg-[#212121] hover:border-[#575757] active:scale-[0.98]">Begin</button>
+            </div>
+            <button type="button" id="pds-panel-btn" class="hidden w-full px-4 py-3.5 flex items-center justify-between gap-4 text-left" aria-expanded="false" aria-controls="pds-content" onclick="togglePanel('pds')">
               <span class="font-medium text-[var(--text-heading)]">Product Disclosure Statement</span>
               <div class="flex items-center gap-2">
                 <span id="pds-status" class="text-[11px] font-medium text-[var(--text-muted)]">Reading…</span>
@@ -97,10 +110,14 @@
             </button>
             <div id="pds-content" class="accordion-panel open px-4 pb-4" role="region" aria-labelledby="pds-panel">
               <div class="doc-light rounded-xl border border-[var(--border)] bg-[var(--bg-canvas)]/60 overflow-hidden flex-1 min-h-0 flex flex-col">
+                <div class="scroll-strip flex items-center justify-center gap-2 py-1.5 bg-white border-b border-[#eee] text-[#737373] pointer-events-none" data-doc="pds">
+                  <svg class="h-4 w-4 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7-7-7"/></svg>
+                  <span class="text-[10px] uppercase tracking-[0.2em]">Scroll to read</span>
+                </div>
                 <div class="prose prose-sm max-w-none text-[var(--text-foreground)] p-4 overflow-y-auto flex-1 min-h-0" id="pds-doc">
                   <!-- PDS content pasted from legal_engine/src/pds.ts -->
-                  <h1># Product Disclosure Statement</h1>
-<h2>## I Stole A Manolo (NZ) Syndicate</h2>
+                  <h1>Product Disclosure Statement</h1>
+<h2>I Stole A Manolo (NZ) Syndicate</h2>
 
 **Campaign:** i-stole-a-manolo  
 **Version:** 1.0.0  
@@ -169,31 +186,31 @@ Our approach blends the tradition, passion, and community of racing with modern 
 
 ---
 
-## §1. Title & Structure
+## 1. Title & Structure
 
 This Product Disclosure Statement relates to the I Stole A Manolo (NZ) Syndicate, a digitally-syndicated thoroughbred ownership campaign managed by Evolution Stables, a registered Syndicate Manager under the New Zealand Thoroughbred Racing (NZTR) Rules of Racing and Syndication Code of Practice.
 
-Participation is offered in the form of fractional leasehold stakes. Each stake is a percentage interest in the syndicated leasehold of the thoroughbred described in §2, from a minimum investment of 1.0%, with increments of 0.5% thereafter.
+Participation is offered in the form of fractional leasehold stakes. Each stake is a percentage interest in the syndicated leasehold of the thoroughbred described in Section 2, from a minimum investment of 1.0%, with increments of 0.5% thereafter.
 
 ---
 
-## §2. Asset Specifics
+## 2. Asset Specifics
 
-### §2.1 About Horse & Trainer
+### 2.1 About Horse & Trainer
 
 I Stole A Manolo (NZ) is a 3-year-old gelding by Proisir out of Manolo Blahnik, bred by B.A.X Bloodstock. A promising type with early speed, he has shown ability at Matamata trials and is targeting a spring campaign.
 
 Lance O'Sullivan & Andrew Scott (Matamata, NZ) — one of New Zealand's premier training partnerships, combining decades of Group 1 experience with a welfare-first philosophy. Their Matamata facility is purpose-built for thoroughbred development.
 
-### §2.3 Racing Outlook & Pedigree
+### 2.3 Racing Outlook & Pedigree
 
 Proisir (sire) — Champion NZ 2YO, G1 Sistema Stakes winner, progeny include multiple stakes performers. Manolo Blahnik (dam) — unraced half-sister to stakes winners. This is a speed-oriented pedigree suited to 1200–1400m.
 
-### §2.4 Racing Expectation
+### 2.4 Racing Expectation
 
 Targeting a 3YO spring campaign with potential for early black-type. Race schedule expectations will be confirmed by the yard and communicated to Members.
 
-### §2.2 Key Details
+### 2.2 Key Details
 
 | Attribute | Detail |
 | :--- | :--- |
@@ -209,13 +226,13 @@ Targeting a 3YO spring campaign with potential for early black-type. Race schedu
 
 ---
 
-## §3. Commercial Model
+## 3. Commercial Model
 
 This syndicate operates on a fixed rate of **$76.00 per month per 1% stake**.
 
 ---
 
-## §4. Deposit & Billing
+## 4. Deposit & Billing
 
 The digitally syndicated campaign operates on a five-month initial investment upon participation, with recurring monthly payments due on the 1st of every month thereafter.
 
@@ -228,7 +245,7 @@ Upon formal termination or maturity of the syndicate lease, all unused prepaid k
 
 ---
 
-## §5. Investor Return
+## 5. Investor Return
 
 Investors receive a distribution calculated strictly from official New Zealand Thoroughbred Racing (NZTR) gross stakes won during their eligible participation period:
 
@@ -239,7 +256,7 @@ Investors receive a distribution calculated strictly from official New Zealand T
 
 ---
 
-## §6. Exit & Termination
+## 6. Exit & Termination
 
 Rules for exit and termination are designed around three core pillars: creating accessible investment opportunities, maintaining commercial viability, and prioritizing the long-term care of the horse.
 
@@ -251,37 +268,37 @@ Rules for exit and termination are designed around three core pillars: creating 
 
 ---
 
-## §7. Taxes
+## 7. Taxes
 
 Investors are responsible for their own tax liabilities arising from any distributions or returns generated by their participation in this Syndicate. Evolution Stables does not provide tax advice. Participants should consult their own independent tax advisors regarding the implications of holding an interest and receiving racehorse distributions.
 
 ---
 
-## §8. Insurance
+## 8. Insurance
 
 Evolution Stables has not secured mortality insurance for this leasehold stake. Because this is a fixed-term leasehold interest rather than an equity ownership stake, capital mortality insurance is not applicable. In the event of the horse's death or permanent retirement, the lease terminates automatically, and all unspent deposit funds are refunded pro-rata as outlined in Section 6.
 
 ---
 
-## §9. Valuation
+## 9. Valuation
 
 No independent valuation of the horse's capital value has been undertaken for this offering. The pricing of the interests is based entirely on the wholesale operational cost of leasing the horse over the term, rather than the intrinsic capital value of the bloodstock.
 
 ---
 
-## §10. Veterinary Report
+## 10. Veterinary Report
 
 I Stole A Manolo (NZ) is an actively training thoroughbred. A general veterinary inspection is conducted prior to the commencement of the lease to ensure the horse is fit for racing purposes. However, investors acknowledge that racehorses are prone to injury and illness, and past fitness does not guarantee future soundness.
 
 ---
 
-## §11. Material Interests
+## 11. Material Interests
 
 Evolution Stables Ltd receives a 5.0% margin incorporated into the listed rate to cover the structuring, management, and regulatory oversight of the syndicate. Platform Fees of 3.0% cover payment processing and platform services. There are no other hidden fees or material conflicts of interest.
 
 ---
 
-## §12. Risk Disclosure
+## 12. Risk Disclosure
 
 Participation in racehorse syndication is highly speculative and carries significant risks.
 
@@ -292,31 +309,31 @@ Participation in racehorse syndication is highly speculative and carries signifi
 
 ---
 
-## §13. Responsible Investment
+## 13. Responsible Investment
 
 Evolution Stables holds itself and its partners to the highest standards of care. Animal welfare remains central to all decisions made during the lease. All training, spelling, and veterinary decisions are made by licensed professionals. All post-racing arrangements are the responsibility of the horse's connections and are expected to comply with NZTR's welfare guidelines.
 
 ---
 
-## §14. Records & Financial Reporting
+## 14. Records & Financial Reporting
 
 Evolution Stables will maintain a register of all Members. Financial updates, including prize money distributions and race reports, will be provided regularly. A final financial summary will be issued at the conclusion of the lease term.
 
 ---
 
-## §15. Complaints
+## 15. Complaints
 
 Any complaints regarding the management of the Syndicate should be directed in the first instance to Evolution Stables. If the matter cannot be resolved, it may be escalated to New Zealand Thoroughbred Racing (NZTR) in accordance with the Rules of Racing.
 
 ---
 
-## §16. Transfer of Interest
+## 16. Transfer of Interest
 
 Interests may only be transferred subject to the written consent of the Syndicate Manager and NZTR compliance requirements. Evolution Stables does not guarantee a secondary market.
 
 ---
 
-## §17. Investment Details
+## 17. Investment Details
 
 I hereby apply for the following interest in the I Stole A Manolo (NZ) Syndicate:
 
@@ -326,7 +343,7 @@ I hereby apply for the following interest in the I Stole A Manolo (NZ) Syndicate
 
 ---
 
-## §18. Investor Declaration
+## 18. Investor Declaration
 
 By signing this Application Form, on 2026-09-01 I acknowledge and agree that:
 
@@ -344,7 +361,7 @@ By signing this Application Form, on 2026-09-01 I acknowledge and agree that:
 
 ---
 
-## §19. Promoter Declaration
+## 19. Promoter Declaration
 
 I, Alex Baddeley, as the promoter of this syndicate, declare that the information provided in this Product Disclosure Statement is, to the best of my knowledge, true and correct, and that I am not aware of any information that would make this statement misleading in any material respect.
 
@@ -368,9 +385,13 @@ I, Alex Baddeley, as the promoter of this syndicate, declare that the informatio
             </div>
           </div>
 
-          <!-- SA Panel (Panel 2 - opens after PDS complete) -->
-          <div class="rounded-xl border border-[var(--border)] bg-[var(--bg-surface-base)] overflow-hidden" id="sa-panel">
-            <button type="button" class="w-full px-4 py-3.5 flex items-center justify-between gap-4 text-left" aria-expanded="false" aria-controls="sa-content" onclick="togglePanel('sa')" disabled>
+          <!-- SA Panel (Panel 2 — arrives COLLAPSED with a Begin button, gates open after PDS complete) -->
+          <div class="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden flex flex-col flex-none min-h-0" id="sa-panel">
+            <div id="sa-begin-row" class="w-full px-4 py-3 flex items-center justify-between gap-4">
+              <span class="font-medium text-[var(--text-heading)]">Syndicate Agreement</span>
+              <button type="button" id="sa-begin-btn" disabled onclick="beginDoc('sa')" class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-1.5 text-[11px] font-light tracking-[0.18em] uppercase text-[var(--text-foreground)] opacity-40 cursor-not-allowed bg-[var(--bg-surface-base)] border border-[var(--border)] transition-all duration-300 hover:text-white hover:bg-[#212121] hover:border-[#575757] active:scale-[0.98]">Begin</button>
+            </div>
+            <button type="button" id="sa-panel-btn" class="hidden w-full px-4 py-3.5 flex items-center justify-between gap-4 text-left" aria-expanded="false" aria-controls="sa-content" onclick="togglePanel('sa')" disabled>
               <span class="font-medium text-[var(--text-heading)]">Syndicate Agreement</span>
               <div class="flex items-center gap-2">
                 <span id="sa-status" class="text-[11px] font-medium text-[var(--text-muted)]">Locked</span>
@@ -379,9 +400,13 @@ I, Alex Baddeley, as the promoter of this syndicate, declare that the informatio
             </button>
             <div id="sa-content" class="accordion-panel collapsed px-4 pb-4" role="region" aria-labelledby="sa-panel">
               <div class="doc-light rounded-xl border border-[var(--border)] bg-[var(--bg-canvas)]/60 overflow-hidden flex-1 min-h-0 flex flex-col">
+                <div class="scroll-strip flex items-center justify-center gap-2 py-1.5 bg-white border-b border-[#eee] text-[#737373] pointer-events-none" data-doc="sa">
+                  <svg class="h-4 w-4 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7-7-7"/></svg>
+                  <span class="text-[10px] uppercase tracking-[0.2em]">Scroll to read</span>
+                </div>
                 <div class="prose prose-sm max-w-none text-[var(--text-foreground)] p-4 overflow-y-auto flex-1 min-h-0" id="sa-doc">
                   <!-- SA content from existing mockup -->
-                  <h1># Syndicate Agreement</h1>
+                  <h1>Syndicate Agreement</h1>
 <p><strong>Campaign:</strong> i-stole-a-manolo | <strong>Version:</strong> 1.0.0 | <strong>Effective Date:</strong> 2026-09-01</p>
 <hr>
 <h2>1. Formation</h2>
@@ -460,10 +485,12 @@ Director, Evolution Stables Ltd<br>
         </div>
 
         <!-- Modal Action Footer — pinned, never scrolls -->
-        <div class="pt-2 border-t border-[var(--border)] space-y-3 shrink-0">
-          <button type="button" id="next-kyc-btn" disabled class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-6 py-3.5 text-[11px] font-light tracking-[0.18em] uppercase text-[var(--text-foreground)] bg-[var(--bg-surface-base)] border border-[var(--border)] transition-all duration-300 hover:text-white hover:bg-[#212121] hover:border-[#575757] active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100">
-            Next (KYC)
-          </button>
+        <div class="pt-3 border-t border-[var(--border)] space-y-4 shrink-0">
+          <div class="mx-auto flex w-[90%]">
+            <button type="button" id="next-kyc-btn" disabled class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-6 py-3.5 text-[11px] font-light tracking-[0.18em] uppercase text-[var(--text-foreground)] bg-[var(--bg-surface-base)] border border-[var(--border)] transition-all duration-300 hover:text-white hover:bg-[#212121] hover:border-[#575757] active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 flex-1">
+              Next (KYC)
+            </button>
+          </div>
           <p class="text-[10px] font-light leading-relaxed text-[var(--text-muted)]/70 text-center">
             <span class="text-[var(--accent)]">Acceptance = recorded</span> — who + document hash + timestamp, logged at the instant of the tick.
           </p>
@@ -508,8 +535,16 @@ Director, Evolution Stables Ltd<br>
       const otherBtn = document.getElementById(otherPanelBtnId);
 
       let tickRevealed = false;
+      const scrolledFlag = { pds: false, sa: false };
+      const strip = document.querySelector('.scroll-strip[data-doc="' + (docId === 'pds-doc' ? 'pds' : 'sa') + '"]');
 
       doc.addEventListener('scroll', () => {
+        // First scroll hides the bouncing 'Scroll to read' strip (founder 2026-09-12)
+        const docKey = docId === 'pds-doc' ? 'pds' : 'sa';
+        if (!scrolledFlag[docKey]) {
+          scrolledFlag[docKey] = true;
+          if (strip) strip.style.display = 'none';
+        }
         // Check if scrolled to bottom (within 50px) — tick lives in-doc as last element
         const { scrollTop, scrollHeight, clientHeight } = doc;
         if (!tickRevealed && scrollTop + clientHeight >= scrollHeight - 50) {
@@ -543,11 +578,12 @@ Director, Evolution Stables Ltd<br>
             pdsComplete = true;
             statusEl.textContent = 'PDS ✓ COMPLETE';
             statusEl.className = 'text-[11px] font-medium text-[var(--status-active)]';
-            // Close PDS panel
+            // Close PDS panel; completed doc shows the standard header row
+            // (label + COMPLETE status), read-only — never a Begin button.
             togglePanel('pds');
-            // Enable and open SA panel
-            otherBtn.disabled = false;
-            otherBtn.click();
+            // Enable SA: its Begin button lights up
+            const saBeginBtn = document.getElementById('sa-begin-btn');
+            if (saBeginBtn) { saBeginBtn.disabled = false; saBeginBtn.classList.remove('opacity-40', 'cursor-not-allowed'); }
           } else {
             saComplete = true;
             statusEl.textContent = 'SA ✓ COMPLETE';
@@ -563,7 +599,8 @@ Director, Evolution Stables Ltd<br>
 
     function togglePanel(panel) {
       const content = document.getElementById(panel + '-content');
-      const btn = document.getElementById(panel + '-panel').querySelector('button');
+      const btn = document.getElementById(panel + '-panel-btn');
+      if (!btn) return;
       const svg = btn.querySelector('svg');
       
       if (content.classList.contains('collapsed')) {
@@ -585,14 +622,21 @@ Director, Evolution Stables Ltd<br>
     }
 
     // Initialize scroll detection for both panels
-    setupScrollDetection('pds-doc', 'pds-tick-sign', 'pds-agree', 'pds-status', 'pds-panel', 'sa-panel');
-    setupScrollDetection('sa-doc', 'sa-tick-sign', 'sa-agree', 'sa-status', 'sa-panel', 'pds-panel');
+    setupScrollDetection('pds-doc', 'pds-tick-sign', 'pds-agree', 'pds-status', 'pds-panel-btn', 'sa-panel-btn');
+    setupScrollDetection('sa-doc', 'sa-tick-sign', 'sa-agree', 'sa-status', 'sa-panel-btn', 'pds-panel-btn');
 
-    // Ensure PDS panel starts open, SA panel starts collapsed
-    document.getElementById('pds-content').classList.remove('collapsed');
-    document.getElementById('pds-content').classList.add('open');
-    document.getElementById('sa-content').classList.remove('open');
-    document.getElementById('sa-content').classList.add('collapsed');
+    // Both panels START COLLAPSED with Begin rows (founder 2026-09-12: the step
+    // ARRIVES with both docs collapsed — Begin triggers the read, never auto-open).
+    beginDoc('pds');
+    function beginDoc(doc) {
+      const beginRow = document.getElementById(doc + '-begin-row');
+      const panelBtn = document.getElementById(doc + '-panel-btn');
+      if (beginRow) beginRow.classList.add('hidden');
+      if (panelBtn) panelBtn.classList.remove('hidden');
+      togglePanel(doc); // opens the panel; scroll strip shows until first scroll
+    }
+    // Expose for the inline onclick handlers
+    window.beginDoc = beginDoc;
   </script>
 </body>
 </html>

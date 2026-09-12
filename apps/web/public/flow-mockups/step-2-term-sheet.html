@@ -84,29 +84,29 @@
         <div class="space-y-4 text-[13px] font-light border-t border-[var(--border)] pt-5">
           <div class="border-b border-[var(--border)] pb-3.5">
             <p class="flex justify-between items-baseline">
-              <span class="text-[var(--text-muted)]">Initial Payment</span>
+              <span class="text-[var(--text-heading)]">Initial Payment</span>
               <strong class="text-[var(--text-heading)] font-medium">$380 NZD</strong>
             </p>
             <p class="text-[11px] text-[var(--text-muted)]/60 mt-1">for a 1.0% stake — includes deposit in initial payment</p>
           </div>
           <div class="border-b border-[var(--border)] pb-3.5">
             <p class="flex justify-between items-baseline">
-              <span class="text-[var(--text-muted)]">Monthly thereafter</span>
+              <span class="text-[var(--text-heading)]">Monthly thereafter</span>
               <strong class="text-[var(--text-heading)] font-medium">$76 NZD</strong>
             </p>
             <p class="text-[11px] text-[var(--text-muted)]/60 mt-1">billed on the 1st of each month</p>
           </div>
           <div class="border-b border-[var(--border)] pb-3.5">
             <p class="flex justify-between items-baseline">
-              <span class="text-[var(--text-muted)]">Lease period</span>
+              <span class="text-[var(--text-heading)]">Lease period</span>
               <strong class="text-[var(--text-heading)] font-medium">22 months</strong>
             </p>
             <p class="text-[11px] text-[var(--text-muted)]/60 mt-1">From 1 September 2026 to 30 June 2028</p>
           </div>
           <div>
             <p class="flex justify-between items-baseline">
-              <span class="text-[var(--text-muted)]">Distribution</span>
-              <strong class="text-[var(--status-active)] text-[13px] font-medium">75% Stakes won</strong>
+              <span class="text-[var(--text-heading)]">Investor Return</span>
+              <strong class="text-[var(--status-active)] text-[13px] font-medium">75% Gross Stakes</strong>
             </p>
             <p class="text-[11px] text-[var(--text-muted)]/60 mt-1">distributed quarterly, pro-rated based on your investment &amp; official NZTR results</p>
           </div>
@@ -114,11 +114,14 @@
       </div>
 
       <!-- Modal Action Footer — pinned, never scrolls -->
-      <div class="pt-2 border-t border-[var(--border)] space-y-3 shrink-0">
-        <!-- CTA → Step 3 (matches nav Get Started pill: grey, no gold fill) -->
-        <a href="step-3-sa-acceptance.html" class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-6 py-3.5 text-[11px] font-light tracking-[0.18em] uppercase text-[var(--text-foreground)] bg-[var(--bg-surface-base)] border border-[var(--border)] transition-all duration-300 hover:text-white hover:bg-[#212121] hover:border-[#575757] active:scale-[0.98]">
-          Invest in I Stole A Manolo (NZ)
-        </a>
+      <div class="pt-3 border-t border-[var(--border)] space-y-4 shrink-0">
+        <!-- CTA → Step 3 (matches nav Get Started pill: grey, no gold fill).
+             w-[90%] + mx-auto: hover scale stays inside the footer. -->
+        <div class="mx-auto flex w-[90%]">
+          <a href="step-3-sa-acceptance.html" class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-full px-6 py-3.5 text-[11px] font-light tracking-[0.18em] uppercase text-[var(--text-foreground)] bg-[var(--bg-surface-base)] border border-[var(--border)] transition-all duration-300 hover:text-white hover:bg-[#212121] hover:border-[#575757] active:scale-[0.98] flex-1">
+            Invest in I Stole A Manolo (NZ)
+          </a>
+        </div>
         <p class="text-[11px] font-light text-[var(--text-muted)] leading-relaxed text-center">
           Subject to
           <a href="#" class="text-[var(--text-muted)] underline underline-offset-2 hover:text-[var(--text-heading)] transition-colors">Product Disclosure Statement</a>
