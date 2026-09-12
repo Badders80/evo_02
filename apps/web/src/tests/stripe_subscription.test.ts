@@ -18,8 +18,9 @@ function test_builds_subscription_params() {
   assert.equal(params.get('line_items[0][price_data][recurring][interval]'), 'month');
   assert.equal(params.get('line_items[0][price_data][unit_amount]'), String(76 * 100));
   assert.equal(params.get('line_items[0][quantity]'), '1');
-  assert.equal(params.get('subscription_data[add_invoice_items][0][price_data][unit_amount]'), String(380 * 100));
-  assert.equal(params.get('subscription_data[add_invoice_items][0][quantity]'), '1');
+  assert.equal(params.get('line_items[1][price_data][unit_amount]'), String(380 * 100));
+  assert.equal(params.get('line_items[1][quantity]'), '1');
+  assert.equal(params.get('line_items[1][price_data][recurring]'), null, 'one-time join float has no recurring key');
   assert.equal(params.get('metadata[horse_slug]'), 'nellie');
   assert.equal(params.get('metadata[units]'), '2.5');
   console.log('✅ subscription params: recurring keep + one-time join float + metadata');

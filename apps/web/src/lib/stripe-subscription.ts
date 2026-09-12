@@ -24,11 +24,14 @@ export function buildSubscriptionCheckoutParams(input: SubscriptionCheckoutInput
   p.append('line_items[0][price_data][unit_amount]', String(Math.round(input.monthlyKeepUnitNzd * 100)));
   p.append('line_items[0][quantity]', '1');
 
-  // One-time join float (5×M) on the first invoice.
-  p.append('subscription_data[add_invoice_items][0][price_data][currency]', 'nzd');
-  p.append('subscription_data[add_invoice_items][0][price_data][product_data][name]', `${input.legalName} — Join Float (5×M)`);
-  p.append('subscription_data[add_invoice_items][0][price_data][unit_amount]', String(Math.round(input.joinFloatUnitNzd * 100)));
-  p.append('subscription_data[add_invoice_items][0][quantity]', '1');
+  // One-time join float (5×M) on the first invoice, as a second line item.
+  // subscription_data[add_invoice_items] is rejected (400 parameter_unknown) by
+  // the account's API version (2026-03-25.dahlia); a one-time line_items entry
+  // alongside the recurring one is accepted and lands on the first invoice.
+  p.append('line_items[1][price_data][currency]', 'nzd');
+  p.append('line_items[1][price_data][product_data][name]', `${input.legalName} — Join Float (5×M)`);
+  p.append('line_items[1][price_data][unit_amount]', String(Math.round(input.joinFloatUnitNzd * 100)));
+  p.append('line_items[1][quantity]', '1');
 
   for (const [k, v] of Object.entries(input.metadata)) {
     p.append(`metadata[${k}]`, v);
