@@ -1,5 +1,11 @@
 import { computeDslPricing, SHARE_MATH } from '@evo/legal_engine';
-import { getCampaignBySlug, getCompiledLegalPackForCampaign, isCheckoutOpen } from './horses-data';
+import {
+  getCampaignBySlug,
+  getCompiledLegalPackForCampaign,
+  isCheckoutOpen,
+  areLegalDocsApproved,
+  type HorseCampaign,
+} from './horses-data';
 import { getInventoryId } from './inventory-ids';
 
 export class HttpError extends Error {
@@ -104,6 +110,7 @@ export const CHECKOUT_ERROR_COPY: Record<string, string> = {
   INVALID_STAKE: 'Stake must be a multiple of {step}%',
   CAMPAIGN_NOT_FOUND: 'This campaign is no longer available.',
   CHECKOUT_CLOSED: 'This offering is closed.',
+  LEGAL_LOCK: 'This offering is not yet open — its legal documents are still being finalised.',
   RESERVE_FAILED: 'That stake was just acquired by another co-owner. Available stake is now {max}%.',
   PURCHASES_DISABLED: 'Checkout is temporarily unavailable — please try again shortly.',
   SUPABASE_NOT_CONFIGURED: 'Checkout is temporarily unavailable — please try again shortly.',
@@ -141,16 +148,42 @@ export function r2ConfigFromEnv(env: NodeJS.Dict<string> = process.env): {
   return { accountId, accessKeyId, secretAccessKey, bucketName };
 }
 
-export const NELLIE_SLUG = 'nellie';
+/**
+ * Per-horse checkout gate (replaces the former nellie-only pin, 2026-09-12).
+ * A horse is buyable ONLY when its campaign is open for stakes AND all three
+ * legal docs (term sheet, PDS, SA) are approved — the app-layer mirror of the
+ * DB legal-lock trigger (00013). Fail closed: a non-'listed' status or any
+ * missing/non-approved doc makes the horse unbuyable.
+ */
 
 export function isSha256Hex(value: string): boolean {
   return /^[a-f0-9]{64}$/.test(value);
 }
 
-export function assertNellieOnly(slug: string): void {
-  if (slug !== NELLIE_SLUG) {
-    throw new HttpError(409, 'NOT_NELLIE', 'Only Nellie is open for checkout');
+/** 3/3-docs check: throws 409 LEGAL_LOCK unless term sheet, PDS and SA are all approved. */
+export function assertLegalDocsApproved(
+  campaign: Parameters<typeof areLegalDocsApproved>[0]
+): void {
+  if (!areLegalDocsApproved(campaign)) {
+    throw new HttpError(
+      409,
+      'LEGAL_LOCK',
+      'This campaign is not buyable until its term sheet, PDS and SA are all approved'
+    );
   }
+}
+
+/** Pure status+docs gate over campaign data — unit-testable without a DB read. */
+export function assertCampaignBuyable(
+  campaign: Pick<
+    HorseCampaign,
+    'listingStatus' | 'termSheetStatus' | 'pdsStatus' | 'saStatus'
+  >
+): void {
+  if (!isCheckoutOpen(campaign)) {
+    throw new HttpError(409, 'CHECKOUT_CLOSED', 'This campaign is not open for stakes');
+  }
+  assertLegalDocsApproved(campaign);
 }
 
 export async function resolveLegalHashes(
@@ -188,17 +221,23 @@ export async function resolveCampaignInventory(slug: string) {
   return { campaign, inventoryId };
 }
 
+/** Async per-horse gate: resolve (404 unknown) then apply the status+docs gate. */
+export async function assertCheckoutEligible(slug: string): Promise<{
+  campaign: HorseCampaign;
+  inventoryId: string;
+}> {
+  const resolved = await resolveCampaignInventory(slug);
+  assertCampaignBuyable(resolved.campaign);
+  return resolved;
+}
+
 export async function assertCheckoutCampaign(slug: string) {
   // Review-branch preview: any slug, any status — lets the workflow walk on
   // coming_soon horses. Never set WORKFLOW_PREVIEW in prod.
-  if (!isWorkflowPreview()) {
-    assertNellieOnly(slug);
+  if (isWorkflowPreview()) {
+    return resolveCampaignInventory(slug);
   }
-  const resolved = await resolveCampaignInventory(slug);
-  if (!isCheckoutOpen(resolved.campaign) && !isWorkflowPreview()) {
-    throw new HttpError(409, 'CHECKOUT_CLOSED', 'This campaign is not open for stakes');
-  }
-  return resolved;
+  return assertCheckoutEligible(slug);
 }
 
 export function buildHoldingInsert(input: {

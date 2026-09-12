@@ -6,14 +6,13 @@ import { getCompiledLegalPackForCampaign } from '@/lib/horses-data';
 import { verifyStripeSignature } from '@/lib/stripe-signature';
 import {
   HttpError,
-  assertNellieOnly,
+  assertCheckoutCampaign,
   buildHoldingInsert,
   interpretConsumeResult,
   isUniqueViolation,
   pricingForUnits,
   r2ConfigFromEnv,
   requirePaidCheckoutSession,
-  resolveCampaignInventory,
   resolveLegalHashes,
   stakePctToStepUnits,
 } from '@/lib/nellie-loop';
@@ -46,8 +45,11 @@ async function persistCompletedCheckout(event: StripeEvent): Promise<void> {
   }
 
   requirePaidCheckoutSession(session);
-  assertNellieOnly(horseSlug);
-  const { campaign, inventoryId } = await resolveCampaignInventory(horseSlug);
+  // Per-horse checkout gate (replaces the former nellie-only pin 2026-09-12):
+  // unknown slug → 404 CAMPAIGN_NOT_FOUND, closed campaign → 409 CHECKOUT_CLOSED,
+  // legals not all approved → 409 LEGAL_LOCK. Same gate as create-session (incl.
+  // the review-branch WORKFLOW_PREVIEW bypass) so the two ends can never diverge.
+  const { campaign, inventoryId } = await assertCheckoutCampaign(horseSlug);
   // Investor-SA checkout: verify against the investor's stake-specific compile —
   // the SA hash the investor ticked, not the 1.0% default. Task 4: the execution
   // block (name + tick date) is part of the signed bytes — recompile with the

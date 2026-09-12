@@ -11,6 +11,7 @@ import {
   getSire,
   getTrainer,
   type ListingStatus,
+  type DslDocStatus,
 } from '@evo/db_models';
 import { getHorseCdnUrls, getTrainerCdnUrls } from '@evo/storage/cdn';
 import { getHorseMediaWithFallback } from './media-fallback';
@@ -28,6 +29,13 @@ export interface HorseCampaign {
   softLegal: HorseSoftLegalContent;
   marketing: HorseMarketingContent;
   listingStatus: ListingStatus;
+  /** Legal-lock docs (00012/00013): all three must be 'approved' before the horse
+   * can be purchased — app-layer mirror of the DB legal-lock trigger. Optional in
+   * the type only so non-DB constructors (test fixtures) compile; rowToCampaign
+   * always maps them (columns are NOT NULL DEFAULT 'draft'). */
+  termSheetStatus?: DslDocStatus;
+  pdsStatus?: DslDocStatus;
+  saStatus?: DslDocStatus;
   owner: {
     entity: string;
     contact: string;
@@ -114,8 +122,24 @@ export function getMarketplaceHook(campaign: {
   return firstSentence(campaign.softLegal.aboutHorse);
 }
 
-export function isCheckoutOpen(campaign: HorseCampaign): boolean {
+export function isCheckoutOpen(campaign: Pick<HorseCampaign, 'listingStatus'>): boolean {
   return campaign.listingStatus === 'listed';
+}
+
+/**
+ * Legal-lock rule (00013, founder 2026-09-09): a horse is only buyable once its
+ * term sheet, PDS and SA are ALL 'approved'. Pure predicate mirroring the DB
+ * trigger so the app never relies on the DB alone (defense-in-depth); a missing
+ * or non-approved status is never 'approved' — fail closed.
+ */
+export function areLegalDocsApproved(
+  campaign: Pick<HorseCampaign, 'termSheetStatus' | 'pdsStatus' | 'saStatus'>
+): boolean {
+  return (
+    campaign.termSheetStatus === 'approved' &&
+    campaign.pdsStatus === 'approved' &&
+    campaign.saStatus === 'approved'
+  );
 }
 
 function parseJsonb<T>(value: unknown): T | null {
@@ -269,6 +293,9 @@ function rowToCampaign(
         : undefined,
     },
     listingStatus,
+    termSheetStatus: row.term_sheet_status,
+    pdsStatus: row.pds_status,
+    saStatus: row.sa_status,
     owner,
     trainer,
     pedigree: {

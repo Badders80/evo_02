@@ -15,12 +15,13 @@ const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || svcLine.split('=').
 process.env.NEXT_PUBLIC_SUPABASE_URL = SUPABASE_URL;
 process.env.SUPABASE_SERVICE_ROLE_KEY = SERVICE_KEY;
 
-import { getAllCampaigns, getCompiledLegalPackForCampaign, isCheckoutOpen } from '../lib/horses-data';
+import { getAllCampaigns, getCompiledLegalPackForCampaign, isCheckoutOpen, areLegalDocsApproved } from '../lib/horses-data';
 import { NELLIE_INVENTORY_ID, getInventoryId } from '../lib/inventory-ids';
 import {
   HttpError,
+  assertCampaignBuyable,
   assertCheckoutCampaign,
-  assertNellieOnly,
+  assertLegalDocsApproved,
   buildHoldingInsert,
   interpretConsumeResult,
   interpretReserveResult,
@@ -150,11 +151,48 @@ console.log('Running @evo/web Nellie loop tests...\n');
   // the flip was reverted same-day — checkout isn't live yet, so all stay brochure.
   const open = (await getAllCampaigns()).filter(isCheckoutOpen).map((c: { slug: string }) => c.slug);
   assert.deepEqual(open, []);
-  assert.throws(() => assertNellieOnly('tml-x-yearn'), (err: unknown) => err instanceof HttpError && err.status === 409);
   assert.rejects(async () => assertCheckoutCampaign('tml-x-yearn'), (err: unknown) => err instanceof HttpError && (err as HttpError).status === 409);
   assert.rejects(async () => assertCheckoutCampaign('nellie'), (err: unknown) => err instanceof HttpError && (err as HttpError).status === 409);
   assert.equal(getInventoryId('nellie'), NELLIE_INVENTORY_ID);
   console.log('✅ no campaign is buyable (brochure mode)');
+}
+
+{
+  // Per-horse checkout gate (2026-09-12, replaces assertNellieOnly): a horse is
+  // buyable ONLY when its campaign is open AND all three legal docs are approved.
+  // Tested on staged campaign slices (pure predicates) so no DB flip is needed —
+  // the DB stays brochure. The three workflow slugs are nellie (3/3 docs approved
+  // in seed), tml-x-yearn and i-stole-a-manolo.
+  const buyable = (slug: string) => ({
+    slug,
+    listingStatus: 'listed' as const,
+    termSheetStatus: 'approved' as const,
+    pdsStatus: 'approved' as const,
+    saStatus: 'approved' as const,
+  });
+  for (const slug of ['nellie', 'tml-x-yearn', 'i-stole-a-manolo']) {
+    const c = buyable(slug);
+    assert.equal(isCheckoutOpen(c), true, `${slug} must be open when listed`);
+    assert.equal(areLegalDocsApproved(c), true, `${slug} must have 3/3 docs approved`);
+    assertCampaignBuyable(c); // must not throw
+  }
+  // (b) wrong status → 409 (the old pin's code shape: a non-buyable horse 409s).
+  assert.throws(
+    () => assertCampaignBuyable({ ...buyable('nellie'), listingStatus: 'coming_soon' }),
+    (err: unknown) => err instanceof HttpError && (err as HttpError).status === 409 && (err as HttpError).code === 'CHECKOUT_CLOSED'
+  );
+  // (c) legal-lock rule: listed but one doc NOT approved → 409 LEGAL_LOCK.
+  assert.throws(
+    () => assertCampaignBuyable({ ...buyable('nellie'), saStatus: 'draft' }),
+    (err: unknown) => err instanceof HttpError && (err as HttpError).status === 409 && (err as HttpError).code === 'LEGAL_LOCK'
+  );
+  assert.throws(
+    () => assertLegalDocsApproved({ termSheetStatus: 'approved', pdsStatus: 'pending', saStatus: 'approved' }),
+    (err: unknown) => err instanceof HttpError && (err as HttpError).status === 409 && (err as HttpError).code === 'LEGAL_LOCK'
+  );
+  // (d) unknown slug → 404 CAMPAIGN_NOT_FOUND through the resolve+gate path.
+  assert.rejects(async () => assertCheckoutCampaign('__no-such-horse__'), (err: unknown) => err instanceof HttpError && (err as HttpError).status === 404);
+  console.log('✅ per-horse gate: buyable slugs pass, closed / legal-lock / unknown fail');
 }
 
 {
