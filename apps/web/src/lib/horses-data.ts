@@ -1,5 +1,6 @@
 import {
   computeDslPricing,
+  monthsBetween,
   type DslPricing,
   compileLegalPack,
   type CompiledLegalPack,
@@ -366,6 +367,19 @@ export function getCompiledLegalPackForCampaign(
   stakePct = 1.0,
   execution?: { investorName?: string; executionDate?: string }
 ): CompiledLegalPack {
+  // Term months are derived from the stored dates (inventory has no term_months
+  // column); both PDS §3 and SA clause 5 read context.termMonths, and a blank is
+  // rendered when the dates are missing — never an invented term.
+  const termMonths = monthsBetween(campaign.termStartDate, campaign.termEndDate) ?? undefined;
+
+  // Locked share math: a leasehold offered in stake-step increments is counted in
+  // those increments (5% offered in 0.5% steps = 10 shares of 0.5% each). The SA
+  // sentence multiplies shares × step, so the count must come from the same math.
+  const shareCount =
+    campaign.stakeStepPct > 0
+      ? Math.round(campaign.totalSyndicateStakePct / campaign.stakeStepPct)
+      : Math.round(campaign.totalSyndicateStakePct);
+
   const buildContext = (pricing: DslPricing) => ({
     syndicateName: `${campaign.legalName} Syndicate`,
     campaignSlug: campaign.slug,
@@ -391,9 +405,12 @@ export function getCompiledLegalPackForCampaign(
     pricing,
     closeStyle: campaign.closeStyle,
     totalHorsePercentage: campaign.totalSyndicateStakePct,
-    totalShares: Math.round(campaign.totalSyndicateStakePct),
+    totalShares: shareCount,
     sharesAvailable: Math.round(campaign.capTableFixture.availablePct),
     paymentModel: campaign.paymentModel,
+    termMonths,
+    minInvestmentPct: campaign.minStakePct,
+    stakeStepPct: campaign.stakeStepPct,
     termStartDate: campaign.termStartDate,
     termEndDate: campaign.termEndDate,
     distributionSplit: campaign.distributionSplit,
