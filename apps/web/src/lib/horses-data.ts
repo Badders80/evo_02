@@ -12,6 +12,7 @@ import {
   getTrainer,
   type ListingStatus,
   type DslDocStatus,
+  type CampaignStatus,
 } from '@evo/db_models';
 import { getHorseCdnUrls, getTrainerCdnUrls } from '@evo/storage/cdn';
 import { getHorseMediaWithFallback } from './media-fallback';
@@ -29,6 +30,14 @@ export interface HorseCampaign {
   softLegal: HorseSoftLegalContent;
   marketing: HorseMarketingContent;
   listingStatus: ListingStatus;
+  /** RAW inventory.status column — what the DB row actually says, BEFORE the
+   * sold-out derivation (f5) folds zero availability into 'fully_subscribed'.
+   * The webhook settles on this (plus the 3/3 legal-docs lock) so a purchase
+   * that consumed the last available stake is not rejected as fully_subscribed
+   * after the card is charged. Optional in the type only so non-DB constructors
+   * (test fixtures) compile; rowToCampaign always maps it from row.status.
+   * Never rendered directly — every UI surface keeps using listingStatus. */
+  rawListingStatus?: CampaignStatus;
   /** Legal-lock docs (00012/00013): all three must be 'approved' before the horse
    * can be purchased — app-layer mirror of the DB legal-lock trigger. Optional in
    * the type only so non-DB constructors (test fixtures) compile; rowToCampaign
@@ -191,7 +200,7 @@ async function fetchOwnerMap(): Promise<Map<string, { entity: string; contact: s
   return map;
 }
 
-function statusToListingStatus(status: string): ListingStatus {
+export function statusToListingStatus(status: string): ListingStatus {
   switch (status) {
     case 'listed':
       return 'listed';
@@ -293,6 +302,9 @@ function rowToCampaign(
         : undefined,
     },
     listingStatus,
+    // RAW DB status — the settlement truth for the webhook, untouched by the
+    // sold-out derivation. UI and create-session keep using listingStatus.
+    rawListingStatus: row.status,
     termSheetStatus: row.term_sheet_status,
     pdsStatus: row.pds_status,
     saStatus: row.sa_status,

@@ -4,6 +4,7 @@ import {
   getCompiledLegalPackForCampaign,
   isCheckoutOpen,
   areLegalDocsApproved,
+  statusToListingStatus,
   type HorseCampaign,
 } from './horses-data';
 import { getInventoryId } from './inventory-ids';
@@ -181,6 +182,31 @@ export function assertCampaignBuyable(
   >
 ): void {
   if (!isCheckoutOpen(campaign)) {
+    throw new HttpError(409, 'CHECKOUT_CLOSED', 'This campaign is not open for stakes');
+  }
+  assertLegalDocsApproved(campaign);
+}
+
+/**
+ * Settlement-specific gate (founder option A, 2026-09-12): the webhook settles
+ * on LEGAL state — the RAW DB status plus the 3/3-docs lock — never the
+ * availability-derived sold-out flag. Reading the DERIVED listingStatus here
+ * would 409 a purchase that consumed the last available stake: the buyer's own
+ * reservation zeroes shares_available, flipping a listed row to
+ * 'fully_subscribed' before the webhook runs — after the card is charged.
+ * Fail closed: the RAW status must be a purchasable status (only 'listed'
+ * maps to 'listed' via statusToListingStatus) AND all three legal docs must be
+ * 'approved'. Deliberately does NOT consult listingStatus, availability or the
+ * sold-out derivation — the reserved-units/consume checks in the webhook stay
+ * the guard on whether THIS purchase had the units it claims.
+ */
+export function assertCampaignSettleable(
+  campaign: Pick<
+    HorseCampaign,
+    'rawListingStatus' | 'termSheetStatus' | 'pdsStatus' | 'saStatus'
+  >
+): void {
+  if (statusToListingStatus(campaign.rawListingStatus ?? '') !== 'listed') {
     throw new HttpError(409, 'CHECKOUT_CLOSED', 'This campaign is not open for stakes');
   }
   assertLegalDocsApproved(campaign);

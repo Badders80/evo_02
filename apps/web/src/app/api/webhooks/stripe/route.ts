@@ -6,13 +6,14 @@ import { getCompiledLegalPackForCampaign } from '@/lib/horses-data';
 import { verifyStripeSignature } from '@/lib/stripe-signature';
 import {
   HttpError,
-  assertCheckoutCampaign,
+  assertCampaignSettleable,
   buildHoldingInsert,
   interpretConsumeResult,
   isUniqueViolation,
   pricingForUnits,
   r2ConfigFromEnv,
   requirePaidCheckoutSession,
+  resolveCampaignInventory,
   resolveLegalHashes,
   stakePctToStepUnits,
 } from '@/lib/nellie-loop';
@@ -45,11 +46,18 @@ async function persistCompletedCheckout(event: StripeEvent): Promise<void> {
   }
 
   requirePaidCheckoutSession(session);
-  // Per-horse checkout gate (replaces the former nellie-only pin 2026-09-12):
-  // unknown slug → 404 CAMPAIGN_NOT_FOUND, closed campaign → 409 CHECKOUT_CLOSED,
-  // legals not all approved → 409 LEGAL_LOCK. Same gate as create-session (incl.
-  // the review-branch WORKFLOW_PREVIEW bypass) so the two ends can never diverge.
-  const { campaign, inventoryId } = await assertCheckoutCampaign(horseSlug);
+  // Settlement gate (founder option A, 2026-09-12): the webhook settles on
+  // LEGAL state — the RAW DB status plus the 3/3-docs lock — never the
+  // availability-derived sold-out flag. By the time this runs the money has
+  // moved and the reservation was legitimately created; the buyer's own
+  // purchase can be what zeroed shares_available, which would flip the
+  // DERIVED listingStatus to 'fully_subscribed' and wrongly 409 the paid
+  // charge here. create-session keeps the derived gate (a buyer may not START
+  // on a sold-out horse); this end settles: unknown slug → 404
+  // CAMPAIGN_NOT_FOUND, non-'listed' RAW status → 409 CHECKOUT_CLOSED, legals
+  // not all approved → 409 LEGAL_LOCK.
+  const { campaign, inventoryId } = await resolveCampaignInventory(horseSlug);
+  assertCampaignSettleable(campaign);
   // Investor-SA checkout: verify against the investor's stake-specific compile —
   // the SA hash the investor ticked, not the 1.0% default. Task 4: the execution
   // block (name + tick date) is part of the signed bytes — recompile with the

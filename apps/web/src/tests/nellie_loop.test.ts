@@ -20,6 +20,7 @@ import { NELLIE_INVENTORY_ID, getInventoryId } from '../lib/inventory-ids';
 import {
   HttpError,
   assertCampaignBuyable,
+  assertCampaignSettleable,
   assertCheckoutCampaign,
   assertLegalDocsApproved,
   buildHoldingInsert,
@@ -193,6 +194,47 @@ console.log('Running @evo/web Nellie loop tests...\n');
   // (d) unknown slug → 404 CAMPAIGN_NOT_FOUND through the resolve+gate path.
   assert.rejects(async () => assertCheckoutCampaign('__no-such-horse__'), (err: unknown) => err instanceof HttpError && (err as HttpError).status === 404);
   console.log('✅ per-horse gate: buyable slugs pass, closed / legal-lock / unknown fail');
+}
+
+{
+  // Settlement gate (founder option A, 2026-09-12): the webhook settles on
+  // LEGAL state — RAW DB status + 3/3-docs lock — never the availability-
+  // derived sold-out flag. A buyer's own purchase can zero shares_available,
+  // flipping a 'listed' row to DERIVED 'fully_subscribed' before the webhook
+  // runs; that display flag must not 409 a paid, settled charge. Staged
+  // campaign slices (pure predicates) — no DB flip.
+  const soldOutButRawListed = {
+    slug: 'nellie',
+    listingStatus: 'fully_subscribed' as const, // DERIVED: what the catalog/UI sees
+    rawListingStatus: 'listed' as const, // RAW DB status: what the webhook settles on
+    termSheetStatus: 'approved' as const,
+    pdsStatus: 'approved' as const,
+    saStatus: 'approved' as const,
+  };
+  // (a) RAW 'listed' + 3/3 docs approved → the settlement gate PASSES even
+  //     when the derived status is fully_subscribed (the sold-out 409 bug).
+  assertCampaignSettleable(soldOutButRawListed); // must not throw
+  // (d) the derived status is untouched: create-session/catalog still see a
+  //     never-buyable horse — isCheckoutOpen false and the buyable gate 409s.
+  assert.equal(isCheckoutOpen(soldOutButRawListed), false);
+  assert.throws(
+    () => assertCampaignBuyable(soldOutButRawListed),
+    (err: unknown) =>
+      err instanceof HttpError && (err as HttpError).status === 409 && (err as HttpError).code === 'CHECKOUT_CLOSED'
+  );
+  // (b) RAW status not purchasable (not 'listed') → settlement 409 CHECKOUT_CLOSED.
+  assert.throws(
+    () => assertCampaignSettleable({ ...soldOutButRawListed, rawListingStatus: 'coming_soon' as const }),
+    (err: unknown) =>
+      err instanceof HttpError && (err as HttpError).status === 409 && (err as HttpError).code === 'CHECKOUT_CLOSED'
+  );
+  // (c) legal-lock: RAW 'listed' but a doc not approved → settlement 409 LEGAL_LOCK.
+  assert.throws(
+    () => assertCampaignSettleable({ ...soldOutButRawListed, saStatus: 'draft' }),
+    (err: unknown) =>
+      err instanceof HttpError && (err as HttpError).status === 409 && (err as HttpError).code === 'LEGAL_LOCK'
+  );
+  console.log('✅ settlement gate settles on raw status + 3/3 docs; derived sold-out stays a display/start block');
 }
 
 {
