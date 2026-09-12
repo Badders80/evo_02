@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createClient, getSupabaseServiceClient } from '@/lib/supabase-server';
-import { HttpError, requireUserId } from '@/lib/nellie-loop';
+import { HttpError, assertCheckoutCampaign, requireUserId } from '@/lib/nellie-loop';
 import { createVerificationSession } from '@/lib/stripe-identity';
 import { getInventoryId } from '@/lib/inventory-ids';
-import { getCampaignBySlug, getCompiledLegalPackForCampaign } from '@/lib/horses-data';
+import { getCompiledLegalPackForCampaign } from '@/lib/horses-data';
 
 /**
  * POST /api/investor-sa/accept — Investor-SA checkout (Task 2 from G009).
@@ -25,8 +25,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
     }
 
-    // Fetch the campaign data
-    const campaign = await getCampaignBySlug(horseSlug);
+    // Same eligibility gate as /api/checkout/create-session — rejects
+    // coming_soon / unavailable campaigns instead of accepting an SA for them.
+    // Throws HttpError (404 CAMPAIGN_NOT_FOUND / 409 CHECKOUT_CLOSED) when the
+    // campaign is not open; the catch block below maps it to the right status.
+    const { campaign } = await assertCheckoutCampaign(horseSlug);
     if (!campaign) {
       return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
     }
