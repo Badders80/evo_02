@@ -15,7 +15,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checks } from './checks.mjs';
 import { ensureChromium } from './lib/browser.mjs';
-import { inventory, setStatus, releaseExpiredReservations, rearmFixtures, profileByEmail, sql } from './lib/db.mjs';
+import { inventory, setStatus, releaseExpiredReservations, rearmFixtures, clearInvestorHorse, profileByEmail, sql } from './lib/db.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = join(HERE, '..');
@@ -77,6 +77,11 @@ async function main() {
 
   const before = inventory(cfg.slug);
   const profile = profileByEmail(cfg.email);
+  cfg.userId = profile?.id ?? null;
+  if (!cfg.userId) {
+    console.error(`REFUSING TO RUN: no profile row for ${cfg.email} in the local DB.`);
+    process.exit(2);
+  }
   banner(`testnet — ${cfg.slug} — ${started.toISOString()}`);
   console.log(`  inventory before : ${JSON.stringify(before)}`);
   console.log(`  investor         : ${profile?.email} kyc=${profile?.kycStatus}`);
@@ -90,8 +95,12 @@ async function main() {
   // so without this a second run would find nothing left to buy). TESTNET_REARM=0 disables.
   const fullRun = selected.length === checks.length;
   if (fullRun && process.env.TESTNET_REARM !== '0') {
+    const cleared = clearInvestorHorse(cfg.userId, cfg.inventoryId);
     const armed = rearmFixtures(cfg.slug, cfg.inventoryId, cfg.rearmShares, cfg.rearmReserved);
-    console.log(`  re-arm           : shares_available=${armed.shares} reserved=${armed.reserved} (released ${armed.released} expired)`);
+    console.log(
+      `  re-arm           : shares_available=${armed.shares} reserved=${armed.reserved} (released ${armed.released} expired)` +
+        ` | cleared this investor: ${cleared.holdings} holding(s), ${cleared.reservations} reservation(s)`
+    );
   }
   releaseExpiredReservations();
   setStatus(cfg.slug, 'listed');
@@ -101,16 +110,26 @@ async function main() {
   const results = [];
   let failed = 0;
   try {
+    const seen = new Map();
     for (const c of selected) {
       const t0 = Date.now();
       let r;
+      const missing = (c.needs || []).filter((n) => seen.get(n) !== true);
+      if (missing.length) {
+        results.push({ id: c.id, title: c.title, task: c.task, ok: false, skipped: true, evidence: `skipped: ${missing.join(', ')} did not pass`, detail: 'dependency not met', ms: 0 });
+        console.log(`  SKIP  ${c.id.padEnd(3)} ${c.title}`);
+        console.log(`        why: ${missing.join(', ')} did not pass`);
+        seen.set(c.id, false);
+        continue;
+      }
       try {
         r = await c.run(ctx);
       } catch (e) {
         r = { ok: false, evidence: `threw: ${e.message}`, detail: e.stack?.split('\n')[1]?.trim() || '' };
       }
+      seen.set(c.id, r.ok);
       const ms = Date.now() - t0;
-      if (!r.ok) failed++;
+      if (!r.ok && !r.skipped) failed++;
       results.push({ id: c.id, title: c.title, task: c.task, ok: r.ok, evidence: r.evidence, detail: r.detail, ms });
       console.log(`  ${r.ok ? 'PASS' : 'FAIL'}  ${c.id.padEnd(3)} ${c.title}`);
       if (r.evidence) console.log(`        evidence: ${r.evidence}`);
@@ -136,6 +155,7 @@ async function main() {
     investor: profile,
     passed: results.filter((r) => r.ok).length,
     failed,
+    skipped: results.filter((r) => r.skipped).length,
     results,
   };
   writeFileSync(join(outDir, 'report.json'), JSON.stringify(report, null, 2));
@@ -147,7 +167,7 @@ async function main() {
     '',
     '| check | task | verdict | evidence |',
     '|---|---|---|---|',
-    ...results.map((r) => `| ${r.id} ${r.title} | ${r.task} | ${r.ok ? '✅' : '❌'} | ${String(r.evidence).replace(/\|/g, '\\|')} |`),
+    ...results.map((r) => `| ${r.id} ${r.title} | ${r.task} | ${r.ok ? '✅' : r.skipped ? '⏭️' : '❌'} | ${String(r.evidence).replace(/\|/g, '\\|')} |`),
     '',
     `Revert: ${ctx.state.revertNote}`,
     '',

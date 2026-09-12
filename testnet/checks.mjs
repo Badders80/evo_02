@@ -56,6 +56,7 @@ export const checks = [
   {
     id: 'M3',
     title: 'Test card charges the real Stripe session',
+    needs: ['M2'],
     task: '2.1',
     async run(ctx) {
       const paid = await withPage(({ page }) => payStripe(page, ctx.state.sessionUrl));
@@ -72,6 +73,7 @@ export const checks = [
   {
     id: 'M4',
     title: 'Webhook settles the purchase (no 409, event marked processed)',
+    needs: ['M3'],
     task: '2.1a',
     async run(ctx) {
       // The listener forwards within seconds; the handler is synchronous.
@@ -92,6 +94,7 @@ export const checks = [
   {
     id: 'M5',
     title: 'Holding row written with float 5, hashes stamped, subscription attached',
+    needs: ['M4'],
     task: '2.1',
     async run(ctx) {
       const h = holding(ctx.state.userId, ctx.cfg.inventoryId);
@@ -118,6 +121,7 @@ export const checks = [
   {
     id: 'M6',
     title: 'Reservation consumed, availability decremented by exactly the stake',
+    needs: ['M2'],
     task: '2.1',
     async run(ctx) {
       // Stripe's session metadata carries the reservation id written by create-session.
@@ -156,6 +160,7 @@ export const checks = [
   {
     id: 'M9',
     title: 'A repeat purchase of the same horse is REFUSED (never charged-and-dropped)',
+    needs: ['M5'],
     task: '2.1e',
     async run(ctx) {
       // Give the horse availability again, then try the same investor + same horse.

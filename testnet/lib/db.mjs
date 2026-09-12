@@ -101,6 +101,17 @@ export function rearmFixtures(slug, inventoryId, shares, reserved) {
   return { released, shares, reserved };
 }
 
+/**
+ * Clears the runner's own artifacts for this investor + horse (holdings and reservations),
+ * so a full run always starts from the same state. Required once a repeat purchase is refused:
+ * without it, run 2 onward has nothing to buy and M2 legitimately 409s. Local test DB only.
+ */
+export function clearInvestorHorse(userId, inventoryId) {
+  const reservations = Number(sql(`with d as (delete from checkout_reservations where user_id = '${userId}' and inventory_id = '${inventoryId}' returning 1) select count(*) from d`));
+  const holdings = Number(sql(`with d as (delete from holdings where user_id = '${userId}' and horse_id = '${inventoryId}' returning 1) select count(*) from d`));
+  return { reservations, holdings };
+}
+
 /** Clears the runner's own artifacts so a rerun starts clean (never touches other users). */
 export function clearSessionArtifacts(sessionId) {
   sql(`delete from events where payload::text like '%${sessionId}%' and event_type <> 'checkout.session.completed'`);

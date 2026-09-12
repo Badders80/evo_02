@@ -42,8 +42,11 @@ already been charged. A walk that buys 1% of a 5% syndicate would never have fou
 - **Refuses to run without a `sk_test…` key.** No live mode, ever.
 - **Always reverts** in a `finally` block: `release_expired_reservations()` + the horse back to
   `coming_soon` — even if a check throws.
-- The walk owns its fixture state (it flips the horse to `listed` itself). No other local state is touched;
-  other users' rows are never written.
+- The walk owns its fixture state: it flips the horse to `listed`, restores availability (`TESTNET_REARM_SHARES`,
+  default 8 units), and **deletes this investor's own holdings/reservations for that horse** so a full run always
+  starts from the same place. Other users' rows are never written. `TESTNET_REARM=0` disables the re-arm.
+- **A failed check skips its dependants** rather than cascading (`M3←M2`, `M4←M3`, `M5←M4`, `M6←M2`, `M9←M5`).
+  Skips print as `SKIP`/`⏭️` and are not counted as failures — but any FAIL still exits non-zero.
 
 ## Layout
 
