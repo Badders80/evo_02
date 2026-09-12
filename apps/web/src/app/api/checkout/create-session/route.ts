@@ -3,6 +3,7 @@ import { createClient, getSupabaseServiceClient } from '@/lib/supabase-server';
 import {
   HttpError,
   assertCheckoutCampaign,
+  assertNoActiveHolding,
   interpretReserveResult,
   purchasesAreEnabled,
   requireUserId,
@@ -119,6 +120,8 @@ export async function POST(request: Request) {
     }
 
     const adminClient = getSupabaseServiceClient();
+    // Founder option A (2026-09-12): refuse a repeat purchase before payment.
+    await assertNoActiveHolding(adminClient, userId, inventoryId);
     // Boundary conversion: the reservation RPC counts 0.5% step-units against
     // inventory.shares_available — investor-facing values are percent. Convert here only.
     const stepUnits = stakePctToStepUnits(units, campaign.stakeStepPct);

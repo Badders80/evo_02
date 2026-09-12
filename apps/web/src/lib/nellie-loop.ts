@@ -8,6 +8,7 @@ import {
   type HorseCampaign,
 } from './horses-data';
 import { getInventoryId } from './inventory-ids';
+import { createClient, getSupabaseServiceClient } from '@/lib/supabase-server';
 
 export class HttpError extends Error {
   status: number;
@@ -264,6 +265,29 @@ export async function assertCheckoutCampaign(slug: string) {
     return resolveCampaignInventory(slug);
   }
   return assertCheckoutEligible(slug);
+}
+
+/** Founder option A (2026-09-12): throw 409 ALREADY_HELD if the user already has an active holding for this horse. */
+export async function assertNoActiveHolding(
+  adminClient: ReturnType<typeof getSupabaseServiceClient>,
+  userId: string,
+  inventoryId: string
+): Promise<void> {
+  const { data: holdings, error } = await adminClient
+    .from('holdings')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('horse_id', inventoryId)
+    .eq('status', 'active')
+    .maybeSingle();
+
+  if (error) {
+    throw new HttpError(500, 'FETCH_ACTIVE_HOLDING_FAILED', error.message);
+  }
+
+  if (holdings) {
+    throw new HttpError(409, 'ALREADY_HELD', 'You already have an active stake in this horse');
+  }
 }
 
 export function buildHoldingInsert(input: {
