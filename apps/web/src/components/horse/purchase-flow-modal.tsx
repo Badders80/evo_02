@@ -138,7 +138,6 @@ function Step2TermSheet({
   termStartDate,
   termEndDate,
   distributionSplit,
-  termSheetHash,
   onProceed,
   onBack,
 }: {
@@ -155,7 +154,6 @@ function Step2TermSheet({
   distributionSplit?: string;
   /** Generated DSL term sheet (compileLegalPack output) — replaces the static mockup. */
   termSheetMarkdown?: string;
-  termSheetHash?: string;
   onProceed: () => void;
   /** In-modal back (Step 2 → horse page: closes the modal). */
   onBack: () => void;
@@ -413,13 +411,8 @@ function Step2TermSheet({
       </div>
 
       {/* Modal Action Footer — pinned. Step 2 = terms summary only (mockup lock);
-          PDS/SA live in Step 3's accordion; the hash rides here as the audit trail. */}
+          PDS/SA live in Step 3's accordion. */}
       <div className="pt-3 border-t border-border space-y-4 shrink-0">
-      {termSheetHash && (
-        <p className="font-mono text-[10px] text-muted-foreground/60">
-          sha256: {termSheetHash.slice(0, 4)}…{termSheetHash.slice(-4)}
-        </p>
-      )}
 
       {/* CTA → Step 3 (acceptance lives only in Step 3 — always live).
           Same GlowPillButton as the NavBar 'Get Started' (founder 2026-09-11). */}
@@ -892,7 +885,6 @@ export default function PurchaseFlowModal({
           termEndDate={termEndDate}
           distributionSplit={distributionSplit}
           termSheetMarkdown={mergedLegalPack?.termSheetMarkdown}
-          termSheetHash={mergedLegalPack?.termSheetHash}
           onProceed={() => setStep('accept')}
           onBack={onClose}
         />
@@ -907,29 +899,33 @@ export default function PurchaseFlowModal({
         />
       ) : step === 'checkout' ? (
         <div className="flex-1 min-h-0 overflow-y-auto space-y-6 text-center">
-          <button
-            type="button"
-            onClick={() => setStep('kyc')}
-            aria-label="Back"
-            className="inline-flex items-center gap-1.5 text-[12px] font-light text-muted-foreground hover:text-heading transition-colors mb-3"
-          >
-            <span aria-hidden>←</span>
-            <span>Back</span>
-          </button>
+          <div className="flex justify-start">
+            <button
+              type="button"
+              onClick={() => setStep('kyc')}
+              aria-label="Back"
+              className="inline-flex items-center gap-1.5 text-[12px] font-light text-muted-foreground hover:text-heading transition-colors mb-3"
+            >
+              <span aria-hidden>←</span>
+              <span>Back</span>
+            </button>
+          </div>
           <div className="h-12 w-12 mx-auto animate-spin rounded-full border-4 border-accent border-t-transparent" />
           <p className="text-[15px] font-light text-foreground">Redirecting to Stripe Checkout…</p>
         </div>
       ) : (
         <div className="flex-1 min-h-0 overflow-y-auto space-y-6 text-center">
-          <button
-            type="button"
-            onClick={() => setStep('accept')}
-            aria-label="Back"
-            className="inline-flex items-center gap-1.5 text-[12px] font-light text-muted-foreground hover:text-heading transition-colors mb-3"
-          >
-            <span aria-hidden>←</span>
-            <span>Back</span>
-          </button>
+          <div className="flex justify-start">
+            <button
+              type="button"
+              onClick={() => setStep('accept')}
+              aria-label="Back"
+              className="inline-flex items-center gap-1.5 text-[12px] font-light text-muted-foreground hover:text-heading transition-colors mb-3"
+            >
+              <span aria-hidden>←</span>
+              <span>Back</span>
+            </button>
+          </div>
           <div className="h-12 w-12 mx-auto animate-spin rounded-full border-4 border-accent border-t-transparent" />
           <p className="text-[15px] font-light text-foreground">
             Redirecting to Stripe Identity for KYC verification…

@@ -253,8 +253,6 @@ export default async function MarketplaceCampaignPage({ params }: { params: Prom
                   minInvestmentPct={campaign.minStakePct}
                   maxInvestmentPct={campaign.capTableFixture.availablePct > 0 ? campaign.capTableFixture.availablePct : 10.0}
                   stakeStepPct={campaign.stakeStepPct || 0.5}
-                  termStartDate={campaign.termStartDate}
-                  termEndDate={campaign.termEndDate}
                   distributionSplit={campaign.distributionSplit}
                   legalPack={{
                     termSheetMarkdown: legalPack.termSheetMarkdown,
