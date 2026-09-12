@@ -36,7 +36,7 @@ function formatTermDate(iso?: string): string | null {
  * Any two of {start, end, months} determine the third; we store start + end and
  * derive months here.
  */
-function monthsBetween(startIso?: string, endIso?: string): number | null {
+export function monthsBetween(startIso?: string, endIso?: string): number | null {
   if (!startIso || !endIso) return null;
   const s = new Date(`${startIso}T00:00:00Z`);
   const e = new Date(`${endIso}T00:00:00Z`);
